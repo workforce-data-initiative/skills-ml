@@ -110,4 +110,4 @@ def normalize_job_title(job_title):
             seen_add( hash(item['title']) )
             ret.append(item)
 
-    return json.dumps(ret)
+    return ret
