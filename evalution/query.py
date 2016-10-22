@@ -4,6 +4,10 @@ import esa_jobtitle_normalizer
 import json
 import requests
 
+from airflow import DAG
+from airflow.operators import PythonOperator
+from datetime import datetime, timedelta
+
 class NormalizerResponse(metaclass=ABCMeta):
     """
     Abstract interface for enforcing common iteration, access patterns
@@ -92,20 +96,47 @@ class API_Normalizer(NormalizerResponse):
                           'description': response[0][0],
                           'SOC*Code': response[0][1]}))
 
-k = Mini_Normalizer(name='Explicit Semantic Analysis',
-                    access='small_job_titles.csv',
-                    normalize = esa_jobtitle_normalizer.normalize_job_title)
+def instantiate_evaluators(access=access):# should probably borrow more from default args?
+    normalizers_to_evaluate = [Mini_Normalizer(name='Explicit Semantic Analysis Normalizer',
+                                access=access,
+                                normalize = esa_jobtitle_normalizer.normalize_job_title),
+                               API_Normalizer(name='Elasticsearch/API Normalizer',
+                                access=access,
+                                endpoint_url = r"http://api.dataatwork.org/v1/jobs/normalize")]
+    return normalizers_to_evaluate
 
-h = API_Normalizer(name='Elasticsearch',
-                   access='small_job_titles.csv',
-                   endpoint_url = r"http://api.dataatwork.org/v1/jobs/normalize")
+def run_evaluator(evaluator=None):
+    for response in evaluator:
+        evaluator.log_response(response)
 
-job_title = 'cupcake ninja'
-#print(k.normalize( job_title) )
+# some DAG args, please tweak for sanity
+default_args = {
+    'evaluation_file': 'small_job_titles.csv',
+    'owner':'job_title_normalizer',
+    'depends_on_past':True,
+    'start_date': datetime.today()
+}
 
-#print(h.normalize( job_title) )
-for e in h:
-    h.log_response(e)
-print('\n\n')
-for e in k:
-    k.log_response(e)
+dag = DAG('job_title_normalizer_evaluation',
+          schedule_interval='@once',
+          default_args=default_args)
+
+run_this = DummyOperator(
+        task_id='Root ...',
+        dag=dag)
+
+for evaluator in instantiate_evaluators(default_args['evaluation_file']):
+    task = PythonOperator(
+            task_id= evaluator.name,
+            python_callable=run_evaluator,
+            op_kwards={'evaluator':evaluator},
+            dag=dag)
+    task.set_upstream(run_this)
+
+##print(k.normalize( job_title) )
+##print(h.normalize( job_title) )
+#for e in h:
+#    h.log_response(e)
+#print('\n\n')
+#for e in k:
+#    k.log_response(e)
