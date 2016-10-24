@@ -1,0 +1,6 @@
+pandas
+requests
+scipy
+scikit-learn
+nltk
+airflow
