@@ -144,5 +144,4 @@ class ESANormalizer(object):
             if hash(item['title']) not in seen:  # to conserve seen set memory
                 seen_add(hash(item['title']))
                 ret.append(item)
-
         return ret
