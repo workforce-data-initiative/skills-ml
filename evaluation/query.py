@@ -54,9 +54,12 @@ class NormalizerResponse(metaclass=ABCMeta):
 
 
 class Mini_Normalizer(NormalizerResponse):
-    def __init__(self, name, access, normalize):
+    def __init__(self, name, access, normalize_class):
         super().__init__(name, access)
-        self.normalize = normalize
+        self.normalizer = normalize_class()
+
+    def normalize(self, job_title):
+        return self.normalizer.normalize_job_title(job_title)
 
     def ranked_rows(self, response):
         if len(response) > 0 and len(response[2]) > 0:
@@ -94,7 +97,7 @@ class API_Normalizer(NormalizerResponse):
 def instantiate_evaluators(access):# should probably borrow more from default args?
     normalizers_to_evaluate = [Mini_Normalizer(name='Explicit_Semantic_Analysis_Normalizer',
                                 access=access,
-                                normalize = esa_jobtitle_normalizer.normalize_job_title),
+                                normalize_class = esa_jobtitle_normalizer.ESANormalizer),
                                API_Normalizer(name='Elasticsearch_API_Normalizer',
                                 access=access,
                                 endpoint_url = r"http://api.dataatwork.org/v1/jobs/normalize")]
