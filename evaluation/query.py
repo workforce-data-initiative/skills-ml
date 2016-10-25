@@ -20,15 +20,16 @@ and one without ranks. The latter is for sending to people to fill out
 and the former is for testing those results against the normalizer's
 """
 
+
 class NormalizerResponse(metaclass=ABCMeta):
     """
     Abstract interface for enforcing common iteration, access patterns
     to a variety of possible normalizers.
     """
-    def __init__(self, name=None, access=None, logger=None):
+    def __init__(self, name=None, access=None, num_examples=3):
         self.name = name
-        self.access = access # initalizing object for access test source data to push to normalizer
-        self.logger = logger # object for pushing normalizer response to some store (ES, local file,etc)
+        self.access = access
+        self.num_examples = num_examples
 
     def __iter__(self):
         iter_obj = self._access()
@@ -45,15 +46,30 @@ class NormalizerResponse(metaclass=ABCMeta):
                            sep='\t',
                            header=None).iterrows()
 
-
     def _get_response(self, answer, job_title):
         """
-        Gets response from normalizer when provided item(s) from the data stream (job titles)
+        Gets response from normalizer when provided item(s)
+        from the data stream (job titles)
         """
         return (answer, job_title, self.normalize(job_title))
 
+    @abstractmethod
+    def _good_response(response):
+        pass
 
-class Mini_Normalizer(NormalizerResponse):
+    def ranked_rows(self, response):
+        if self._good_response(response):
+            normalized_responses = [
+                (response[1], response[0][0], norm_response['title'], i)
+                for i, norm_response
+                in enumerate(response[2][0:self.num_examples])
+            ]
+            random.shuffle(normalized_responses)
+            for row in normalized_responses:
+                yield row
+
+
+class MiniNormalizer(NormalizerResponse):
     def __init__(self, name, access, normalize_class):
         super().__init__(name, access)
         self.normalizer = normalize_class()
@@ -61,47 +77,36 @@ class Mini_Normalizer(NormalizerResponse):
     def normalize(self, job_title):
         return self.normalizer.normalize_job_title(job_title)
 
-    def ranked_rows(self, response):
-        if len(response) > 0 and len(response[2]) > 0:
-            normalized_responses = [
-                (response[1], response[0][0], norm_response['title'], i)
-                for i, norm_response
-                in enumerate(response[2][0:3])
-            ]
-            random.shuffle(normalized_responses)
-            for row in normalized_responses:
-                yield row
-
-class API_Normalizer(NormalizerResponse):
-    def __init__(self, name, access, endpoint_url, normalize=None):
-        super().__init__(name, access)
-        self.endpoint_url = endpoint_url
-        self.normalize = self._get_job_normalize
-
-    def _get_job_normalize(self, job_title):
-        r = requests.get(self.endpoint_url, params={'job_title': job_title, 'limit': 3})
-        return r.json()
-
-    def ranked_rows(self, response):
-        if 'error' not in response[2]:
-            normalized_responses = [
-                (response[1], response[0][0], norm_response['title'], i)
-                for i, norm_response
-                in enumerate(response[2][0:3])
-            ]
-            random.shuffle(normalized_responses)
-            for row in normalized_responses:
-                yield row
+    def _good_response(self, response):
+        return len(response) > 0 and len(response[2]) > 0
 
 
-def instantiate_evaluators(access):# should probably borrow more from default args?
-    normalizers_to_evaluate = [Mini_Normalizer(name='Explicit_Semantic_Analysis_Normalizer',
-                                access=access,
-                                normalize_class = esa_jobtitle_normalizer.ESANormalizer),
-                               API_Normalizer(name='Elasticsearch_API_Normalizer',
-                                access=access,
-                                endpoint_url = r"http://api.dataatwork.org/v1/jobs/normalize")]
-    return normalizers_to_evaluate
+class DataAtWorkNormalizer(NormalizerResponse):
+    endpoint_url = r"http://api.dataatwork.org/v1/jobs/normalize"
+
+    def normalize(self, job_title):
+        response = requests.get(
+            self.endpoint_url,
+            params={'job_title': job_title, 'limit': self.num_examples}
+        )
+        return response.json()
+
+    def _good_response(self, response):
+        return 'error' not in response[2]
+
+
+def instantiate_evaluators(evaluation_filename):
+    return [
+        MiniNormalizer(
+            name='Explicit_Semantic_Analysis_Normalizer',
+            access=evaluation_filename,
+            normalize_class=esa_jobtitle_normalizer.ESANormalizer
+        ),
+        DataAtWorkNormalizer(
+            name='Elasticsearch_API_Normalizer',
+            access=evaluation_filename
+        )
+    ]
 
 
 def run_evaluator(evaluator=None):
@@ -111,7 +116,12 @@ def run_evaluator(evaluator=None):
         with open(unranked_filename, 'w') as uf:
             writer = csv.writer(f)
             unranked_writer = csv.writer(uf)
-            unranked_writer.writerow(['interesting job title', 'short job desc', 'normalized job title', 'rank relevance of normalized job title (-1 for irrelevant)'])
+            unranked_writer.writerow([
+                'interesting job title',
+                'short job desc',
+                'normalized job title',
+                'rank relevance of normalized job title (-1 for irrelevant)'
+            ])
             for response in evaluator:
                 for ranked_row in evaluator.ranked_rows(response):
                     writer.writerow(ranked_row)
@@ -120,8 +130,8 @@ def run_evaluator(evaluator=None):
 # some DAG args, please tweak for sanity
 default_args = {
     'evaluation_file': 'interesting_job_titles.csv',
-    'owner':'job_title_normalizer',
-    'depends_on_past':True,
+    'owner': 'job_title_normalizer',
+    'depends_on_past': True,
     'start_date': datetime.today()
 }
 
@@ -130,13 +140,13 @@ dag = DAG('job_title_normalizer_evaluation',
           default_args=default_args)
 
 run_this = DummyOperator(
-        task_id='Root',
-        dag=dag)
+    task_id='Root',
+    dag=dag)
 
 for evaluator in instantiate_evaluators(default_args['evaluation_file']):
     task = PythonOperator(
-            task_id= evaluator.name,
-            python_callable=run_evaluator,
-            op_kwargs={'evaluator':evaluator},
-            dag=dag)
+        task_id=evaluator.name,
+        python_callable=run_evaluator,
+        op_kwargs={'evaluator': evaluator},
+        dag=dag)
     task.set_upstream(run_this)
