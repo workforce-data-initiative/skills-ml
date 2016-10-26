@@ -41,10 +41,11 @@ def test_NormalizerResponse():
             name='test normalizer',
             access=csvname
         )
-        result = []
-        for response in evaluator:
-            for ranked_row in evaluator.ranked_rows(response):
-                result.append(ranked_row)
+        result = [
+            ranked_row
+            for response in evaluator
+            for ranked_row in evaluator.ranked_rows(response)
+        ]
         assert result == [
             ('Cupcake Ninja', 'a baker', 'Cupcake Ninja 1', 1),
             ('Cupcake Ninja', 'a baker', 'Cupcake Ninja 2', 2),
