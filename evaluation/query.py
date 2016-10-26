@@ -6,9 +6,6 @@ import random
 import requests
 
 from algorithms.job_normalizers import esa_jobtitle_normalizer
-from airflow import DAG
-from airflow.operators import DummyOperator, PythonOperator
-from datetime import datetime, timedelta
 
 from enum import IntEnum
 
@@ -144,21 +141,22 @@ class DataAtWorkNormalizer(NormalizerResponse):
         return 'error' not in response[InterimSchema.normalizer_response]
 
 
-def instantiate_evaluators(evaluation_filename):
+def generate_evaluators(evaluation_filename):
     return [
-        MiniNormalizer(
-            name='Explicit_Semantic_Analysis_Normalizer',
-            access=evaluation_filename,
-            normalize_class=esa_jobtitle_normalizer.ESANormalizer
-        ),
-        DataAtWorkNormalizer(
-            name='Elasticsearch_API_Normalizer',
-            access=evaluation_filename
-        )
+        (MiniNormalizer, {
+            'name': 'Explicit_Semantic_Analysis_Normalizer',
+            'access': evaluation_filename,
+            'normalize_class': esa_jobtitle_normalizer.ESANormalizer
+        }),
+        (DataAtWorkNormalizer, {
+            'name': 'Elasticsearch_API_Normalizer',
+            'access': evaluation_filename
+        })
     ]
 
 
-def run_evaluator(evaluator=None):
+def run_evaluator(evaluator_class, **kwargs):
+    evaluator = evaluator_class(**kwargs)
     filename = '{}_output.csv'.format(evaluator.name)
     unranked_filename = '{}_unranked_output.csv'.format(evaluator.name)
     with open(filename, 'w') as f:
@@ -175,27 +173,3 @@ def run_evaluator(evaluator=None):
                 for ranked_row in evaluator.ranked_rows(response):
                     writer.writerow(ranked_row)
                     unranked_writer.writerow(ranked_row[:-1])
-
-# some DAG args, please tweak for sanity
-default_args = {
-    'evaluation_file': 'interesting_job_titles.csv',
-    'owner': 'job_title_normalizer',
-    'depends_on_past': True,
-    'start_date': datetime.today()
-}
-
-dag = DAG('job_title_normalizer_evaluation',
-          schedule_interval=None,
-          default_args=default_args)
-
-run_this = DummyOperator(
-    task_id='Root',
-    dag=dag)
-
-for evaluator in instantiate_evaluators(default_args['evaluation_file']):
-    task = PythonOperator(
-        task_id=evaluator.name,
-        python_callable=run_evaluator,
-        op_kwargs={'evaluator': evaluator},
-        dag=dag)
-    task.set_upstream(run_this)
