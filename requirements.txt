@@ -5,3 +5,5 @@ scikit-learn
 nltk
 airflow
 pytest
+airflow[s3]
+PyYAML

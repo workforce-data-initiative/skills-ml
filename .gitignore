@@ -93,3 +93,6 @@ airflow/
 
 # tmp directory for downloaded files
 tmp/
+
+# config file holding infrastructure information
+config.yaml
