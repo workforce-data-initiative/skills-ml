@@ -1,22 +1,8 @@
 import evaluation.query as query
 
-import csv
-import tempfile
-from contextlib import contextmanager
 import random
 
-
-@contextmanager
-def makeNamedTemporaryCSV(content, separator=','):
-    tf = tempfile.NamedTemporaryFile()
-    with open(tf.name, 'w') as write_stream:
-        writer = csv.writer(write_stream, delimiter=separator)
-        for row in content:
-            writer.writerow(row)
-
-    yield tf.name
-
-    tf.close()
+from tests.utils import makeNamedTemporaryCSV
 
 
 def test_NormalizerResponse():
