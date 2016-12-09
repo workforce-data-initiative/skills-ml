@@ -96,3 +96,6 @@ tmp/
 
 # config file holding infrastructure information
 config.yaml
+
+# Output folder/s3 upload staging area
+output/
