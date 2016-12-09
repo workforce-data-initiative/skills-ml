@@ -15,12 +15,14 @@ class CorpusCreator(object):
         self.nlp = NLPTransforms()
 
     def raw_corpora(self, generator):
-        """
+        """Transforms job listings into corpus format
+
         Args:
             generator: an iterable that generates JSON strings.
                 Each string is expected to represent a job listing
                 conforming to the common schema
                 See sample_job_listing.json for an example of this schema
+
         Yields:
             (string) The next job listing transformed into corpus format
         """
