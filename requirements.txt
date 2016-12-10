@@ -9,3 +9,4 @@ PyYAML
 tox
 codecov
 Sphinx
+pytest-cov
