@@ -1,9 +1,11 @@
 pandas
 requests
-scipy
 scikit-learn
+scipy
 nltk
-airflow
 pytest
 airflow[s3]
 PyYAML
+tox
+codecov
+Sphinx

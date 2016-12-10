@@ -1,6 +1,13 @@
 # skills-ml
 Open Skills Project - Machine Learning
 
+.. image:: https://travis-ci.org/workforce-data-initiative/skills-ml.svg?branch=master
+        :target: https://travis-ci.org/workforce-data-initiative/skills-ml
+
+.. image:: https://codecov.io/gh/workforce-data-initiative/skills-ml/branch/master/graph/badge.svg
+	 :target: https://codecov.io/gh/workforce-data-initiative/skills-ml
+	 :alt: Code Coverage
+
 This is the home for the methods and pipelines responsible for creating a skills and jobs ontology, usable by the Open Skills API.
 
 ## Quick Start:

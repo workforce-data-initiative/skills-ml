@@ -1,0 +1,18 @@
+language: python
+python: 3.4
+notifications:
+  email: false
+
+env:
+  - TOXENV=py34
+
+before_install:
+    - sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
+
+install:
+    - pip install -r requirements.txt
+
+# command to run tests, e.g. python setup.py test
+script: tox -e ${TOXENV}
+
+after_success: codecov
