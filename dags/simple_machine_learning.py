@@ -5,6 +5,7 @@ and common schema job listings
 """
 import csv
 import logging
+import os
 from datetime import datetime
 
 from airflow import DAG
@@ -34,8 +35,11 @@ dag = DAG(
     default_args=default_args
 )
 
-skills_filename = 'skills_master_table.tsv'
-titles_filename = 'job_titles_master_table.tsv'
+output_folder = config.get('output_folder', 'output')
+if not os.path.isdir(output_folder):
+    os.mkdir(output_folder)
+skills_filename = '{}/skills_master_table.tsv'.format(output_folder)
+titles_filename = '{}/job_titles_master_table.tsv'.format(output_folder)
 
 
 class SkillExtractOperator(BaseOperator):
@@ -47,8 +51,6 @@ class SkillExtractOperator(BaseOperator):
             hash_function=md5
         )
         skill_extractor.run()
-        logging.info('config')
-        logging.info(config)
         upload(conn, skills_filename, config['output_tables']['s3_path'])
 
 

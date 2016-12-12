@@ -8,4 +8,6 @@ labeled_postings:
     s3_path: 'postings-bucket/labeled'
 output_tables:
     s3_path: 'output-bucket/tables'
+local_mode: True
+output_folder: 'output'
 ...
