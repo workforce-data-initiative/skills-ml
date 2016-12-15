@@ -8,5 +8,7 @@ airflow[s3]
 PyYAML
 tox
 codecov
+httpretty
 Sphinx
 pytest-cov
+Elasticsearch
