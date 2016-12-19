@@ -35,13 +35,16 @@ class ElasticsearchIndexerBase(object):
         """Replace index with a new one
         zero_downtime_index for safety and rollback
         """
-        with zero_downtime_index(self.index_name, self.index_config()) as target_index:
+        with zero_downtime_index(self.alias_name, self.index_config()) as target_index:
             self.index_all(target_index)
 
     def append(self):
         """Index documents onto an existing index"""
         target_index = get_index_from_alias(self.alias_name)
-        self.index_all(target_index)
+        if not target_index:
+            self.replace()
+        else:
+            self.index_all(target_index)
 
     def index_all(self, index_name):
         """Index all available documents, using streaming_bulk for speed
