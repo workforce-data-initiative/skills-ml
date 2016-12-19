@@ -17,7 +17,7 @@ def job_postings(s3_conn, quarter, s3_path=None):
     Stream all job listings from s3 for a given quarter
     Args:
         s3_conn: a boto s3 connection
-        quarter: a string representing a quarter (Q12015)
+        quarter: a string representing a quarter (2015Q1)
         s3_path (optional): path to the job listings. Defaults to config file
 
     Yields:
