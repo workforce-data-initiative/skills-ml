@@ -43,6 +43,8 @@ def create_index(index_name, index_config, client):
 
 def get_index_from_alias(alias_name, index_client=None):
     index_client = index_client or indices_client()
+    if not index_client.exists_alias(name=alias_name):
+        return None
     return list(index_client.get_alias(name=alias_name).keys())[0]
 
 
