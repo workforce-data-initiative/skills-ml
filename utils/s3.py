@@ -4,7 +4,7 @@ Common S3 utilities
 import boto
 from config import config
 import logging
-
+import os
 
 def split_s3_path(path):
     """
@@ -36,3 +36,14 @@ def upload(s3_conn, filename, s3_path):
         name='{}/{}'.format(prefix, filename.replace('/', '_'))
     )
     key.set_contents_from_filename(filename)
+
+def load2tmp(s3_conn, filename, s3_path):
+    bucket_name, prefix = split_s3_path(s3_path)
+    bucket = s3_conn.get_bucket(bucket_name)
+    key = boto.s3.key.Key(
+            bucket=bucket,
+            name=prefix
+    )
+    if not os.path.exists("../tmp"):
+            os.makedirs("../tmp")
+    key.get_contents_to_filename("tmp/"+filename)
