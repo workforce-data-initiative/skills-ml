@@ -21,6 +21,7 @@ from utils.hash import md5
 from algorithms.corpus_creators.basic import SimpleCorpusCreator
 from algorithms.skill_taggers.simple import SimpleSkillTagger
 from algorithms.skill_extractors.onet_ksas import OnetSkillExtractor
+from algorithms.skill_importance_extractors.onet import OnetSkillImportanceExtractor
 from algorithms.title_extractors.onet import OnetTitleExtractor
 
 # some DAG args, please tweak for sanity
@@ -40,6 +41,7 @@ if not os.path.isdir(output_folder):
     os.mkdir(output_folder)
 skills_filename = '{}/skills_master_table.tsv'.format(output_folder)
 titles_filename = '{}/job_titles_master_table.tsv'.format(output_folder)
+skill_importance_filename = '{}/ksas_importance.tsv'.format(output_folder)
 
 
 class SkillExtractOperator(BaseOperator):
@@ -90,8 +92,20 @@ class SkillTagOperator(BaseOperator):
             '{}/{}'.format(config['labeled_postings'], quarter)
         )
 
+class SkillImportanceOperator(BaseOperator):
+    def execute(self, context):
+        conn = S3Hook().get_conn()
+        skill_extractor = OnetSkillImportanceExtractor(
+            onet_source=OnetCache(conn),
+            output_filename=skill_importance_filename,
+            hash_function=md5
+        )
+        skill_extractor.run()
+        upload(conn, skill_importance_filename, config['output_tables']['s3_path'])
+
 skills = SkillExtractOperator(task_id='skill_extract', dag=dag)
 titles = TitleExtractOperator(task_id='title_extract', dag=dag)
 skill_tagger = SkillTagOperator(task_id='skill_tag', dag=dag)
+skill_importance = SkillImportanceOperator(task_id='skill_importance', dag=dag)
 
 skill_tagger.set_upstream(skills)
