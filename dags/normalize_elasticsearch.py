@@ -14,15 +14,14 @@ from utils.airflow import datetime_to_quarter
 from datetime import datetime
 from datasets import job_postings
 
-# some DAG args, please tweak for sanity
 default_args = {
     'depends_on_past': False,
-    'start_date': datetime.today(),
+    'start_date': datetime(2010, 1, 1),
 }
 
 dag = DAG(
     'normalize_elasticsearch',
-    schedule_interval=None,
+    schedule_interval='0 0 1 */3 *',
     default_args=default_args
 )
 
