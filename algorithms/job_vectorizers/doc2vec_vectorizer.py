@@ -24,12 +24,15 @@ class Doc2Vectorizer(object):
 
     def _load_model(self, modelname):
         full_path = self.path + self.model_name
-        load2tmp(self.s3_conn, modelname, full_path)
+        if not os.path.exists("tmp/gensim_doc2vec"):
+            load2tmp(self.s3_conn, modelname, full_path)
         return gensim.models.Doc2Vec.load("tmp/gensim_doc2vec")
 
-    def vectorize(self, document):
+    def vectorize(self, documents):
         model = self._load_model(modelname=MODEL_NAME)
-        return model.infer_vector(self.nlp.clean_split(document))
+        for document in documents:
+            #print('vectorizing...')
+            yield model.infer_vector(document)
 
     def split_train_test(self):
         pass
