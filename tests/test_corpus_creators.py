@@ -1,4 +1,4 @@
-from algorithms.corpus_creators.basic import SimpleCorpusCreator
+from algorithms.corpus_creators.basic import SimpleCorpusCreator, GensimCorpusCreator
 
 
 def test_simple_corpus_creator():
@@ -34,4 +34,6 @@ def test_simple_corpus_creator():
     }
 
     corpus = SimpleCorpusCreator()._transform(sample_document)
+    assert corpus == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'
+    corpus = GensimCorpusCreator()._transform(sample_document)
     assert corpus == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'
