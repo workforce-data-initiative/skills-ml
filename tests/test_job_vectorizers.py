@@ -1,4 +1,5 @@
 from algorithms.job_vectorizers.doc2vec_vectorizer import Doc2Vectorizer
+from airflow.hooks import S3Hook
 
 def test_job_vectorizer():
     sample_document = {
@@ -31,5 +32,9 @@ def test_job_vectorizer():
         "datePosted": "2013-05-12",
         "@type": "JobPosting"
     }
-    job_vec = Doc2Vectorizer().vectorize(sample_document['description'])
+    MODEL_NAME = 'gensim_doc2vec'
+    PATHTOMODEL = 'skills-private/model_cache/'
+    s3_conn = S3Hook().get_conn()
+    job_vec = Doc2Vectorizer(model_name=MODEL_NAME, path=PATHTOMODEL, s3_conn=s3_conn).vectorize(sample_document['description'])
+
     assert job_vec.shape[0] == 500
