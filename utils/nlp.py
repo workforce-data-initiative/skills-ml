@@ -33,7 +33,7 @@ class NLPTransforms(object):
             if not unicodedata.category(char)[0] in self.punct
         )
 
-    def clean_split(self, document):
+    def clean_str(self, document):
         """
         Args:
             document: A unicode string
@@ -50,4 +50,4 @@ class NLPTransforms(object):
         document = re.sub(r"\'d", " \'d", document)
         document = re.sub(r"\'ll", " \'ll", document)
         document = re.sub(r"\s{2,}", " ", document)
-        return document.split()
+        return document

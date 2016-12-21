@@ -46,4 +46,7 @@ def load2tmp(s3_conn, filename, s3_path):
     )
     if not os.path.exists("../tmp"):
             os.makedirs("../tmp")
-    key.get_contents_to_filename("tmp/"+filename)
+    key.get_contents_to_filename("tmp/"+filename, cb=log_download_progress)
+
+def log_download_progress(num_bytes, obj_size):
+    logging.info('%s bytes transferred out of %s total', num_bytes, obj_size)
