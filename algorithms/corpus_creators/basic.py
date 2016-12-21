@@ -30,6 +30,13 @@ class CorpusCreator(object):
             document = json.loads(line)
             yield self._transform(document)
 
+    def array_corpora(self, generator):
+        """
+        """
+        for line in generator:
+            document = json.loads(line)
+            #print(self._transform(document).split())
+            yield self._transform(document).split()
 
 class SimpleCorpusCreator(CorpusCreator):
     """
@@ -48,5 +55,24 @@ class SimpleCorpusCreator(CorpusCreator):
     def _transform(self, document):
         return self.join_spaces([
             self.nlp.lowercase_strip_punc(document[field])
+            for field in self.document_schema_fields
+        ])
+
+class GensimCorpusCreator(CorpusCreator):
+    """
+        An object that transforms job listing documents by picking
+        important schema fields and returns them as one large cleaned array of words
+    """
+    document_schema_fields = [
+        'description',
+        'experienceRequirements',
+        'qualifications',
+        'skills'
+    ]
+    join_spaces = ' '.join
+
+    def _transform(self, document):
+        return self.join_spaces([
+            self.nlp.clean_str(document[field])
             for field in self.document_schema_fields
         ])
