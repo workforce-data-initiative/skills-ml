@@ -16,7 +16,7 @@ MODEL_NAME = 'gensim_doc2vec'
 PATHTOMODEL = 'skills-private/model_cache/'
 
 class Doc2Vectorizer(object):
-    def __init__(self, model_name, path, s3_conn):
+    def __init__(self, model_name=MODEL_NAME, path=PATHTOMODEL, s3_conn=None):
         self.model_name = model_name
         self.path = path
         self.nlp = NLPTransforms()
