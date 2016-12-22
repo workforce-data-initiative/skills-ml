@@ -1,7 +1,8 @@
 from datetime import date
 from calendar import monthrange
 import metta
-import pandas
+import pandas as pd
+from random import randint
 
 def quarter_boundaries(quarter):
     year, quarter = quarter.split('Q')
@@ -30,9 +31,11 @@ def upload_to_metta(train_path, test_path, train_quarter, test_quarter, num_dime
     train_config = metta_config(train_quarter, num_dimensions)
     test_config = metta_config(test_quarter, num_dimensions)
 
-    X_train = pandas.from_csv(train_path)
-    X_test = pandas.from_csv(test_path)
-
+    X_train = pd.read_csv(train_path,sep=',')
+    X_train['label'] = pd.Series([randint(0,23) for i in range(len(X_train))])
+    X_test = pd.read_csv(test_path, sep=',')
+    X_test['label'] = pd.Series([randint(0,23) for i in range(len(X_test))])
+    #Y_train = pd.read_csv()
     metta.archive_train_test(
         train_config,
         X_train,
@@ -42,4 +45,11 @@ def upload_to_metta(train_path, test_path, train_quarter, test_quarter, num_dime
     )
 
 if __name__ == '__main__':
-    pass
+    upload_to_metta('../tmp/job_features_train_2011Q1.csv',
+                    '../tmp/job_features_test_2016Q1.csv',
+                    '2011Q1',
+                    '2016Q1',
+                    500)
+
+
+
