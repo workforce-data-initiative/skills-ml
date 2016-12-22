@@ -10,7 +10,7 @@ import boto
 
 from config import config
 from utils.s3 import split_s3_path
-
+from utils.s3 import log_download_progress
 
 def job_postings(s3_conn, quarter, s3_path=None):
     """
@@ -31,7 +31,7 @@ def job_postings(s3_conn, quarter, s3_path=None):
     for key in keys:
         logging.info('Extracting job postings from key {}'.format(key.name))
         with tempfile.NamedTemporaryFile() as outfile:
-            key.get_contents_to_file(outfile)
+            key.get_contents_to_file(outfile, cb=log_download_progress)
             outfile.seek(0)
             for line in outfile:
                 yield line.decode('utf-8')

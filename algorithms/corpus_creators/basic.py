@@ -1,5 +1,5 @@
 import json
-
+from random import randint
 from utils.nlp import NLPTransforms
 
 
@@ -37,6 +37,13 @@ class CorpusCreator(object):
             document = json.loads(line)
             #print(self._transform(document).split())
             yield self._transform(document).split()
+
+    def label_corpora(self,generator):
+        """
+        """
+        for line in generator:
+            document = json.loads(line)
+            yield self._transform(document)
 
 class SimpleCorpusCreator(CorpusCreator):
     """
@@ -76,3 +83,13 @@ class GensimCorpusCreator(CorpusCreator):
             self.nlp.clean_str(document[field])
             for field in self.document_schema_fields
         ])
+
+class JobCategoryCorpusCreator(CorpusCreator):
+    """
+    Fake job category labeler
+    """
+    document_schema_fields = [
+        'occupationalCategory']
+
+    def _transform(self, document):
+        return str(randint(0,23))
