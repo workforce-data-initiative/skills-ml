@@ -13,3 +13,4 @@ Sphinx
 pytest-cov
 Elasticsearch
 gensim
+git+git://github.com/dssg/metta-data.git
