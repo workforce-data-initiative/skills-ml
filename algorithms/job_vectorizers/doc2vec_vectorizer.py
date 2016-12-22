@@ -2,6 +2,7 @@ import pandas as pd
 import json
 import os
 from gensim.models import Doc2Vec
+import datetime
 
 from utils.nlp import NLPTransforms
 
@@ -31,12 +32,3 @@ class Doc2Vectorizer(object):
 
     def split_train_test(self):
         pass
-
-
-
-
-
-
-
-
-
