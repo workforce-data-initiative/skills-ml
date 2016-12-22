@@ -35,11 +35,11 @@ class JobLabelOperator(BaseOperator):
         quarter = datetime_to_quarter(context['execution_date'])
         job_label_filename = 'tmp/job_label_train_'+quarter+'.csv'
         with open(job_label_filename, 'w') as outfile:
-            writer = csv.writer(outfile, delimiter='\n')
+            writer = csv.writer(outfile, delimiter=',')
             job_postings_generator = job_postings(s3_conn, quarter)
             corpus_generator = JobCategoryCorpusCreator().label_corpora(job_postings_generator)
             for label in corpus_generator:
-                writer.writerow(label)
+                writer.writerow([label])
         logging.info('Done labeling job categories to %s', job_label_filename)
 
 JobLabelOperator(task_id='job_labeling', dag=dag)

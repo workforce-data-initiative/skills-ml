@@ -43,7 +43,8 @@ class CorpusCreator(object):
         """
         for line in generator:
             document = json.loads(line)
-            yield self._transform(document)
+            #yield self._transform(document)
+            yield str(randint(0,23))
 
 class SimpleCorpusCreator(CorpusCreator):
     """
@@ -92,4 +93,7 @@ class JobCategoryCorpusCreator(CorpusCreator):
         'occupationalCategory']
 
     def _transform(self, document):
-        return str(randint(0,23))
+        return self.join_spaces([
+            self.nlp.lowercase_strip_punc(document[field])
+            for field in self.document_schema_fields
+        ])
