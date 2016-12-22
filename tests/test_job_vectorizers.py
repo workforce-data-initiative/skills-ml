@@ -5,7 +5,6 @@ import gensim
 import boto
 from moto import mock_s3
 from tempfile import NamedTemporaryFile
-from utils.s3 import log_download_progress
 
 class FakeCorpusGenerator(object):
     def __init__(self, num, infer=False):
@@ -41,7 +40,7 @@ def test_job_vectorizer():
     temp_model = NamedTemporaryFile()
     model.save(temp_model.name)
     temp_model.seek(0)
-    key.set_contents_from_filename(temp_model.name, cb=log_download_progress)
+    key.set_contents_from_filename(temp_model.name)
     fake_corpus_train_infer = FakeCorpusGenerator(num=100, infer=True)
     vectorized_job_generator = Doc2Vectorizer(model_name=MODEL_NAME,
                                               path=PATHTOMODEL,
