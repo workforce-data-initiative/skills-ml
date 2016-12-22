@@ -1,10 +1,9 @@
 import pandas as pd
-import gensim
 import json
 import re
 import os
 import boto
-from tempfile import TemporaryFile
+from gensim.models import Doc2Vec
 
 from utils.nlp import NLPTransforms
 
@@ -26,7 +25,7 @@ class Doc2Vectorizer(object):
         full_path = self.path + self.model_name
         if not os.path.exists("tmp/gensim_doc2vec"):
             load2tmp(self.s3_conn, modelname, full_path)
-        return gensim.models.Doc2Vec.load("tmp/gensim_doc2vec")
+        return Doc2Vec.load("tmp/gensim_doc2vec")
 
     def vectorize(self, documents):
         model = self._load_model(modelname=MODEL_NAME)
