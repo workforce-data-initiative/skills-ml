@@ -5,8 +5,7 @@ notifications:
   slack:
     secure: b7XBAtsHLlROoqR0P1z3phK9LHTB5SzOvS8VRk9nYzqrOGZ749IGEzBSZc1s6SzXQ701wgXZ9TZ+wSn46uO/+PiNiol27lu13O76JoMz+idFyb07lW7wltE/4mlWyYm87f7cLKaaxr3+2+Wr7VDJsvWvnIyZDCN16HrKE2h0JdnLTjsC8pXPDmFGA5ZDuQg0l/D7n4+AV+4OoUt2UQzyHoOROyoEjYV6OejEkWwQeJ5FY/2FCgYJZud4U+FVXkcjrlPBYFA+IevgBPu5LOwJjjIAq2C5E6F287VpvYoPnAdKA8IW0kR6FRW9CD5s5YpTf5BbEz/UMfUOChj0r7cSjwk+/RooqJ6nDK2t9gqpx8m+SZUO2JoZo/if/4yE8UIZD2WjhT/CIK34YS6aZDjj+7MoYYtBO87uf2cWV7gkDTg3v+aVf9IgQ4o6IU4YvGQCkTF6vZ9hn0BkTwZyjoKNc/+eWsKB69CwAXkxww8bXYHLCDCjjCejAhc9TtHiY06bHalTny40DPTwKLwlNjrDz8KQOjMtvF5eoF5h74lvTyYmG88LDvY9HZFVYhBOh8dZ68y2GRG9TlwGPXq4lRNLMcW9KCPC7Fg9N3pgI4ChXuKWQ2fQH700SEq76VrHEMYhv6sxbG6KXt4sdeEaD3wHlrzh02C7NKqelwIbw0AQKng=
 env:
-- TOXENV=py34
-- BOTO_CONFIG=/tmp/nowhere
+- TOXENV=py34 BOTO_CONFIG=/tmp/nowhere
 before_install:
 - sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
 install:
