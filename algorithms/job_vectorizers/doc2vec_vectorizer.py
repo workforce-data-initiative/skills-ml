@@ -1,13 +1,9 @@
 import pandas as pd
 import json
-import re
 import os
-import boto
 from gensim.models import Doc2Vec
 
 from utils.nlp import NLPTransforms
-
-from airflow.hooks import S3Hook
 
 from utils.s3 import split_s3_path, load2tmp
 
