@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import os
+import logging
 from gensim.models import Doc2Vec
 import datetime
 
@@ -19,16 +20,14 @@ class Doc2Vectorizer(object):
         self.s3_conn = s3_conn
 
     def _load_model(self, modelname):
-        full_path = self.path + self.model_name
-        if not os.path.exists("tmp/gensim_doc2vec"):
-            load2tmp(self.s3_conn, modelname, full_path)
-        return Doc2Vec.load("tmp/gensim_doc2vec")
+        filepath = 'tmp/' + modelname
+        s3path = self.path + self.model_name
+        if not os.path.exists(filepath):
+            logging.warning('calling load2tmp from %s to %s', s3path, filepath)
+            load2tmp(self.s3_conn, filepath, s3path)
+        return Doc2Vec.load(filepath)
 
     def vectorize(self, documents):
-        model = self._load_model(modelname=MODEL_NAME)
+        model = self._load_model(modelname=self.model_name)
         for document in documents:
-            #print('vectorizing...')
             yield model.infer_vector(document)
-
-    def split_train_test(self):
-        pass

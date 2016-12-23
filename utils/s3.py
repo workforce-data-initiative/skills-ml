@@ -37,16 +37,15 @@ def upload(s3_conn, filename, s3_path):
     )
     key.set_contents_from_filename(filename)
 
-def load2tmp(s3_conn, filename, s3_path):
+def load2tmp(s3_conn, out_filename, s3_path):
     bucket_name, prefix = split_s3_path(s3_path)
     bucket = s3_conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(
-            bucket=bucket,
-            name=prefix
+        bucket=bucket,
+        name=prefix
     )
-    if not os.path.exists("../tmp"):
-            os.makedirs("../tmp")
-    key.get_contents_to_filename("tmp/"+filename, cb=log_download_progress)
+    logging.warning('loading from %s into %s', key, out_filename)
+    key.get_contents_to_filename(out_filename)
 
 def log_download_progress(num_bytes, obj_size):
     logging.info('%s bytes transferred out of %s total', num_bytes, obj_size)
