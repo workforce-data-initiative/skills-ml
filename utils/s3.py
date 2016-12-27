@@ -47,7 +47,7 @@ def download(s3_conn, out_filename, s3_path):
         name=prefix
     )
     logging.info('loading from %s into %s', key, out_filename)
-    key.get_contents_to_filename(out_filename)
+    key.get_contents_to_filename(out_filename, cb=log_download_progress)
 
 
 def log_download_progress(num_bytes, obj_size):
