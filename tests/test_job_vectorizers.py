@@ -1,13 +1,10 @@
 from algorithms.job_vectorizers.doc2vec_vectorizer import Doc2Vectorizer
-from algorithms.corpus_creators.basic import GensimCorpusCreator
-from airflow.hooks import S3Hook
 import gensim
 import logging
-import boto
 import os
 from moto import mock_s3
-from tempfile import NamedTemporaryFile
-from mock import MagicMock, patch
+from mock import patch
+
 
 class FakeCorpusGenerator(object):
     def __init__(self, num, infer=False):
@@ -15,6 +12,7 @@ class FakeCorpusGenerator(object):
         self.corpus = 'this is a job description with words for testing'
         self.tag = 'tag1'
         self.infer = infer
+
     def __iter__(self):
         if not self.infer:
             for i in range(self.num):
@@ -23,8 +21,9 @@ class FakeCorpusGenerator(object):
             for i in range(self.num):
                 yield self.corpus.split()
 
+
 @mock_s3
-@patch('algorithms.job_vectorizers.doc2vec_vectorizer.load2tmp')
+@patch('algorithms.job_vectorizers.doc2vec_vectorizer.download')
 def test_job_vectorizer(load_mock):
     model_name = 'test_doc2vec'
     s3_prefix = 'fake-bucket/cache/'
