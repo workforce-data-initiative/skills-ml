@@ -1,6 +1,5 @@
 from algorithms.job_vectorizers.doc2vec_vectorizer import Doc2Vectorizer
 import gensim
-import logging
 import os
 from moto import mock_s3
 from mock import patch
@@ -35,7 +34,6 @@ def test_job_vectorizer(load_mock):
     expected_cache_path = 'tmp/{}'.format(model_name)
 
     def side_effect(s3_conn, filepath, s3_path):
-        logging.warning('in side effect')
         assert filepath == expected_cache_path
         assert s3_path == '{}{}'.format(s3_prefix, model_name)
         model.save(filepath)
@@ -46,7 +44,4 @@ def test_job_vectorizer(load_mock):
     assert len(model.vocab.keys()) == 9
     assert vectorized_job_generator.__next__().shape[0] == 5
     if os.path.exists(expected_cache_path):
-        logging.warning('removing cache')
         os.unlink(expected_cache_path)
-
-    assert False
