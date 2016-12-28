@@ -1,20 +1,12 @@
-import csv
 import logging
-import os
 from datetime import datetime
-import json
-import pandas as pd
 
 from airflow import DAG
 from airflow.hooks import S3Hook
 from airflow.operators import BaseOperator
 
 from utils.airflow import datetime_to_quarter
-from utils.s3 import upload
-from utils.hash import md5
-from config import config
 from datasets import job_postings
-
 from algorithms.corpus_creators.basic import JobCategoryCorpusCreator
 
 # some DAG args, please tweak for sanity
