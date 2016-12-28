@@ -31,19 +31,31 @@ class CorpusCreator(object):
             yield self._transform(document)
 
     def array_corpora(self, generator):
-        """
+        """Transforms job listings into corpus format for gensim's doc2vec
+
+        Args:
+            generator: an iterable that generates an array of words(strings).
+                Each array is expected to represent a job listing(a doc)
+                including fields of interests
+        Yields:
+            (list) The next job listing transformed into gensim's doc2vec
+
         """
         for line in generator:
             document = json.loads(line)
-            #print(self._transform(document).split())
             yield self._transform(document).split()
 
-    def label_corpora(self,generator):
-        """
+    def label_corpora(self, generator):
+        """Extract job label(category) from job listings and transfrom into corpus format
+
+        Args:
+            generator: an iterable that generates a list of job label (strings).
+
+        Yields:
+            (string) The next job label transform into corpus format
         """
         for line in generator:
             document = json.loads(line)
-            #yield self._transform(document)
             yield str(randint(0,23))
 
 class SimpleCorpusCreator(CorpusCreator):
@@ -87,7 +99,8 @@ class GensimCorpusCreator(CorpusCreator):
 
 class JobCategoryCorpusCreator(CorpusCreator):
     """
-    Fake job category labeler
+        An object that extract the label of each job listing document which could be onet soc code or
+        occupationalCategory and returns them as a lowercased string
     """
     document_schema_fields = [
         'occupationalCategory']
