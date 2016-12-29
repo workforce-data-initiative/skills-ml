@@ -92,7 +92,8 @@ ENV/
 airflow/
 
 # tmp directory for downloaded files
-tmp/
+tmp/*
+!tmp/README.md
 
 # config file holding infrastructure information
 config.yaml
