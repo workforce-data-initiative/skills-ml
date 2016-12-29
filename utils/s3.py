@@ -26,7 +26,7 @@ def upload(s3_conn, filename, s3_path):
         s3_path: the destination path on s3
     """
     if config.get('local_mode', False):
-        logging.info('Local mode is set, forgoing s3 upload')
+        logging.warning('Local mode is set, forgoing s3 upload')
         return
     bucket_name, prefix = split_s3_path(s3_path)
     bucket = s3_conn.get_bucket(bucket_name)
@@ -35,4 +35,20 @@ def upload(s3_conn, filename, s3_path):
         bucket=bucket,
         name='{}/{}'.format(prefix, filename.replace('/', '_'))
     )
+    logging.info('uploading from %s to %s', filename, key)
     key.set_contents_from_filename(filename)
+
+
+def download(s3_conn, out_filename, s3_path):
+    bucket_name, prefix = split_s3_path(s3_path)
+    bucket = s3_conn.get_bucket(bucket_name)
+    key = boto.s3.key.Key(
+        bucket=bucket,
+        name=prefix
+    )
+    logging.info('loading from %s into %s', key, out_filename)
+    key.get_contents_to_filename(out_filename, cb=log_download_progress)
+
+
+def log_download_progress(num_bytes, obj_size):
+    logging.info('%s bytes transferred out of %s total', num_bytes, obj_size)

@@ -8,7 +8,10 @@ airflow[s3]
 PyYAML
 tox
 codecov
-httpretty
+httpretty==0.8.10
 Sphinx
 pytest-cov
 Elasticsearch
+gensim
+git+git://github.com/dssg/metta-data.git
+moto
