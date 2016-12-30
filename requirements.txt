@@ -15,3 +15,4 @@ Elasticsearch
 gensim
 git+git://github.com/dssg/metta-data.git
 moto
+unicodecsv

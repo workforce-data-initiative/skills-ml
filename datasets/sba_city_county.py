@@ -1,3 +1,7 @@
+from utils.fs import cache_json
+import logging
+import requests
+
 URL = 'http://api.sba.gov/geodata/city_county_links_for_state_of/{}.json'
 
 STATE_CODES = [
@@ -8,8 +12,9 @@ STATE_CODES = [
     "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
 ]
 
+
 def _grab_state_data(state_code):
-    logging.info('Looking up ---%s---', state_code)
+    logging.warning('Looking up ---%s---', state_code)
     response = requests.get(URL.format(state_code))
     try:
         response = response.json()
@@ -20,7 +25,8 @@ def _grab_state_data(state_code):
     except:
         return {}
 
-@cacheable('county_lookup.json')
+
+@cache_json('county_lookup.json')
 def county_lookup():
     return {
         state_code: _grab_state_data(state_code)
