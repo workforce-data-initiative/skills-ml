@@ -14,7 +14,7 @@ STATE_CODES = [
 
 
 def _grab_state_data(state_code):
-    logging.warning('Looking up ---%s---', state_code)
+    logging.info('Looking up counties for --%s--', state_code)
     response = requests.get(URL.format(state_code))
     try:
         response = response.json()
