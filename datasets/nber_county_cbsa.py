@@ -1,3 +1,4 @@
+"""Retrieve county->CBSA crosswalk file from the NBER"""
 import unicodecsv as csv
 import logging
 import requests
@@ -9,6 +10,12 @@ URL = 'http://www.nber.org/cbsa-msa-fips-ssa-county-crosswalk/2016/cbsatocountyc
 
 @cache_json('cbsa_lookup.json')
 def cbsa_lookup():
+    """
+    Construct a County->CBSA Lookup table from NBER data
+    Returns: dict
+        each key is a (State Code, County FIPS code) tuple
+        each value is a (CBSA FIPS code, CBSA Name) tuple
+    """
     logging.info("Beginning CBSA lookup")
     cbsa_lookup = {}
     download = requests.get(URL)

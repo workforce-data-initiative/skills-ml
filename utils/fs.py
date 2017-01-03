@@ -1,3 +1,4 @@
+"""Filesystem-related utilities"""
 from functools import wraps
 import os
 import json

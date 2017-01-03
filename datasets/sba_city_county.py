@@ -1,3 +1,4 @@
+"""Retrieve county lookup tables from the SBA for each state"""
 from utils.fs import cache_json
 import logging
 import requests
@@ -28,6 +29,13 @@ def _grab_state_data(state_code):
 
 @cache_json('county_lookup.json')
 def county_lookup():
+    """
+    Retrieve county lookup tables if they are not already cached
+    Returns:
+        dict
+            each key is a state,
+            each value is a dict {city_name: (fips_county_code, county_name)}
+    """
     return {
         state_code: _grab_state_data(state_code)
         for state_code in STATE_CODES
