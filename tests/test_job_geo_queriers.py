@@ -7,9 +7,11 @@ county_lookup = {
     'MA': {'Elgin': ('823', 'Sussex')}
 }
 cbsa_lookup = {
-    ('IL', '123'): ('456', 'Chicago, IL'),
-    ('IL', '234'): ('678', 'Rockford, IL'),
-    ('MA', '823'): ('987', 'Boston, MA')
+    'IL': {
+        '123': ('456', 'Chicago, IL'),
+        '234': ('678', 'Rockford, IL'),
+    },
+    'MA': {'823': ('987', 'Boston, MA')}
 }
 
 sample_job = {

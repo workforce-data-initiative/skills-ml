@@ -16,4 +16,4 @@ def test_cbsa_lookup():
     )
 
     results = cbsa_lookup.__wrapped__()
-    assert results == {('AL', '001'): ('33860', 'Montgomery, AL')}
+    assert results == {'AL': {'001': ('33860', 'Montgomery, AL')}}
