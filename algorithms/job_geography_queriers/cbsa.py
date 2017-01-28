@@ -1,6 +1,6 @@
 import logging
 
-from datasets import county_lookup, cbsa_lookup
+from datasets import ua_cbsa, place_ua
 
 
 class JobCBSAQuerier(object):
@@ -8,8 +8,8 @@ class JobCBSAQuerier(object):
     Queries the Core-Based Statistical Area for a job
     """
     def __init__(self):
-        self.county_lookup = county_lookup()
-        self.cbsa_lookup = cbsa_lookup()
+        self.ua_cbsa = ua_cbsa()
+        self.place_ua = place_ua()
 
     def query(self, job_posting):
         """
@@ -22,14 +22,13 @@ class JobCBSAQuerier(object):
         city = job_posting['jobLocation']['address']['addressLocality']
         state_code = job_posting['jobLocation']['address']['addressRegion']
         logging.debug('Looking up CBSA for %s, %s', city, state_code)
-        if state_code not in self.county_lookup or city not in self.county_lookup[state_code]:
+        if state_code not in self.place_ua or city not in self.place_ua[state_code]:
             logging.warning('Could not find %s/%s', state_code, city)
-            return None, None
-        county_fips, county_name = self.county_lookup[state_code][city]
-        county_fips = county_fips.zfill(3)
-        if state_code not in self.cbsa_lookup or county_fips not in self.cbsa_lookup[state_code]:
-            logging.warning('Could not find %s/%s', state_code, county_fips)
-            return None, None
-        cbsa_fips, cbsa_name = self.cbsa_lookup[state_code][county_fips]
-        logging.info('Found %s, %s', cbsa_fips, cbsa_name)
-        return cbsa_fips, cbsa_name
+            return []
+        ua_fips = self.place_ua[state_code][city]
+        if ua_fips not in self.ua_cbsa:
+            logging.warning('Could not find %s/%s', state_code, ua_fips)
+            return []
+        hits = self.ua_cbsa[ua_fips]
+        logging.info('Found %s hits, %s', len(hits), hits)
+        return hits

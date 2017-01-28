@@ -1,0 +1,29 @@
+import httpretty
+
+from datasets.place_ua import place_ua, URL
+
+RESPONSE = '''UA,UANAME,STATE,PLACE,PLNAME,CLASSFP,GEOID,POPPT,HUPT,AREAPT,AREALANDPT,UAPOP,UAHU,UAAREA,UAAREALAND,PLPOP,PLHU,PLAREA,PLAREALAND,UAPOPPCT,UAHUPCT,UAAREAPCT,UAAREALANDPCT,PLPOPPCT,PLHUPCT,PLAREAPCT,PLAREALANDPCT
+00037,"Abbeville, LA Urban Cluster",22,00100,"Abbeville city",C1,2200100,12073,5168,13424306,13348680,19824,8460,29523368,29222871,12257,5257,15756922,15655575,60.9,61.09,45.47,45.68,98.5,98.31,85.2,85.26
+00199,"Aberdeen--Bel Air South--Bel Air North, MD Urbanized Area",24,00125,"Aberdeen borough",C1,2400125,14894,6156,14961125,14942090,213751,83721,349451754,339626464,14959,6191,17618553,17599518,6.97,7.35,4.28,4.4,99.57,99.43,84.92,84.9
+99999,"Not in a 2010 urban area",26,13480,"Carp Lake CDP",U1,2613480,357,526,12371409,5331938,,,,,357,526,12371409,5331938,,,,,100,100,100,100
+00037,"Abbeville, LA Urban Cluster",22,99999,"Not in a census designated place or incorporated place",,2299999,3810,1537,10712370,10487499,19824,8460,29523368,29222871,,,,,19.22,18.17,36.28,35.89,,,,
+62677,"New Orleans, LA Urbanized Area",22,01780,"Ama CDP",U1,2201780,1041,439,3021598,3016072,899703,426562,695715795,651105206,1316,547,11475232,9109388,.12,.1,.43,.46,79.1,80.26,26.33,33.11
+01171,"Albuquerque, NM Urbanized Area",35,58070,"Placitas CDP (Sandoval County)",U1,3558070,544,280,2550047,2550047,741318,314851,657890843,648969769,4977,2556,76919539,76919539,.07,.09,.39,.39,10.93,10.95,3.32,3.32
+'''
+
+
+@httpretty.activate
+def test_place_ua():
+    httpretty.register_uri(
+        httpretty.GET,
+        URL,
+        body=RESPONSE,
+        content_type='text/csv'
+    )
+
+    results = place_ua.__wrapped__()
+    assert results == {
+        'LA': {'abbeville': '00037', 'ama': '62677'},
+        'MD': {'aberdeen': '00199'},
+        'NM': {'placitas': '01171' },
+    }
