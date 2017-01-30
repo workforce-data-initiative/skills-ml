@@ -9,6 +9,7 @@ from airflow.operators import BaseOperator
 
 from utils.airflow import datetime_to_quarter
 from utils.s3 import upload
+from utils.nlp import NLPTransforms
 from datasets import job_postings
 from algorithms.aggregators.title import GeoTitleAggregator
 from config import config
@@ -43,7 +44,9 @@ class GeoTitleCountOperator(BaseOperator):
         )
 
         job_postings_generator = job_postings(s3_conn, quarter)
-        counts, title_rollup = GeoTitleAggregator().counts(job_postings_generator)
+        title_cleaner = NLPTransforms().lowercase_strip_punc
+        counts, title_rollup = GeoTitleAggregator(title_cleaner=title_cleaner)\
+            .counts(job_postings_generator)
 
         total_counts = 0
         with open(count_filename, 'w') as count_file:

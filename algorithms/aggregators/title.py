@@ -13,7 +13,8 @@ class GeoTitleAggregator(object):
         geo_querier (object) an object that returns a geography of a given job
             Optional, defaults to JobCBSAQuerier
     """
-    def __init__(self, geo_querier=None):
+    def __init__(self, geo_querier=None, title_cleaner=None):
+        self.title_cleaner = title_cleaner or (lambda s: s)
         self.geo_querier = geo_querier or JobCBSAQuerier()
 
     def counts(self, job_postings):
@@ -30,7 +31,7 @@ class GeoTitleAggregator(object):
         title_rollup = Counter()
         for line in job_postings:
             job_posting = json.loads(line)
-            job_title = job_posting['title']
+            job_title = self.title_cleaner(job_posting['title'])
             title_rollup[job_title] += 1
             hits = self.geo_querier.query(job_posting)
             for cbsa_fips in hits:

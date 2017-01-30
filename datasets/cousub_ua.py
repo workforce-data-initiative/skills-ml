@@ -1,4 +1,4 @@
-"""Retrieve Census Place->Urbanized Area crosswalk"""
+"""Retrieve County Subdivision->Urbanized Area crosswalk"""
 from collections import defaultdict
 import unicodecsv as csv
 import logging
@@ -8,11 +8,12 @@ import re
 
 from utils.fs import cache_json
 
-URL = 'http://www2.census.gov/geo/docs/maps-data/data/rel/ua_place_rel_10.txt'
+URL = 'http://www2.census.gov/geo/docs/maps-data/data/rel/ua_cousub_rel_10.txt'
 ABBR_LOOKUP = us.states.mapping('fips', 'abbr')
 SUFFIXES = [
     'city',
     'town',
+    'township',
     'village',
     'CDP',
     'zona urbana',
@@ -25,15 +26,15 @@ SUFFIXES = [
     'metropolitan government',
     'urban county',
 ]
-DELIMITERS = ['/', '-', ' City']
+DELIMITERS = ['-']
 
 
-@cache_json('place_ua_lookup.json')
-def place_ua(city_cleaner):
+@cache_json('cousub_ua_lookup.json')
+def cousub_ua(city_cleaner):
     """
-    Construct a Place->UA Lookup table from Census data
+    Construct a County Subdivision->UA Lookup table from Census data
     Returns: dict
-    { StateCode: { PlaceName: UA Code } }
+    { StateCode: { CountySubdivisionName: UA Code } }
     """
     logging.info("Beginning UA lookup")
     lookup = defaultdict(dict)
@@ -47,10 +48,9 @@ def place_ua(city_cleaner):
         total += 1
         state_fips = row[2]
         ua = row[0]
-        place_name = row[4]
-        place_fips = row[3]
+        place_name = row[6]
 
-        if place_fips == '99999' or ua == '99999':
+        if ua == '99999':
             not_designated += 1
             continue
 
