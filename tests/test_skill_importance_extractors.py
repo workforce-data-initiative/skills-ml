@@ -71,3 +71,4 @@ def test_onet_skill_extractor():
             assert 'Data Value' in row
             assert 'O*NET-SOC Code' in row
             assert 'ONET KSA' in row
+            assert row['Scale ID'] in ['im', 'lv']
