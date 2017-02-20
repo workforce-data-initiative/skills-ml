@@ -89,7 +89,7 @@ ENV/
 .ropeproject
 
 # Airflow
-airflow/
+/airflow/
 
 # tmp directory for downloaded files
 tmp/*
@@ -98,5 +98,9 @@ tmp/*
 # config file holding infrastructure information
 config.yaml
 
+# db config file
+api_v1_db.yaml
+
 # Output folder/s3 upload staging area
-output/
+output/*
+!output/interesting_job_titles.tsv
