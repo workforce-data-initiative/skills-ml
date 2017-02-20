@@ -18,3 +18,7 @@ moto
 unicodecsv
 us
 mock
+Sqlalchemy
+testing.postgresql
+psycopg2
+

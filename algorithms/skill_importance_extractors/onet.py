@@ -32,6 +32,8 @@ class OnetSkillImportanceExtractor(object):
             with open(fullpath) as f:
                 onet = [row for row in csv.DictReader(f, delimiter='\t')]
         onet = pd.DataFrame(onet)
+        for col in col_name:
+            onet[col] = onet[col].astype(str).str.lower()
         return onet[col_name]
 
     def run(self):
