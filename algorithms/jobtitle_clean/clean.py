@@ -1,15 +1,37 @@
 import pandas as pd
+import re
+from collections import OrderedDict
 
 from datasets import negative_dict
 
 from utils.nlp import NLPTransforms
 
+def clean_by_rules(jobtitle):
+    """
+    Remove numbers
+    :params string jobtitle: A job title string
+    :return: A cleaned version of job title
+    :rtype: string
+    """
+    # remove numbers and word with number
+    jobtitle = re.sub('[0-9].*', ' ', jobtitle).strip()
 
-def clean_by_rules():
-    pass
+    # make one space between words
+    jobtitle = ' '.join(' '.join(jobtitle.split()).split())
 
-def clean_by_neg_dic():
-    pass
+    return jobtitle
+
+def clean_by_neg_dic(jobtitle, negative_dict):
+    """
+    Remove words from the negaive dictionary
+    :params string jobtitle: A job title string
+    :return: A cleaned version of job title
+    :rtype: string
+    """
+    result = [word for word in jobtitle.split() if word not in negative_dict['states']]
+    result2str = ' '.join(result)
+
+    return result2str
 
 class JobTitleStringClean(object):
     """
@@ -19,9 +41,25 @@ class JobTitleStringClean(object):
     def __init__(self):
         self.negative_dict = negative_dict()
 
-    def clean(self, jobtitles):
+    def clean(self, df_jobtitles):
+        # Drop the rows with NaN vlaue
+        df_jobtitles = df_jobtitles.dropna()
 
-        return jobtitles
+        columns = list(df_jobtitles.columns)
+        new_jobtitles = OrderedDict({key: [] for key in columns})
+        for i, row in enumerate(df_jobtitles.values):
+            try:
+                for colname in columns:
+                    if colname == 'title':
+                        new_title = clean_by_rules(row[columns.index(colname)])
+                        new_title = clean_by_neg_dic(new_title, negative_dict())
+                        new_jobtitles[colname].append(new_title)
+                    else:
+                        new_jobtitles[colname].append(row[columns.index(colname)])
+            except TypeError:
+                print('There is some TypeError',row)
+
+        return pd.DataFrame(new_jobtitles)
 
 
 

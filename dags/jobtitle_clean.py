@@ -35,7 +35,7 @@ class JobTitleCleanOperator(BaseOperator):
         s3_conn = S3Hook().get_conn()
         quarter = datetime_to_quarter(context['execution_date'])
 
-        cleaned_count_filename = '{}/cleaned_geo_title_count_{}.csv'.format(
+        cleaned_count_filename = '{}/cleaned_geo_title_count_{}_new.csv'.format(
             output_folder,
             quarter
         )

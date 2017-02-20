@@ -12,15 +12,15 @@ def negative_dict():
     """
     Construct a dictionary of terms that are considered not to be in job title, including
     states, states abv, cities
-    Returns: list
+    Returns: dictionary
     """
     logging.info("Beginning negative dictionary lookup")
-    lookup = []
+    states = []
     download = requests.get(URL)
     reader = csv.reader(download.content.decode('utf-8').splitlines(), delimiter=',')
     next(reader)
     for row in reader:
-        lookup.append(row[1].lower())
-        lookup.append(row[2].lower())
+        states.append(row[1].lower())
+        states.append(row[2].lower())
 
-    return lookup
+    return {'states': states}
