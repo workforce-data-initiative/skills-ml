@@ -8,6 +8,7 @@ notifications:
 env:
 - TOXENV=py34 BOTO_CONFIG=/tmp/nowhere PYTHONPATH='.'
 before_install:
+- sudo apt-get update
 - sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
 install:
 - pip install -r requirements.txt
