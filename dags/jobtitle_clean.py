@@ -44,33 +44,47 @@ class JobTitleCleanOperator(BaseOperator):
             quarter
         )
 
-        count_filename = '{}/title_count_{}.csv'.format(
-            output_folder,
-            quarter
-        )
-        geo_count_filename = '{}/geo_title_count_{}.csv'.format(
+        count_filename = '{}/geo_title_count_{}.csv'.format(
             output_folder,
             quarter
         )
 
-        geo_title_count_df = pd.read_csv(geo_count_filename, header=None)
+        rollup_filename = '{}/title_count_{}.csv'.format(
+            output_folder,
+            quarter
+        )
+
+        geo_title_count_df = pd.read_csv(count_filename, header=None)
         geo_title_count_df.columns = ['geo', 'title', 'count']
         cleaned_geo_title_count_df = JobTitleStringClean().clean(geo_title_count_df)
 
-        title_count_df = pd.read_csv(count_filename)
+        title_count_df = pd.read_csv(rollup_filename)
         title_count_df.columns = ['title', 'count']
         cleaned_title_count_df = JobTitleStringClean().clean(title_count_df)
 
+        total_counts = 0
         with open(cleaned_count_filename, 'w') as count_file:
             clean_geo_writer = csv.writer(count_file, delimiter=',')
             for idx, row in cleaned_geo_title_count_df.iterrows():
+                total_counts += row['count']
                 clean_geo_writer.writerow([row['geo'], row['title'], row['count']])
 
+        rollup_counts = 0
         with open(cleaned_rollup_filename, 'w') as count_file:
             clean_writer = csv.writer(count_file, delimiter=',')
             for idx, row in cleaned_title_count_df.iterrows():
+                rollup_counts += row['count']
                 clean_writer.writerow([row['title'], row['count']])
 
+        logging.info(
+            'Found %s count rows and %s title rollup rows for %s',
+            total_counts,
+            rollup_counts,
+            quarter,
+        )
+
+        upload(s3_conn, cleaned_count_filename, config['output_tables']['s3_path'])
+        upload(s3_conn, cleaned_rollup_filename, config['output_tables']['s3_path'])
 
 JobTitleCleanOperator(task_id='clean_title_count', dag=dag)
 

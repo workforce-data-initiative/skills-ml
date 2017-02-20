@@ -17,7 +17,7 @@ def clean_by_rules(jobtitle):
     jobtitle = re.sub('[0-9].*', ' ', jobtitle).strip()
 
     # make one space between words
-    jobtitle = ' '.join(' '.join(jobtitle.split()).split())
+    jobtitle = ' '.join(jobtitle.split())
 
     return jobtitle
 
