@@ -28,6 +28,7 @@ def clean_by_neg_dic(jobtitle, negative_list):
     :return: A cleaned version of job title
     :rtype: string
     """
+    # Exact matching
     result = [word for word in jobtitle.split() if word not in negative_list]
     result2str = ' '.join(result)
 
@@ -42,24 +43,32 @@ class JobTitleStringClean(object):
         self.negative_dict = negative_dict()
         self.negative_list = self.negative_dict['places'] + self.negative_dict['states']
     def clean(self, df_jobtitles):
-        # Drop the rows with NaN vlaue
+        """
+        Clean the job titles by rules and negative dictionary.
+        Args:
+            df_jobtitles in pandas DataFrame
+        Returns:
+            pd.DataFrame(cleaned_jobtitles), a clenaed verison of job title in pandas DataFrame
+
+        """
+        # Drop the rows with missing vlaue (NaN)
         df_jobtitles = df_jobtitles.dropna()
 
         columns = list(df_jobtitles.columns)
-        new_jobtitles = OrderedDict({key: [] for key in columns})
+        cleaned_jobtitles = OrderedDict({key: [] for key in columns})
         for i, row in enumerate(df_jobtitles.values):
             try:
                 for colname in columns:
                     if colname == 'title':
                         new_title = clean_by_rules(row[columns.index(colname)])
                         new_title = clean_by_neg_dic(new_title, self.negative_list)
-                        new_jobtitles[colname].append(new_title)
+                        cleaned_jobtitles[colname].append(new_title)
                     else:
-                        new_jobtitles[colname].append(row[columns.index(colname)])
+                        cleaned_jobtitles[colname].append(row[columns.index(colname)])
             except TypeError:
                 print('There is some TypeError',row)
 
-        return pd.DataFrame(new_jobtitles)
+        return pd.DataFrame(cleaned_jobtitles)
 
 
 
