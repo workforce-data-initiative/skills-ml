@@ -4,6 +4,7 @@ Shared Natural Language Processing utilities
 import unicodedata
 import re
 
+
 class NLPTransforms(object):
     # An object that performs common NLP transformations
     # for unicodedata, see:
@@ -33,15 +34,34 @@ class NLPTransforms(object):
             if not unicodedata.category(char)[0] in self.punct
         )
 
+    def title_phase_one(self, document):
+        """
+        Args:
+            document: A unicode string
+        Returns:
+            The document, lowercased, sans punctuation, whitespace normalized
+        """
+        no_apos = re.sub(r'\'', '', self.normalize(document))
+        strip_punc = ''.join(
+            char if not unicodedata.category(char)[0] in self.punct else ' '
+            for char in no_apos
+        )
+        return re.sub(r'\s+', ' ', strip_punc.strip())
+
     def clean_str(self, document):
         """
         Args:
             document: A unicode string
         Returns:
-            The array of split words in document, lowercased, sans punctuation, non-English letters
+            The array of split words in document, lowercased,
+            sans punctuation, non-English letters
         """
         RE_PREPROCESS = r'\W+|\d+'
-        document = re.sub( RE_PREPROCESS, ' ', self.lowercase_strip_punc(document))
+        document = re.sub(
+            RE_PREPROCESS,
+            ' ',
+            self.lowercase_strip_punc(document)
+        )
         document = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", document)
         document = re.sub(r"\'s", " \'s", document)
         document = re.sub(r"\'ve", " \'ve", document)
