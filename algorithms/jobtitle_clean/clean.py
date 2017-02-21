@@ -21,14 +21,14 @@ def clean_by_rules(jobtitle):
 
     return jobtitle
 
-def clean_by_neg_dic(jobtitle, negative_dict):
+def clean_by_neg_dic(jobtitle, negative_list):
     """
     Remove words from the negaive dictionary
     :params string jobtitle: A job title string
     :return: A cleaned version of job title
     :rtype: string
     """
-    result = [word for word in jobtitle.split() if word not in negative_dict['states']]
+    result = [word for word in jobtitle.split() if word not in negative_list]
     result2str = ' '.join(result)
 
     return result2str
@@ -40,7 +40,7 @@ class JobTitleStringClean(object):
 
     def __init__(self):
         self.negative_dict = negative_dict()
-
+        self.negative_list = self.negative_dict['places'] + self.negative_dict['states']
     def clean(self, df_jobtitles):
         # Drop the rows with NaN vlaue
         df_jobtitles = df_jobtitles.dropna()
@@ -52,7 +52,7 @@ class JobTitleStringClean(object):
                 for colname in columns:
                     if colname == 'title':
                         new_title = clean_by_rules(row[columns.index(colname)])
-                        new_title = clean_by_neg_dic(new_title, negative_dict())
+                        new_title = clean_by_neg_dic(new_title, self.negative_list)
                         new_jobtitles[colname].append(new_title)
                     else:
                         new_jobtitles[colname].append(row[columns.index(colname)])
