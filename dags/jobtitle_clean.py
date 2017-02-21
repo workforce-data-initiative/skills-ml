@@ -39,6 +39,7 @@ class JobTitleCleanOperator(BaseOperator):
             output_folder,
             quarter
         )
+
         cleaned_rollup_filename = '{}/cleaned_title_count_{}.csv'.format(
             output_folder,
             quarter
