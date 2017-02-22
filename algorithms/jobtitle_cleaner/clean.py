@@ -52,7 +52,7 @@ class JobTitleStringClean(object):
             pd.DataFrame(cleaned_jobtitles), a clenaed verison of job title in pandas DataFrame
 
         """
-        df_jobtitles = df_jobtitles.fillna('None')
+        df_jobtitles = df_jobtitles.fillna('no title')
 
         columns = list(df_jobtitles.columns)
         cleaned_jobtitles = OrderedDict({key: [] for key in columns})
