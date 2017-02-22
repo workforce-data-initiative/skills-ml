@@ -52,7 +52,6 @@ class JobTitleStringClean(object):
             pd.DataFrame(cleaned_jobtitles), a clenaed verison of job title in pandas DataFrame
 
         """
-        # Drop the rows with missing vlaue (NaN)
         df_jobtitles = df_jobtitles.fillna('None')
 
         columns = list(df_jobtitles.columns)
