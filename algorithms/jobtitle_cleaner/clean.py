@@ -13,8 +13,8 @@ def clean_by_rules(jobtitle):
     :return: A cleaned version of job title
     :rtype: string
     """
-    # remove numbers and word with number
-    jobtitle = re.sub('[0-9].*', ' ', jobtitle).strip()
+    # remove any words with number in it
+    jobtitle = re.sub('\w*\d\w*', ' ', jobtitle).strip()
 
     # make one space between words
     jobtitle = ' '.join(jobtitle.split())
@@ -23,7 +23,7 @@ def clean_by_rules(jobtitle):
 
 def clean_by_neg_dic(jobtitle, negative_list):
     """
-    Remove words from the negaive dictionary
+    Remove words from the negative dictionary
     :params string jobtitle: A job title string
     :return: A cleaned version of job title
     :rtype: string
