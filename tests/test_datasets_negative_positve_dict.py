@@ -1,6 +1,6 @@
 import httpretty
 
-from datasets.negative_dict import negative_dict, PLACEURL, STATEURL
+from datasets.negative_positive_dict import negative_positive_dict, PLACEURL, STATEURL, ONETURL
 
 STATERESPONSE = """id,name,abbreviation,country,type,sort,status,occupied,notes,fips_state,assoc_press,standard_federal_region,census_region,census_region_name,census_division,census_division_name,circuit_court
 "1","Alabama","AL","USA","state","10","current","occupied","","1","Ala.","IV","3","South","6","East South Central","11"
@@ -28,6 +28,11 @@ PLACERESPONSE = """UA,UANAME,STATE,PLACE,PLNAME,CLASSFP,GEOID,POPPT,HUPT,AREAPT,
 08785,"Boise City, ID Urbanized Area",16,08830,"Boise City city",C1,1608830,204776,92335,172985761,171285375,349684,146177,350800300,346614209,205671,92700,207328481,205550644,58.56,63.17,49.31,49.42,99.56,99.61,83.44,83.33
 """
 
+ONETRESPONSE="""'\tO*NET-SOC Code\tTitle\tOriginal Title\tDescription\tjob_uuid\tnlp_a
+0\t11-1011.00\tChief Executives\tChief Executives\tDetermine and formulate policies and provide overall direction of companies or private and public sector organizations within guidelines set up by a board of directors or similar governing body. Plan, direct, or coordinate operational activities at the highest level of management with the help of subordinate executives and staff managers.\te4063de16cae5cf29207ca572e3a891d\tchief executives'
+1\t11-1011.03\tChief Sustainability Officers\tChief Sustainability Officers\tCommunicate and coordinate with management, shareholders, customers, and employees to address sustainability issues. Enact or oversee a corporate sustainability strategy.\tb4155ade06cff632fb89ff03057b3107\tchief sustainability officers
+"""
+
 @httpretty.activate
 def test_negative_dict():
     httpretty.register_uri(
@@ -44,10 +49,22 @@ def test_negative_dict():
         content_type='text/csv'
     )
 
-    results_states = negative_dict.__wrapped__()['states']
+    httpretty.register_uri(
+        httpretty.GET,
+        ONETURL,
+        body=ONETRESPONSE,
+        content_type='text/csv'
+    )
+
+    results_states = set(negative_positive_dict.__wrapped__()['states'])
     assert results_states == {'alabama', 'al', 'alaska', 'ak', 'arizona', 'az', 'arkansas', 'ar', 'california', 'ca',
                               'colorado', 'co', 'connecticut', 'ct', 'delaware', 'de', 'florida', 'fl', 'georgia', 'ga'}
 
-    results_places = negative_dict.__wrapped__()['places']
+    results_places = set(negative_positive_dict.__wrapped__()['places'])
     assert results_places == {'abbeville', 'aberdeen', 'winston-salem', 'ama', 'placitas',
                               'boise city', 'grain valley', 'st. louis', 'carp lake'}
+
+    results_onetjobs = set(negative_positive_dict.__wrapped__()['onetjobs'])
+    assert  results_onetjobs == {'chief executives', 'chief sustainability officers'}
+
+

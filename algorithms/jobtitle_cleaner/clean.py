@@ -2,7 +2,7 @@ import pandas as pd
 import re
 from collections import OrderedDict
 
-from datasets import negative_dict
+from datasets import negative_positive_dict
 
 from utils.nlp import NLPTransforms
 
@@ -21,7 +21,7 @@ def clean_by_rules(jobtitle):
 
     return jobtitle
 
-def clean_by_neg_dic(jobtitle, negative_list):
+def clean_by_neg_dic(jobtitle, negative_list, positive_list):
     """
     Remove words from the negative dictionary
     :params string jobtitle: A job title string
@@ -29,7 +29,7 @@ def clean_by_neg_dic(jobtitle, negative_list):
     :rtype: string
     """
     # Exact matching
-    result = [word for word in jobtitle.split() if word not in negative_list]
+    result = [word for word in jobtitle.split() if (word not in negative_list) or (word in positive_list)]
     result2str = ' '.join(result)
 
     return result2str
@@ -40,8 +40,9 @@ class JobTitleStringClean(object):
     """
 
     def __init__(self):
-        self.negative_dict = negative_dict()
-        self.negative_list = self.negative_dict['places'] + self.negative_dict['states']
+        self.dict = negative_positive_dict()
+        self.negative_list = self.dict['places'] + self.dict['states']
+        self.positive_list = self.dict['onetjobs']
     def clean(self, df_jobtitles):
         """
         Clean the job titles by rules and negative dictionary.
@@ -52,7 +53,7 @@ class JobTitleStringClean(object):
 
         """
         # Drop the rows with missing vlaue (NaN)
-        df_jobtitles = df_jobtitles.dropna()
+        df_jobtitles = df_jobtitles.fillna('None')
 
         columns = list(df_jobtitles.columns)
         cleaned_jobtitles = OrderedDict({key: [] for key in columns})
@@ -61,7 +62,7 @@ class JobTitleStringClean(object):
                 for colname in columns:
                     if colname == 'title':
                         new_title = clean_by_rules(row[columns.index(colname)])
-                        new_title = clean_by_neg_dic(new_title, self.negative_list)
+                        new_title = clean_by_neg_dic(new_title, self.negative_list, self.positive_list)
                         cleaned_jobtitles[colname].append(new_title)
                     else:
                         cleaned_jobtitles[colname].append(row[columns.index(colname)])
