@@ -10,7 +10,6 @@ from airflow.operators import BaseOperator
 
 from utils.airflow import datetime_to_quarter
 from utils.s3 import upload
-from utils.nlp import NLPTransforms
 from datasets import job_postings
 from algorithms.jobtitle_cleaner.clean import JobTitleStringClean
 from config import config
