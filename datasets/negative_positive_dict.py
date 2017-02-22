@@ -7,6 +7,7 @@ import re
 
 STATEURL = 'https://s3-us-west-2.amazonaws.com/skills-public/tables/state_table.csv'
 PLACEURL = 'http://www2.census.gov/geo/docs/maps-data/data/rel/ua_place_rel_10.txt'
+ONETURL = 'https://s3-us-west-2.amazonaws.com/skills-public/pipeline/tables/job_titles_master_table.tsv'
 SUFFIXES = [
     'city',
     'town',
@@ -24,15 +25,14 @@ SUFFIXES = [
 ]
 DELIMITERS = ['/', '-', ' City']
 
-
-@cache_json('negative_dict_lookup.json')
-def negative_dict():
+@cache_json('negative_positive_dict_lookup.json')
+def negative_positive_dict():
     """
     Construct a dictionary of terms that are considered not to be in job title, including
     states, states abv, cities
-    Returns: dictionary
+    Returns: dictionary of set
     """
-    logging.info("Beginning negative dictionary lookup")
+    logging.info("Beginning negative dictionary build")
     states = []
     download = requests.get(STATEURL)
     reader = csv.reader(download.content.splitlines(), delimiter=',')
@@ -55,4 +55,13 @@ def negative_dict():
     places = list(set(places))
     places.remove('not in a census designated place or incorporated place')
 
-    return {'states': set(states), 'places': set(places)}
+    onetjobs = []
+    download = requests.get(ONETURL)
+    reader = csv.reader(download.content.splitlines(), delimiter='\t')
+    next(reader)
+    for row in reader:
+        onetjobs.append(row[2].lower())
+        onetjobs.append(row[3].lower())
+    onetjobs = list(set(onetjobs))
+
+    return {'states': states, 'places': places, 'onetjobs': onetjobs}
