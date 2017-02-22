@@ -4,8 +4,6 @@ from collections import OrderedDict
 
 from datasets import negative_positive_dict
 
-from utils.nlp import NLPTransforms
-
 def clean_by_rules(jobtitle):
     """
     Remove numbers
