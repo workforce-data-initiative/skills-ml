@@ -44,7 +44,7 @@ class GeoTitleCountOperator(BaseOperator):
         )
 
         job_postings_generator = job_postings(s3_conn, quarter)
-        title_cleaner = NLPTransforms().lowercase_strip_punc
+        title_cleaner = NLPTransforms().title_phase_one
         counts, title_rollup = GeoTitleAggregator(title_cleaner=title_cleaner)\
             .counts(job_postings_generator)
 
