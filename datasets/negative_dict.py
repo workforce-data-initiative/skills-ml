@@ -55,4 +55,4 @@ def negative_dict():
     places = list(set(places))
     places.remove('not in a census designated place or incorporated place')
 
-    return {'states': states, 'places': places}
+    return {'states': set(states), 'places': set(places)}
