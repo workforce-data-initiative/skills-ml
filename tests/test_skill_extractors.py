@@ -87,6 +87,11 @@ def test_onet_skill_extractor():
         # -1 row that is a dupe
         assert len(output) == 7
 
+        assert len([row for row in output if row['ksa_type'] == 'knowledge']) == 2
+        assert len([row for row in output if row['ksa_type'] == 'skill']) == 1
+        assert len([row for row in output if row['ksa_type'] == 'ability']) == 1
+        assert len([row for row in output if row['ksa_type'] == 'tool']) == 3
+
         # make sure uuid is hashed version of the KSA
         for row in output:
             assert row['skill_uuid'] == md5(row['ONET KSA'])

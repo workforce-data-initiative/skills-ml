@@ -5,9 +5,17 @@ import yaml
 
 
 def get_apiv1_dbengine():
+    return create_engine(get_apiv1_dburl())
+
+
+def get_apiv1_dburl():
     dburl = os.environ.get('API_V1_DB_URL', None)
     if not dburl:
-        config_filename = 'api_v1_db_config.yaml'
+        config_filename = os.path.join(
+            os.path.dirname(__file__),
+            '../',
+            'api_v1_db_config.yaml'
+        )
 
         with open(config_filename) as f:
             config = yaml.load(f)
@@ -19,4 +27,4 @@ def get_apiv1_dbengine():
                 'port': config['PGPORT'],
             }
             dburl = URL('postgres', **dbconfig)
-    return create_engine(dburl)
+    return dburl
