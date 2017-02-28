@@ -41,7 +41,7 @@ def test_job_vectorizer(load_mock):
     load_mock.side_effect = side_effect
     fake_corpus_train_infer = FakeCorpusGenerator(num=100, infer=True)
     vectorized_job_generator = Doc2Vectorizer(model_name=model_name, path=s3_prefix).vectorize(fake_corpus_train_infer)
-    assert len(model.vocab.keys()) == 9
+    assert len(model.wv.vocab.keys()) == 9
     assert vectorized_job_generator.__next__().shape[0] == 5
     if os.path.exists(expected_cache_path):
         os.unlink(expected_cache_path)
