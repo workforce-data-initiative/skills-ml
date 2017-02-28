@@ -56,11 +56,11 @@ class JobTitleCleanOperator(BaseOperator):
 
         geo_title_count_df = pd.read_csv(count_filename, header=None)
         geo_title_count_df.columns = ['geo', 'title', 'count']
-        cleaned_geo_title_count_df = JobTitleStringClean().clean(geo_title_count_df)
+        cleaned_geo_title_count_df = JobTitleStringClean().clean(geo_title_count_df, ['geo', 'title'])
 
         title_count_df = pd.read_csv(rollup_filename)
         title_count_df.columns = ['title', 'count']
-        cleaned_title_count_df = JobTitleStringClean().clean(title_count_df)
+        cleaned_title_count_df = JobTitleStringClean().clean(title_count_df, ['title'])
 
         total_counts = 0
         with open(cleaned_count_filename, 'w') as count_file:
