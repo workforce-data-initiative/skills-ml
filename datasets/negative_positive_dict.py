@@ -4,8 +4,8 @@ import unicodecsv as csv
 import logging
 import requests
 import re
+import us
 
-STATEURL = 'https://s3-us-west-2.amazonaws.com/skills-public/tables/state_table.csv'
 PLACEURL = 'http://www2.census.gov/geo/docs/maps-data/data/rel/ua_place_rel_10.txt'
 ONETURL = 'https://s3-us-west-2.amazonaws.com/skills-public/pipeline/tables/job_titles_master_table.tsv'
 SUFFIXES = [
@@ -34,12 +34,8 @@ def negative_positive_dict():
     """
     logging.info("Beginning negative dictionary build")
     states = []
-    download = requests.get(STATEURL)
-    reader = csv.reader(download.content.splitlines(), delimiter=',')
-    next(reader)
-    for row in reader:
-        states.append(row[1].lower())
-        states.append(row[2].lower())
+    states.extend(list(map(lambda x: x.lower(), list(us.states.mapping('name', 'abbr').keys()))))
+    states.extend(list(map(lambda x: x.lower(), list(us.states.mapping('name', 'abbr').values()))))
 
     places = []
     download = requests.get(PLACEURL)

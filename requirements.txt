@@ -17,7 +17,6 @@ git+git://github.com/dssg/metta-data.git
 moto
 unicodecsv
 us
-<<<<<<< HEAD
 Sqlalchemy
 testing.postgresql
 psycopg2

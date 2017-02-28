@@ -54,6 +54,8 @@ class JobTitleCleanOperator(BaseOperator):
             quarter
         )
 
+        logging.info('Cleaning and aggregating job titles on %s', quarter)
+
         geo_title_count_df = pd.read_csv(count_filename, header=None)
         geo_title_count_df.columns = ['geo', 'title', 'count']
         cleaned_geo_title_count_df = JobTitleStringClean().clean(geo_title_count_df, ['geo', 'title'])
