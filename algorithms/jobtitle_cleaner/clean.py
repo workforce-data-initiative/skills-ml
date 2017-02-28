@@ -41,16 +41,18 @@ class JobTitleStringClean(object):
         self.dict = negative_positive_dict()
         self.negative_list = self.dict['places'] + self.dict['states']
         self.positive_list = self.dict['onetjobs']
-    def clean(self, df_jobtitles):
+
+    def clean(self, df_jobtitles, groupby_keys):
         """
         Clean the job titles by rules and negative dictionary.
         Args:
-            df_jobtitles in pandas DataFrame
+            df_jobtitles: job titles in pandas DataFrame
+            groupby_keys: a list of keys to be grouped by
         Returns:
-            pd.DataFrame(cleaned_jobtitles), a clenaed verison of job title in pandas DataFrame
+            agg_cleaned_jobtitles: a clenaed and aggregated verison of job title in pandas DataFrame
 
         """
-        df_jobtitles = df_jobtitles.fillna('no title')
+        df_jobtitles = df_jobtitles.fillna('without jobtitle')
 
         columns = list(df_jobtitles.columns)
         cleaned_jobtitles = OrderedDict({key: [] for key in columns})
@@ -66,7 +68,11 @@ class JobTitleStringClean(object):
             except TypeError:
                 print('There is some TypeError',row)
 
-        return pd.DataFrame(cleaned_jobtitles)
+        cleaned_jobtitles = pd.DataFrame(cleaned_jobtitles)
+        agg_cleaned_jobtitles = pd.DataFrame(cleaned_jobtitles.groupby(groupby_keys, as_index=False)['count'].sum())
+        agg_cleaned_jobtitles = agg_cleaned_jobtitles.fillna('without jobtitle')
+
+        return agg_cleaned_jobtitles
 
 
 
