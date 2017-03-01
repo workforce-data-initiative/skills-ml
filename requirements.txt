@@ -17,6 +17,8 @@ git+git://github.com/dssg/metta-data.git
 moto
 unicodecsv
 us
+mock
 Sqlalchemy
 testing.postgresql
 psycopg2
+mock

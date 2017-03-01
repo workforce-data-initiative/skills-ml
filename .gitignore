@@ -104,3 +104,6 @@ api_v1_db.yaml
 # Output folder/s3 upload staging area
 output/*
 !output/interesting_job_titles.tsv
+
+# missed test log
+missed.txt
