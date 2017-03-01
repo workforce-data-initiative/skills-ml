@@ -1,6 +1,6 @@
 import httpretty
 
-from datasets.negative_positive_dict import negative_positive_dict, PLACEURL, STATEURL, ONETURL
+from datasets.negative_positive_dict import negative_positive_dict, PLACEURL, ONETURL
 
 STATERESPONSE = """id,name,abbreviation,country,type,sort,status,occupied,notes,fips_state,assoc_press,standard_federal_region,census_region,census_region_name,census_division,census_division_name,circuit_court
 "1","Alabama","AL","USA","state","10","current","occupied","","1","Ala.","IV","3","South","6","East South Central","11"
@@ -39,13 +39,6 @@ def test_negative_dict():
         httpretty.GET,
         PLACEURL,
         body=PLACERESPONSE,
-        content_type='text/csv'
-    )
-
-    httpretty.register_uri(
-        httpretty.GET,
-        STATEURL,
-        body=STATERESPONSE,
         content_type='text/csv'
     )
 
