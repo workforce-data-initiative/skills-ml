@@ -12,7 +12,7 @@ httpretty==0.8.10
 Sphinx
 pytest-cov
 Elasticsearch
-gensim
+gensim==0.13.4
 git+git://github.com/dssg/metta-data.git
 moto
 unicodecsv
