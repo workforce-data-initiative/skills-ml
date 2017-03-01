@@ -1,10 +1,7 @@
 import pandas as pd
 import re
 from collections import OrderedDict
-<<<<<<< HEAD
 import logging
-=======
->>>>>>> ed416b88dce55f54810848f86f9bd1a0ce4e6101
 
 from datasets import negative_positive_dict
 
