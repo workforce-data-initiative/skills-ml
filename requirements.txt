@@ -21,8 +21,4 @@ mock
 Sqlalchemy
 testing.postgresql
 psycopg2
-<<<<<<< HEAD
 mock
-=======
-
->>>>>>> ed416b88dce55f54810848f86f9bd1a0ce4e6101
