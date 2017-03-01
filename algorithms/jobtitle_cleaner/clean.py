@@ -1,7 +1,10 @@
 import pandas as pd
 import re
 from collections import OrderedDict
+<<<<<<< HEAD
 import logging
+=======
+>>>>>>> ed416b88dce55f54810848f86f9bd1a0ce4e6101
 
 from datasets import negative_positive_dict
 
@@ -37,7 +40,6 @@ def clean_by_neg_dic(jobtitle, negative_list, positive_list):
             result.append(word)
         else:
             result.append(word)
-    #result = [word for word in jobtitle.split() if (word not in negative_list) or (word in positive_list)]
     result2str = ' '.join(result)
 
     return result2str
@@ -70,7 +72,6 @@ class JobTitleStringClean(object):
         Clean the job titles by rules and negative dictionary.
         Args:
             df_jobtitles: job titles in pandas DataFrame
-
         Returns:
             cleaned_jobtitles: a clenaed verison of job title in pandas DataFrame
         """
@@ -96,7 +97,6 @@ class JobTitleStringClean(object):
 
         cleaned_jobtitles = pd.DataFrame(cleaned_jobtitles)
         return cleaned_jobtitles
-
 
 
 
