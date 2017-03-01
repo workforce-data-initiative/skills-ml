@@ -2,19 +2,6 @@ import httpretty
 
 from datasets.negative_positive_dict import negative_positive_dict, PLACEURL, ONETURL
 
-STATERESPONSE = """id,name,abbreviation,country,type,sort,status,occupied,notes,fips_state,assoc_press,standard_federal_region,census_region,census_region_name,census_division,census_division_name,circuit_court
-"1","Alabama","AL","USA","state","10","current","occupied","","1","Ala.","IV","3","South","6","East South Central","11"
-"2","Alaska","AK","USA","state","10","current","occupied","","2","Alaska","X","4","West","9","Pacific","9"
-"3","Arizona","AZ","USA","state","10","current","occupied","","4","Ariz.","IX","4","West","8","Mountain","9"
-"4","Arkansas","AR","USA","state","10","current","occupied","","5","Ark.","VI","3","South","7","West South Central","8"
-"5","California","CA","USA","state","10","current","occupied","","6","Calif.","IX","4","West","9","Pacific","9"
-"6","Colorado","CO","USA","state","10","current","occupied","","8","Colo.","VIII","4","West","8","Mountain","10"
-"7","Connecticut","CT","USA","state","10","current","occupied","","9","Conn.","I","1","Northeast","1","New England","2"
-"8","Delaware","DE","USA","state","10","current","occupied","","10","Del.","III","3","South","5","South Atlantic","3"
-"9","Florida","FL","USA","state","10","current","occupied","","12","Fla.","IV","3","South","5","South Atlantic","11"
-"10","Georgia","GA","USA","state","10","current","occupied","","13","Ga.","IV","3","South","5","South Atlantic","11"
-"""
-
 PLACERESPONSE = """UA,UANAME,STATE,PLACE,PLNAME,CLASSFP,GEOID,POPPT,HUPT,AREAPT,AREALANDPT,UAPOP,UAHU,UAAREA,UAAREALAND,PLPOP,PLHU,PLAREA,PLAREALAND,UAPOPPCT,UAHUPCT,UAAREAPCT,UAAREALANDPCT,PLPOPPCT,PLHUPCT,PLAREAPCT,PLAREALANDPCT
 00037,"Abbeville, LA Urban Cluster",22,00100,"Abbeville city",C1,2200100,12073,5168,13424306,13348680,19824,8460,29523368,29222871,12257,5257,15756922,15655575,60.9,61.09,45.47,45.68,98.5,98.31,85.2,85.26
 00199,"Aberdeen--Bel Air South--Bel Air North, MD Urbanized Area",24,00125,"Aberdeen borough",C1,2400125,14894,6156,14961125,14942090,213751,83721,349451754,339626464,14959,6191,17618553,17599518,6.97,7.35,4.28,4.4,99.57,99.43,84.92,84.9
@@ -48,10 +35,6 @@ def test_negative_dict():
         body=ONETRESPONSE,
         content_type='text/csv'
     )
-
-    results_states = set(negative_positive_dict.__wrapped__()['states'])
-    assert results_states == {'alabama', 'al', 'alaska', 'ak', 'arizona', 'az', 'arkansas', 'ar', 'california', 'ca',
-                              'colorado', 'co', 'connecticut', 'ct', 'delaware', 'de', 'florida', 'fl', 'georgia', 'ga'}
 
     results_places = set(negative_positive_dict.__wrapped__()['places'])
     assert results_places == {'abbeville', 'aberdeen', 'winston-salem', 'ama', 'placitas',
