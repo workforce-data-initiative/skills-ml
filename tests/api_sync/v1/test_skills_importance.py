@@ -121,8 +121,8 @@ def test_skills_importance():
         # this task depends on jobs and skills master being loaded
         # so add the needed rows
         session.add(JobMaster('job_uuid', '11-1011.00', '', '', '', ''))
-        session.add(SkillMaster('skill_uuid1', '', '', '', ''))
-        session.add(SkillMaster('skill_uuid2', '', '', '', ''))
+        session.add(SkillMaster(uuid='skill_uuid1'))
+        session.add(SkillMaster(uuid='skill_uuid2'))
         session.commit()
         with utils.makeNamedTemporaryCSV(sample_ksas, separator='\t') as fname:
             load_skills_importance(fname, engine)

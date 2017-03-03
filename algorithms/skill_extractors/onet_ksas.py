@@ -20,7 +20,7 @@ class OnetSkillExtractor(object):
         self.onet_source = onet_source
         self.hash_function = hash_function
 
-    def onet_to_pandas(self, filename, col_name, use_relevance=True):
+    def onet_to_pandas(self, filename, col_name, ksa_type, use_relevance=True):
         """
         Args:
             filename: an unpathed filename referring to an ONET skill file
@@ -48,6 +48,9 @@ class OnetSkillExtractor(object):
                 else:
                     onet = [row for row in csv.DictReader(f, delimiter='\t')]
         onet = pd.DataFrame(onet)
+        if ksa_type:
+            col_name = col_name + ['ksa_type']
+            onet['ksa_type'] = ksa_type
 
         for col in col_name:
             onet[col] = onet[col].astype(str).str.lower()
@@ -61,18 +64,19 @@ class OnetSkillExtractor(object):
         nlp = NLPTransforms()
         # create dataframes for each KSA type
         standard_columns = ['O*NET-SOC Code', 'Element ID', 'Element Name']
-        skills = self.onet_to_pandas('Skills.txt', standard_columns)
-        ability = self.onet_to_pandas('Abilities.txt', standard_columns)
-        knowledge = self.onet_to_pandas('Knowledge.txt', standard_columns)
+        skills = self.onet_to_pandas('Skills.txt', standard_columns, 'skill')
+        ability = self.onet_to_pandas('Abilities.txt', standard_columns, 'ability')
+        knowledge = self.onet_to_pandas('Knowledge.txt', standard_columns, 'knowledge')
         tools = self.onet_to_pandas(
             'Tools and Technology.txt',
             ['O*NET-SOC Code', 'Commodity Code', 'T2 Example'],
+            'tool',
             use_relevance=False
         )
 
         # Concat KSA dataframes into one table
         # note significant duplications since it's by ONET SOC Code
-        new_columns = ['O*NET-SOC Code', 'Element ID', 'ONET KSA']
+        new_columns = ['O*NET-SOC Code', 'Element ID', 'ONET KSA', 'ksa_type']
         skills.columns = new_columns
         ability.columns = new_columns
         knowledge.columns = new_columns
@@ -83,6 +87,7 @@ class OnetSkillExtractor(object):
         onet_modelreference = self.onet_to_pandas(
             'Content Model Reference.txt',
             ['Element ID', 'Description'],
+            ksa_type=None,
             use_relevance=False
         )
 
