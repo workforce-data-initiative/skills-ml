@@ -36,11 +36,11 @@ class GeoTitleCountOperator(BaseOperator):
     def execute(self, context):
         s3_conn = S3Hook().get_conn()
         quarter = datetime_to_quarter(context['execution_date'])
-        count_filename = '{}/geo_title_count_{}.csv'.format(
+        count_filename = '{}/geo_title_count/{}.csv'.format(
             output_folder,
             quarter
         )
-        rollup_filename = '{}/title_count_{}.csv'.format(
+        rollup_filename = '{}/title_count/{}.csv'.format(
             output_folder,
             quarter
         )
@@ -79,22 +79,22 @@ class JobTitleCleanOperator(BaseOperator):
         s3_conn = S3Hook().get_conn()
         quarter = datetime_to_quarter(context['execution_date'])
 
-        cleaned_count_filename = '{}/cleaned_geo_title_count_{}_new.csv'.format(
+        cleaned_count_filename = '{}/cleaned_geo_title_count/{}.csv'.format(
             output_folder,
             quarter
         )
 
-        cleaned_rollup_filename = '{}/cleaned_title_count_{}.csv'.format(
+        cleaned_rollup_filename = '{}/cleaned_title_count/{}.csv'.format(
             output_folder,
             quarter
         )
 
-        count_filename = '{}/geo_title_count_{}.csv'.format(
+        count_filename = '{}/geo_title_count/{}.csv'.format(
             output_folder,
             quarter
         )
 
-        rollup_filename = '{}/title_count_{}.csv'.format(
+        rollup_filename = '{}/title_count/{}.csv'.format(
             output_folder,
             quarter
         )
