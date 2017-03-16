@@ -1,7 +1,7 @@
-from utils.fs import cache_json, CACHE_DIRECTORY
+from utils.fs import cache_json, CACHE_DIRECTORY, check_create_folder
 import os
 import json
-
+import shutil
 
 def test_cache_json():
     counter = {'times_called': 0}
@@ -20,3 +20,10 @@ def test_cache_json():
     # run the function again and make sure the cached version is used
     assert a_function(counter) == '6'
     assert counter['times_called'] == 1
+
+def test_check_create_folder():
+    test_dir = 'test_dir'
+    filename = os.path.join(test_dir, 'test.txt')
+    check_create_folder(filename)
+    assert os.path.exists(test_dir) == True
+    shutil.rmtree(test_dir)
