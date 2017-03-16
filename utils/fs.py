@@ -22,3 +22,7 @@ def cache_json(filename):
                 return function_output
         return cache_wrapper
     return cache_decorator
+
+def check_create_folder(filename):
+    """Check if the folder exisits. If not, create the folder"""
+    os.makedirs(os.path.dirname(filename), exist_ok=True)

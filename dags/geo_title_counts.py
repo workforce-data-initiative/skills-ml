@@ -11,6 +11,7 @@ from airflow.operators import BaseOperator
 from utils.airflow import datetime_to_quarter
 from utils.s3 import upload
 from utils.nlp import NLPTransforms
+from utils.fs import check_create_folder
 from datasets import job_postings
 from algorithms.aggregators.title import GeoTitleAggregator
 from algorithms.jobtitle_cleaner.clean import JobTitleStringClean, aggregate
@@ -36,6 +37,7 @@ class GeoTitleCountOperator(BaseOperator):
     def execute(self, context):
         s3_conn = S3Hook().get_conn()
         quarter = datetime_to_quarter(context['execution_date'])
+
         count_filename = '{}/geo_title_count/{}.csv'.format(
             output_folder,
             quarter
@@ -51,6 +53,7 @@ class GeoTitleCountOperator(BaseOperator):
             .counts(job_postings_generator)
 
         total_counts = 0
+        check_create_folder(count_filename)
         with open(count_filename, 'w') as count_file:
             count_writer = csv.writer(count_file, delimiter=',')
             for key, count in counts.items():
@@ -59,6 +62,7 @@ class GeoTitleCountOperator(BaseOperator):
                 count_writer.writerow([geo, title, count])
 
         rollup_counts = 0
+        check_create_folder(rollup_filename)
         with open(rollup_filename, 'w') as rollup_file:
             rollup_writer = csv.writer(rollup_file, delimiter=',')
             for title, count in title_rollup.items():
@@ -112,6 +116,7 @@ class JobTitleCleanOperator(BaseOperator):
         agg_cleaned_title_count_df = aggregate(cleaned_title_count_df, ['title'])
 
         total_counts = 0
+        check_create_folder(cleaned_count_filename)
         with open(cleaned_count_filename, 'w') as count_file:
             clean_geo_writer = csv.writer(count_file, delimiter=',')
             for idx, row in agg_cleaned_geo_title_count_df.iterrows():
@@ -119,6 +124,7 @@ class JobTitleCleanOperator(BaseOperator):
                 clean_geo_writer.writerow([row['geo'], row['title'], row['count']])
 
         rollup_counts = 0
+        check_create_folder(cleaned_rollup_filename)
         with open(cleaned_rollup_filename, 'w') as count_file:
             clean_writer = csv.writer(count_file, delimiter=',')
             for idx, row in agg_cleaned_title_count_df.iterrows():
