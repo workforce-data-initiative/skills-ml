@@ -37,7 +37,7 @@ def test_upload():
         upload(s3_conn, f.name, s3_path)
         key = boto.s3.key.Key(
             bucket=bucket,
-            name='apath/akey/{}'.format(f.name.replace('/', '_'))
+            name='apath/akey/{}'.format(f.name)
         )
         s = key.get_contents_as_string()
         assert s.decode('utf-8') == 'test'

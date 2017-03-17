@@ -33,7 +33,7 @@ def upload(s3_conn, filename, s3_path):
 
     key = boto.s3.key.Key(
         bucket=bucket,
-        name='{}/{}'.format(prefix, filename.replace('/', '_'))
+        name='{}/{}'.format(prefix, filename)
     )
     logging.info('uploading from %s to %s', filename, key)
     key.set_contents_from_filename(filename)
