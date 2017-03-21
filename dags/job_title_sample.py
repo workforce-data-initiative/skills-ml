@@ -67,4 +67,10 @@ class JobTitleSampleOperator(BaseOperator):
             for line in count_sample:
                 sample_file.write(line)
 
+        logging.info(
+            'Sampled %s job title rows for %s',
+            SAMPLENUM,
+            quarter,
+        )
+
 JobTitleSampleOperator(task_id='jobtitle_sample', dag=dag)
