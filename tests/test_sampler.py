@@ -1,4 +1,4 @@
-from algorithms.file_sampler import sampler
+from skills_ml.algorithms.file_sampler import sampler
 from unittest.mock import mock_open
 import os
 import tempfile

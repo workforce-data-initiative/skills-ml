@@ -1,4 +1,4 @@
-from algorithms.representativeness_calculators.geo_occupation import \
+from skills_ml.algorithms.representativeness_calculators.geo_occupation import \
     GeoOccupationRepresentativenessCalculator
 
 

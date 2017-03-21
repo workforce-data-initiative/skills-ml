@@ -1,6 +1,6 @@
-from algorithms.skill_taggers.simple import SimpleSkillTagger
+from skills_ml.algorithms.skill_taggers.simple import SimpleSkillTagger
 from tests import utils
-from utils.hash import md5
+from skills_ml.utils.hash import md5
 
 
 def test_simple_skill_tagger():

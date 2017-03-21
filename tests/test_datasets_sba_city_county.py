@@ -2,7 +2,7 @@ import httpretty
 import json
 from mock import patch
 
-from datasets.sba_city_county import county_lookup, URL
+from skills_ml.datasets.sba_city_county import county_lookup, URL
 
 COUNTY_RESPONSE = json.dumps([
     {
@@ -25,7 +25,7 @@ COUNTY_RESPONSE = json.dumps([
 
 
 @httpretty.activate
-@patch('datasets.sba_city_county.STATE_CODES', ['IL'])
+@patch('skills_ml.datasets.sba_city_county.STATE_CODES', ['IL'])
 def test_county_lookup():
     httpretty.register_uri(
         httpretty.GET,

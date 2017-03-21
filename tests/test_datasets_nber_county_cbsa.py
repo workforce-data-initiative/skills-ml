@@ -1,6 +1,6 @@
 import httpretty
 
-from datasets.nber_county_cbsa import cbsa_lookup, URL
+from skills_ml.datasets.nber_county_cbsa import cbsa_lookup, URL
 
 CBSA_RESPONSE = '''"countyname","state","ssacounty","fipscounty","cbsa","cbsaname","ssast","fipst"
 "AUTAUGA","AL","01000","01001","33860","Montgomery, AL","01","01"'''.encode('latin-1')

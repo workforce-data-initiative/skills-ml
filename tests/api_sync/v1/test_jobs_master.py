@@ -2,8 +2,8 @@ import testing.postgresql
 from tests import utils
 
 from sqlalchemy import create_engine
-from api_sync.v1.models import ensure_db
-from api_sync.v1.jobs_master import load_jobs_master
+from skills_ml.api_sync.v1.models import ensure_db
+from skills_ml.api_sync.v1.jobs_master import load_jobs_master
 
 
 sample_input = [

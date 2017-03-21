@@ -12,15 +12,15 @@ from airflow.hooks import S3Hook
 from airflow.operators import BaseOperator
 
 from config import config
-from datasets import OnetCache
-from utils.es import basic_client
-from utils.hash import md5
-from utils.s3 import split_s3_path, upload
+from skills_ml.datasets import OnetCache
+from skills_ml.utils.es import basic_client
+from skills_ml.utils.hash import md5
+from skills_ml.utils.s3 import split_s3_path, upload
 
-from algorithms.skill_extractors.onet_ksas import OnetSkillExtractor
-from algorithms.skill_importance_extractors.onet import OnetSkillImportanceExtractor
-from algorithms.title_extractors.onet import OnetTitleExtractor
-from algorithms.elasticsearch_indexers.job_titles_master import JobTitlesMasterIndexer
+from skills_ml.algorithms.skill_extractors.onet_ksas import OnetSkillExtractor
+from skills_ml.algorithms.skill_importance_extractors.onet import OnetSkillImportanceExtractor
+from skills_ml.algorithms.title_extractors.onet import OnetTitleExtractor
+from skills_ml.algorithms.elasticsearch_indexers.job_titles_master import JobTitlesMasterIndexer
 
 # some DAG args, please tweak for sanity
 default_args = {
@@ -46,7 +46,11 @@ class SkillExtractOperator(BaseOperator):
     def execute(self, context):
         conn = S3Hook().get_conn()
         skill_extractor = OnetSkillExtractor(
-            onet_source=OnetCache(conn),
+            onet_source=OnetCache(
+                conn,
+                cache_dir=config['onet']['cache_dir'],
+                s3_path=config['onet']['s3_path'],
+            ),
             output_filename=skills_filename,
             hash_function=md5
         )
@@ -58,7 +62,11 @@ class TitleExtractOperator(BaseOperator):
     def execute(self, context):
         conn = S3Hook().get_conn()
         title_extractor = OnetTitleExtractor(
-            onet_source=OnetCache(conn),
+            onet_source=OnetCache(
+                conn,
+                cache_dir=config['onet']['cache_dir'],
+                s3_path=config['onet']['s3_path'],
+            ),
             output_filename=titles_filename,
             hash_function=md5
         )
@@ -70,7 +78,11 @@ class SkillImportanceOperator(BaseOperator):
     def execute(self, context):
         conn = S3Hook().get_conn()
         skill_extractor = OnetSkillImportanceExtractor(
-            onet_source=OnetCache(conn),
+            onet_source=OnetCache(
+                conn,
+                cache_dir=config['onet']['cache_dir'],
+                s3_path=config['onet']['s3_path'],
+            ),
             output_filename=skill_importance_filename,
             hash_function=md5
         )
@@ -91,7 +103,8 @@ class IndexJobTitlesMasterOperator(BaseOperator):
         JobTitlesMasterIndexer(
             s3_conn=conn.get_conn(),
             es_client=basic_client(),
-            job_title_generator=reader
+            job_title_generator=reader,
+            alias_name=config['normalizer']['titles_master_index_name']
         ).replace()
 
 skills = SkillExtractOperator(task_id='skill_extract', dag=dag)

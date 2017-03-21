@@ -3,8 +3,8 @@ from sqlalchemy.orm import sessionmaker
 from tests.utils import makeNamedTemporaryCSV
 
 from sqlalchemy import create_engine
-from api_sync.v1.models import ensure_db, JobMaster, JobUnusualTitle
-from api_sync.v1.jobs_unusual_titles import load_jobs_unusual_titles
+from skills_ml.api_sync.v1.models import ensure_db, JobMaster, JobUnusualTitle
+from skills_ml.api_sync.v1.jobs_unusual_titles import load_jobs_unusual_titles
 
 
 sample_titles = [

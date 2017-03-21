@@ -1,12 +1,42 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
+from setuptools import setup
+
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
+
+with open('requirements.txt') as requirements_file:
+    requirements = requirements_file.readlines()
+
+with open('requirements_dev.txt') as requirements_file:
+    test_requirements = requirements_file.readlines() + requirements
 
 setup(
     name='Skills ML',
-    version='1.0',
-    description='Skills ML',
-    author='Tristan Crockett',
-    author_email='thcrockett@uchicago.edu',
-    packages=find_packages(),
+    version='0.1.0',
+    description='Algorithms for Jobs/skills taxonomy creation',
+    author="Center for Data Science and Public Policy",
+    author_email='datascifellows@gmail.com',
+    url='https://github.com/workforce-data-initiative/skills-ml',
+    packages=[
+        'skills_ml.algorithms',
+        'skills_ml.api_sync',
+        'skills_ml.datasets',
+        'skills_ml.evaluation',
+        'skills_ml.utils',
+    ],
+    include_package_data=True,
+    install_requires=requirements,
+    license="MIT license",
+    keywords='nlp jobs skills onet',
+    classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+    ],
+    test_suite='tests',
+    tests_require=test_requirements
 )

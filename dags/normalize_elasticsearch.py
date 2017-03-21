@@ -8,11 +8,12 @@ from airflow import DAG
 from airflow.operators import BaseOperator
 from airflow.hooks import S3Hook
 
-from utils.es import basic_client
-from algorithms.elasticsearch_indexers.normalize_topn import NormalizeTopNIndexer
-from utils.airflow import datetime_to_quarter
+from skills_ml.utils.es import basic_client
+from skills_ml.algorithms.elasticsearch_indexers.normalize_topn import NormalizeTopNIndexer
+from skills_ml.utils.airflow import datetime_to_quarter
 from datetime import datetime
-from datasets import job_postings
+from skills_ml.datasets import job_postings
+from config import config
 
 default_args = {
     'depends_on_past': False,
@@ -33,6 +34,8 @@ class IndexQuarterOperator(BaseOperator):
         NormalizeTopNIndexer(
             quarter=quarter,
             job_postings_generator=job_postings,
+            job_titles_index=config['normalizer']['titles_master_index_name'],
+            alias_name=config['normalizer']['es_index_name'],
             s3_conn=conn,
             es_client=basic_client()
         ).append()

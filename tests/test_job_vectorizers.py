@@ -1,4 +1,4 @@
-from algorithms.job_vectorizers.doc2vec_vectorizer import Doc2Vectorizer
+from skills_ml.algorithms.job_vectorizers.doc2vec_vectorizer import Doc2Vectorizer
 import gensim
 import os
 from moto import mock_s3

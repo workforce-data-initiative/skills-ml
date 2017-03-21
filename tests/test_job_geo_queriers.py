@@ -1,5 +1,5 @@
 from mock import patch
-from algorithms.job_geography_queriers.cbsa import JobCBSAQuerier
+from skills_ml.algorithms.job_geography_queriers.cbsa import JobCBSAQuerier
 import unittest
 
 place_ua_lookup = {
@@ -19,9 +19,9 @@ ua_cbsa_lookup = {
 
 class CBSATest(unittest.TestCase):
     def setUp(self):
-        place_patch = patch('algorithms.job_geography_queriers.cbsa.place_ua', return_value=place_ua_lookup)
-        cousub_patch = patch('algorithms.job_geography_queriers.cbsa.cousub_ua', return_value=cousub_ua_lookup)
-        cbsa_patch = patch('algorithms.job_geography_queriers.cbsa.ua_cbsa', return_value=ua_cbsa_lookup)
+        place_patch = patch('skills_ml.algorithms.job_geography_queriers.cbsa.place_ua', return_value=place_ua_lookup)
+        cousub_patch = patch('skills_ml.algorithms.job_geography_queriers.cbsa.cousub_ua', return_value=cousub_ua_lookup)
+        cbsa_patch = patch('skills_ml.algorithms.job_geography_queriers.cbsa.ua_cbsa', return_value=ua_cbsa_lookup)
         self.addCleanup(cousub_patch.stop)
         self.addCleanup(place_patch.stop)
         self.addCleanup(cbsa_patch.stop)

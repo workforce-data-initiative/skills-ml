@@ -3,8 +3,8 @@ from sqlalchemy.orm import sessionmaker
 from tests import utils
 
 from sqlalchemy import create_engine
-from api_sync.v1.models import ensure_db, JobMaster, SkillMaster
-from api_sync.v1.skills_importance import load_skills_importance
+from skills_ml.api_sync.v1.models import ensure_db, JobMaster, SkillMaster
+from skills_ml.api_sync.v1.skills_importance import load_skills_importance
 
 
 sample_ksas = [

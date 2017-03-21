@@ -1,4 +1,4 @@
-from algorithms.corpus_creators.basic import GensimCorpusCreator
+from skills_ml.algorithms.corpus_creators.basic import GensimCorpusCreator
 def test_doc2vec_corpus_creator():
     sample_document = {
         "incentiveCompensation": "",

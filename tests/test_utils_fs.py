@@ -1,4 +1,4 @@
-from utils.fs import cache_json, CACHE_DIRECTORY, check_create_folder
+from skills_ml.utils.fs import cache_json, CACHE_DIRECTORY, check_create_folder
 import os
 import json
 import shutil

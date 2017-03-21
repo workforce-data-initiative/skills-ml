@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.operators import DummyOperator, PythonOperator
 from datetime import datetime
-from evaluation.query import generate_evaluators, run_evaluator
+from skills_ml.evaluation.query import generate_evaluators, run_evaluator
 
 # some DAG args, please tweak for sanity
 default_args = {

@@ -1,4 +1,4 @@
-from algorithms.corpus_creators.basic import SimpleCorpusCreator
+from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
 
 
 def test_simple_corpus_creator():

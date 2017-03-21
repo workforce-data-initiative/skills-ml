@@ -1,4 +1,4 @@
-import evaluation.query as query
+import skills_ml.evaluation.query as query
 
 import random
 

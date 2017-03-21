@@ -1,4 +1,4 @@
-from utils import nlp
+from skills_ml.utils import nlp
 
 transforms = nlp.NLPTransforms()
 
