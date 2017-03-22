@@ -9,7 +9,7 @@ from airflow.operators import BaseOperator
 from utils.airflow import datetime_to_quarter
 from utils.s3 import upload
 from utils.fs import check_create_folder
-from algorithms.jobtitle_sampler import sampler
+from algorithms.file_sampler import sampler
 from config import config
 
 default_args = {
@@ -34,13 +34,15 @@ class JobTitleSampleOperator(BaseOperator):
         s3_conn = S3Hook().get_conn()
         quarter = datetime_to_quarter(context['execution_date'])
 
-        cleaned_count_filename = '{}/cleaned_geo_title_count/{}.csv'.format(
+        cleaned_count_filename = '{}/{}/{}.csv'.format(
             output_folder,
+            config.get('cleaned_geo_title_count'),
             quarter
         )
 
-        cleaned_rollup_filename = '{}/cleaned_title_count/{}.csv'.format(
+        cleaned_rollup_filename = '{}/{}/{}.csv'.format(
             output_folder,
+            config.get('cleaned_title_count'),
             quarter
         )
 
@@ -54,8 +56,8 @@ class JobTitleSampleOperator(BaseOperator):
             quarter
         )
 
-        geo_sample = sampler.reservoir_sample(SAMPLENUM, cleaned_count_filename)
-        count_sample = sampler.reservoir_sample(SAMPLENUM, cleaned_rollup_filename)
+        geo_sample = sampler.reservoir_sample(SAMPLENUM, cleaned_count_filename, 12)
+        count_sample = sampler.reservoir_sample(SAMPLENUM, cleaned_rollup_filename, 12)
 
         check_create_folder(sampled_count_filename)
         with open(sampled_count_filename, 'w') as sample_file:
