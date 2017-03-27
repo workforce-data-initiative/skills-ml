@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -18,13 +18,7 @@ setup(
     author="Center for Data Science and Public Policy",
     author_email='datascifellows@gmail.com',
     url='https://github.com/workforce-data-initiative/skills-ml',
-    packages=[
-        'skills_ml.algorithms',
-        'skills_ml.api_sync',
-        'skills_ml.datasets',
-        'skills_ml.evaluation',
-        'skills_ml.utils',
-    ],
+    packages=find_packages(include=['skills_ml*']),
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
