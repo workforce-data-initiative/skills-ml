@@ -4,8 +4,8 @@ import pandas as pd
 
 from tests import utils
 
-from algorithms.title_extractors.onet import OnetTitleExtractor
-from utils.hash import md5
+from skills_ml.algorithms.title_extractors.onet import OnetTitleExtractor
+from skills_ml.utils.hash import md5
 
 
 def test_onet_title_extractor():

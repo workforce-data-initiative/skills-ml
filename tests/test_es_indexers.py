@@ -2,10 +2,10 @@ import httpretty
 import json
 import re
 
-from utils.es import basic_client
+from skills_ml.utils.es import basic_client
 
-from algorithms.elasticsearch_indexers.job_titles_master import JobTitlesMasterIndexer
-from algorithms.elasticsearch_indexers.normalize_topn import NormalizeTopNIndexer
+from skills_ml.algorithms.elasticsearch_indexers.job_titles_master import JobTitlesMasterIndexer
+from skills_ml.algorithms.elasticsearch_indexers.normalize_topn import NormalizeTopNIndexer
 
 
 def test_index_titles():
@@ -17,7 +17,7 @@ def test_index_titles():
 
     indexer = JobTitlesMasterIndexer(
         job_title_generator=input_data,
-        app_config={'normalizer': {'titles_master_index_name': 'stuff'}},
+        alias_name='stuff',
         s3_conn=None,
         es_client=basic_client()
     )
@@ -56,12 +56,8 @@ def test_normalize_topn():
     indexer = NormalizeTopNIndexer(
         s3_conn=None,
         es_client=basic_client(),
-        app_config={
-            'normalizer': {
-                'titles_master_index_name': 'stuff',
-                'es_index_name': 'otherstuff'
-            }
-        },
+        job_titles_index='stuff',
+        alias_name='otherstuff',
         quarter='2014Q1',
         job_postings_generator=generator
     )

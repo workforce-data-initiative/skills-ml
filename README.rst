@@ -28,7 +28,14 @@ skills-ml depends on python3, so create a virtual environment using a python3 ex
 
 `virtualenv venv -p /usr/bin/python3`
 
-3. Airflow
+3. Python requirements
+~~~~~~~~~~~~~~~~~~~~~~
+Activate your virtualenv and install requirements.
+
+`source venv/bin/activate`
+`pip install requirements_dev.txt`
+
+4. Airflow
 ~~~~~~~~~~~~~~~~~~~~~~
 Although many of the algorithmic components can be used as pure Python classes, the main way of running this code is on Airflow. There are a number of things to get Airflow up and running, but the script below will launch Airflow with a reasonable default configuration for this repository, and even start the webserver.
 
@@ -36,12 +43,12 @@ Although many of the algorithmic components can be used as pure Python classes, 
 
 The script will prompt you to use the Airflow UI to input S3 credentials. That should be done at this stage.
 
-4. Configure s3 buckets and prefixes
+5. Configure s3 buckets and prefixes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Configuration of external data sources, such as s3, is controlled via a config.yaml file in the root directory of the project. Copy example_config.yaml to example_config.yaml and modify it to match the source buckets and paths for the data you wish to use (such as job listings, or ONET extracts).
 
-5. Run whatever DAGs or tasks you like
+6. Run whatever DAGs or tasks you like
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For instance, this code will test a sample ONET title extractor:
 `PYTHONPATH='.' airflow test simple_machine_learning title_extract 2016-01-01`

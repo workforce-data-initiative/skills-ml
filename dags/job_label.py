@@ -5,9 +5,9 @@ from airflow import DAG
 from airflow.hooks import S3Hook
 from airflow.operators import BaseOperator
 
-from utils.airflow import datetime_to_quarter
-from datasets import job_postings
-from algorithms.corpus_creators.basic import JobCategoryCorpusCreator
+from skills_ml.utils.airflow import datetime_to_quarter
+from skills_ml.datasets import job_postings
+from skills_ml.algorithms.corpus_creators.basic import JobCategoryCorpusCreator
 
 # some DAG args, please tweak for sanity
 default_args = {

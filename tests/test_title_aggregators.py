@@ -1,7 +1,7 @@
 import json
 
-from algorithms.aggregators.title import GeoTitleAggregator
-from utils.nlp import NLPTransforms
+from skills_ml.algorithms.aggregators.title import GeoTitleAggregator
+from skills_ml.utils.nlp import NLPTransforms
 
 
 class FakeCBSAQuerier(object):

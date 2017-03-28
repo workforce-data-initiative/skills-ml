@@ -1,4 +1,4 @@
-from algorithms.job_normalizers.esa_jobtitle_normalizer import ESANormalizer
+from skills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer import ESANormalizer
 from mock import patch
 from tests import utils
 
@@ -17,7 +17,7 @@ class MockOnetSourceDownloader(object):
             return temp
 
 
-@patch('algorithms.job_normalizers.esa_jobtitle_normalizer.ONET_VERSIONS', ['db_21_0_text'])
+@patch('skills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer.ONET_VERSIONS', ['db_21_0_text'])
 def test_esa_normalizer():
     normalizer = ESANormalizer(MockOnetSourceDownloader)
     assert normalizer.normalize_job_title('Staffing Expert')[0]['title'] == 'chief executives'

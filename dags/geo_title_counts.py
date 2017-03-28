@@ -8,13 +8,13 @@ from airflow import DAG
 from airflow.hooks import S3Hook
 from airflow.operators import BaseOperator
 
-from utils.airflow import datetime_to_quarter
-from utils.s3 import upload
-from utils.nlp import NLPTransforms
-from utils.fs import check_create_folder
-from datasets import job_postings
-from algorithms.aggregators.title import GeoTitleAggregator
-from algorithms.jobtitle_cleaner.clean import JobTitleStringClean, aggregate
+from skills_ml.utils.airflow import datetime_to_quarter
+from skills_ml.utils.s3 import upload
+from skills_ml.utils.nlp import NLPTransforms
+from skills_ml.utils.fs import check_create_folder
+from skills_ml.datasets import job_postings
+from skills_ml.algorithms.aggregators.title import GeoTitleAggregator
+from skills_ml.algorithms.jobtitle_cleaner.clean import JobTitleStringClean, aggregate
 from config import config
 
 default_args = {
@@ -47,7 +47,11 @@ class GeoTitleCountOperator(BaseOperator):
             quarter
         )
 
-        job_postings_generator = job_postings(s3_conn, quarter)
+        job_postings_generator = job_postings(
+            s3_conn,
+            quarter,
+            config['job_postings']['s3_path']
+        )
         title_cleaner = NLPTransforms().title_phase_one
         counts, title_rollup = GeoTitleAggregator(title_cleaner=title_cleaner)\
             .counts(job_postings_generator)

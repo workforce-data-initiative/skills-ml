@@ -8,11 +8,11 @@ from airflow import DAG
 from airflow.operators import BaseOperator
 
 from config import config
-from utils.airflow import datetime_to_year_quarter, datetime_to_quarter
-from utils.db import get_apiv1_dbengine as get_db
-from api_sync.v1.models import ensure_db
+from skills_ml.utils.airflow import datetime_to_year_quarter, datetime_to_quarter
+from skills_ml.utils.db import get_apiv1_dbengine as get_db
+from skills_ml.api_sync.v1.models import ensure_db
 
-from api_sync.v1 import \
+from skills_ml.api_sync.v1 import \
     load_jobs_master, \
     load_alternate_titles, \
     load_jobs_unusual_titles, \

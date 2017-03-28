@@ -13,13 +13,13 @@ from airflow.hooks import S3Hook
 from airflow.operators import BaseOperator
 
 from config import config
-from datasets import job_postings
-from utils.airflow import datetime_to_quarter
-from utils.s3 import upload
-from utils.hash import md5
+from skills_ml.datasets import job_postings
+from skills_ml.utils.airflow import datetime_to_quarter
+from skills_ml.utils.s3 import upload
+from skills_ml.utils.hash import md5
 
-from algorithms.corpus_creators.basic import SimpleCorpusCreator
-from algorithms.skill_taggers.simple import SimpleSkillTagger
+from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
+from skills_ml.algorithms.skill_taggers.simple import SimpleSkillTagger
 
 default_args = {
     'depends_on_past': False,

@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from airflow import models
 from mock import patch
 from dags.api_sync_v1 import dag
-from api_sync.v1.models import JobMaster,\
+from skills_ml.api_sync.v1.models import JobMaster,\
     SkillMaster,\
     SkillImportance,\
     GeoTitleCount,\

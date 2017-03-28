@@ -6,10 +6,10 @@ from airflow import DAG
 from airflow.hooks import S3Hook
 from airflow.operators import BaseOperator
 
-from utils.airflow import datetime_to_quarter
-from utils.s3 import upload
-from utils.fs import check_create_folder
-from algorithms.file_sampler import sampler
+from skills_ml.utils.airflow import datetime_to_quarter
+from skills_ml.utils.s3 import upload
+from skills_ml.utils.fs import check_create_folder
+from skills_ml.algorithms.file_sampler import sampler
 from config import config
 
 default_args = {

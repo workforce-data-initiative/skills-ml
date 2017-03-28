@@ -1,5 +1,5 @@
 import json
-from algorithms.corpus_creators.basic import CorpusCreator
+from skills_ml.algorithms.corpus_creators.basic import CorpusCreator
 
 sample_input = [json.dumps({
     'test_field': 'We are looking for a person to fill this job'

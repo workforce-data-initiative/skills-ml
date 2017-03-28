@@ -3,8 +3,8 @@ from sqlalchemy.orm import sessionmaker
 from tests import utils
 
 from sqlalchemy import create_engine
-from api_sync.v1.models import ensure_db, GeoTitleCount, Geography, Quarter
-from api_sync.v1.geo_title_counts import load_geo_title_counts
+from skills_ml.api_sync.v1.models import ensure_db, GeoTitleCount, Geography, Quarter
+from skills_ml.api_sync.v1.geo_title_counts import load_geo_title_counts
 
 sample_counts = [
     [41700, 'customer service representative', 2],

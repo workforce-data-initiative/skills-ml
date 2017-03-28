@@ -1,0 +1,10 @@
+codecov
+httpretty==0.8.10
+mock
+mock
+moto
+pytest-cov
+pytest
+Sphinx
+testing.postgresql
+tox
