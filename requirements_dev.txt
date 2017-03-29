@@ -8,3 +8,4 @@ pytest
 Sphinx
 testing.postgresql
 tox
+git+git://github.com/workforce-data-initiative/skills-utils.git@master
