@@ -33,6 +33,7 @@ skills-ml depends on python3, so create a virtual environment using a python3 ex
 Activate your virtualenv and install requirements.
 
 `source venv/bin/activate`
+`pip install requirements.txt`
 `pip install requirements_dev.txt`
 
 4. Airflow
