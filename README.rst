@@ -61,6 +61,5 @@ Structure
 * algorithms/ - Core algorithmic components. Each subdirectory is meant to contain a different type of component, such as a job title normalizer or a skill tagger, with a common interface so different pipelines can try out different versions of the components.
 * evaluation/ - Code for testing different components against each other
 * datasets.py - Wrappers for interfacing with different datasets, such as ONET
-* dags/ - Pipelines in Airflow DAG form
 * tests/ - A test suite
 * utils/ - Common utilities

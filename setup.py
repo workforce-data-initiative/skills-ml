@@ -9,7 +9,10 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.readlines()
 
 with open('requirements_dev.txt') as requirements_file:
-    test_requirements = requirements_file.readlines() + requirements
+    test_requirements = [
+        req for req in requirements_file.readlines()
+        if 'git+' not in req
+    ] + requirements
 
 setup(
     name='Skills ML',
