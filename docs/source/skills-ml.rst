@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
 
     skills-ml.algorithms
-    skills-ml.dags
     skills-ml.evaluation
     skills-ml.tests
     skills-ml.utils

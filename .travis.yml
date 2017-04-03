@@ -13,8 +13,5 @@ before_install:
 install:
 - pip install -r requirements.txt
 - pip install -r requirements_dev.txt
-before_script:
-- airflow initdb
-- sed -i 's/\/home\/travis\/airflow\/dags/\/home\/travis\/build\/workforce-data-initiative\/skills-ml\/dags/g' /home/travis/airflow/airflow.cfg
 script: py.test -vvv -s --cov=skills_ml.algorithms --cov=skills_ml.utils --cov=skills_ml.evaluation --cov=skills_ml.api_sync
 after_success: codecov
