@@ -1,5 +1,5 @@
 """Retrieve county lookup tables from the SBA for each state"""
-from skills_ml.utils.fs import cache_json
+from skills_utils.fs import cache_json
 import logging
 import requests
 

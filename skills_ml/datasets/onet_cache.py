@@ -3,7 +3,7 @@ import os
 
 import boto
 
-from skills_ml.utils.s3 import split_s3_path
+from skills_utils.s3 import split_s3_path
 
 
 class OnetCache(object):

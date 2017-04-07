@@ -4,7 +4,7 @@ from gensim.models import Doc2Vec
 
 from skills_ml.utils.nlp import NLPTransforms
 
-from skills_ml.utils.s3 import download
+from skills_utils.s3 import download
 
 MODEL_NAME = 'gensim_doc2vec'
 PATHTOMODEL = 'skills-private/model_cache/'

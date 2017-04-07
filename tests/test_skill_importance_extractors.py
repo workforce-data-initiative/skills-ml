@@ -5,7 +5,7 @@ import pandas as pd
 from tests import utils
 
 from skills_ml.algorithms.skill_importance_extractors.onet import OnetSkillImportanceExtractor
-from skills_ml.utils.hash import md5
+from skills_utils.hash import md5
 
 
 def test_onet_skill_extractor():

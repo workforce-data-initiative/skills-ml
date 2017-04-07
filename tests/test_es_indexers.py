@@ -2,7 +2,7 @@ import httpretty
 import json
 import re
 
-from skills_ml.utils.es import basic_client
+from skills_utils.es import basic_client
 
 from skills_ml.algorithms.elasticsearch_indexers.job_titles_master import JobTitlesMasterIndexer
 from skills_ml.algorithms.elasticsearch_indexers.normalize_topn import NormalizeTopNIndexer

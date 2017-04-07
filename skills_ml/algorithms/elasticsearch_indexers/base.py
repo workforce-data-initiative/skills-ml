@@ -5,7 +5,7 @@ Subclasses implement the index setting definition and transformation of data,
 The base class handles index management and bulk indexing with ES
 """
 import logging
-from skills_ml.utils.es import get_index_from_alias, zero_downtime_index
+from skills_utils.es import get_index_from_alias, zero_downtime_index
 from elasticsearch.helpers import streaming_bulk
 
 
