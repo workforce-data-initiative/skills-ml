@@ -44,10 +44,6 @@ Or use `pip install`
     
     pip install git+git://github.com/workforce-data-initiative/skills-ml.git@master
 
-### 3. Test
-
-    import skills_ml
-
 Structure
 ----------
 - [algorithms/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/algorithms) - Core algorithmic module. Each subdirectory is meant to contain a different type of component, such as a job title normalizer or a skill tagger, with a common interface so different pipelines can try out different versions of the components.
