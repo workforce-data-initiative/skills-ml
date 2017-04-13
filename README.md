@@ -13,13 +13,13 @@ This is the library for the methods usable by the Open Skills API, including pro
 Quick Start
 -----------
 ### 1. Clone repository
-skills-ml is available through cloning the repository and then working from the repository root.
+**skills-ml** is available through cloning the repository and then working from the repository root.
 
     git clone https://github.com/workforce-data-initiative/skills-ml.git 
     cd skills-ml 
 
 ### 2. Virtualenv
-skills-ml depends on python3, so create a virtual environment using a python3 executable.
+**skills-ml** depends on python3, so create a virtual environment using a python3 executable.
 
     virtualenv venv -p /usr/bin/python3
     
@@ -35,6 +35,7 @@ Configuration of external data sources, such as s3, is controlled via a config.y
 
 Structure
 ----------
-### 1. Algorithms
-
-### 2. 
+- algorithms/
+- api_sync/
+- datasets/
+- evaluation/ 
