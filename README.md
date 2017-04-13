@@ -35,7 +35,7 @@ Configuration of external data sources, such as s3, is controlled via a config.y
 
 Structure
 ----------
-- algorithms/
-- api_sync/
-- datasets/
-- evaluation/ 
+- [algorithms/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/algorithms) - Core algorithmic module. Each subdirectory is meant to contain a different type of component, such as a job title normalizer or a skill tagger, with a common interface so different pipelines can try out different versions of the components.
+- [api_sync/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/api_sync) - Module to manage integrating workforce data into a relational database suitable for powering the Open SkillsAPI.
+- [datasets/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/datasets) - Wrappers for interfacing with different datasets, such as ONET.
+- [evaluation/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/evaluation) - Code for testing different components against each other.
