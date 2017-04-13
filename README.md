@@ -30,8 +30,8 @@ Activate your virtualenv and install requirements.
 	pip install requirements.txt 
 	pip install requirements_dev.txt
 
-### 4. Database Configure
-
+### 4. Configure s3 buckets and prefixes
+Configuration of external data sources, such as s3, is controlled via a config.yaml file in the root directory of the project. Copy `example_config.yaml` and modify it to match the source buckets and paths for the data you wish to use (such as job listings, or ONET extracts).
 
 Structure
 ----------
