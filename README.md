@@ -55,7 +55,7 @@ pip install git+git://github.com/workforce-data-initiative/skills-ml.git@master
 
 ### 3. Import skills_ml
 ```python
-from sills_ml import sills_ml
+from sills_ml 
 ```
 
 Structure
