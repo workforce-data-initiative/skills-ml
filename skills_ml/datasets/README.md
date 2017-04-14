@@ -1,5 +1,6 @@
 datasets
 -----------
+Different datasets wrapper functions that could be used for different purposes. Details are in the docstring of each function.
 
 ### Example
 
