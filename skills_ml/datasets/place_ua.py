@@ -6,7 +6,7 @@ import requests
 import us
 import re
 
-from skills_ml.utils.fs import cache_json
+from skills_utils.fs import cache_json
 
 URL = 'http://www2.census.gov/geo/docs/maps-data/data/rel/ua_place_rel_10.txt'
 ABBR_LOOKUP = us.states.mapping('fips', 'abbr')

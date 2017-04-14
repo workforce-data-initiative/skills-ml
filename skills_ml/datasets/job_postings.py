@@ -1,8 +1,8 @@
 import logging
 import tempfile
 
-from skills_ml.utils.s3 import split_s3_path
-from skills_ml.utils.s3 import log_download_progress
+from skills_utils.s3 import split_s3_path
+from skills_utils.s3 import log_download_progress
 
 
 def job_postings(s3_conn, quarter, s3_path):

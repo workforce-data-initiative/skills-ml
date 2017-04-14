@@ -4,7 +4,7 @@ import unicodecsv as csv
 import logging
 import requests
 
-from skills_ml.utils.fs import cache_json
+from skills_utils.fs import cache_json
 
 URL = 'http://www.nber.org/cbsa-msa-fips-ssa-county-crosswalk/2016/cbsatocountycrosswalk2016.csv'
 

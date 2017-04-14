@@ -1,5 +1,5 @@
 from collections import defaultdict
-from skills_ml.utils.fs import cache_json
+from skills_utils.fs import cache_json
 import unicodecsv as csv
 import logging
 import requests

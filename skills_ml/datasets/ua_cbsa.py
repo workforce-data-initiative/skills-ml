@@ -4,7 +4,7 @@ import unicodecsv as csv
 import logging
 import requests
 
-from skills_ml.utils.fs import cache_json
+from skills_utils.fs import cache_json
 
 URL = 'http://www2.census.gov/geo/docs/maps-data/data/rel/ua_cbsa_rel_10.txt'
 
