@@ -15,11 +15,14 @@ Quick Start
 ### 1. Virtualenv
 **skills-ml** depends on python3, so create a virtual environment using a python3 executable.
 
-    virtualenv venv -p /usr/bin/python3
-    
+```bash
+virtualenv venv -p /usr/bin/python3
+``` 
 Activate your virtualenv
-    
-    source venv/bin/activate
+
+```bash    
+source venv/bin/activate
+```
 
 ### 2. Installation
 
@@ -29,20 +32,31 @@ There are two ways to install **skills-ml**. You can either install from the sou
 
 **skills-ml** is available through cloning the repository. First you need to install all the requirements.
 
-	git clone https://github.com/workforce-data-initiative/skills-ml.git
-	cd skills-ml
-	pip install requirements.txt
-	pip install requirements_dev.txt
+```bash
+git clone https://github.com/workforce-data-initiative/skills-ml.git
+cd skills-ml
+pip install requirements.txt
+pip install requirements_dev.txt
+```
 
 Then install with `setup.py`
-  
-    python setup.py install
+
+```bash  
+python setup.py install
+```
 
 #### Install with `pip`
 
 Or use `pip install`
     
-    pip install git+git://github.com/workforce-data-initiative/skills-ml.git@master
+```bash
+pip install git+git://github.com/workforce-data-initiative/skills-ml.git@master
+```
+
+### 3. Import skills_ml
+```python
+from sills_ml import sills_ml
+```
 
 Structure
 ----------
