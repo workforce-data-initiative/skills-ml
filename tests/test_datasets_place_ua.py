@@ -1,6 +1,6 @@
 import httpretty
 
-from skills_ml.utils.nlp import NLPTransforms
+from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.datasets.place_ua import place_ua, URL
 
 RESPONSE = '''UA,UANAME,STATE,PLACE,PLNAME,CLASSFP,GEOID,POPPT,HUPT,AREAPT,AREALANDPT,UAPOP,UAHU,UAAREA,UAAREALAND,PLPOP,PLHU,PLAREA,PLAREALAND,UAPOPPCT,UAHUPCT,UAAREAPCT,UAAREALANDPCT,PLPOPPCT,PLHUPCT,PLAREAPCT,PLAREALANDPCT

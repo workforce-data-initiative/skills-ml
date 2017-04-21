@@ -13,5 +13,5 @@ before_install:
 install:
 - pip install -r requirements.txt
 - pip install -r requirements_dev.txt
-script: py.test -vvv -s --cov=skills_ml.algorithms --cov=skills_ml.utils --cov=skills_ml.evaluation --cov=skills_ml.api_sync
+script: py.test -vvv -s --cov=skills_ml.algorithms --cov=skills_ml.datasets --cov=skills_ml.evaluation
 after_success: codecov

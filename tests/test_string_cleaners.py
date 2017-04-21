@@ -1,4 +1,4 @@
-from skills_ml.utils import nlp
+from skills_ml.algorithms.string_cleaners import nlp
 
 transforms = nlp.NLPTransforms()
 
