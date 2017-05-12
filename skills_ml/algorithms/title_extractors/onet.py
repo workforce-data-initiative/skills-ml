@@ -4,8 +4,9 @@ from skills_ml.algorithms.string_cleaners import NLPTransforms
 
 
 class Onet_Title(object):
-    """
-        An object representing job title data from different ONET files
+    """An object representing job title data from different ONET files
+
+    Originally written by Kwame Porter Robinson
     """
     def __init__(self, onet_cache):
         """

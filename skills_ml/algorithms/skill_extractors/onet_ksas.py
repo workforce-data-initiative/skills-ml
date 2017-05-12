@@ -8,6 +8,8 @@ from skills_ml.algorithms.string_cleaners import NLPTransforms
 class OnetSkillExtractor(object):
     """
     An object that creates a skills CSV based on ONET data
+
+    Originally written by Kwame Porter Robinson
     """
     def __init__(self, onet_source, output_filename, hash_function):
         """

@@ -1,3 +1,6 @@
+"""Originally written by Kwame Porter Robinson
+"""
+
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse.csr import csr_matrix
