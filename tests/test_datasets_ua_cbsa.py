@@ -22,6 +22,9 @@ def test_ua_cbsa():
 
     results = ua_cbsa.__wrapped__()
     assert results == {
-        '00037': ['10020', '35340'],
-        '00091': ['48140']
+        '00037': [
+            ('10020', 'Abbeville, LA Micro Area'),
+            ('35340', 'New Iberia, LA Micro Area'),
+        ],
+        '00091': [('48140', 'Wausau, WI Metro Area')]
     }

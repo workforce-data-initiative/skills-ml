@@ -12,9 +12,9 @@ URL = 'http://www2.census.gov/geo/docs/maps-data/data/rel/ua_cbsa_rel_10.txt'
 @cache_json('ua_cbsa_lookup.json')
 def ua_cbsa():
     """
-    Construct a Place->UA Lookup table from Census data
+    Construct a UA->CBSA Lookup table from Census data
     Returns: dict
-    { UA Fips: [CBSA FIPS] }
+    { UA Fips: [(CBSA FIPS, CBSA Name)] }
     """
     logging.info("Beginning CBSA lookup")
     lookup = defaultdict(list)
@@ -31,12 +31,13 @@ def ua_cbsa():
         total += 1
         ua_fips = row[0]
         cbsa_fips = row[2]
+        cbsa_name = row[3]
 
         if cbsa_fips == '99999' or ua_fips == '99999':
             not_designated += 1
             continue
 
-        lookup[ua_fips].append(cbsa_fips)
+        lookup[ua_fips].append((cbsa_fips, cbsa_name))
 
         logging.info(
             'Done extracting CBSAs %s total rows, %s not designated, %s found',

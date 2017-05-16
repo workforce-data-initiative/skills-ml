@@ -7,9 +7,12 @@ from skills_ml.algorithms.string_cleaners import NLPTransforms
 class FakeCBSAQuerier(object):
     def query(self, job_listing):
         if job_listing['id'] == 1:
-            return ['123', '234']
+            return [
+                ('123', 'Another Metro', 'YY'),
+                ('234', 'A Micro', 'ZY')
+            ]
         else:
-            return ['456']
+            return [('456', 'A Metro', 'XX')]
 
 SAMPLE_JOBS = [
     {'id': 1, 'title': 'Cupcake Ninja'},
@@ -27,10 +30,10 @@ def test_geo_title_aggregator():
         [json.dumps(job) for job in SAMPLE_JOBS]
     )
     assert counts == {
-        ('456', 'Regular Ninja'): 1,
-        ('456', 'React Ninja'): 2,
-        ('123', 'Cupcake Ninja'): 1,
-        ('234', 'Cupcake Ninja'): 1
+        ('456', 'A Metro', 'XX', 'Regular Ninja'): 1,
+        ('456', 'A Metro', 'XX', 'React Ninja'): 2,
+        ('123', 'Another Metro', 'YY', 'Cupcake Ninja'): 1,
+        ('234', 'A Micro', 'ZY', 'Cupcake Ninja'): 1
     }
 
     assert title_rollup == {
@@ -50,10 +53,10 @@ def test_geo_title_aggregator_with_cleaning():
         [json.dumps(job) for job in SAMPLE_JOBS]
     )
     assert counts == {
-        ('456', 'regular ninja'): 1,
-        ('456', 'react ninja'): 2,
-        ('123', 'cupcake ninja'): 1,
-        ('234', 'cupcake ninja'): 1
+        ('456', 'A Metro', 'XX', 'regular ninja'): 1,
+        ('456', 'A Metro', 'XX', 'react ninja'): 2,
+        ('123', 'Another Metro', 'YY', 'cupcake ninja'): 1,
+        ('234', 'A Micro', 'ZY', 'cupcake ninja'): 1
     }
 
     assert title_rollup == {
