@@ -1,8 +1,7 @@
 codecov
 httpretty==0.8.10
 mock
-mock
-moto
+moto<1.0
 pytest-cov
 pytest
 Sphinx
