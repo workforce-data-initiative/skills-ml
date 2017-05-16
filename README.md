@@ -55,7 +55,7 @@ pip install git+git://github.com/workforce-data-initiative/skills-ml.git@master
 
 ### 3. Import skills_ml
 ```python
-from sills_ml 
+import skills_ml
 ```
 
 Structure
@@ -64,6 +64,14 @@ Structure
 - [api_sync/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/api_sync) - Module to manage integrating workforce data into a relational database suitable for powering the Open SkillsAPI.
 - [datasets/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/datasets) - Wrappers for interfacing with different datasets, such as ONET, Urbanized Area.
 - [evaluation/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/evaluation) - Code for testing different components against each other.
+
+
+Contributors
+----------
+Kwame Porter Robinson - [Github](https://github.com/robinsonkwame)
+Eddie Lin - [Github](https://github.com/tweddielin)
+Tristan Crockett - [Github](https://github.com/thcrock)
+
 
 License
 -------

@@ -6,6 +6,10 @@ from skills_ml.algorithms.skill_taggers.base import SkillTaggerBase
 
 
 class SimpleSkillTagger(SkillTaggerBase):
+    """Tag skills in unstructured text
+
+    Originally written by Kwame Porter Robinson
+    """
     def __init__(self, hash_function, *args, **kwargs):
         super(SimpleSkillTagger, self).__init__(*args, **kwargs)
         self.tracker = {

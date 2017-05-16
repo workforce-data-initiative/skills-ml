@@ -6,6 +6,8 @@ import logging
 class OnetSkillImportanceExtractor(object):
     """
     An object that creates a skills importance CSV based on ONET data
+
+    Originally written by Kwame Porter Robinson
     """
     def __init__(self, onet_source, output_filename, hash_function):
         """

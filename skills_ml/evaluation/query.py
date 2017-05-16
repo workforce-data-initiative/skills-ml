@@ -17,6 +17,8 @@ input job title\tdescription of job\tONET code
 Each task will output two CSV files, one with the normalizer's ranks
 and one without ranks. The latter is for sending to people to fill out
 and the former is for testing those results against the normalizer's
+
+Originally written by Kwame Porter Robinson
 """
 
 
