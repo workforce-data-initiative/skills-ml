@@ -1,6 +1,6 @@
 codecov
 httpretty==0.8.10
-mock
+freezegun
 mock
 moto
 pytest-cov
