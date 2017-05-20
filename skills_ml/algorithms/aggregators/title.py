@@ -2,7 +2,6 @@
 """
 import logging
 import json
-from collections import Counter
 from skills_ml.algorithms.job_geography_queriers.cbsa import JobCBSAQuerier
 
 
@@ -10,38 +9,42 @@ class GeoTitleAggregator(object):
     """Aggregates job titles by geography
 
     Args:
+        job_aggregators (list of .JobAggregator objects) - The aggregators
+            that should accumulate data based on geography and title for each
+            job posting
         geo_querier (object) an object that returns a geography of a given job
             Optional, defaults to JobCBSAQuerier
+        title_cleaner (function) a function that cleans a given job title
     """
-    def __init__(self, geo_querier=None, title_cleaner=None):
+    def __init__(
+        self,
+        job_aggregators,
+        geo_querier=None,
+        title_cleaner=None,
+    ):
+        self.job_aggregators = job_aggregators
         self.title_cleaner = title_cleaner or (lambda s: s)
         self.geo_querier = geo_querier or JobCBSAQuerier()
 
-    def counts(self, job_postings):
+    def process_postings(self, job_postings):
         """
         Computes the title/CBSA distribution of the given job postings
         Args:
             job_postings (iterable) Job postings, each in common schema format
-        Returns:
-            (collections.Counter)
-                The number of job postings for each
-                (CBSA FIPS Code, CBSA Name, State Code, Job Title) tuple
+
+        When complete, the aggregators in self.job_aggregators will be updated
+        with data from the job postings
         """
-        counts = Counter()
-        title_rollup = Counter()
-        for line in job_postings:
+        for i, line in enumerate(job_postings):
             job_posting = json.loads(line)
             job_title = self.title_cleaner(job_posting['title'])
-            title_rollup[job_title] += 1
-            hits = self.geo_querier.query(job_posting)
-            for cbsa_fips, cbsa_name, state_code in hits:
-                counts[(cbsa_fips, cbsa_name, state_code, job_title)] += 1
-                logging.info(
-                    '%s, %s, %s, %s, %s',
-                    cbsa_fips,
-                    cbsa_name,
-                    state_code,
-                    job_title,
-                    counts[(cbsa_fips, job_title)]
+            geography_hits = self.geo_querier.query(job_posting)
+
+            for aggregator in self.job_aggregators.values():
+                aggregator.accumulate(
+                    job_posting=job_posting,
+                    job_key=job_title,
+                    groups=geography_hits
                 )
-        return counts, title_rollup
+            if i % 1000 == 0:
+                logging.info('Aggregated %s job postings', i)

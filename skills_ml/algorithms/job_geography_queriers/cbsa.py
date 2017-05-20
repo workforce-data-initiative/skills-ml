@@ -19,6 +19,10 @@ class JobCBSAQuerier(object):
     """
     Queries the Core-Based Statistical Area for a job
     """
+
+    # The columns that are returned for each row
+    geo_key_names = ('cbsa_fips', 'cbsa_name', 'state_code')
+
     def __init__(self):
         self.ua_cbsa = ua_cbsa()
         self.place_ua = place_ua(city_cleaner)

@@ -1,10 +1,12 @@
 import contextlib
 import tempfile
 import pandas as pd
+from collections import Counter
 
 from tests import utils
 
 from skills_ml.algorithms.skill_extractors.onet_ksas import OnetSkillExtractor
+from skills_ml.algorithms.skill_extractors.freetext import FreetextSkillExtractor
 from skills_utils.hash import md5
 
 
@@ -116,3 +118,26 @@ def test_onet_skill_extractor():
             for row in output
             if row['ONET KSA'] == 'written comprehension'
         ) == '1.a.1.a.2'
+
+
+def test_freetext_skill_extractor():
+    content = [
+        ['', 'O*NET-SOC Code', 'Element ID', 'ONET KSA', 'Description', 'skill_uuid', 'nlp_a'],
+        ['1', '11-1011.00', '2.a.1.a', 'reading comprehension', '...', '2c77c703bd66e104c78b1392c3203362', 'reading comprehension'],
+        ['2', '11-1011.00', '2.a.1.b', 'active listening', '...', 'a636cb69257dcec699bce4f023a05126', 'active listening']
+    ]
+    with utils.makeNamedTemporaryCSV(content, '\t') as skills_filename:
+        extractor = FreetextSkillExtractor(skills_filename=skills_filename)
+        result = [extractor.document_skill_counts(doc) for doc in [
+            'this is a job that needs active listening',
+            'this is a reading comprehension job',
+            'this is an active and reading listening job',
+            'this is a reading comprehension and active listening job',
+        ]]
+
+        assert result == [
+            Counter({'active listening': 1}),
+            Counter({'reading comprehension': 1}),
+            Counter(),
+            Counter({'active listening': 1, 'reading comprehension': 1})
+        ]
