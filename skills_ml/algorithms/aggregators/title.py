@@ -25,7 +25,7 @@ class GeoTitleAggregator(object):
         Returns:
             (collections.Counter)
                 The number of job postings for each
-                (CBSA FIPS Code, Job Title) tuple
+                (CBSA FIPS Code, CBSA Name, State Code, Job Title) tuple
         """
         counts = Counter()
         title_rollup = Counter()
@@ -34,11 +34,13 @@ class GeoTitleAggregator(object):
             job_title = self.title_cleaner(job_posting['title'])
             title_rollup[job_title] += 1
             hits = self.geo_querier.query(job_posting)
-            for cbsa_fips in hits:
-                counts[(cbsa_fips, job_title)] += 1
+            for cbsa_fips, cbsa_name, state_code in hits:
+                counts[(cbsa_fips, cbsa_name, state_code, job_title)] += 1
                 logging.info(
-                    '%s, %s, %s',
+                    '%s, %s, %s, %s, %s',
                     cbsa_fips,
+                    cbsa_name,
+                    state_code,
                     job_title,
                     counts[(cbsa_fips, job_title)]
                 )
