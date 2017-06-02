@@ -42,10 +42,10 @@ def test_geo_title_aggregator():
     aggregator.process_postings([json.dumps(job) for job in SAMPLE_JOBS])
 
     assert aggregator.job_aggregators['count'].group_values == {
-        ('456', 'A Metro', 'XX', 'Regular Ninja'): 1,
-        ('456', 'A Metro', 'XX', 'React Ninja'): 2,
-        ('123', 'Another Metro', 'YY', 'Cupcake Ninja'): 1,
-        ('234', 'A Micro', 'ZY', 'Cupcake Ninja'): 1
+        (('456', 'A Metro', 'XX'), 'Regular Ninja'): 1,
+        (('456', 'A Metro', 'XX'), 'React Ninja'): 2,
+        (('123', 'Another Metro', 'YY'), 'Cupcake Ninja'): 1,
+        (('234', 'A Micro', 'ZY'), 'Cupcake Ninja'): 1
     }
 
     assert aggregator.job_aggregators['count'].rollup == {
@@ -55,10 +55,10 @@ def test_geo_title_aggregator():
     }
 
     assert aggregator.job_aggregators['skills'].group_values == {
-        ('123', 'Another Metro', 'YY', 'Cupcake Ninja'): {'slicing': 1, 'dicing': 1},
-        ('234', 'A Micro', 'ZY', 'Cupcake Ninja'): {'slicing': 1, 'dicing': 1},
-        ('456', 'A Metro', 'XX', 'Regular Ninja'): {'slicing': 1, 'dicing': 1},
-        ('456', 'A Metro', 'XX', 'React Ninja'): {'slicing': 2, 'dicing': 2, 'jquery': 1}
+        (('123', 'Another Metro', 'YY'), 'Cupcake Ninja'): {'slicing': 1, 'dicing': 1},
+        (('234', 'A Micro', 'ZY'), 'Cupcake Ninja'): {'slicing': 1, 'dicing': 1},
+        (('456', 'A Metro', 'XX'), 'Regular Ninja'): {'slicing': 1, 'dicing': 1},
+        (('456', 'A Metro', 'XX'), 'React Ninja'): {'slicing': 2, 'dicing': 2, 'jquery': 1}
     }
 
     assert aggregator.job_aggregators['skills'].rollup == {
@@ -87,10 +87,10 @@ def test_geo_title_aggregator_with_cleaning():
     aggregator.process_postings([json.dumps(job) for job in SAMPLE_JOBS])
 
     assert aggregator.job_aggregators['count'].group_values == {
-        ('456', 'A Metro', 'XX', 'regular ninja'): 1,
-        ('456', 'A Metro', 'XX', 'react ninja'): 2,
-        ('123', 'Another Metro', 'YY', 'cupcake ninja'): 1,
-        ('234', 'A Micro', 'ZY', 'cupcake ninja'): 1
+        (('456', 'A Metro', 'XX'), 'regular ninja'): 1,
+        (('456', 'A Metro', 'XX'), 'react ninja'): 2,
+        (('123', 'Another Metro', 'YY'), 'cupcake ninja'): 1,
+        (('234', 'A Micro', 'ZY'), 'cupcake ninja'): 1
     }
 
     assert aggregator.job_aggregators['count'].rollup == {
@@ -100,10 +100,10 @@ def test_geo_title_aggregator_with_cleaning():
     }
 
     assert aggregator.job_aggregators['skills'].group_values == {
-        ('123', 'Another Metro', 'YY', 'cupcake ninja'): {'slicing': 1, 'dicing': 1},
-        ('234', 'A Micro', 'ZY', 'cupcake ninja'): {'slicing': 1, 'dicing': 1},
-        ('456', 'A Metro', 'XX', 'regular ninja'): {'slicing': 1, 'dicing': 1},
-        ('456', 'A Metro', 'XX', 'react ninja'): {'slicing': 2, 'dicing': 2, 'jquery': 1}
+        (('123', 'Another Metro', 'YY'), 'cupcake ninja'): {'slicing': 1, 'dicing': 1},
+        (('234', 'A Micro', 'ZY'), 'cupcake ninja'): {'slicing': 1, 'dicing': 1},
+        (('456', 'A Metro', 'XX'), 'regular ninja'): {'slicing': 1, 'dicing': 1},
+        (('456', 'A Metro', 'XX'), 'react ninja'): {'slicing': 2, 'dicing': 2, 'jquery': 1}
     }
 
     assert aggregator.job_aggregators['skills'].rollup == {

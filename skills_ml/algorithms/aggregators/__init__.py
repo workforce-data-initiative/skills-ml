@@ -16,12 +16,12 @@ class JobAggregator(object):
             job_posting (dict) a job postings in common schema format
             job_key (str) an element of the job posting (say, a title) that is
                 being used for aggregation
-            groups (iterable of tuples) the aggregatable groups (say, CBSAs)
+            groups (iterable) the aggregatable groups (say, CBSAs)
                 that this job posting belongs to
         """
         value = self.value(job_posting)
         for group_key in groups:
-            full_key = group_key + (job_key,)
+            full_key = (group_key, job_key)
             self.group_values[full_key] += value
         self.rollup[job_key] += value
 
