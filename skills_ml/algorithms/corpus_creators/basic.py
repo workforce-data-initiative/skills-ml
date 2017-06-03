@@ -74,7 +74,7 @@ class SimpleCorpusCreator(CorpusCreator):
 
     def _transform(self, document):
         return self.join_spaces([
-            self.nlp.lowercase_strip_punc(document[field])
+            self.nlp.lowercase_strip_punc(document.get(field, ''))
             for field in self.document_schema_fields
         ])
 

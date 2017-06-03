@@ -20,7 +20,7 @@ algorithms
 
 - `representativeness_calculators` - Methods for calculating geographic representativeness of SOC Codes.
 
-- `skill_extractors` - Methods for creating a skills CSV based on ONET data.
+- `skill_extractors` - Methods for extracting skills from structured or unstructured data sources
 
 - `skill_importance_extractors` - Methods for creating a skills importance CSV based on ONET data.
 
