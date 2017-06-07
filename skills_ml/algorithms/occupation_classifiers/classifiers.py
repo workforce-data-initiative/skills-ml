@@ -2,7 +2,6 @@ import os
 import logging
 import json
 import tempfile
-import boto3
 
 from collections import Counter
 
