@@ -17,11 +17,10 @@ SYN0 = 'gensim_doc2vec_va_0605.syn0.npy'
 SYN1 = 'gensim_doc2vec_va_0605.syn1.npy'
 
 class SocClassifier(object):
-    def __init__(self, mode=None, model_name=MODEL_NAME, path=PATHTOMODEL, s3_conn=None):
+    def __init__(self, model_name=MODEL_NAME, path=PATHTOMODEL, s3_conn=None):
         self.model_name = model_name
         self.path = path
         self.s3_conn = s3_conn
-        self.mode = mode
         self.files  = [MODEL_NAME, DOCTAG, SYN0, SYN1]
         self.model = self._load_model()
         self.lookup = self._load_lookup()
@@ -40,10 +39,21 @@ class SocClassifier(object):
 
     def _load_lookup(self):
         filepath = 'tmp/' + LOOKUP
-        download(self.s3_conn, filepath , PATHTOMODEL + LOOKUP)
+        if not os.path.exists(filepath):
+            logging.warning('calling download from %s to %s', self.path + LOOKUP, filepath)
+            download(self.s3_conn, filepath , self.path + LOOKUP)
+
         with open(filepath, 'r') as handle:
             lookup = json.load(handle)
         return lookup
 
-    def classify(jobposting):
-        pass
+    def classify(self, jobposting, mode='top'):
+        inferred_vector = self.model.infer_vector(jobposting.split())
+        resultlist = []
+        sims = self.model.docvecs.most_similar([inferred_vector], topn=1)
+        resultlist.append(list(map(lambda l: self.lookup[l], [x[0] for x in sims])))
+        if mode == 'top':
+            predicted_soc = resultlist[0]
+
+        return predicted_soc
+
