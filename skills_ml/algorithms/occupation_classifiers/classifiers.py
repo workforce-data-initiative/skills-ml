@@ -31,7 +31,8 @@ class SocClassifier(object):
     Soc = SocClassifier(s3_conn=s3_conn)
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
-    def __init__(self, model_name=MODEL_NAME, s3_path=PATHTOMODEL, s3_conn=None):
+    def __init__(self, model_name=MODEL_NAME, s3_path=PATHTOMODEL,
+                 load_model_flag=True, load_lookup_flag=True, s3_conn=None):
         """To initialize the SocClassifier Object, the model and lookup disctionary
         will be downloaded to the tmp/ directory and loaded to the memory.
 
@@ -47,8 +48,8 @@ class SocClassifier(object):
         self.s3_path = s3_path
         self.s3_conn = s3_conn
         self.files  = [MODEL_NAME, DOCTAG, SYN0, SYN1]
-        self.model = self._load_model()
-        self.lookup = self._load_lookup()
+        self.model = self._load_model() if load_model_flag else None
+        self.lookup = self._load_lookup() if load_lookup_flag else None
 
     def _load_model(self, saved=False):
         """The method to download the model from S3 and load to the memory.
@@ -56,18 +57,7 @@ class SocClassifier(object):
         Args:
             saved (bool): wether to save the model files or just load it to the memory
         """
-        if saved:
-            if not os.path.isdir('tmp'):
-                os.mkdir('tmp')
-
-            for f in self.files:
-                filepath = 'tmp/' + f
-                if not os.path.exists(filepath):
-                    logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
-                    download(self.s3_conn, filepath, self.s3_path + f)
-
-            model = Doc2Vec.load('tmp/' + self.model_name)
-        else:
+        if not saved:
             with tempfile.TemporaryDirectory() as td:
                 for f in self.files:
                     filepath = os.path.join(td, f)
@@ -75,18 +65,39 @@ class SocClassifier(object):
                         logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
                         download(self.s3_conn, filepath, self.s3_path + f)
                 model = Doc2Vec.load(os.path.join(td, self.model_name))
+
+        else:
+            if not os.path.isdir('tmp'):
+                os.mkdir('tmp')
+            for f in self.files:
+                filepath = 'tmp/' + f
+                if not os.path.exists(filepath) and saved:
+                    logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
+                    download(self.s3_conn, filepath, self.s3_path + f)
+            model = Doc2Vec.load('tmp/' + self.model_name)
+
         return model
 
-    def _load_lookup(self):
+    def _load_lookup(self, saved=False):
         """The method to download the lookup dictionary from S3 and load to the memory.
         """
-        filepath = 'tmp/' + LOOKUP
-        if not os.path.exists(filepath):
-            logging.warning('calling download from %s to %s', self.s3_path + LOOKUP, filepath)
-            download(self.s3_conn, filepath , self.s3_path + LOOKUP)
+        if not saved:
+            with tempfile.TemporaryDirectory() as td:
+                filepath = os.path.join(td, LOOKUP)
+                print(filepath)
+                logging.warning('calling download from %s to %s', self.s3_path + LOOKUP, filepath)
+                download(self.s3_conn, filepath, self.s3_path + LOOKUP)
+                with open(filepath, 'r') as handle:
+                    lookup = json.load(handle)
 
-        with open(filepath, 'r') as handle:
-            lookup = json.load(handle)
+        else:
+            filepath = 'tmp/' + LOOKUP
+            if not os.path.exists(filepath):
+                logging.warning('calling download from %s to %s', self.s3_path + LOOKUP, filepath)
+                download(self.s3_conn, filepath , self.s3_path + LOOKUP)
+                with open(filepath, 'r') as handle:
+                    lookup = json.load(handle)
+
         return lookup
 
     def classify(self, jobposting, mode='top'):
