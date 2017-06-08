@@ -5,6 +5,7 @@ from moto import mock_s3
 from mock import patch
 import json
 
+
 import pytest
 
 
@@ -50,31 +51,18 @@ class FakeCorpusGenerator(object):
             self.lookup[str(k)] = data[2]
             yield gensim.models.doc2vec.TaggedDocument(words, label)
             k += 1
-            # if self.num:
-            #     if k >= self.num:
-            #         if not os.path.exists('tmp/lookup_test.json'):
-            #             print('generating lookup table as tmp/lookup_test.json')
-            #             with open('tmp/lookup_test.json', 'w') as handle:
-            #                 json.dump(self.lookup, handle)
-            #         break
-            #     k += 1
+
 
 def test_occupation_classifier():
     model_name = 'test_doc2vec'
     s3_prefix = 'fake-bucket/cache/'
-
-    expected_cache_path = 'tmp/{}'.format(model_name)
 
     fake_corpus_train = FakeCorpusGenerator(num=10)
     model = gensim.models.Doc2Vec(size=500, min_count=1, iter=5, window=4)
     model.build_vocab(fake_corpus_train)
     model.train(fake_corpus_train)
     lookup = fake_corpus_train.lookup
-    print(lookup)
-    # with open('tmp/lookup_test.json', 'r') as handle:
-    #     lookup = json.load(handle)
-    #     os.remove('tmp/lookup_test.json')
-    # print(lookup)
+
     soc = SocClassifier(model_name=model_name,
                         s3_path='{}{}'.format(s3_prefix, model_name),
                         model=model,
