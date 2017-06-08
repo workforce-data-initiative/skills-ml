@@ -32,7 +32,7 @@ class SocClassifier(object):
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
     def __init__(self, model_name=MODEL_NAME, s3_path=PATHTOMODEL,
-                 load_model_flag=True, load_lookup_flag=True, s3_conn=None):
+                 lookup=None, model=None, s3_conn=None):
         """To initialize the SocClassifier Object, the model and lookup disctionary
         will be downloaded to the tmp/ directory and loaded to the memory.
 
@@ -48,8 +48,8 @@ class SocClassifier(object):
         self.s3_path = s3_path
         self.s3_conn = s3_conn
         self.files  = [MODEL_NAME, DOCTAG, SYN0, SYN1]
-        self.model = self._load_model() if load_model_flag else None
-        self.lookup = self._load_lookup() if load_lookup_flag else None
+        self.model = self._load_model() if model == None else model
+        self.lookup = self._load_lookup() if lookup == None else lookup
 
     def _load_model(self, saved=False):
         """The method to download the model from S3 and load to the memory.
