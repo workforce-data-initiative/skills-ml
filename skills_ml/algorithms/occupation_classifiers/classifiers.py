@@ -2,6 +2,8 @@ import os
 import logging
 import json
 import tempfile
+import yaml
+import boto
 
 from collections import Counter
 
@@ -9,15 +11,23 @@ from gensim.models import Doc2Vec
 
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
-from skills_utils.s3 import download
+from skills_utils.s3 import download, split_s3_path
 
-PATHTOMODEL = 'open-skills-private/model_cache/'
-LOOKUP = 'lookup_va_0605.json'
+with open('config.yaml') as f:
+    config = yaml.load(f)
 
-MODEL_NAME = 'gensim_doc2vec_va_0605'
-DOCTAG = 'gensim_doc2vec_va_0605.docvecs.doctag_syn0.npy'
-SYN0 = 'gensim_doc2vec_va_0605.syn0.npy'
-SYN1 = 'gensim_doc2vec_va_0605.syn1.npy'
+
+def list_files(s3_conn, s3_path):
+    bucket_name, prefix = split_s3_path(s3_path)
+    bucket = s3_conn.get_bucket(bucket_name)
+    key = boto.s3.key.Key(
+        bucket=bucket,
+        name=prefix
+    )
+    files = []
+    for key in bucket.list(prefix=prefix):
+        files.append(key.name.split('/')[-1])
+    return list(filter(None, files))
 
 class SocClassifier(object):
     """The SocClassifier Object to classify each jobposting description to O*Net SOC code.
@@ -31,12 +41,12 @@ class SocClassifier(object):
     Soc = SocClassifier(s3_conn=s3_conn)
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
-    def __init__(self, model_name=MODEL_NAME, s3_path=PATHTOMODEL,
-                 lookup=None, model=None, s3_conn=None):
+    def __init__(self, model_id='va_0605', model_type='gensim_doc2vec', lookup=None, model=None, s3_conn=None):
         """To initialize the SocClassifier Object, the model and lookup disctionary
         will be downloaded to the tmp/ directory and loaded to the memory.
 
         Attributes:
+            model_id (str): model id
             model_name (str): the name of the model to be used.
             s3_path (str): the path of the model on S3.
             s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
@@ -44,10 +54,12 @@ class SocClassifier(object):
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
             lookup (dict): lookup table for mapping each jobposting index to soc code.
         """
-        self.model_name = model_name
-        self.s3_path = s3_path
+        self.model_id = model_id
+        self.model_type = model_type
+        self.model_name = self.model_type + '_' + self.model_id
+        self.s3_path = config['model_cache'] + self.model_id
         self.s3_conn = s3_conn
-        self.files  = [MODEL_NAME, DOCTAG, SYN0, SYN1]
+        self.files  = list_files(self.s3_conn, self.s3_path)
         self.model = self._load_model() if model == None else model
         self.lookup = self._load_lookup() if lookup == None else lookup
 
@@ -63,7 +75,7 @@ class SocClassifier(object):
                     filepath = os.path.join(td, f)
                     if not os.path.exists(filepath):
                         logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
-                        download(self.s3_conn, filepath, self.s3_path + f)
+                        download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
                 model = Doc2Vec.load(os.path.join(td, self.model_name))
 
         else:
@@ -73,7 +85,7 @@ class SocClassifier(object):
                 filepath = 'tmp/' + f
                 if not os.path.exists(filepath) and saved:
                     logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
-                    download(self.s3_conn, filepath, self.s3_path + f)
+                    download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
             model = Doc2Vec.load('tmp/' + self.model_name)
 
         return model
@@ -86,7 +98,7 @@ class SocClassifier(object):
                 filepath = os.path.join(td, LOOKUP)
                 print(filepath)
                 logging.warning('calling download from %s to %s', self.s3_path + LOOKUP, filepath)
-                download(self.s3_conn, filepath, self.s3_path + LOOKUP)
+                download(self.s3_conn, filepath, os.path.join(self.s3_path, LOOKUP))
                 with open(filepath, 'r') as handle:
                     lookup = json.load(handle)
 
@@ -94,7 +106,7 @@ class SocClassifier(object):
             filepath = 'tmp/' + LOOKUP
             if not os.path.exists(filepath):
                 logging.warning('calling download from %s to %s', self.s3_path + LOOKUP, filepath)
-                download(self.s3_conn, filepath , self.s3_path + LOOKUP)
+                download(self.s3_conn, filepath , os.join(self.s3_path, LOOKUP))
                 with open(filepath, 'r') as handle:
                     lookup = json.load(handle)
 
