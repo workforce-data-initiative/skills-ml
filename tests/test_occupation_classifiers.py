@@ -1,8 +1,13 @@
 from skills_ml.algorithms.occupation_classifiers.classifiers import SocClassifier
+from skills_utils.s3 import upload
 import gensim
 import os
 from moto import mock_s3
 from mock import patch
+import boto
+import tempfile
+
+
 import json
 
 
@@ -52,21 +57,40 @@ class FakeCorpusGenerator(object):
             yield gensim.models.doc2vec.TaggedDocument(words, label)
             k += 1
 
-
+@mock_s3
 def test_occupation_classifier():
-    model_name = 'test_doc2vec'
+    s3_conn = boto.connect_s3()
+
+    bucket_name = 'fake-bucket'
+    bucket = s3_conn.create_bucket(bucket_name)
+
+    model_id = 'test_0606'
+    model_type = 'gensim_doc2vec_'
+    model_name = model_type + model_id
     s3_prefix = 'fake-bucket/cache/'
 
     fake_corpus_train = FakeCorpusGenerator(num=10)
-    model = gensim.models.Doc2Vec(size=500, min_count=1, iter=5, window=4)
-    model.build_vocab(fake_corpus_train)
-    model.train(fake_corpus_train)
-    lookup = fake_corpus_train.lookup
 
-    soc = SocClassifier(model_name=model_name,
-                        s3_path='{}{}'.format(s3_prefix, model_name),
-                        model=model,
-                        lookup=lookup
+    model = gensim.models.Doc2Vec(size=500, min_count=1, iter=5, window=4)
+
+    with tempfile.TemporaryDirectory() as td:
+        model.build_vocab(fake_corpus_train)
+        model.train(fake_corpus_train)
+        model.save(os.path.join(td, model_name))
+        upload(s3_conn, os.path.join(td, model_name), os.path.join(s3_prefix, model_id))
+
+    with tempfile.TemporaryDirectory() as td:
+        lookup = fake_corpus_train.lookup
+        lookup_name = 'lookup_' + model_id + '.json'
+        with open(os.path.join(td, lookup_name), 'w') as handle:
+            json.dump(lookup, handle)
+        upload(s3_conn, os.path.join(td, lookup_name), os.path.join(s3_prefix, model_id))
+
+    soc = SocClassifier(model_id=model_id,
+                        s3_path=s3_prefix,
+                        s3_conn=s3_conn,
                     )
 
+    assert soc.model_name == model_name
+    assert soc.lookup_name == lookup_name
     assert soc.classify(docs) == '29-2061.00'
