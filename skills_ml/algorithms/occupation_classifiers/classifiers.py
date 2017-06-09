@@ -11,20 +11,8 @@ from gensim.models import Doc2Vec
 
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
-from skills_utils.s3 import download, split_s3_path
+from skills_utils.s3 import download, split_s3_path, list_files
 
-
-def list_files(s3_conn, s3_path):
-    bucket_name, prefix = split_s3_path(s3_path)
-    bucket = s3_conn.get_bucket(bucket_name)
-    key = boto.s3.key.Key(
-        bucket=bucket,
-        name=prefix
-    )
-    files = []
-    for key in bucket.list(prefix=prefix):
-        files.append(key.name.split('/')[-1])
-    return list(filter(None, files))
 
 class SocClassifier(object):
     """The SocClassifier Object to classify each jobposting description to O*Net SOC code.
