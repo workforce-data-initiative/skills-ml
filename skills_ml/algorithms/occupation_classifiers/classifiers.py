@@ -5,7 +5,7 @@ import tempfile
 import yaml
 import boto
 
-from collections import Counter
+from collections import Counter, defaultdict
 
 from gensim.models import Doc2Vec
 
@@ -51,7 +51,6 @@ class SocClassifier(object):
         self.files  = list_files(self.s3_conn, self.s3_path)
         self.model = self._load_model() if model == None else model
         self.lookup = self._load_lookup() if lookup == None else lookup
-
 
     def _load_model(self, saved=False):
         """The method to download the model from S3 and load to the memory.
@@ -110,16 +109,23 @@ class SocClassifier(object):
             mode (str): a flag of which method to use for classifying.
 
         Returns:
-            str: The predicted soc code.
+            tuple(str, float): The predicted soc code and cosine similarity .
         """
         inferred_vector = self.model.infer_vector(jobposting.split())
-        sims = self.model.docvecs.most_similar([inferred_vector], topn=1)
-        resultlist = list(map(lambda l: self.lookup[l], [x[0] for x in sims]))
         if mode == 'top':
+            sims = self.model.docvecs.most_similar([inferred_vector], topn=1)
+            resultlist = list(map(lambda l: (self.lookup[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
             predicted_soc = resultlist[0]
+            return predicted_soc
 
         if mode == 'common':
-            predicted_soc = [Counter(r).most_common()[0][0] for r in resultlist]
+            sims = self.model.docvecs.most_similar([inferred_vector], topn=10)
+            resultlist = list(map(lambda l: (self.lookup[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
+            most_common = Counter([r[0] for r in resultlist]).most_common()[0]
+            resultdict = defaultdict(list)
+            for k, v in resultlist:
+                resultdict[k].append(v)resultdict[k].append(v)
 
-        return predicted_soc
+            predicted_soc = (most_common[0], sum(resultdict[most_common[0]])/most_common[1])
+            return predicted_soc
 
