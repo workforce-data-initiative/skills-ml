@@ -7,9 +7,7 @@ from mock import patch
 import boto
 import tempfile
 
-
 import json
-
 
 import pytest
 
@@ -93,4 +91,5 @@ def test_occupation_classifier():
 
     assert soc.model_name == model_name
     assert soc.lookup_name == lookup_name
-    assert soc.classify(docs) == '29-2061.00'
+    assert soc.classify(docs, 'top')[0] == '29-2061.00'
+    assert soc.classify(docs, 'common')[0] == '29-2061.00'
