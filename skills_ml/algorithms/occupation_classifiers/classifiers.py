@@ -124,7 +124,7 @@ class SocClassifier(object):
             most_common = Counter([r[0] for r in resultlist]).most_common()[0]
             resultdict = defaultdict(list)
             for k, v in resultlist:
-                resultdict[k].append(v)resultdict[k].append(v)
+                resultdict[k].append(v)
 
             predicted_soc = (most_common[0], sum(resultdict[most_common[0]])/most_common[1])
             return predicted_soc
