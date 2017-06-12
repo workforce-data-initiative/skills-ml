@@ -1,4 +1,4 @@
-from skills_ml.algorithms.occupation_classifiers.classifiers import SocClassifier
+from skills_ml.algorithms.occupation_classifiers.classifiers import VectorModel
 from skills_utils.s3 import upload
 import gensim
 import os
@@ -84,12 +84,12 @@ def test_occupation_classifier():
             json.dump(lookup, handle)
         upload(s3_conn, os.path.join(td, lookup_name), os.path.join(s3_prefix, model_id))
 
-    soc = SocClassifier(model_id=model_id,
+    vector_model = VectorModel(model_id=model_id,
                         s3_path=s3_prefix,
                         s3_conn=s3_conn,
                     )
 
-    assert soc.model_name == model_name
-    assert soc.lookup_name == lookup_name
-    assert soc.classify(docs, 'top')[0] == '29-2061.00'
-    assert soc.classify(docs, 'common')[0] == '29-2061.00'
+    assert vector_model.model_name == model_name
+    assert vector_model.lookup_name == lookup_name
+    assert vector_model.classify(docs, 'top')[0] == '29-2061.00'
+    assert vector_model.classify(docs, 'common')[0] == '29-2061.00'
