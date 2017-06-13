@@ -7,6 +7,7 @@ pytest
 PyYAML
 Elasticsearch
 gensim==0.13.4
+annoy
 unicodecsv
 us
 Sqlalchemy
