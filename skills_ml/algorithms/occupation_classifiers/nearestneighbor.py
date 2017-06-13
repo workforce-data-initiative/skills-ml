@@ -1,5 +1,6 @@
 import numpy as np
 import logging
+from collections import Counter, defaultdict
 
 from gensim.models import Doc2Vec
 from skills_ml.algorithms.occupation_classifiers import base

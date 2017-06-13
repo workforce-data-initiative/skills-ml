@@ -2,7 +2,6 @@ import os
 import logging
 import json
 import tempfile
-from collections import Counter, defaultdict
 
 from gensim.models import Doc2Vec
 

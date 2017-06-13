@@ -1,7 +1,3 @@
-import os
-import json
-from collections import Counter, defaultdict
-
 from skills_ml.algorithms.occupation_classifiers.nearestneighbor import NearestNeighbors
 
 class Classifiers(object):
