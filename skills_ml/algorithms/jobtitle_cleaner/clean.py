@@ -64,6 +64,13 @@ class JobTitleStringClean(object):
         self.negative_list = self.dict['places'] + self.dict['states']
         self.positive_list = self.dict['onetjobs']
 
+    def clean_title(self, title):
+        return clean_by_neg_dic(
+            clean_by_rules(title),
+            self.negative_list,
+            self.positive_list
+        )
+
     def clean(self, df_jobtitles):
         """
         Clean the job titles by rules and negative dictionary.
@@ -94,6 +101,3 @@ class JobTitleStringClean(object):
 
         cleaned_jobtitles = pd.DataFrame(cleaned_jobtitles)
         return cleaned_jobtitles
-
-
-
