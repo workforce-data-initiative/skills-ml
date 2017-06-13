@@ -17,7 +17,7 @@ class NearestNeighbors(base.VectorModel):
         _training_data (np.ndarray): a document vector array where each row is a document vector.
         _target (np.ndarray): a label array.
     """
-    def __init__(self, indexed, **kwargs):
+    def __init__(self, indexed=False, **kwargs):
         super(NearestNeighbors, self).__init__(**kwargs)
         self.indexed = indexed
         self.indexer = self._ann_indexer()

@@ -1,4 +1,4 @@
-from skills_ml.algorithms.occupation_classifiers.classifiers import VectorModel
+from skills_ml.algorithms.occupation_classifiers.classifiers import NearestNeighbors
 from skills_utils.s3 import upload
 import gensim
 import os
@@ -84,12 +84,12 @@ def test_occupation_classifier():
             json.dump(lookup, handle)
         upload(s3_conn, os.path.join(td, lookup_name), os.path.join(s3_prefix, model_id))
 
-    vector_model = VectorModel(model_id=model_id,
+    nn_classifier = NearestNeighbors(model_id=model_id,
                         s3_path=s3_prefix,
                         s3_conn=s3_conn,
                     )
 
-    assert vector_model.model_name == model_name
-    assert vector_model.lookup_name == lookup_name
-    assert vector_model.classify(docs, 'top')[0] == '29-2061.00'
-    assert vector_model.classify(docs, 'common')[0] == '29-2061.00'
+    assert nn_classifier.model_name == model_name
+    assert nn_classifier.lookup_name == lookup_name
+    assert nn_classifier.predict_soc(docs, 'top')[0] == '29-2061.00'
+    assert nn_classifier.predict_soc(docs, 'common')[0] == '29-2061.00'
