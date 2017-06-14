@@ -90,10 +90,6 @@ class NearestNeighbors(base.VectorModel):
         Returns:
             Annoy index object if self.indexed is True. None if we want to use gensim built-in index.
         """
-        try:
-            from gensim.similarities.index import AnnoyIndexer
-        except ImportError:
-            raise ValueError("SKIP: Please install the annoy indexer")
 
         logging.info('indexing the model %s', self.model_name)
         self.model.init_sims()
