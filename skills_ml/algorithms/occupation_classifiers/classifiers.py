@@ -1,7 +1,7 @@
 from skills_ml.algorithms.occupation_classifiers.nearestneighbor import NearestNeighbors
 
 class Classifiers(object):
-    """The VectorModel Object to classify each jobposting description to O*Net SOC code.
+    """The Classifiers Object to classify each jobposting description to O*Net SOC code.
 
     Example:
 
