@@ -22,7 +22,7 @@ class VectorModel(object):
     vector_model = VectorModel(s3_conn=s3_conn)
 
     """
-    def __init__(self, model_id='va_0605', model_type='gensim_doc2vec_', saved =True, indexed=True,
+    def __init__(self, model_id='va_0605', model_type='gensim_doc2vec_', saved =True,
         lookup=None, model=None, s3_conn=None, s3_path='open-skills-private/model_cache/'):
         """To initialize the SocClassifier Object, the model and lookup disctionary
         will be downloaded to the tmp/ directory and loaded to the memory.

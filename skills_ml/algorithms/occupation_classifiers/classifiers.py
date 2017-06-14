@@ -1,8 +1,12 @@
+import tempfile
+import os
 import logging
 from collections import Counter, defaultdict
 
-from skills_ml.algorithms.occupation_classifiers import base
+from gensim.similarities.index import AnnoyIndexer
 
+from skills_ml.algorithms.occupation_classifiers import base
+from skills_utils.s3 import download, split_s3_path, list_files
 
 class Classifier(object):
     """The Classifiers Object to classify each jobposting description to O*Net SOC code.
@@ -13,21 +17,35 @@ class Classifier(object):
     from skills_ml.algorithms.occupation_classifiers.base import Classifier
 
     s3_conn = S3Hook().get_conn()
-    Soc = Classifier(s3_conn=s3_conn, classifier_name='ann')
+    Soc = Classifier(s3_conn=s3_conn, classifier_id='ann_0614')
 
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
-    def __init__(self, classifier_name=None, s3_conn=None, **kwargs):
-        self.classifier_list = ['ann', 'knn']
-        self.classifier_name = classifier_name
+    def __init__(self, classifier_id='ann_0614', s3_conn=None, s3_path='open-skills-private/model_cache/', **kwargs):
+        """Initialization of Classifier
+        """
+        self.classifier_id = classifier_id
+        self.classifier_name = classifier_id.split('_')[0]
         self.s3_conn = s3_conn
+        self.s3_path = s3_path + classifier_id
+        self.files  = list_files(self.s3_conn, self.s3_path)
         self.classifier = self._load_classifier(**kwargs)
 
     def _load_classifier(self, **kwargs):
         if self.classifier_name == 'ann':
-            return NearestNeighbors(s3_conn=self.s3_conn, indexed=True, **kwargs)
+            with tempfile.TemporaryDirectory() as td:
+                for f in self.files:
+                    filepath = os.path.join(td, f)
+                    if not os.path.exists(filepath):
+                        logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
+                        download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
+                ann_index = AnnoyIndexer()
+                ann_index.load(os.path.join(td, self.classifier_id + '.index'))
+            return NearestNeighbors(s3_conn=self.s3_conn, indexer=ann_index, **kwargs)
+
         elif self.classifier_name == 'knn':
             return NearestNeighbors(s3_conn=self.s3_conn, indexed=False, **kwargs)
+
         else:
             print('Not implemented yet!')
             return None
@@ -45,13 +63,15 @@ class NearestNeighbors(base.VectorModel):
         indexed (bool): index the data with Annoy or not. Annoy can find approximate nearest neighbors much faster.
         indexer (:obj: `gensim.similarities.index`): Annoy index object should be passed in for faster query.
     """
-    def __init__(self, indexed=False, **kwargs):
+    def __init__(self, indexed=False, indexer=None, **kwargs):
         super(NearestNeighbors, self).__init__(**kwargs)
         self.indexed = indexed
-        self.indexer = self._ann_indexer()
+        self.indexer = self._ann_indexer() if indexed else indexer
+
 
     def _ann_indexer(self):
-        """Annoy is an open source library to search for points in space that are close to a given query point.
+        """This function should be in the training process. It's here for temporary usage.
+        Annoy is an open source library to search for points in space that are close to a given query point.
         It also creates large read-only file-based data structures that are mmapped into memory so that many
         processes may share the same data. For our purpose, it is used to find similarity between words or
         documents in a vector space.
@@ -59,18 +79,16 @@ class NearestNeighbors(base.VectorModel):
         Returns:
             Annoy index object if self.indexed is True. None if we want to use gensim built-in index.
         """
-        if self.indexed:
-            try:
-                from gensim.similarities.index import AnnoyIndexer
-            except ImportError:
-                raise ValueError("SKIP: Please install the annoy indexer")
+        try:
+            from gensim.similarities.index import AnnoyIndexer
+        except ImportError:
+            raise ValueError("SKIP: Please install the annoy indexer")
 
-            logging.info('indexing the model %s', self.model_name)
-            self.model.init_sims()
-            annoy_index = AnnoyIndexer(self.model, 200)
-            return annoy_index
-        else:
-            return None
+        logging.info('indexing the model %s', self.model_name)
+        self.model.init_sims()
+        annoy_index = AnnoyIndexer(self.model, 200)
+        return annoy_index
+
 
     def predict_soc(self, jobposting, mode='top'):
         """The method to predict the soc code a job posting belongs to.
