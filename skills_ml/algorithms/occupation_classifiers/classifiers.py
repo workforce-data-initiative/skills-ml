@@ -21,18 +21,27 @@ class Classifier(object):
 
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
-    def __init__(self, classifier_id='ann_0614', s3_conn=None, s3_path='open-skills-private/model_cache/', **kwargs):
+    def __init__(self, classifier_id='ann_0614', classifier=None,
+        s3_conn=None, s3_path='open-skills-private/model_cache/', **kwargs):
         """Initialization of Classifier
+
+        Attributes:
+            classifier_id (str): classifier id
+            classifier_type (str): classifier type
+            s3_path (str): the path of the classifier on S3.
+            s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
+            files (:obj: `list` of (str)): classifier files need to be downloaded/loaded.
+            classifier (:obj): classifier object that will do the actually classification
         """
         self.classifier_id = classifier_id
-        self.classifier_name = classifier_id.split('_')[0]
+        self.classifier_type = classifier_id.split('_')[0]
         self.s3_conn = s3_conn
         self.s3_path = s3_path + classifier_id
         self.files  = list_files(self.s3_conn, self.s3_path)
-        self.classifier = self._load_classifier(**kwargs)
+        self.classifier = self._load_classifier(**kwargs) if classifier == None else classifier
 
     def _load_classifier(self, **kwargs):
-        if self.classifier_name == 'ann':
+        if self.classifier_type == 'ann':
             with tempfile.TemporaryDirectory() as td:
                 for f in self.files:
                     filepath = os.path.join(td, f)
@@ -43,8 +52,10 @@ class Classifier(object):
                 ann_index.load(os.path.join(td, self.classifier_id + '.index'))
             return NearestNeighbors(s3_conn=self.s3_conn, indexer=ann_index, **kwargs)
 
-        elif self.classifier_name == 'knn':
+
+        elif self.classifier_type == 'knn':
             return NearestNeighbors(s3_conn=self.s3_conn, indexed=False, **kwargs)
+
 
         else:
             print('Not implemented yet!')
