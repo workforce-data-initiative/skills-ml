@@ -10,13 +10,13 @@ cousub_ua_lookup = {
     'ND': {'elgin': '623'}
 }
 ua_cbsa_lookup = {
-    '123': [('456', 'Chicago, IL Metro Area')],
-    '234': [('678', 'Rockford, IL Metro Area')],
+    '123': [['456', 'Chicago, IL Metro Area']],
+    '234': [['678', 'Rockford, IL Metro Area']],
     '823': [
-        ('987', 'Springfield, MA Metro Area'),
-        ('876', 'Worcester, MA Metro Area'),
+        ['987', 'Springfield, MA Metro Area'],
+        ['876', 'Worcester, MA Metro Area'],
     ],
-    '623': [('345', 'Fargo, ND Metro Area')]
+    '623': [['345', 'Fargo, ND Metro Area']]
 }
 
 
@@ -52,7 +52,7 @@ class CBSATest(unittest.TestCase):
         }
 
         assert self.querier.query(sample_job) == [
-            ('456', 'Chicago, IL Metro Area', 'IL'),
+            ['456', 'Chicago, IL Metro Area', 'IL'],
         ]
 
     def test_querier_multiple_hits(self):
@@ -74,8 +74,8 @@ class CBSATest(unittest.TestCase):
         }
 
         assert self.querier.query(sample_job) == [
-            ('987', 'Springfield, MA Metro Area', 'MA'),
-            ('876', 'Worcester, MA Metro Area', 'MA'),
+            ['987', 'Springfield, MA Metro Area', 'MA'],
+            ['876', 'Worcester, MA Metro Area', 'MA'],
         ]
 
     def test_querier_no_hits(self):
@@ -116,7 +116,7 @@ class CBSATest(unittest.TestCase):
             "id": 5
         }
 
-        assert self.querier.query(sample_job) == [('345', 'Fargo, ND Metro Area', 'ND')]
+        assert self.querier.query(sample_job) == [['345', 'Fargo, ND Metro Area', 'ND']]
 
     def test_querier_blank(self):
         assert self.querier.query({'id': 5}) == []
