@@ -95,23 +95,25 @@ def test_occupation_classifier():
         )
 
 
-    with tempfile.TemporaryDirectory() as td:
-        model.init_sims()
-        ann_index = AnnoyIndexer(model, 10)
-        ann_index.save(os.path.join(td, classifier_name))
-        for f in os.listdir(td):
-            upload(s3_conn, os.path.join(td, f), os.path.join(s3_prefix, classifier_id))
-
+    model.init_sims()
+    ann_index = AnnoyIndexer(model, 10)
+    ann_classifier = NearestNeighbors(
+        model_id=model_id,
+        s3_path=s3_prefix,
+        s3_conn=s3_conn,
+        )
+    ann_classifier.indexer = ann_index
     clf = Classifier(
         classifier_id=classifier_id,
         s3_conn=s3_conn,
         s3_path=s3_prefix,
-        classifier = nn_classifier
+        classifier = ann_classifier
         )
 
 
     assert nn_classifier.model_name == model_name
     assert nn_classifier.lookup_name == lookup_name
+    assert nn_classifier.indexer != clf.classifier.indexer
     assert nn_classifier.predict_soc(docs, 'top')[0] == clf.classify(docs, mode='top')[0]
     assert nn_classifier.predict_soc(docs, 'common')[0] == clf.classify(docs, mode='common')[0]
 
