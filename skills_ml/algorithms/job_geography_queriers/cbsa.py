@@ -68,6 +68,6 @@ class JobCBSAQuerier(object):
             return []
 
         hits = self.ua_cbsa[ua_fips]
-        hits = [hit + [state_code] for hit in hits]
+        hits = [tuple(hit + [state_code]) for hit in hits]
         logging.info('Found %s hits, %s', len(hits), hits)
-        return hits
+        return tuple(hits)
