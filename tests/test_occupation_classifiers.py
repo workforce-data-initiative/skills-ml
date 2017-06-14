@@ -1,4 +1,5 @@
-from skills_ml.algorithms.occupation_classifiers.classifiers import SocClassifier
+from skills_ml.algorithms.occupation_classifiers.classifiers import NearestNeighbors, Classifier
+from gensim.similarities.index import AnnoyIndexer
 from skills_utils.s3 import upload
 import gensim
 import os
@@ -67,6 +68,9 @@ def test_occupation_classifier():
     model_name = model_type + model_id
     s3_prefix = 'fake-bucket/cache/'
 
+    classifier_id = 'ann_0614'
+    classifier_name =  classifier_id + '.index'
+
     fake_corpus_train = FakeCorpusGenerator(num=10)
 
     model = gensim.models.Doc2Vec(size=500, min_count=1, iter=5, window=4)
@@ -84,12 +88,32 @@ def test_occupation_classifier():
             json.dump(lookup, handle)
         upload(s3_conn, os.path.join(td, lookup_name), os.path.join(s3_prefix, model_id))
 
-    soc = SocClassifier(model_id=model_id,
-                        s3_path=s3_prefix,
-                        s3_conn=s3_conn,
-                    )
+    nn_classifier = NearestNeighbors(
+        model_id=model_id,
+        s3_path=s3_prefix,
+        s3_conn=s3_conn,
+        )
 
-    assert soc.model_name == model_name
-    assert soc.lookup_name == lookup_name
-    assert soc.classify(docs, 'top')[0] == '29-2061.00'
-    assert soc.classify(docs, 'common')[0] == '29-2061.00'
+
+    model.init_sims()
+    ann_index = AnnoyIndexer(model, 10)
+    ann_classifier = NearestNeighbors(
+        model_id=model_id,
+        s3_path=s3_prefix,
+        s3_conn=s3_conn,
+        )
+    ann_classifier.indexer = ann_index
+    clf = Classifier(
+        classifier_id=classifier_id,
+        s3_conn=s3_conn,
+        s3_path=s3_prefix,
+        classifier = ann_classifier
+        )
+
+
+    assert nn_classifier.model_name == model_name
+    assert nn_classifier.lookup_name == lookup_name
+    assert nn_classifier.indexer != clf.classifier.indexer
+    assert nn_classifier.predict_soc(docs, 'top')[0] == clf.classify(docs, mode='top')[0]
+    assert nn_classifier.predict_soc(docs, 'common')[0] == clf.classify(docs, mode='common')[0]
+
