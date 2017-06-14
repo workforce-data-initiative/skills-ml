@@ -22,7 +22,7 @@ class Classifier(object):
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
     def __init__(self, classifier_id='ann_0614', classifier=None,
-        s3_conn=None, s3_path='open-skills-private/model_cache/', **kwargs):
+        s3_conn=None, s3_path='open-skills-private/model_cache/', classify_kwargs=None, **kwargs):
         """Initialization of Classifier
 
         Attributes:
@@ -32,6 +32,7 @@ class Classifier(object):
             s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
             files (:obj: `list` of (str)): classifier files need to be downloaded/loaded.
             classifier (:obj): classifier object that will do the actually classification
+            classify_kwargs (:dict): arguments to pass through to the .classify method when called on a job posting
         """
         self.classifier_id = classifier_id
         self.classifier_type = classifier_id.split('_')[0]
@@ -39,6 +40,7 @@ class Classifier(object):
         self.s3_path = s3_path + classifier_id
         self.files  = list_files(self.s3_conn, self.s3_path)
         self.classifier = self._load_classifier(**kwargs) if classifier == None else classifier
+        self.classify_kwargs = classify_kwargs if classify_kwargs else {}
 
     def _load_classifier(self, **kwargs):
         if self.classifier_type == 'ann':
@@ -61,8 +63,8 @@ class Classifier(object):
             print('Not implemented yet!')
             return None
 
-    def classify(self, jobposting, **kwargs):
-        return self.classifier.predict_soc(jobposting, **kwargs)
+    def classify(self, jobposting):
+        return self.classifier.predict_soc(jobposting, **(self.classify_kwargs))
 
 
 class NearestNeighbors(base.VectorModel):

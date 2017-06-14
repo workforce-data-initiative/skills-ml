@@ -103,17 +103,25 @@ def test_occupation_classifier():
         s3_conn=s3_conn,
         )
     ann_classifier.indexer = ann_index
-    clf = Classifier(
+    clf_top = Classifier(
         classifier_id=classifier_id,
         s3_conn=s3_conn,
         s3_path=s3_prefix,
-        classifier = ann_classifier
-        )
+        classifier=ann_classifier,
+        classify_kwargs={'mode': 'top'}
+    )
+    clf_common = Classifier(
+        classifier_id=classifier_id,
+        s3_conn=s3_conn,
+        s3_path=s3_prefix,
+        classifier=ann_classifier,
+        classify_kwargs={'mode': 'common'}
+    )
 
 
     assert nn_classifier.model_name == model_name
     assert nn_classifier.lookup_name == lookup_name
-    assert nn_classifier.indexer != clf.classifier.indexer
-    assert nn_classifier.predict_soc(docs, 'top')[0] == clf.classify(docs, mode='top')[0]
-    assert nn_classifier.predict_soc(docs, 'common')[0] == clf.classify(docs, mode='common')[0]
+    assert nn_classifier.indexer != clf_top.classifier.indexer
+    assert nn_classifier.predict_soc(docs, 'top')[0] == clf_top.classify(docs)[0]
+    assert nn_classifier.predict_soc(docs, 'common')[0] == clf_common.classify(docs)[0]
 

@@ -2,8 +2,10 @@ from collections import Counter, defaultdict
 
 
 class JobAggregator(object):
-    def __init__(self):
+    def __init__(self, output_count=1, output_total=False):
         self.initialize_counts()
+        self.output_count = output_count
+        self.output_total = output_total
 
     def initialize_counts(self):
         self.group_values = defaultdict(Counter)
@@ -28,16 +30,42 @@ class JobAggregator(object):
     def value(self, job_posting):
         raise NotImplementedError
 
+    def _outputs(self, row_counter):
+        outputs = [
+            value
+            for value, _ in row_counter.most_common(self.output_count)
+        ]
+        if self.output_total:
+            outputs.append(len(row_counter.keys()))
+        return outputs
+
+    def output_header_row(self, prefix):
+        output_header_row = [
+            '{}_{}'.format(prefix, str(i))
+            for i in range(1, self.output_count+1)
+        ]
+        if self.output_total:
+            output_header_row += '{}_total'.format(prefix)
+        return output_header_row
+
+    def group_outputs(self, full_key):
+        return self._outputs(self.group_values[full_key])
+
+    def rollup_outputs(self, job_key):
+        return self._outputs(self.rollup[job_key])
+
 
 class CountAggregator(JobAggregator):
     """Counts job postings"""
 
-    def initialize_counts(self):
-        self.group_values = Counter()
-        self.rollup = Counter()
-
     def value(self, job_posting):
-        return 1
+        return Counter(total=1)
+
+    def output_header_row(self, prefix):
+        return ['{}_total'.format(prefix)]
+
+    def _outputs(self, row_counter):
+        return [row_counter['total']]
 
 
 class SkillAggregator(JobAggregator):
@@ -49,8 +77,8 @@ class SkillAggregator(JobAggregator):
         corpus creator (object) an object that returns a text corpus
             from a job posting
     """
-    def __init__(self, skill_extractor, corpus_creator):
-        super(SkillAggregator, self).__init__()
+    def __init__(self, skill_extractor, corpus_creator, *args, **kwargs):
+        super(SkillAggregator, self).__init__(*args, **kwargs)
         self.skill_extractor = skill_extractor
         self.corpus_creator = corpus_creator
 
@@ -58,3 +86,25 @@ class SkillAggregator(JobAggregator):
         return self.skill_extractor.document_skill_counts(
             self.corpus_creator._transform(job_posting)
         )
+
+
+class SocCodeAggregator(JobAggregator):
+    """Aggregates SOC codes found in job postings
+
+    Args:
+        occupation_classifier (.occupation_classifiers.SocClassifier)
+            An object that returns a classified SOC code and similarity score
+            from unstructured text
+        corpus creator (object) an object that returns unstructured text
+            from a job posting
+    """
+    def __init__(self, occupation_classifier, corpus_creator, *args, **kwargs):
+        super(SocCodeAggregator, self).__init__(*args, **kwargs)
+        self.occupation_classifier = occupation_classifier
+        self.corpus_creator = corpus_creator
+
+    def value(self, job_posting):
+        soc_code, similarity_score = self.occupation_classifier.classify(
+            self.corpus_creator._transform(job_posting)
+        )
+        return Counter({soc_code: 1})
