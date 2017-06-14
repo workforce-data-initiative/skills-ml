@@ -2,6 +2,7 @@ import os
 import logging
 import json
 import tempfile
+import numpy as np
 
 from gensim.models import Doc2Vec
 
@@ -37,6 +38,8 @@ class VectorModel(object):
             files (:obj: `list` of (str)): model files need to be downloaded/loaded.
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
             lookup (dict): lookup table for mapping each jobposting index to soc code.
+            training_data (np.ndarray): a document vector array where each row is a document vector.
+            target (np.ndarray): a label array.
         """
         self.model_id = model_id
         self.model_type = model_type
@@ -48,6 +51,8 @@ class VectorModel(object):
         self.files  = list_files(self.s3_conn, self.s3_path)
         self.model = self._load_model() if model == None else model
         self.lookup = self._load_lookup() if lookup == None else lookup
+        self.training_data = self.model.docvecs.doctag_syn0
+        self.target = self._create_target_data()
 
     def _load_model(self):
         """The method to download the model from S3 and load to the memory.
@@ -104,4 +109,14 @@ class VectorModel(object):
 
         return lookup
 
+    def _create_target_data(self):
+        """To create a label array by mapping each doc vector to the lookup table.
 
+        Returns:
+            np.ndarray: label array.
+        """
+        y = []
+        for i in range(len(self.training_data)):
+            y.append(self.lookup[self.model.docvecs.index_to_doctag(i)])
+
+        return np.array(y)
