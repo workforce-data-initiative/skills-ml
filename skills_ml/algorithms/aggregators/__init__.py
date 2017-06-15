@@ -91,7 +91,7 @@ class SkillAggregator(JobAggregator):
 
 
 class SocCodeAggregator(JobAggregator):
-    """Aggregates SOC codes found in job postings
+    """Aggregates SOC codes inferred from job posting text
 
     Args:
         occupation_classifier (.occupation_classifiers.SocClassifier)
@@ -110,3 +110,13 @@ class SocCodeAggregator(JobAggregator):
             self.corpus_creator._transform(job_posting)
         )
         return Counter({soc_code: 1})
+
+
+class GivenSocCodeAggregator(JobAggregator):
+    """Aggregates SOC codes given as an input field
+
+    Caution! We may or may not know where these came from, and the method
+    for creating them may differ from record to record
+    """
+    def value(self, job_posting):
+        return Counter({job_posting.get('onet_soc_code', '99-9999.00'): 1})
