@@ -50,3 +50,17 @@ def test_geo_soc_aggregator_process_postings():
         '11-CAKE.00': {'total': 1},
         '12-OTHER.00': {'total': 3},
     }
+
+def test_geo_soc_aggregator_noclassifier():
+    job_aggregators = OrderedDict(
+        count=CountAggregator(),
+    )
+    aggregator = GeoSocAggregator(
+        job_aggregators=job_aggregators,
+        geo_querier=FakeCBSAQuerier()
+    )
+    aggregator.process_postings([json.dumps(job) for job in SAMPLE_JOBS])
+
+    assert aggregator.job_aggregators['count'].rollup == {
+        '99-9999.00': {'total': 4},
+    }

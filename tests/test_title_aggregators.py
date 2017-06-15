@@ -4,7 +4,7 @@ from tempfile import NamedTemporaryFile
 import copy
 import csv
 
-from skills_ml.algorithms.aggregators import SkillAggregator, CountAggregator, SocCodeAggregator
+from skills_ml.algorithms.aggregators import SkillAggregator, CountAggregator, SocCodeAggregator, GivenSocCodeAggregator
 from skills_ml.algorithms.aggregators.title import GeoTitleAggregator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.skill_extractors.freetext import FakeFreetextSkillExtractor
@@ -205,3 +205,18 @@ def test_soc_aggregator():
 
     aggregate = sum(map(aggregator.value, SAMPLE_JOBS), Counter())
     assert aggregate == Counter({'12-1234.00': len(SAMPLE_JOBS)})
+
+
+def test_given_soc_aggregator():
+    aggregator = GivenSocCodeAggregator()
+    aggregate = sum(map(aggregator.value, SAMPLE_JOBS), Counter())
+    assert aggregate == {'99-9999.00': len(SAMPLE_JOBS)}
+
+    weighted_jobs = copy.deepcopy(SAMPLE_JOBS)
+    for job in weighted_jobs:
+        if job['id'] == 1:
+            job['onet_soc_code'] = '23-1234.00'
+        else:
+            job['onet_soc_code'] = '12-1234.00'
+    aggregate = sum(map(aggregator.value, weighted_jobs), Counter())
+    assert aggregate == {'23-1234.00': 1, '12-1234.00': 3}

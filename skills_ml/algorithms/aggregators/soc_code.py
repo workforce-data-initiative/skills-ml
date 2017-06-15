@@ -10,15 +10,17 @@ class GeoSocAggregator(GeoAggregator):
     """Aggregates job titles by geography
 
     Args:
-        occupation_classifier (..occupation_classifiers.classifiers.Classifier)
-            a SOC code classifier
+        occupation_classifier (..occupation_classifiers.classifiers.Classifier,
+            optional)
+            a SOC code classifier,
+            if absent will aggregate using the given SOC code
         corpus_creator (CorpusCreator, optional) an object that will transform
             a given common schema job posting into unstructured text for the
             occupation classifier. Defaults to SimpleCorpusCreator
     """
     def __init__(
         self,
-        occupation_classifier,
+        occupation_classifier=None,
         corpus_creator=None,
         *args,
         **kwargs
@@ -39,10 +41,13 @@ class GeoSocAggregator(GeoAggregator):
         """
         for i, line in enumerate(job_postings):
             job_posting = json.loads(line)
-            soc_code, _ = \
-                self.occupation_classifier.classify(
-                    self.corpus_creator._transform(job_posting)
-                )
+            if self.occupation_classifier:
+                soc_code, _ = \
+                    self.occupation_classifier.classify(
+                        self.corpus_creator._transform(job_posting)
+                    )
+            else:
+                soc_code = job_posting.get('onet_soc_code', '99-9999.00')
             geography_hits = self.geo_querier.query(job_posting)
 
             for aggregator in self.job_aggregators.values():
