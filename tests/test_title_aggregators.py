@@ -81,7 +81,8 @@ def test_geo_title_aggregator_save_counts():
             skills=['slicing', 'dicing', 'jquery']
         ),
         corpus_creator=SimpleCorpusCreator(),
-        output_count=2
+        output_count=3,
+        output_total=True,
     )
     job_aggregators['count'] = CountAggregator()
     aggregator = GeoTitleAggregator(
@@ -98,13 +99,13 @@ def test_geo_title_aggregator_save_counts():
         tf.seek(0)
         reader = csv.reader(tf)
         header_row = next(reader)
-        assert header_row == ['cbsa_fips', 'cbsa_name', 'state_code', 'title', 'skills_1', 'skills_2', 'count_total']
+        assert header_row == ['cbsa_fips', 'cbsa_name', 'state_code', 'title', 'skills_1', 'skills_2', 'skills_3', 'skills_total', 'count_total']
         data_rows = [row for row in reader]
         expected = [
-            ['123', 'Another Metro', 'YY', 'Cupcake Ninja', 'slicing', 'dicing', '2'],
-            ['234', 'A Micro', 'ZY', 'Cupcake Ninja', 'slicing', 'dicing', '2'],
-            ['456', 'A Metro', 'XX', 'Regular Ninja', 'slicing', 'dicing', '2'],
-            ['456', 'A Metro', 'XX', 'React Ninja', 'slicing', 'dicing', '4'],
+            ['123', 'Another Metro', 'YY', 'Cupcake Ninja', 'slicing', 'dicing', '', '2', '2'],
+            ['234', 'A Micro', 'ZY', 'Cupcake Ninja', 'slicing', 'dicing', '', '2', '2'],
+            ['456', 'A Metro', 'XX', 'Regular Ninja', 'slicing', 'dicing', '', '2', '2'],
+            ['456', 'A Metro', 'XX', 'React Ninja', 'slicing', 'dicing', 'jquery', '3', '4'],
         ]
 
         for expected_row in expected:
