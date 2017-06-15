@@ -35,6 +35,8 @@ class JobAggregator(object):
             value
             for value, _ in row_counter.most_common(self.output_count)
         ]
+        for _ in range(len(outputs), self.output_count):
+            outputs.append(None)
         if self.output_total:
             outputs.append(len(row_counter.keys()))
         return outputs
@@ -45,7 +47,7 @@ class JobAggregator(object):
             for i in range(1, self.output_count+1)
         ]
         if self.output_total:
-            output_header_row += '{}_total'.format(prefix)
+            output_header_row.append('{}_total'.format(prefix))
         return output_header_row
 
     def group_outputs(self, full_key):
