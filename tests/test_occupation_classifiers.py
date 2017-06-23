@@ -77,7 +77,7 @@ def test_occupation_classifier():
 
     with tempfile.TemporaryDirectory() as td:
         model.build_vocab(fake_corpus_train)
-        model.train(fake_corpus_train)
+        model.train(fake_corpus_train, total_examples=model.corpus_count, epochs=model.iter)
         model.save(os.path.join(td, model_name))
         upload(s3_conn, os.path.join(td, model_name), os.path.join(s3_prefix, model_id))
 
