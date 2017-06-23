@@ -6,7 +6,7 @@ nltk
 pytest
 PyYAML
 Elasticsearch
-gensim==0.13.4
+gensim == 2.2.0
 annoy
 unicodecsv
 us
