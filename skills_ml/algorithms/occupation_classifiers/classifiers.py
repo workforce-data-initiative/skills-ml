@@ -14,7 +14,7 @@ class Classifier(object):
     Example:
 
     from airflow.hooks import S3Hook
-    from skills_ml.algorithms.occupation_classifiers.base import Classifier
+    from skills_ml.algorithms.occupation_classifiers.classifiers import Classifier
 
     s3_conn = S3Hook().get_conn()
     Soc = Classifier(s3_conn=s3_conn, classifier_id='ann_0614')
