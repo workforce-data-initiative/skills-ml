@@ -3,11 +3,19 @@ from collections import Counter, OrderedDict
 from tempfile import NamedTemporaryFile
 import copy
 import csv
+from multiprocessing import Pool
 
-from skills_ml.algorithms.aggregators import SkillAggregator, CountAggregator, SocCodeAggregator, GivenSocCodeAggregator
+from skills_utils.iteration import Batch
+
+from skills_ml.algorithms.aggregators import \
+    SkillAggregator,\
+    CountAggregator,\
+    SocCodeAggregator,\
+    GivenSocCodeAggregator
 from skills_ml.algorithms.aggregators.title import GeoTitleAggregator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
-from skills_ml.algorithms.skill_extractors.freetext import FakeFreetextSkillExtractor
+from skills_ml.algorithms.skill_extractors.freetext import \
+    FakeFreetextSkillExtractor
 from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
 
 
@@ -24,14 +32,30 @@ class FakeCBSAQuerier(object):
             return [('456', 'A Metro', 'XX')]
 
 SAMPLE_JOBS = [
-    {'id': 1, 'title': 'Cupcake Ninja', 'description': 'Slicing and dicing frosting'},
-    {'id': 2, 'title': 'Regular Ninja', 'description': 'Slicing and dicing enemies'},
-    {'id': 3, 'title': 'React Ninja', 'description': 'Slicing and dicing components'},
-    {'id': 4, 'title': 'React Ninja', 'description': 'Slicing and dicing and then trashing jQuery'},
+    {
+        'id': 1,
+        'title': 'Cupcake Ninja',
+        'description': 'Slicing and dicing frosting'
+    },
+    {
+        'id': 2,
+        'title': 'Regular Ninja',
+        'description': 'Slicing and dicing enemies'
+    },
+    {
+        'id': 3,
+        'title': 'React Ninja',
+        'description': 'Slicing and dicing components'
+    },
+    {
+        'id': 4,
+        'title': 'React Ninja',
+        'description': 'Slicing and dicing and then trashing jQuery'
+    },
 ]
 
 
-def test_geo_title_aggregator_process_postings():
+def build_basic_geo_title_aggregator():
     job_aggregators = OrderedDict(
         skills=SkillAggregator(
             skill_extractor=FakeFreetextSkillExtractor(
@@ -46,8 +70,10 @@ def test_geo_title_aggregator_process_postings():
         job_aggregators=job_aggregators,
         geo_querier=FakeCBSAQuerier()
     )
-    aggregator.process_postings([json.dumps(job) for job in SAMPLE_JOBS])
+    return aggregator
 
+
+def basic_assertions(aggregator):
     assert aggregator.job_aggregators['count'].group_values == {
         (('456', 'A Metro', 'XX'), 'Regular Ninja'): {'total': 1},
         (('456', 'A Metro', 'XX'), 'React Ninja'): {'total': 2},
@@ -62,10 +88,14 @@ def test_geo_title_aggregator_process_postings():
     }
 
     assert aggregator.job_aggregators['skills'].group_values == {
-        (('123', 'Another Metro', 'YY'), 'Cupcake Ninja'): {'slicing': 1, 'dicing': 1},
-        (('234', 'A Micro', 'ZY'), 'Cupcake Ninja'): {'slicing': 1, 'dicing': 1},
-        (('456', 'A Metro', 'XX'), 'Regular Ninja'): {'slicing': 1, 'dicing': 1},
-        (('456', 'A Metro', 'XX'), 'React Ninja'): {'slicing': 2, 'dicing': 2, 'jquery': 1}
+        (('123', 'Another Metro', 'YY'), 'Cupcake Ninja'):
+            {'slicing': 1, 'dicing': 1},
+        (('234', 'A Micro', 'ZY'), 'Cupcake Ninja'):
+            {'slicing': 1, 'dicing': 1},
+        (('456', 'A Metro', 'XX'), 'Regular Ninja'):
+            {'slicing': 1, 'dicing': 1},
+        (('456', 'A Metro', 'XX'), 'React Ninja'):
+            {'slicing': 2, 'dicing': 2, 'jquery': 1}
     }
 
     assert aggregator.job_aggregators['skills'].rollup == {
@@ -73,6 +103,50 @@ def test_geo_title_aggregator_process_postings():
         'Regular Ninja': {'slicing': 1, 'dicing': 1},
         'React Ninja': {'slicing': 2, 'dicing': 2, 'jquery': 1}
     }
+
+
+def test_geo_title_aggregator_process_postings():
+    aggregator = build_basic_geo_title_aggregator()
+    aggregator.process_postings([json.dumps(job) for job in SAMPLE_JOBS])
+    basic_assertions(aggregator)
+
+
+def test_addition_operator():
+    first_aggregator = build_basic_geo_title_aggregator()
+    second_aggregator = build_basic_geo_title_aggregator()
+
+    first_aggregator.process_postings(
+        [json.dumps(job) for job in SAMPLE_JOBS[0:2]]
+    )
+    second_aggregator.process_postings(
+        [json.dumps(job) for job in SAMPLE_JOBS[2:]]
+    )
+
+    first_aggregator.merge_job_aggregators(second_aggregator.job_aggregators)
+    basic_assertions(first_aggregator)
+
+
+def parallelizable_aggregation(job_postings):
+    aggregator = build_basic_geo_title_aggregator()
+    aggregator.process_postings(job_postings)
+    return aggregator.job_aggregators
+
+
+def test_multiprocessing():
+    pool = Pool(processes=2)
+    batcher = Batch((json.dumps(job) for job in SAMPLE_JOBS), 2)
+    aggregators = pool.map(
+        parallelizable_aggregation,
+        [list(batch) for batch in batcher]
+    )
+    combined_aggregator = GeoTitleAggregator(
+        job_aggregators=aggregators[0],
+        geo_querier=FakeCBSAQuerier()
+    )
+    for aggregator in aggregators[1:]:
+        combined_aggregator.merge_job_aggregators(aggregator)
+    basic_assertions(combined_aggregator)
+
 
 def test_geo_title_aggregator_save_counts():
     job_aggregators = OrderedDict()
@@ -92,20 +166,71 @@ def test_geo_title_aggregator_save_counts():
     weighted_jobs = copy.deepcopy(SAMPLE_JOBS)
     for job in weighted_jobs:
         job['description'] = 'slicing'
-    aggregator.process_postings([json.dumps(job) for job in SAMPLE_JOBS + weighted_jobs])
+    aggregator.process_postings(
+        [json.dumps(job) for job in SAMPLE_JOBS + weighted_jobs]
+    )
 
     with NamedTemporaryFile(mode='w+') as tf:
         aggregator.save_counts(tf.name)
         tf.seek(0)
         reader = csv.reader(tf)
         header_row = next(reader)
-        assert header_row == ['cbsa_fips', 'cbsa_name', 'state_code', 'title', 'skills_1', 'skills_2', 'skills_3', 'skills_total', 'count_total']
+        assert header_row == [
+            'cbsa_fips',
+            'cbsa_name',
+            'state_code',
+            'title',
+            'skills_1',
+            'skills_2',
+            'skills_3',
+            'skills_total',
+            'count_total'
+        ]
         data_rows = [row for row in reader]
         expected = [
-            ['123', 'Another Metro', 'YY', 'Cupcake Ninja', 'slicing', 'dicing', '', '2', '2'],
-            ['234', 'A Micro', 'ZY', 'Cupcake Ninja', 'slicing', 'dicing', '', '2', '2'],
-            ['456', 'A Metro', 'XX', 'Regular Ninja', 'slicing', 'dicing', '', '2', '2'],
-            ['456', 'A Metro', 'XX', 'React Ninja', 'slicing', 'dicing', 'jquery', '3', '4'],
+            [
+                '123',
+                'Another Metro',
+                'YY',
+                'Cupcake Ninja',
+                'slicing',
+                'dicing',
+                '',
+                '2',
+                '2'
+            ],
+            [
+                '234',
+                'A Micro',
+                'ZY',
+                'Cupcake Ninja',
+                'slicing',
+                'dicing',
+                '',
+                '2',
+                '2'],
+            [
+                '456',
+                'A Metro',
+                'XX',
+                'Regular Ninja',
+                'slicing',
+                'dicing',
+                '',
+                '2',
+                '2'
+            ],
+            [
+                '456',
+                'A Metro',
+                'XX',
+                'React Ninja',
+                'slicing',
+                'dicing',
+                'jquery',
+                '3',
+                '4'
+            ],
         ]
 
         for expected_row in expected:
@@ -129,7 +254,9 @@ def test_geo_title_aggregator_save_rollup():
     weighted_jobs = copy.deepcopy(SAMPLE_JOBS)
     for job in weighted_jobs:
         job['description'] = 'slicing'
-    aggregator.process_postings([json.dumps(job) for job in SAMPLE_JOBS + weighted_jobs])
+    aggregator.process_postings(
+        [json.dumps(job) for job in SAMPLE_JOBS + weighted_jobs]
+    )
 
     with NamedTemporaryFile(mode='w+') as tf:
         aggregator.save_rollup(tf.name)
@@ -180,10 +307,14 @@ def test_geo_title_aggregator_with_cleaning():
     }
 
     assert aggregator.job_aggregators['skills'].group_values == {
-        (('123', 'Another Metro', 'YY'), 'cupcake ninja'): {'slicing': 1, 'dicing': 1},
-        (('234', 'A Micro', 'ZY'), 'cupcake ninja'): {'slicing': 1, 'dicing': 1},
-        (('456', 'A Metro', 'XX'), 'regular ninja'): {'slicing': 1, 'dicing': 1},
-        (('456', 'A Metro', 'XX'), 'react ninja'): {'slicing': 2, 'dicing': 2, 'jquery': 1}
+        (('123', 'Another Metro', 'YY'), 'cupcake ninja'):
+            {'slicing': 1, 'dicing': 1},
+        (('234', 'A Micro', 'ZY'), 'cupcake ninja'):
+            {'slicing': 1, 'dicing': 1},
+        (('456', 'A Metro', 'XX'), 'regular ninja'):
+            {'slicing': 1, 'dicing': 1},
+        (('456', 'A Metro', 'XX'), 'react ninja'):
+            {'slicing': 2, 'dicing': 2, 'jquery': 1}
     }
 
     assert aggregator.job_aggregators['skills'].rollup == {

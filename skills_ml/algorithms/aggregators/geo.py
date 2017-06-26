@@ -19,6 +19,11 @@ class GeoAggregator(object):
         self.job_aggregators = job_aggregators
         self.geo_querier = geo_querier or JobCBSAQuerier()
 
+    def merge_job_aggregators(self, other_job_aggregators):
+        for key, value in other_job_aggregators.items():
+            self.job_aggregators[key] += value
+        return self
+
     def process_postings(self, job_postings):
         raise NotImplementedError()
 

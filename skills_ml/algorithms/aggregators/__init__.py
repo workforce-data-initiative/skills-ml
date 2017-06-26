@@ -11,6 +11,15 @@ class JobAggregator(object):
         self.group_values = defaultdict(Counter)
         self.rollup = defaultdict(Counter)
 
+    def __iadd__(self, other):
+        assert type(self) == type(other)
+        for key, value in other.group_values.items():
+            self.group_values[key] += value
+        for key, value in other.rollup.items():
+            self.rollup[key] += value
+
+        return self
+
     def accumulate(self, job_posting, job_key, groups):
         """Incorporates the data from a single job posting
 
