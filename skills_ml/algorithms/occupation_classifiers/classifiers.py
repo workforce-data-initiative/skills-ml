@@ -8,6 +8,16 @@ from gensim.similarities.index import AnnoyIndexer
 from skills_ml.algorithms.occupation_classifiers import base
 from skills_utils.s3 import download, split_s3_path, list_files
 
+
+def download_ann_classifier_files(s3_prefix, classifier_id, download_directory, s3_conn):
+    s3_path = s3_prefix + classifier_id
+    files = list_files(s3_conn, s3_path)
+    for f in files:
+        filepath = os.path.join(download_directory, f)
+        logging.info('calling download from %s to %s', s3_path + f, filepath)
+        download(s3_conn, filepath, os.path.join(s3_path, f))
+
+
 class Classifier(object):
     """The Classifiers Object to classify each jobposting description to O*Net SOC code.
 
@@ -22,7 +32,7 @@ class Classifier(object):
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
     def __init__(self, classifier_id='ann_0614', classifier=None,
-        s3_conn=None, s3_path='open-skills-private/model_cache/', classify_kwargs=None, **kwargs):
+        s3_conn=None, s3_path='open-skills-private/model_cache/', classify_kwargs=None, temporary_directory=None, **kwargs):
         """Initialization of Classifier
 
         Attributes:
@@ -39,25 +49,23 @@ class Classifier(object):
         self.s3_conn = s3_conn
         self.s3_path = s3_path + classifier_id
         self.files  = list_files(self.s3_conn, self.s3_path)
+        self.temporary_directory = temporary_directory or tempfile.TemporaryDirectory()
         self.classifier = self._load_classifier(**kwargs) if classifier == None else classifier
         self.classify_kwargs = classify_kwargs if classify_kwargs else {}
 
     def _load_classifier(self, **kwargs):
         if self.classifier_type == 'ann':
-            with tempfile.TemporaryDirectory() as td:
-                for f in self.files:
-                    filepath = os.path.join(td, f)
-                    if not os.path.exists(filepath):
-                        logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
-                        download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
-                ann_index = AnnoyIndexer()
-                ann_index.load(os.path.join(td, self.classifier_id + '.index'))
+            for f in self.files:
+                filepath = os.path.join(self.temporary_directory, f)
+                if not os.path.exists(filepath):
+                    logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
+                    download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
+            ann_index = AnnoyIndexer()
+            ann_index.load(os.path.join(self.temporary_directory, self.classifier_id + '.index'))
             return NearestNeighbors(s3_conn=self.s3_conn, indexer=ann_index, **kwargs)
-
 
         elif self.classifier_type == 'knn':
             return NearestNeighbors(s3_conn=self.s3_conn, indexed=False, **kwargs)
-
 
         else:
             print('Not implemented yet!')
