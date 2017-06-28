@@ -25,6 +25,8 @@ def _compute_percentages(counts, total):
 
 
 class DatasetStatsCounter(object):
+    directory = 'quarterly'
+
     """Accumulate data Dataset ETL statistics for a quarter
     to show presence and absence of different fields,
     and the total count of rows
@@ -77,16 +79,32 @@ class DatasetStatsCounter(object):
         self.stats['last_updated'] = datetime.now().isoformat()
         key = boto.s3.key.Key(
             bucket=bucket,
-            name='{}/quarterly/{}_{}'.format(
+            name='{}/{}/{}_{}'.format(
                 prefix,
+                self.directory,
                 self.dataset_id,
                 self.quarter
             )
         )
         key.set_contents_from_string(json.dumps(self.stats))
 
+    @staticmethod
+    def quarterly_posting_stats(s3_conn, stats_s3_path):
+        bucket_name, prefix = split_s3_path(stats_s3_path)
+        bucket = s3_conn.get_bucket(bucket_name)
+        total = Counter()
+        for key in bucket.list(
+            prefix='{}/{}'.format(prefix, DatasetStatsCounter.directory)
+        ):
+            quarter = key.name[-6:]
+            stats = json.loads(key.get_contents_as_string().decode('utf-8'))
+            total[quarter] += stats['total']
+        return total
+
 
 class DatasetStatsAggregator(object):
+    directory = 'dataset_summaries'
+
     """Aggregate data Dataset ETL statistics up to the dataset level
 
     Args:
@@ -128,6 +146,12 @@ class DatasetStatsAggregator(object):
             self.stats['total']
         )
 
+    def _load(self, s3_prefix):
+        bucket_name, prefix = split_s3_path(s3_prefix)
+        bucket = self.s3_conn.get_bucket(bucket_name)
+        key = self._key(bucket, prefix)
+        self.stats = json.loads(key.get_contents_as_string().decode('utf-8'))
+
     def _save(self, s3_prefix):
         """Save stats to S3, including percentages
         """
@@ -137,7 +161,11 @@ class DatasetStatsAggregator(object):
         self.stats['last_updated'] = datetime.now().isoformat()
         key = boto.s3.key.Key(
             bucket=bucket,
-            name='{}/dataset_summaries/{}.json'.format(prefix, self.dataset_id)
+            name='{}/{}/{}.json'.format(
+                prefix,
+                self.directory,
+                self.dataset_id
+            )
         )
         key.set_contents_from_string(json.dumps(self.stats))
 
@@ -151,8 +179,23 @@ class DatasetStatsAggregator(object):
             self._accumulate_key(key)
         self._save(s3_prefix)
 
+    @staticmethod
+    def partners(s3_conn, s3_prefix):
+        partners_list = []
+        bucket_name, prefix = split_s3_path(s3_prefix)
+        bucket = s3_conn.get_bucket(bucket_name)
+        for key in bucket.list(
+            prefix='{}/{}'.format(prefix, DatasetStatsAggregator.directory)
+        ):
+            stats = json.loads(key.get_contents_as_string().decode('utf-8'))
+            if stats['total'] > 0:
+                partner_id = key.name.split('/')[-1].split('.')[0]
+                partners_list.append(partner_id)
+        return partners_list
+
 
 class GlobalStatsAggregator(object):
+    filename = 'summary.json'
     """Aggregate Dataset ETL statistics up to the global level
 
     Args:
@@ -182,6 +225,12 @@ class GlobalStatsAggregator(object):
             self.stats['total']
         )
 
+    def _key(self, bucket, prefix):
+        return boto.s3.key.Key(
+            bucket=bucket,
+            name='{}/{}'.format(prefix, self.filename)
+        )
+
     def _save(self, s3_prefix):
         """Save stats to S3, including percentages
         """
@@ -189,11 +238,14 @@ class GlobalStatsAggregator(object):
         bucket = self.s3_conn.get_bucket(bucket_name)
         self._compute_percentages()
         self.stats['last_updated'] = datetime.now().isoformat()
-        key = boto.s3.key.Key(
-            bucket=bucket,
-            name='{}/summary.json'.format(prefix)
-        )
+        key = self._key(bucket, prefix)
         key.set_contents_from_string(json.dumps(self.stats))
+
+    def _load(self, s3_prefix):
+        bucket_name, prefix = split_s3_path(s3_prefix)
+        bucket = self.s3_conn.get_bucket(bucket_name)
+        key = self._key(bucket, prefix)
+        self.stats = json.loads(key.get_contents_as_string().decode('utf-8'))
 
     def run(self, s3_prefix):
         """Compute stats and save them to s3
@@ -204,3 +256,7 @@ class GlobalStatsAggregator(object):
         for key in self._iterate_keys(s3_prefix):
             self._accumulate_key(key)
         self._save(s3_prefix)
+
+    def saved_total(self, s3_prefix):
+        self._load(s3_prefix)
+        return self.stats['total']

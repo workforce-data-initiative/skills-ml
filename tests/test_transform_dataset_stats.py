@@ -212,3 +212,121 @@ def test_global_stats_aggregator():
         }
         key = s3_conn.get_bucket('test-bucket').get_key('stats/summary.json')
         assert json.loads(key.get_contents_as_string().decode('utf-8')) == expected_stats
+
+
+# test retrieval utilities
+
+config = {'partner_stats': {'s3_path': 'stats-bucket/partner-etl'}}
+
+
+def upload_quarterly_dataset_counts(bucket, dataset_id, quarter, num_total):
+    key = boto.s3.key.Key(
+        bucket=bucket,
+        name='partner-etl/quarterly/{}_{}'.format(
+            dataset_id,
+            quarter
+        )
+    )
+    key.set_contents_from_string(json.dumps({
+        'total': num_total,
+        'output_counts': {
+            'title': num_total,
+        },
+        'input_counts': {
+            'jobtitle': num_total,
+        },
+        'output_percentages': {
+            'title': 1.0,
+        },
+        'input_percentages': {
+            'jobtitle': 1.0,
+        },
+        'last_updated': '2017-01-10T00:00:00',
+        'quarter': quarter,
+    }))
+
+
+def test_total_job_postings():
+    with moto.mock_s3():
+        s3_conn = boto.connect_s3()
+        s3_conn.create_bucket('stats-bucket')
+        bucket = s3_conn.get_bucket('stats-bucket')
+        key = boto.s3.key.Key(
+            bucket=bucket,
+            name='partner-etl/summary.json'
+        )
+        key.set_contents_from_string(json.dumps({
+            'total': 8,
+            'output_counts': {
+                'title': 8,
+                'description': 4
+            },
+            'output_percentages': {
+                'title': 1.0,
+                'description': 0.5
+
+            },
+            'last_updated': '2017-01-10T00:00:00',
+        }))
+
+        assert GlobalStatsAggregator(s3_conn)\
+            .saved_total(config['partner_stats']['s3_path']) == 8
+
+
+def test_quarterly_posting_stats():
+    with moto.mock_s3():
+        s3_conn = boto.connect_s3()
+        s3_conn.create_bucket('stats-bucket')
+        bucket = s3_conn.get_bucket('stats-bucket')
+        upload_quarterly_dataset_counts(bucket, 'XX', '2014Q1', 5)
+        upload_quarterly_dataset_counts(bucket, 'XX', '2014Q2', 6)
+        upload_quarterly_dataset_counts(bucket, 'XX', '2014Q3', 7)
+        upload_quarterly_dataset_counts(bucket, 'XX', '2014Q4', 8)
+        upload_quarterly_dataset_counts(bucket, 'ZZ', '2014Q1', 10)
+        upload_quarterly_dataset_counts(bucket, 'ZZ', '2014Q2', 9)
+        upload_quarterly_dataset_counts(bucket, 'ZZ', '2014Q3', 8)
+        upload_quarterly_dataset_counts(bucket, 'ZZ', '2014Q4', 10)
+        assert DatasetStatsCounter.quarterly_posting_stats(
+            s3_conn,
+            config['partner_stats']['s3_path']
+        ) == {
+            '2014Q1': 15,
+            '2014Q2': 15,
+            '2014Q3': 15,
+            '2014Q4': 18
+        }
+
+def upload_partner_rollup(bucket, dataset_id, num_total):
+    key = boto.s3.key.Key(
+        bucket=bucket,
+        name='partner-etl/dataset_summaries/{}.json'.format(dataset_id)
+    )
+    key.set_contents_from_string(json.dumps({
+        'total': num_total,
+        'output_counts': {
+            'title': num_total,
+        },
+        'input_counts': {
+            'jobtitle': num_total,
+        },
+        'output_percentages': {
+            'title': 1.0,
+        },
+        'input_percentages': {
+            'jobtitle': 1.0,
+        },
+        'last_updated': '2017-01-10T00:00:00',
+    }))
+
+def test_partner_list():
+    with moto.mock_s3():
+        s3_conn = boto.connect_s3()
+        s3_conn.create_bucket('stats-bucket')
+        bucket = s3_conn.get_bucket('stats-bucket')
+        upload_partner_rollup(bucket, 'XX', 45)
+        upload_partner_rollup(bucket, 'YY', 55)
+        upload_partner_rollup(bucket, 'ZZ', 0)
+        assert DatasetStatsAggregator.partners(
+            s3_conn,
+            config['partner_stats']['s3_path']
+        ) == ['XX', 'YY']
