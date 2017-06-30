@@ -11,5 +11,6 @@ annoy
 unicodecsv
 us
 Sqlalchemy
+geocoder
 psycopg2
 alembic
