@@ -13,3 +13,4 @@ us
 Sqlalchemy
 psycopg2
 alembic
+retrying
