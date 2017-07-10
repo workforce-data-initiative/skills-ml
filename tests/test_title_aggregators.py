@@ -23,13 +23,10 @@ class FakeCBSAQuerier(object):
     geo_key_names = ('cbsa_fips', 'cbsa_name', 'state_code')
 
     def query(self, job_listing):
-        if job_listing['id'] == 1:
-            return [
-                ('123', 'Another Metro', 'YY'),
-                ('234', 'A Micro', 'ZY')
-            ]
+        if json.loads(job_listing)['id'] == 1:
+            return ('123', 'Another Metro', 'YY')
         else:
-            return [('456', 'A Metro', 'XX')]
+            return ('456', 'A Metro', 'XX')
 
 SAMPLE_JOBS = [
     {
@@ -78,7 +75,6 @@ def basic_assertions(aggregator):
         (('456', 'A Metro', 'XX'), 'Regular Ninja'): {'total': 1},
         (('456', 'A Metro', 'XX'), 'React Ninja'): {'total': 2},
         (('123', 'Another Metro', 'YY'), 'Cupcake Ninja'): {'total': 1},
-        (('234', 'A Micro', 'ZY'), 'Cupcake Ninja'): {'total': 1},
     }
 
     assert aggregator.job_aggregators['count'].rollup == {
@@ -89,8 +85,6 @@ def basic_assertions(aggregator):
 
     assert aggregator.job_aggregators['skills'].group_values == {
         (('123', 'Another Metro', 'YY'), 'Cupcake Ninja'):
-            {'slicing': 1, 'dicing': 1},
-        (('234', 'A Micro', 'ZY'), 'Cupcake Ninja'):
             {'slicing': 1, 'dicing': 1},
         (('456', 'A Metro', 'XX'), 'Regular Ninja'):
             {'slicing': 1, 'dicing': 1},
@@ -200,16 +194,6 @@ def test_geo_title_aggregator_save_counts():
                 '2'
             ],
             [
-                '234',
-                'A Micro',
-                'ZY',
-                'Cupcake Ninja',
-                'slicing',
-                'dicing',
-                '',
-                '2',
-                '2'],
-            [
                 '456',
                 'A Metro',
                 'XX',
@@ -297,7 +281,6 @@ def test_geo_title_aggregator_with_cleaning():
         (('456', 'A Metro', 'XX'), 'regular ninja'): {'total': 1},
         (('456', 'A Metro', 'XX'), 'react ninja'): {'total': 2},
         (('123', 'Another Metro', 'YY'), 'cupcake ninja'): {'total': 1},
-        (('234', 'A Micro', 'ZY'), 'cupcake ninja'): {'total': 1}
     }
 
     assert aggregator.job_aggregators['count'].rollup == {
@@ -308,8 +291,6 @@ def test_geo_title_aggregator_with_cleaning():
 
     assert aggregator.job_aggregators['skills'].group_values == {
         (('123', 'Another Metro', 'YY'), 'cupcake ninja'):
-            {'slicing': 1, 'dicing': 1},
-        (('234', 'A Micro', 'ZY'), 'cupcake ninja'):
             {'slicing': 1, 'dicing': 1},
         (('456', 'A Metro', 'XX'), 'regular ninja'):
             {'slicing': 1, 'dicing': 1},

@@ -1,5 +1,4 @@
 import csv
-from skills_ml.algorithms.job_geography_queriers.cbsa import JobCBSAQuerier
 
 
 class GeoAggregator(object):
@@ -8,16 +7,11 @@ class GeoAggregator(object):
         job_aggregators (dict of .JobAggregator objects) - The aggregators
             that should accumulate data based on geography and title for each
             job posting
-        geo_querier (object, optional) an object that returns a geography of a
-            given job. Defaults to JobCBSAQuerier
+        geo_querier (object) an object that returns a geography of a given job.
     """
-    def __init__(
-        self,
-        job_aggregators,
-        geo_querier=None,
-    ):
+    def __init__(self, job_aggregators, geo_querier):
         self.job_aggregators = job_aggregators
-        self.geo_querier = geo_querier or JobCBSAQuerier()
+        self.geo_querier = geo_querier
 
     def merge_job_aggregators(self, other_job_aggregators):
         for key, value in other_job_aggregators.items():

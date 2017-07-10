@@ -1,5 +1,7 @@
 from mock import patch
 from skills_ml.algorithms.job_geography_queriers.cbsa import JobCBSAQuerier
+from skills_ml.algorithms.job_geography_queriers.cbsa_from_geocode import JobCBSAFromGeocodeQuerier
+import json
 import unittest
 
 place_ua_lookup = {
@@ -131,3 +133,75 @@ class CBSATest(unittest.TestCase):
 
     def test_querier_blank(self):
         assert self.querier.query({'id': 5}) == []
+
+
+cbsa_results = {
+    'Elgin, IL': ['456', 'Chicago, IL Metro Area'],
+    'Elgin, TX': None,
+}
+
+
+class CBSAFromGeocodeTest(unittest.TestCase):
+    def setUp(self):
+        self.querier = JobCBSAFromGeocodeQuerier(cbsa_results=cbsa_results)
+
+    def test_querier_one_hit(self):
+        sample_job = json.dumps({
+            "description": "We are looking for someone for a job",
+            "jobLocation": {
+                "@type": "Place",
+                "address": {
+                    "addressLocality": "Elgin",
+                    "addressRegion": "IL",
+                    "@type": "PostalAddress"
+                }
+            },
+            "@context": "http://schema.org",
+            "alternateName": "Customer Service Representative",
+            "datePosted": "2013-03-07",
+            "@type": "JobPosting",
+            "id": 5
+        })
+
+        assert self.querier.query(sample_job) == \
+            ('456', 'Chicago, IL Metro Area', 'IL')
+
+    def test_querier_hit_no_cbsa(self):
+        sample_job = json.dumps({
+            "description": "We are looking for someone for a job",
+            "jobLocation": {
+                "@type": "Place",
+                "address": {
+                    "addressLocality": "Elgin",
+                    "addressRegion": "TX",
+                    "@type": "PostalAddress"
+                }
+            },
+            "@context": "http://schema.org",
+            "alternateName": "Customer Service Representative",
+            "datePosted": "2013-03-07",
+            "@type": "JobPosting",
+            "id": 5
+        })
+
+        assert self.querier.query(sample_job) == (None, None, 'TX')
+
+    def test_querier_not_present(self):
+        sample_job = json.dumps({
+            "description": "We are looking for someone for a job",
+            "jobLocation": {
+                "@type": "Place",
+                "address": {
+                    "addressLocality": "Elgin",
+                    "addressRegion": "ND",
+                    "@type": "PostalAddress"
+                }
+            },
+            "@context": "http://schema.org",
+            "alternateName": "Customer Service Representative",
+            "datePosted": "2013-03-07",
+            "@type": "JobPosting",
+            "id": 5
+        })
+
+        assert self.querier.query(sample_job) == (None, None, 'ND')

@@ -33,13 +33,13 @@ class GeoTitleAggregator(GeoAggregator):
         for i, line in enumerate(job_postings):
             job_posting = json.loads(line)
             job_title = self.title_cleaner(job_posting['title'])
-            geography_hits = self.geo_querier.query(job_posting)
+            geography_hit = self.geo_querier.query(line)
 
             for aggregator in self.job_aggregators.values():
                 aggregator.accumulate(
                     job_posting=job_posting,
                     job_key=job_title,
-                    groups=geography_hits
+                    groups=(geography_hit,)
                 )
             if i % 1000 == 0:
                 logging.info('Aggregated %s job postings', i)

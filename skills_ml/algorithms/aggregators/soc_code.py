@@ -48,13 +48,13 @@ class GeoSocAggregator(GeoAggregator):
                     )
             else:
                 soc_code = job_posting.get('onet_soc_code', '99-9999.00')
-            geography_hits = self.geo_querier.query(job_posting)
+            geography_hits = self.geo_querier.query(line)
 
             for aggregator in self.job_aggregators.values():
                 aggregator.accumulate(
                     job_posting=job_posting,
                     job_key=soc_code,
-                    groups=geography_hits
+                    groups=(geography_hits,)
                 )
             if i % 1000 == 0:
                 logging.info('Aggregated %s job postings', i)
