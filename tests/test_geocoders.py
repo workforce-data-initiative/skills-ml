@@ -9,44 +9,44 @@ import boto
 
 
 @moto.mock_s3
-@patch('time.sleep')
-def test_geocode_cacher(time_mock):
-    with open('tests/sample_geocode_result.json') as f:
-        sample_geocode_result = json.load(f)
-    s3_conn = boto.connect_s3()
-    s3_conn.create_bucket('geobucket')
+def test_geocode_cacher():
+    with patch('time.sleep') as time_mock:
+        with open('tests/sample_geocode_result.json') as f:
+            sample_geocode_result = json.load(f)
+        s3_conn = boto.connect_s3()
+        s3_conn.create_bucket('geobucket')
 
-    geocode_result = namedtuple('GeocodeResult', ['json'])
-    geocode_func = MagicMock(
-        return_value=geocode_result(json=sample_geocode_result)
-    )
-    geocoder = S3CachedGeocoder(
-        s3_conn=s3_conn,
-        cache_s3_path='geobucket/geocodes.json',
-        geocode_func=geocode_func,
-        sleep_time=1
-    )
-    geocoder.geocode('Canarsie, NY')
-    geocoder.geocode('Poughkeepsie, NY')
-    geocoder.geocode('Canarsie, NY')
-    geocoder.save()
-    assert geocode_func.call_count == 2
-    assert geocode_func.call_args_list == [
-        call('Canarsie, NY'),
-        call('Poughkeepsie, NY')
-    ]
-    assert time_mock.call_count == 2
+        geocode_result = namedtuple('GeocodeResult', ['json'])
+        geocode_func = MagicMock(
+            return_value=geocode_result(json=sample_geocode_result)
+        )
+        geocoder = S3CachedGeocoder(
+            s3_conn=s3_conn,
+            cache_s3_path='geobucket/geocodes.json',
+            geocode_func=geocode_func,
+            sleep_time=1
+        )
+        geocoder.geocode('Canarsie, NY')
+        geocoder.geocode('Poughkeepsie, NY')
+        geocoder.geocode('Canarsie, NY')
+        geocoder.save()
+        assert geocode_func.call_count == 2
+        assert geocode_func.call_args_list == [
+            call('Canarsie, NY'),
+            call('Poughkeepsie, NY')
+        ]
+        assert time_mock.call_count == 2
 
-    new_geocoder = S3CachedGeocoder(
-        s3_conn=s3_conn,
-        cache_s3_path='geobucket/geocodes.json',
-        geocode_func=geocode_func,
-        sleep_time=1
-    )
-    assert new_geocoder.all_cached_geocodes == {
-        'Canarsie, NY': sample_geocode_result,
-        'Poughkeepsie, NY': sample_geocode_result,
-    }
+        new_geocoder = S3CachedGeocoder(
+            s3_conn=s3_conn,
+            cache_s3_path='geobucket/geocodes.json',
+            geocode_func=geocode_func,
+            sleep_time=1
+        )
+        assert new_geocoder.all_cached_geocodes == {
+            'Canarsie, NY': sample_geocode_result,
+            'Poughkeepsie, NY': sample_geocode_result,
+        }
 
 
 @moto.mock_s3
