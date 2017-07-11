@@ -15,3 +15,5 @@ geocoder
 psycopg2
 alembic
 retrying
+fiona
+shapely

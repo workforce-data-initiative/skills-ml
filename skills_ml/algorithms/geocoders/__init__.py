@@ -34,12 +34,6 @@ def job_posting_search_string(job_posting):
 class S3CachedGeocoder(object):
     """Geocoder that uses S3 as a cache.
 
-    Warning: Not to be used in parallel!
-    To respect throttling limits, it would be dangerous to try and run more
-    then one of these against a geocoder service. As a result, the code
-    assumes that when it comes time to save, there have been no
-    external changes to the file on S3 worth keeping.
-
     Args:
         s3_conn (boto.s3.connection) an s3 connection
         cache_s3_path (string) path (including bucket) to the json cache on s3
@@ -79,11 +73,33 @@ class S3CachedGeocoder(object):
             )
             self.cache = {}
 
+    def retrieve_from_cache(self, job_posting):
+        """Retrieve a saved geocode result from the cache if it exists
+
+        Usable in parallel, since it will not perform geocoding on its own.
+        This means that you should make code that calls this dependent
+        on the geocoding for the job posting being completed
+
+        Args:
+            job_posting (string) A job posting in schema.org/JobPosting json form
+        Returns: (string) The geocoding result, or None if none is available
+        """
+        if not self.cache:
+            self._load()
+        search_string = job_posting_search_string(job_posting)
+        return self.cache.get(search_string, None)
+
     def geocode(self, search_string):
         """Geocodes a single search string
 
         First checks in cache to see if the search string has been geocoded
         If the geocoding function is called, the process will sleep afterwards
+
+        Warning: Not to be used in parallel!
+        To respect throttling limits, it would be dangerous to try and run more
+        then one of these against a geocoder service. As a result, the code
+        assumes that when it comes time to save, there have been no
+        external changes to the file on S3 worth keeping.
 
         Args:
             search_string (string) A search query to send to the geocoder

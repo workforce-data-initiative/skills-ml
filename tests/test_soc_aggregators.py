@@ -9,10 +9,10 @@ class FakeCBSAQuerier(object):
     geo_key_names = ('cbsa_fips', 'cbsa_name', 'state_code')
 
     def query(self, job_listing):
-        if job_listing['id'] == 1:
-            return [('234', 'A Micro', 'ZY')]
+        if json.loads(job_listing)['id'] == 1:
+            return ('234', 'A Micro', 'ZY')
         else:
-            return [('456', 'A Metro', 'XX')]
+            return ('456', 'A Metro', 'XX')
 
 
 class FakeSocClassifier(object):
