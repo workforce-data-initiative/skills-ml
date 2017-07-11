@@ -82,7 +82,17 @@ def test_job_posting_search_string():
     with open('sample_job_listing.json') as f:
         sample_job_posting = f.read()
 
-    assert job_posting_search_string(sample_job_posting) == 'Salisbury, PA'
+    assert job_posting_search_string(sample_job_posting) == 'Salisbury, Pennsylvania'
+
+
+def test_job_posting_weird_region():
+    fake_job = {'jobLocation': {'address': {
+        'addressLocality': 'Any City',
+        'addressRegion': 'Northeastern USA'
+    }}}
+
+    assert job_posting_search_string(json.dumps(fake_job)) ==\
+        'Any City, Northeastern USA'
 
 
 def test_job_posting_search_string_only_city():
