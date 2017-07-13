@@ -1,5 +1,5 @@
-from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator
-def test_doc2vec_corpus_creator():
+from skills_ml.algorithms.corpus_creators.basic import Word2VecGensimCorpusCreator
+def test_word2vec_corpus_creator():
     sample_document = {
         "incentiveCompensation": "",
         "experienceRequirements": "Here are some experience and requirements",
@@ -32,5 +32,5 @@ def test_doc2vec_corpus_creator():
         "@type": "JobPosting"
     }
 
-    corpus = Doc2VecGensimCorpusCreator()._transform(sample_document)
+    corpus = Word2VecGensimCorpusCreator()._transform(sample_document)
     assert corpus == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'
