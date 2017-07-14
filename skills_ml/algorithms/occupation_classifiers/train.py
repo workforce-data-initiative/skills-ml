@@ -11,6 +11,7 @@ from datetime import datetime
 from itertools import chain
 from glob import glob
 
+import os
 import json
 import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
@@ -26,7 +27,7 @@ class RepresentationTrainer(object):
     trainer = RepresentationTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')
     trainer.train()
     """
-    def __init__(self, s3_conn, quarters, jb_s3_path):
+    def __init__(self, s3_conn, quarters, jb_s3_path, model_s3_path='open-skills-private/model_cache'):
         """Initialization
 
         Attributes:
@@ -43,6 +44,7 @@ class RepresentationTrainer(object):
         self.model = None
         self._metadata = None
         self.training_time = datetime.today().isoformat()
+        self.model_s3_path = model_s3_path
 
     def train(self, size=500, min_count=3, iter=8, window=6, workers=2, **kwargs):
         """Train a doc2vec model, build a lookup table and model metadata. After training, they will be saved to S3.
@@ -94,6 +96,7 @@ class RepresentationTrainer(object):
             meta_dict['metadata']['quarters'] = self.quarters
             meta_dict['metadata']['model_name'] = 'doc2vec' + self.training_time
             meta_dict['metadata']['gensim_version']  = gensim_name + gensim_version
+            meta_dict['metadata']['training_time'] = self.training_time
 
             self._metadata = meta_dict
             metaname = 'metadata_' + self.training_time
@@ -102,7 +105,7 @@ class RepresentationTrainer(object):
                 json.dump(meta_dict, handle, indent=4, separators=(',', ': '))
 
         for f in glob('tmp/*{}*'.format(self.training_time)):
-            upload(self.s3_conn, f, 'open-skills-private/model_cache/' + modelname)
+            upload(self.s3_conn, f, os.path.join(self.model_s3_path, modelname))
 
     @property
     def metadata(self):
