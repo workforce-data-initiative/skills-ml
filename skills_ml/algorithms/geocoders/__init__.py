@@ -4,8 +4,11 @@ import logging
 import time
 import geocoder
 import boto
+import us
 
 from skills_utils.s3 import split_s3_path
+
+STATE_NAME_LOOKUP = us.states.mapping('abbr', 'name')
 
 
 def job_posting_search_string(job_posting):
@@ -24,7 +27,9 @@ def job_posting_search_string(job_posting):
     locality = location.get('address', {}).get('addressLocality', None)
     region = location.get('address', {}).get('addressRegion', None)
     if locality and region:
-        return '{}, {}'.format(locality, region)
+        # lookup state name, if it's not there just use whatever they typed
+        formatted_region = STATE_NAME_LOOKUP.get(region, region)
+        return '{}, {}'.format(locality, formatted_region)
     elif locality:
         return locality
     else:

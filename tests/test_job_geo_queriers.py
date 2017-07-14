@@ -136,8 +136,8 @@ class CBSATest(unittest.TestCase):
 
 
 cbsa_results = {
-    'Elgin, IL': ['456', 'Chicago, IL Metro Area'],
-    'Elgin, TX': None,
+    'Elgin, Illinois': ['456', 'Chicago, IL Metro Area'],
+    'Elgin, Texas': None,
 }
 
 
