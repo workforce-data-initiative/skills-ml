@@ -13,5 +13,5 @@ def test_raw_corpora():
     assert next(ExampleCorpusCreator().raw_corpora(sample_input)) == 'We are looking for a person to fill this job'
 
 def test_array_corpora():
-    assert next(ExampleCorpusCreator().array_corpora(sample_input)) == \
+    assert next(ExampleCorpusCreator().tokenize_corpora(sample_input)) == \
         ['We', 'are', 'looking', 'for', 'a', 'person', 'to', 'fill', 'this', 'job']
