@@ -17,10 +17,10 @@ Quick Start
 
 ```bash
 virtualenv venv -p /usr/bin/python3
-``` 
+```
 Activate your virtualenv
 
-```bash    
+```bash
 source venv/bin/activate
 ```
 
@@ -35,20 +35,20 @@ There are two ways to install **skills-ml**. You can either install from the sou
 ```bash
 git clone https://github.com/workforce-data-initiative/skills-ml.git
 cd skills-ml
-pip install requirements.txt
-pip install requirements_dev.txt
+pip install -r requirements.txt
+pip install -r requirements_dev.txt
 ```
 
 Then install with `setup.py`
 
-```bash  
+```bash
 python setup.py install
 ```
 
 #### Install with `pip`
 
 Or use `pip install`
-    
+
 ```bash
 pip install git+git://github.com/workforce-data-initiative/skills-ml.git@master
 ```
