@@ -2,13 +2,12 @@ from gensim.models.doc2vec import Doc2Vec
 from gensim import __version__ as gensim_version
 from gensim import __name__ as gensim_name
 
-from skills_ml.datasets import job_postings
+from skills_ml.datasets.job_postings import job_postings, job_postings_chain
 from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator
 
 from skills_utils.s3 import upload
 
 from datetime import datetime
-from itertools import chain
 from glob import glob
 
 import os
@@ -27,20 +26,20 @@ class RepresentationTrainer(object):
     trainer = RepresentationTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')
     trainer.train()
     """
-    def __init__(self, s3_conn, quarters, jb_s3_path, model_s3_path='open-skills-private/model_cache'):
+    def __init__(self, s3_conn, quarters, jp_s3_path, model_s3_path='open-skills-private/model_cache'):
         """Initialization
 
         Attributes:
             s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
             quarters (:obj: `list` of (str)): quarters will be trained on
-            jb_s3_path (:str): job posting path on S3
+            jp_s3_path (:str): job posting path on S3
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             metadata (:dict): model metadata
             training_time (:str): training time
         """
         self.s3_conn = s3_conn
         self.quarters = quarters
-        self.jb_s3_path = jb_s3_path
+        self.jp_s3_path = jp_s3_path
         self.model = None
         self._metadata = None
         self.training_time = datetime.today().isoformat()
@@ -56,10 +55,7 @@ class RepresentationTrainer(object):
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
-        generators = []
-        for quarter in self.quarters:
-            generators.append(job_postings(self.s3_conn, quarter, self.jb_s3_path))
-        job_postings_generator = chain(*generators)
+        job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path)
         corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator))
         corpus_list = list(corpus)
         model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)

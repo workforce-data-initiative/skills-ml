@@ -2,6 +2,7 @@ import logging
 import tempfile
 from retrying import Retrying
 from io import BytesIO
+from itertools import chain
 
 from skills_utils.s3 import split_s3_path
 from skills_utils.s3 import log_download_progress
@@ -66,3 +67,22 @@ def job_postings_highmem(s3_conn, quarter, s3_path):
         outfile = BytesIO(content)
         for line in outfile:
             yield line.decode('utf-8')
+
+def job_postings_chain(s3_conn, quarters, s3_path):
+    """
+    Chain the generators of a list of multiple quarters
+    Args:
+        s3_conn: a boto s3 connection
+        quarters: a list of quarters
+        s3_path: path to the job listings
+
+    Return:
+        a generator that all generators are chained together into
+    """
+    generators = []
+    for quarter in quarters:
+        generators.append(job_postings(s3_conn, quarter, s3_path))
+
+    job_postings_generator = chain(*generators)
+
+    return job_postings_generator
