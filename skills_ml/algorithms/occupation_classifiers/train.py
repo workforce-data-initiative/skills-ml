@@ -45,6 +45,10 @@ class RepresentationTrainer(object):
         self._metadata = None
         self.training_time = datetime.today().isoformat()
         self.model_s3_path = model_s3_path
+        self.modelname = 'doc2vec_' + self.training_time
+        self.model_path = 'tmp/' + self.modelname + '.model'
+        self.lookupname = 'lookup_' + self.training_time
+        self.lookup_path = 'tmp/' + self.lookupname + '.json'
 
     def train(self, size=500, min_count=3, iter=8, window=6, workers=2, **kwargs):
         """Train a doc2vec model, build a lookup table and model metadata. After training, they will be saved to S3.
@@ -61,15 +65,11 @@ class RepresentationTrainer(object):
         model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
         model.build_vocab(corpus_list)
         model.train(corpus_list, total_examples=model.corpus_count, epochs=model.iter)
+        
         self.model = model
-
-        modelname = 'doc2vec_' + self.training_time
-        model_path = 'tmp/' + modelname + '.model'
-        model.save(model_path)
-
-        lookupname = 'lookup_' + self.training_time
-        lookup_path = 'tmp/' + lookupname + '.json'
-        with open(lookup_path, 'w') as handle:
+        model.save(self.model_path)
+        
+        with open(self.lookup_path, 'w') as handle:
             json.dump(corpus.lookup, handle)
 
         if self.model:
@@ -105,7 +105,7 @@ class RepresentationTrainer(object):
                 json.dump(meta_dict, handle, indent=4, separators=(',', ': '))
 
         for f in glob('tmp/*{}*'.format(self.training_time)):
-            upload(self.s3_conn, f, os.path.join(self.model_s3_path, modelname))
+            upload(self.s3_conn, f, os.path.join(self.model_s3_path, self.modelname))
 
     @property
     def metadata(self):
