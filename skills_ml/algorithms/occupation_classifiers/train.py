@@ -58,7 +58,7 @@ class RepresentationTrainer(object):
         job_postings_generator = chain(*generators)
         corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator))
         corpus_list = list(corpus)
-        model = Doc2Vec(size=500, min_count=3, iter=5, window=6, workers=2, **kwargs)
+        model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
         model.build_vocab(corpus_list)
         model.train(corpus_list, total_examples=model.corpus_count, epochs=model.iter)
         self.model = model
