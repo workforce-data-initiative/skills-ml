@@ -41,7 +41,6 @@ class RepresentationTrainer(object):
         self.quarters = quarters
         self.jp_s3_path = jp_s3_path
         self.model = None
-        self._metadata = None
         self.training_time = datetime.today().isoformat()
         self.model_s3_path = model_s3_path
         self.modelname = 'doc2vec_' + self.training_time
@@ -68,8 +67,20 @@ class RepresentationTrainer(object):
         with open(self.lookup_path, 'w') as handle:
             json.dump(corpus.lookup, handle)
 
+
+        meta_dict = self.metadata
+        metaname = 'metadata_' + self.training_time
+        meta_path = 'tmp/' + metaname + '.json'
+        with open(meta_path, 'w') as handle:
+            json.dump(meta_dict, handle, indent=4, separators=(',', ': '))
+
+        for f in glob('tmp/*{}*'.format(self.training_time)):
+            upload(self.s3_conn, f, os.path.join(self.model_s3_path, self.modelname))
+
+    @property
+    def metadata(self):
+        meta_dict = {}
         if self.model:
-            meta_dict = {}
             meta_dict['metadata'] = {}
             meta_dict['metadata']['hyperparameters'] = {
                                             'vector_size': self.model.vector_size,
@@ -93,16 +104,8 @@ class RepresentationTrainer(object):
             meta_dict['metadata']['model_name'] = 'doc2vec' + self.training_time
             meta_dict['metadata']['gensim_version']  = gensim_name + gensim_version
             meta_dict['metadata']['training_time'] = self.training_time
-
-            self._metadata = meta_dict
-            metaname = 'metadata_' + self.training_time
-            meta_path = 'tmp/' + metaname + '.json'
-            with open(meta_path, 'w') as handle:
-                json.dump(meta_dict, handle, indent=4, separators=(',', ': '))
-
-        for f in glob('tmp/*{}*'.format(self.training_time)):
-            upload(self.s3_conn, f, os.path.join(self.model_s3_path, self.modelname))
-
-    @property
-    def metadata(self):
-        return self._metadata
+            
+        else:
+            print("Need to train first")
+        
+        return meta_dict          
