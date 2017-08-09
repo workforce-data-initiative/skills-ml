@@ -1,7 +1,7 @@
 import json
 from random import randint
 from skills_ml.algorithms.string_cleaners import NLPTransforms
-
+import gensim
 
 class CorpusCreator(object):
     """
@@ -30,16 +30,14 @@ class CorpusCreator(object):
             document = json.loads(line)
             yield self._transform(document)
 
-    def array_corpora(self, generator):
+    def tokenize_corpora(self, generator):
         """Transforms job listings into corpus format for gensim's doc2vec
-
         Args:
             generator: an iterable that generates an array of words(strings).
                 Each array is expected to represent a job listing(a doc)
                 including fields of interests
         Yields:
             (list) The next job listing transformed into gensim's doc2vec
-
         """
         for line in generator:
             document = json.loads(line)
@@ -78,7 +76,8 @@ class SimpleCorpusCreator(CorpusCreator):
             for field in self.document_schema_fields
         ])
 
-class GensimCorpusCreator(CorpusCreator):
+
+class Doc2VecGensimCorpusCreator(CorpusCreator):
     """
         An object that transforms job listing documents by picking
         important schema fields and returns them as one large cleaned array of words
@@ -91,11 +90,67 @@ class GensimCorpusCreator(CorpusCreator):
     ]
     join_spaces = ' '.join
 
+    def __init__(self, generator=None):
+        super().__init__()
+        self.lookup = {}
+        self.generator = generator
+        self.k = 0
+
     def _transform(self, document):
         return self.join_spaces([
             self.nlp.clean_str(document[field])
             for field in self.document_schema_fields
         ])
+
+    def __iter__(self):
+        for line in self.generator:
+            document = json.loads(line)
+            # Only train on job posting that has onet_soc_code
+            if document['onet_soc_code']:
+                words = self._transform(document).split()
+                tag = [self.k]
+                self.lookup[self.k] = document['onet_soc_code']
+                yield gensim.models.doc2vec.TaggedDocument(words, tag)
+                self.k += 1
+
+
+class Word2VecGensimCorpusCreator(CorpusCreator):
+    """
+        An object that transforms job listing documents by picking
+        important schema fields and returns them as one large cleaned array of words
+    """
+    document_schema_fields = [
+        'description',
+        'experienceRequirements',
+        'qualifications',
+        'skills'
+    ]
+    join_spaces = ' '.join
+
+    def __init__(self, generator=None):
+        super().__init__()
+        self.generator = generator
+
+    def _transform(self, document):
+        return self.join_spaces([
+            self.nlp.clean_str(document[field])
+            for field in self.document_schema_fields
+        ])
+
+    def __iter__(self):
+        """Transforms job listings into corpus format for gensim's word2vec
+
+        Args:
+            generator: an iterable that generates an array of words(strings).
+                Each array is expected to represent a job listing(a doc)
+                including fields of interests
+        Yields:
+            (list) The next job listing transformed into gensim's doc2vec
+
+        """
+        for line in self.generator:
+            document = json.loads(line)
+            yield self._transform(document).split()
 
 class JobCategoryCorpusCreator(CorpusCreator):
     """
