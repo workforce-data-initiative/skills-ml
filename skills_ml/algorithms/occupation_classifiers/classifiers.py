@@ -2,6 +2,7 @@ import tempfile
 import os
 import logging
 from collections import Counter, defaultdict
+import filelock
 
 from gensim.similarities.index import AnnoyIndexer
 
@@ -10,12 +11,17 @@ from skills_utils.s3 import download, split_s3_path, list_files
 
 
 def download_ann_classifier_files(s3_prefix, classifier_id, download_directory, s3_conn):
-    s3_path = s3_prefix + classifier_id
-    files = list_files(s3_conn, s3_path)
-    for f in files:
-        filepath = os.path.join(download_directory, f)
-        logging.info('calling download from %s to %s', s3_path + f, filepath)
-        download(s3_conn, filepath, os.path.join(s3_path, f))
+    lock = filelock.Filelock(os.path.join(download_directory, 'ann_dl.lock'))
+    with lock.acquire(timeout=1000):
+        s3_path = s3_prefix + classifier_id
+        files = list_files(s3_conn, s3_path)
+        for f in files:
+            filepath = os.path.join(download_directory, f)
+            if not os.path.exists(filepath):
+                logging.info('calling download from %s to %s', s3_path + f, filepath)
+                download(s3_conn, filepath, os.path.join(s3_path, f))
+            else:
+                logging.info('%s already exists, not downloading', filepath)
 
 
 class Classifier(object):
