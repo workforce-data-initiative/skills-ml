@@ -57,6 +57,7 @@ class S3CachedCBSAFinder(object):
         self.shapes = []
         self.properties = []
         self.cache = None
+        self.cache_original_size = 0
         self.shapefile_name = shapefile_name or download_shapefile(cache_dir or 'tmp')
 
     @property
@@ -75,8 +76,11 @@ class S3CachedCBSAFinder(object):
                 self.properties.append(row['properties'])
 
         try:
-            self.cache = \
-                json.loads(self._key.get_contents_as_string().decode('utf-8'))
+            cache_json = self._key.get_contents_as_string().decode('utf-8')
+            self.cache = json.loads(cache_json)
+            if not self.cache:
+                self.cache = {}
+            self.cache_original_size = len(cache_json)
         except boto.exception.S3ResponseError as e:
             logging.warning(
                 'CBSA finder cachefile load failed with exception %s,' +
@@ -142,18 +146,27 @@ class S3CachedCBSAFinder(object):
         try:
             for search_string, geocode_result in geocode_results.items():
                 self.cache[search_string] = self.query(geocode_result)
+            self.save()
         except Exception as e:
             logging.warning('Quitting cbsa finding due to %s', e)
 
-        self.save()
 
     def save(self):
         """Save the cbsa finding cache to S3"""
-        self._key.set_contents_from_string(json.dumps(self.cache))
-        logging.info(
-            'Successfully saved cbsa finding cache to %s',
-            self.cache_s3_path
-        )
+        cache_json = json.dumps(self.cache)
+        if len(cache_json) >= self.cache_original_size:
+            new_cache_json = json.dumps(self.cache)
+            self._key.set_contents_from_string(new_cache_json)
+            logging.info(
+                'Successfully saved cbsa finding cache to %s',
+                self.cache_s3_path
+            )
+        else:
+            logging.error(
+                'New cache size: %s smaller than existing cache size: %s, aborting',
+                len(cache_json),
+                self.cache_original_size
+            )
 
     @property
     def all_cached_cbsa_results(self):
