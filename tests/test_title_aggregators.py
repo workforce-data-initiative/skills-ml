@@ -9,13 +9,14 @@ from skills_utils.iteration import Batch
 
 from skills_ml.algorithms.aggregators import \
     SkillAggregator,\
+    OccupationScopedSkillAggregator,\
     CountAggregator,\
     SocCodeAggregator,\
     GivenSocCodeAggregator
 from skills_ml.algorithms.aggregators.title import GeoTitleAggregator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.skill_extractors.freetext import \
-    FakeFreetextSkillExtractor
+    FakeFreetextSkillExtractor, FakeOccupationScopedSkillExtractor
 from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
 
 
@@ -32,31 +33,38 @@ SAMPLE_JOBS = [
     {
         'id': 1,
         'title': 'Cupcake Ninja',
-        'description': 'Slicing and dicing frosting'
+        'description': 'Slicing and dicing frosting',
+        'onet_soc_code': '23-1234.00',
     },
     {
         'id': 2,
         'title': 'Regular Ninja',
-        'description': 'Slicing and dicing enemies'
+        'description': 'Slicing and dicing enemies',
+        'onet_soc_code': '12-1234.00',
     },
     {
         'id': 3,
         'title': 'React Ninja',
-        'description': 'Slicing and dicing components'
+        'description': 'Slicing and dicing components',
+        'onet_soc_code': '12-1234.00',
     },
     {
         'id': 4,
         'title': 'React Ninja',
-        'description': 'Slicing and dicing and then trashing jQuery'
+        'description': 'Slicing and dicing and then trashing jQuery',
+        'onet_soc_code': '12-1234.00',
     },
 ]
 
 
 def build_basic_geo_title_aggregator():
     job_aggregators = OrderedDict(
-        skills=SkillAggregator(
-            skill_extractor=FakeFreetextSkillExtractor(
-                skills=['slicing', 'dicing', 'jquery']
+        skills=OccupationScopedSkillAggregator(
+            skill_extractor=FakeOccupationScopedSkillExtractor(
+                skills={
+                    '12-1234.00': ['slicing', 'dicing', 'jquery'],
+                    '23-1234.00': ['slicing', 'dicing', 'jquery'],
+                }
             ),
             corpus_creator=SimpleCorpusCreator(),
             output_count=2
@@ -322,13 +330,4 @@ def test_soc_aggregator():
 def test_given_soc_aggregator():
     aggregator = GivenSocCodeAggregator()
     aggregate = sum(map(aggregator.value, SAMPLE_JOBS), Counter())
-    assert aggregate == {'99-9999.00': len(SAMPLE_JOBS)}
-
-    weighted_jobs = copy.deepcopy(SAMPLE_JOBS)
-    for job in weighted_jobs:
-        if job['id'] == 1:
-            job['onet_soc_code'] = '23-1234.00'
-        else:
-            job['onet_soc_code'] = '12-1234.00'
-    aggregate = sum(map(aggregator.value, weighted_jobs), Counter())
     assert aggregate == {'23-1234.00': 1, '12-1234.00': 3}

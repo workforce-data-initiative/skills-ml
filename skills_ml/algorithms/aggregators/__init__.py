@@ -99,6 +99,22 @@ class SkillAggregator(JobAggregator):
         )
 
 
+class OccupationScopedSkillAggregator(SkillAggregator):
+    """Aggregates skills found in job postings using the job's occupation
+
+    Args:
+        skill_extractor (.skill_extractors.FreetextSkillExtractor)
+            an object that returns skill counts from unstructured text
+        corpus creator (object) an object that returns a text corpus
+            from a job posting
+    """
+    def value(self, job_posting):
+        return self.skill_extractor.document_skill_counts(
+            soc_code=job_posting.get('onet_soc_code', None),
+            document=self.corpus_creator._transform(job_posting)
+        )
+
+
 class SocCodeAggregator(JobAggregator):
     """Aggregates SOC codes inferred from job posting text
 

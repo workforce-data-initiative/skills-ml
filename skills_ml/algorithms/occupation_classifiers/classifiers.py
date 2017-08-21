@@ -11,7 +11,7 @@ from skills_utils.s3 import download, split_s3_path, list_files
 
 
 def download_ann_classifier_files(s3_prefix, classifier_id, download_directory, s3_conn):
-    lock = filelock.Filelock(os.path.join(download_directory, 'ann_dl.lock'))
+    lock = filelock.FileLock(os.path.join(download_directory, 'ann_dl.lock'))
     with lock.acquire(timeout=1000):
         s3_path = s3_prefix + classifier_id
         files = list_files(s3_conn, s3_path)
