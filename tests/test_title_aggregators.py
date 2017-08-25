@@ -16,8 +16,40 @@ from skills_ml.algorithms.aggregators import \
 from skills_ml.algorithms.aggregators.title import GeoTitleAggregator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.skill_extractors.freetext import \
-    FakeFreetextSkillExtractor, FakeOccupationScopedSkillExtractor
+    FreetextSkillExtractor, OccupationScopedSkillExtractor
 from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
+
+
+class FakeFreetextSkillExtractor(FreetextSkillExtractor):
+    """A skill extractor that takes a list of skills
+    instead of reading from a filename
+    """
+    def __init__(self, skills):
+        """
+        Args:
+            skills (list) skill names that the extractor should use
+        """
+        self.skills = skills
+        super().__init__('')
+
+    def _skills_lookup(self):
+        return set(self.skills)
+
+
+class FakeOccupationScopedSkillExtractor(OccupationScopedSkillExtractor):
+    """A skill extractor that takes a list of skills
+    instead of reading from a filename
+    """
+    def __init__(self, skills):
+        """
+        Args:
+            skills (dict) soc codes as keys, lists of skill names as values
+        """
+        self.skills = skills
+        super().__init__('')
+
+    def _skills_lookup(self):
+        return self.skills
 
 
 class FakeCBSAQuerier(object):

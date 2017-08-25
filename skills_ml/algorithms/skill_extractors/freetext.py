@@ -116,35 +116,3 @@ class OccupationScopedSkillExtractor(FreetextSkillExtractor):
             All values set to 1 (multiple occurrences of a skill do not count)
         """
         return self._document_skills_in_lookup(document, self.lookup[soc_code])
-
-
-class FakeFreetextSkillExtractor(FreetextSkillExtractor):
-    """A skill extractor that takes a list of skills
-    instead of reading from a filename
-    """
-    def __init__(self, skills):
-        """
-        Args:
-            skills (list) skill names that the extractor should use
-        """
-        self.skills = skills
-        super(FakeFreetextSkillExtractor, self).__init__('')
-
-    def _skills_lookup(self):
-        return set(self.skills)
-
-
-class FakeOccupationScopedSkillExtractor(OccupationScopedSkillExtractor):
-    """A skill extractor that takes a list of skills
-    instead of reading from a filename
-    """
-    def __init__(self, skills):
-        """
-        Args:
-            skills (dict) soc codes as keys, lists of skill names as values
-        """
-        self.skills = skills
-        super(FakeOccupationScopedSkillExtractor, self).__init__('')
-
-    def _skills_lookup(self):
-        return self.skills
