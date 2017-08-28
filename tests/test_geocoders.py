@@ -219,3 +219,55 @@ def test_cbsa_finder_cache():
         ],
         'Flushing, NY': None
     }
+
+
+@moto.mock_s3
+def test_cbsa_finder_sanity_check():
+    s3_conn = boto.connect_s3()
+    s3_conn.create_bucket('geobucket')
+
+    cbsa_finder = S3CachedCBSAFinder(
+        s3_conn=s3_conn,
+        cache_s3_path='geobucket/cbsas.json',
+        shapefile_name='tests/sample_cbsa_shapefile.shp'
+    )
+    geocode_results = {
+        'East of Charlotte, NC': {
+            "bbox": {
+                "northeast": [35.2268961, -80.8461711],
+                "southwest": [35.2267961, -80.8462711]
+            },
+        },
+        'Flushing, NY': {
+            "bbox": {
+                "northeast": [40.7654801, -73.8173791],
+                "southwest": [40.7653801, -73.8174791]
+            },
+        }
+    }
+
+    cbsa_finder.find_all_cbsas_and_save(geocode_results)
+
+    new_finder = S3CachedCBSAFinder(
+        s3_conn=s3_conn,
+        cache_s3_path='geobucket/cbsas.json',
+        shapefile_name='tests/sample_cbsa_shapefile.shp'
+    )
+    assert new_finder.all_cached_cbsa_results == {
+        'East of Charlotte, NC': [
+            '16740',
+            'Charlotte-Concord-Gastonia, NC-SC Metro Area',
+        ],
+        'Flushing, NY': None
+    }
+    new_finder.cache = {}
+    # simulate something happening to the cache
+    new_finder.save()
+
+    assert new_finder.all_cached_cbsa_results == {
+        'East of Charlotte, NC': [
+            '16740',
+            'Charlotte-Concord-Gastonia, NC-SC Metro Area',
+        ],
+        'Flushing, NY': None
+    }
