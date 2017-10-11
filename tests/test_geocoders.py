@@ -100,6 +100,15 @@ def test_job_posting_search_string_only_city():
     assert job_posting_search_strings(json.dumps(fake_job)) == ['City']
 
 
+def test_job_posting_search_string_bad_address():
+    fake_job = {'jobLocation': {'address': {}}}
+    assert job_posting_search_strings(json.dumps(fake_job)) == []
+
+
+def test_job_posting_search_string_no_location():
+    assert job_posting_search_strings('{}') == []
+
+
 @moto.mock_s3
 def test_cbsa_finder_onehit():
     s3_conn = boto.connect_s3()

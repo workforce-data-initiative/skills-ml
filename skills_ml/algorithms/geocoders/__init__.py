@@ -24,7 +24,7 @@ def job_posting_search_strings(job_posting):
     """
     location = json.loads(job_posting).get('jobLocation', None)
     if not location:
-        return None
+        return []
     locality = location.get('address', {}).get('addressLocality', None)
     region = location.get('address', {}).get('addressRegion', None)
     if locality and region:
