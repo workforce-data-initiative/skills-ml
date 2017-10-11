@@ -5,13 +5,14 @@ import time
 import geocoder
 import boto
 import us
+import traceback
 
 from skills_utils.s3 import split_s3_path
 
 STATE_NAME_LOOKUP = us.states.mapping('abbr', 'name')
 
 
-def job_posting_search_string(job_posting):
+def job_posting_search_strings(job_posting):
     """Convert a job posting to a geocode-ready search string
 
     Includes city and state if present, or just city
@@ -28,12 +29,16 @@ def job_posting_search_string(job_posting):
     region = location.get('address', {}).get('addressRegion', None)
     if locality and region:
         # lookup state name, if it's not there just use whatever they typed
-        formatted_region = STATE_NAME_LOOKUP.get(region, region)
-        return '{}, {}'.format(locality, formatted_region)
+
+        lookups = ['{}, {}'.format(locality, region)]
+        formatted_region = STATE_NAME_LOOKUP.get(region, None)
+        if formatted_region:
+            lookups.append('{}, {}'.format(locality, formatted_region))
+        return lookups
     elif locality:
-        return locality
+        return [locality]
     else:
-        return None
+        return []
 
 
 class S3CachedGeocoder(object):
@@ -69,14 +74,20 @@ class S3CachedGeocoder(object):
 
     def _load(self):
         try:
-            self.cache = \
-                json.loads(self._key.get_contents_as_string().decode('utf-8'))
+            cache_json = json.loads(self._key.get_contents_as_string().decode('utf-8'))
+            self.cache = cache_json
+            # results for a new file can be None instead of empty dict,
+            # so explicitly handle that case
+            if not self.cache:
+                self.cache = {}
+
         except boto.exception.S3ResponseError as e:
             logging.warning(
                 'Geocoder cachefile load failed with exception %s,' +
                 'will overwrite', e
             )
             self.cache = {}
+        assert isinstance(self.cache, dict)
 
     def retrieve_from_cache(self, job_posting):
         """Retrieve a saved geocode result from the cache if it exists
@@ -91,8 +102,12 @@ class S3CachedGeocoder(object):
         """
         if not self.cache:
             self._load()
-        search_string = job_posting_search_string(job_posting)
-        return self.cache.get(search_string, None)
+        search_strings = job_posting_search_strings(job_posting)
+        cache_results = [
+            self.cache.get(search_string, None)
+            for search_string in search_strings
+        ]
+        return cache_results
 
     def geocode(self, search_string):
         """Geocodes a single search string
@@ -148,11 +163,12 @@ class S3CachedGeocoder(object):
         processed = 0
         try:
             for i, job_posting in enumerate(job_postings):
-                search_string = job_posting_search_string(job_posting)
-                if not search_string:
+                search_strings = job_posting_search_strings(job_posting)
+                if not search_strings:
                     skipped += 1
                     continue
-                self.geocode(search_string)
+                for search_string in search_strings:
+                    self.geocode(search_string)
                 processed += 1
                 if i % save_every == 0:
                     logging.info(
@@ -162,8 +178,8 @@ class S3CachedGeocoder(object):
                     )
                     self.save()
 
-        except Exception as e:
-            logging.warning('Quitting geocoding due to %s', e)
+        except Exception:
+            logging.error('Quitting geocoding due to %s', traceback.format_exc())
 
         logging.info(
             'Geocoded %s, skipped %s due to lack of location',

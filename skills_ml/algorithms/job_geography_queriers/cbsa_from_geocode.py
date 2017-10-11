@@ -1,6 +1,6 @@
 import json
 import logging
-from skills_ml.algorithms.geocoders import job_posting_search_string
+from skills_ml.algorithms.geocoders import job_posting_search_strings
 
 
 class JobCBSAFromGeocodeQuerier(object):
@@ -47,24 +47,30 @@ class JobCBSAFromGeocodeQuerier(object):
             )
             return (None, None, None)
 
-        search_string = job_posting_search_string(job_posting)
-        if search_string not in self.cbsa_results:
+        search_strings = job_posting_search_strings(job_posting)
+        if not any(search_string in self.cbsa_results for search_string in search_strings):
             logging.warning(
                 'Returning blank CBSA for %s, %s not found in cache',
                 post['id'],
-                search_string
+                search_strings
             )
             return (None, None, state_code)
 
-        cbsa_result = self.cbsa_results[search_string]
-        if not cbsa_result:
+        cbsa_results = [self.cbsa_results[search_string] for search_string in search_strings]
+        first_result_with_cbsa = None
+        for cbsa_result in cbsa_results:
+            if cbsa_result:
+                first_result_with_cbsa = cbsa_result
+                break
+
+        if not first_result_with_cbsa:
             logging.warning(
                 'Returning blank CBSA for %s, %s found in cache as outside CBSA',
                 post['id'],
-                search_string
+                search_strings
             )
             return (None, None, state_code)
 
-        cbsa_fips, cbsa_name = cbsa_result
+        cbsa_fips, cbsa_name = first_result_with_cbsa
 
         return (cbsa_fips, cbsa_name, state_code)

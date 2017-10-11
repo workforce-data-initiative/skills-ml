@@ -136,8 +136,12 @@ class CBSATest(unittest.TestCase):
 
 
 cbsa_results = {
+    # have the IL results differ to make sure that we catch the one with a CBSA
     'Elgin, Illinois': ['456', 'Chicago, IL Metro Area'],
+    'Elgin, IL': None,
+    # TX results should consistently be None so we can test searches that are outside any CBSA
     'Elgin, Texas': None,
+    'Elgin, TX': None,
 }
 
 
