@@ -68,8 +68,23 @@ class S3CachedCBSAFinder(object):
             name=path
         )
 
-    def _load(self):
-        """Load the CBSA Shapefile and result cache into memory"""
+    def _load_cache(self):
+        """Load the result cache into memory"""
+        try:
+            cache_json = self._key.get_contents_as_string().decode('utf-8')
+            self.cache = json.loads(cache_json)
+            if not self.cache:
+                self.cache = {}
+            self.cache_original_size = len(cache_json)
+        except boto.exception.S3ResponseError as e:
+            logging.warning(
+                'CBSA finder cachefile load failed with exception %s,' +
+                'will overwrite', e
+            )
+            self.cache = {}
+
+    def _load_shapefile(self):
+        """Load the CBSA Shapefile into memory"""
         with fiona.collection(self.shapefile_name) as input:
             for row in input:
                 self.shapes.append(shapely.geometry.shape(row['geometry']))
@@ -100,7 +115,7 @@ class S3CachedCBSAFinder(object):
             or None if no CBSAs intersect with it
         """
         if not self.shapes or not self.properties:
-            self._load()
+            self._load_shapefile()
         if 'bbox' not in geocode_result:
             logging.warning('Geocode result failed: %s', geocode_result)
             return None
@@ -175,5 +190,5 @@ class S3CachedCBSAFinder(object):
         Returns: (dict) search strings mapping to their (tuple) results
         """
         if not self.cache:
-            self._load()
+            self._load_cache()
         return self.cache
