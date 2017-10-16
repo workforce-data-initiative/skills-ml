@@ -90,11 +90,12 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     ]
     join_spaces = ' '.join
 
-    def __init__(self, generator=None):
+    def __init__(self, generator=None, occ_classes=[]):
         super().__init__()
         self.lookup = {}
         self.generator = generator
         self.k = 0
+        self.occ_classes = occ_classes
 
     def _transform(self, document):
         return self.join_spaces([
@@ -106,13 +107,21 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
         for line in self.generator:
             document = json.loads(line)
             # Only train on job posting that has onet_soc_code
-            if document['onet_soc_code']:
-                words = self._transform(document).split()
-                tag = [self.k]
-                self.lookup[self.k] = document['onet_soc_code']
-                yield gensim.models.doc2vec.TaggedDocument(words, tag)
-                self.k += 1
-
+            if len(self.occ_classes) == 0:
+                if document['onet_soc_code']:
+                    words = self._transform(document).split()
+                    tag = [self.k]
+                    self.lookup[self.k] = document['onet_soc_code']
+                    yield gensim.models.doc2vec.TaggedDocument(words, tag)
+                    self.k += 1
+            else:
+                if document['onet_soc_code']:
+                    if document['onet_soc_code'][:2] in self.occ_classes:
+                        words = self._transform(document).split()
+                        tag = [self.k]
+                        self.lookup[self.k] = document['onet_soc_code']
+                        yield gensim.models.doc2vec.TaggedDocument(words, tag)
+                        self.k += 1
 
 class Word2VecGensimCorpusCreator(CorpusCreator):
     """
