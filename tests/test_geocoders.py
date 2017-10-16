@@ -1,5 +1,5 @@
 from skills_ml.algorithms.geocoders import S3CachedGeocoder,\
-    job_posting_search_string
+    job_posting_search_strings
 from skills_ml.algorithms.geocoders.cbsa import S3CachedCBSAFinder
 import json
 from unittest.mock import MagicMock, call, patch
@@ -78,11 +78,11 @@ def test_geocode_job_postings():
         == sample_geocode_result
 
 
-def test_job_posting_search_string():
+def test_job_posting_search_strings():
     with open('sample_job_listing.json') as f:
         sample_job_posting = f.read()
 
-    assert job_posting_search_string(sample_job_posting) == 'Salisbury, Pennsylvania'
+    assert sorted(job_posting_search_strings(sample_job_posting)) == sorted(['Salisbury, Pennsylvania', 'Salisbury, PA'])
 
 
 def test_job_posting_weird_region():
@@ -91,13 +91,22 @@ def test_job_posting_weird_region():
         'addressRegion': 'Northeastern USA'
     }}}
 
-    assert job_posting_search_string(json.dumps(fake_job)) ==\
-        'Any City, Northeastern USA'
+    assert job_posting_search_strings(json.dumps(fake_job)) ==\
+        ['Any City, Northeastern USA']
 
 
 def test_job_posting_search_string_only_city():
     fake_job = {'jobLocation': {'address': {'addressLocality': 'City'}}}
-    assert job_posting_search_string(json.dumps(fake_job)) == 'City'
+    assert job_posting_search_strings(json.dumps(fake_job)) == ['City']
+
+
+def test_job_posting_search_string_bad_address():
+    fake_job = {'jobLocation': {'address': {}}}
+    assert job_posting_search_strings(json.dumps(fake_job)) == []
+
+
+def test_job_posting_search_string_no_location():
+    assert job_posting_search_strings('{}') == []
 
 
 @moto.mock_s3
