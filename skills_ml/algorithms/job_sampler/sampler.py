@@ -41,13 +41,14 @@ def reservoir_weighted(it, k, weights):
         weights (dict): weight
     """
     heap = []
-    hkey = lambda w: -np.random.exponential(1.0 / w)
+    hkey = lambda w: np.power(np.random.uniform(0.0, 1.0), 1.0 / w)
     for i, datum in enumerate(it):
         weight = weights[datum[1]]
+        score = hkey(weight)
         if len(heap) < k:
             hq.heappush(heap, (hkey(weight), datum))
-        elif hkey(weight) > heap[0][0]:
-            hq.heapreplace(heap, (hkey(weight), datum))
+        elif score > min([h[0] for h in heap]):
+            hq.heapreplace(heap, (score, datum))
     while len(heap) > 0:
         yield hq.heappop(heap)[1]
 
