@@ -77,8 +77,8 @@ def test_job_sampler_with_weighting():
     num = 1000
     occ_num = 2
     sample_size = 100
-    num_loops = 100
-    weights = {'11':1, '13':3}
+    num_loops = 200
+    weights = {'11':1, '13':2}
     ratio = weights['13'] / weights['11']
 
     fake_corpus_train = FakeCorpusGenerator(num, occ_num)
