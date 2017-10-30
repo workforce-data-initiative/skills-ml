@@ -78,9 +78,39 @@ class SimpleCorpusCreator(CorpusCreator):
 
 
 class Doc2VecGensimCorpusCreator(CorpusCreator):
-    """
-        An object that transforms job listing documents by picking
-        important schema fields and returns them as one large cleaned array of words
+    """Corpus for training Gensim Doc2Vec
+    An object that transforms job listing documents by picking
+    important schema fields and returns them as one large cleaned array of words
+
+    Example:
+    from airflow.hooks import S3Hook
+    from skills_ml.datasets.job_postings import job_postings, job_postings_chain
+    from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator
+
+    s3_conn = S3Hook().get_conn()
+    job_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')
+
+    # Default will include all the job postings with O*NET SOC code.
+    corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator))
+
+    # For using pre-defined major group filter, one need to specify occ_classes
+    corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator), occ_classes=['11', '13'])
+
+    # For using self-defined filter function, one can pass the function like this
+    def filter_by_full_soc(document):
+        if document['onet_soc_code]:
+            if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:
+                return document
+
+    corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator), filter_func=filter_by_full_soc, key='onet_soc_code')
+
+    Attributes:
+        generator (generator): a job posting generator
+        occ_classes (list): a list of O*NET major group classes you want to include in the corpus being created.
+        filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
+                                and output a job posting. Default is to filter documents by major group.
+        key (string): a key indicates the label which should exist in common schema of job posting.
+
     """
     document_schema_fields = [
         'description',
@@ -90,12 +120,14 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     ]
     join_spaces = ' '.join
 
-    def __init__(self, generator=None, occ_classes=[]):
+    def __init__(self, generator=None, occ_classes=None, filter_func=None, key='onet_soc_code'):
         super().__init__()
         self.lookup = {}
         self.generator = generator
         self.k = 0
         self.occ_classes = occ_classes
+        self.key = key
+        self.filter = filter_func if filter_func is not None else self._major_group_filter
 
     def _transform(self, document):
         return self.join_spaces([
@@ -103,25 +135,30 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
             for field in self.document_schema_fields
         ])
 
+    def _major_group_filter(self, document, key=self.key):
+        if document[key]:
+            if document[key][:2] in self.occ_classes:
+                return document
+
     def __iter__(self):
         for line in self.generator:
             document = json.loads(line)
             # Only train on job posting that has onet_soc_code
-            if len(self.occ_classes) == 0:
-                if document['onet_soc_code']:
+            if self.occ_classes is None and self.filter.__name__ is self._major_group_filter.__name__:
+                if document[self.key]:
                     words = self._transform(document).split()
                     tag = [self.k]
-                    self.lookup[self.k] = document['onet_soc_code']
+                    self.lookup[self.k] = document[self.key]
                     yield gensim.models.doc2vec.TaggedDocument(words, tag)
                     self.k += 1
             else:
-                if document['onet_soc_code']:
-                    if document['onet_soc_code'][:2] in self.occ_classes:
-                        words = self._transform(document).split()
-                        tag = [self.k]
-                        self.lookup[self.k] = document['onet_soc_code']
-                        yield gensim.models.doc2vec.TaggedDocument(words, tag)
-                        self.k += 1
+                document = self.filter(document)
+                if document:
+                    words = self._transform(document).split()
+                    tag = [self.k]
+                    self.lookup[self.k] = document[self.key]
+                    yield gensim.models.doc2vec.TaggedDocument(words, tag)
+                    self.k += 1
 
 class Word2VecGensimCorpusCreator(CorpusCreator):
     """
