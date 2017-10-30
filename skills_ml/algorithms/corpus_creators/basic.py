@@ -135,7 +135,8 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
             for field in self.document_schema_fields
         ])
 
-    def _major_group_filter(self, document, key=self.key):
+    def _major_group_filter(self, document):
+        key=self.key
         if document[key]:
             if document[key][:2] in self.occ_classes:
                 return document

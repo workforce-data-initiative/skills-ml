@@ -1,4 +1,4 @@
-from skills_ml.algorithms.job_sampler.sampler import JobSampler
+from skills_ml.algorithms.sampling.jobs import JobSampler
 import gensim
 from collections import Counter
 import random
@@ -91,4 +91,7 @@ def test_job_sampler_with_weighting():
         result.append(counts['13'] / counts['11'])
 
     hist = np.histogram(result)
+
+    # Check if the ratio of the weights (this case is 2.0) falls into the interval with maximum counts
+    # in the histogram as we expect after looping for 200 times
     assert ratio >= hist[1][np.argmax(hist[0])] and ratio <= hist[1][np.argmax(hist[0]) + 1]
