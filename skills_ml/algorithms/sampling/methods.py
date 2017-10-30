@@ -3,8 +3,7 @@ import heapq as hq
 import random
 
 def reservoir(it, k):
-    """
-    Reservoir sampling with Random Sort from a job posting iterator.
+    """Reservoir sampling with Random Sort from a job posting iterator
 
     Randomly choosing a sample of k items from a streaming iterator. Using random sort to implement the algorithm.
     Basically, it's assigning random number as keys to each item and maintain k items with minimum value for keys,
@@ -15,7 +14,7 @@ def reservoir(it, k):
         k (int): Sample size
 
     Returns:
-        list: The result sample of k items.
+        generator: The result sample of k items.
     """
     it = iter(it)
     result = []
@@ -26,19 +25,27 @@ def reservoir(it, k):
             j = random.randint(0, i-1)
             if j < k:
                 result[j] = datum
-    return result
+    while len(result) > 0:
+        yield result.pop()
 
 
 def reservoir_weighted(it, k, weights):
-    """
-    Weighted reservoir Sampling from job posting iterator.
+    """Weighted reservoir Sampling from job posting iterator
 
     Randomly choosing a sample of k items from a streaming iterator based on the weights.
+
 
     Args:
         it (iterator): Job posting iterator to sample from. The format should be (job_posting, label)
         k (int): Sample size
-        weights (dict): weight
+        weights (dict): a dictionary that has key-value pairs as label-weighting pairs. It expects every
+                        label in the iterator to be present as a key in the weights dictionary For example,
+                        weights = {'11': 2, '13', 1}. In this case, the label/key is the occupation major
+                        group and the value is the weight you want to sample with.
+
+    Returns:
+        generator: The result sample of k items from weighted reservori sampling.
+
     """
     heap = []
     hkey = lambda w: np.power(np.random.uniform(0.0, 1.0), 1.0 / w)
@@ -47,31 +54,7 @@ def reservoir_weighted(it, k, weights):
         score = hkey(weight)
         if len(heap) < k:
             hq.heappush(heap, (hkey(weight), datum))
-        elif score > min([h[0] for h in heap]):
+        elif score > heap[0][0]:
             hq.heapreplace(heap, (score, datum))
     while len(heap) > 0:
         yield hq.heappop(heap)[1]
-
-class JobSampler(object):
-    def __init__(self, job_posting, lookup, weights=None, high_level=True):
-        self.job_posting = job_posting
-        self.lookup = lookup
-        self.weights = weights
-        self.high_level = high_level
-
-    def _transform_iterator(self, job_iter, lookup, high_level=True):
-        for job in job_iter:
-            if high_level:
-                yield (job[0], lookup[job[1][0]][:2])
-            else:
-                yield (job[0], lookup[job[1][0]])
-
-    def sample(self, k):
-        it = self._transform_iterator(self.job_posting, self.lookup, self.high_level)
-        if self.weights:
-            return list(reservoir_weighted(it, k, self.weights))
-        else:
-            return reservoir(it, k)
-
-
-
