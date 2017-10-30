@@ -102,7 +102,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
             if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:
                 return document
 
-    corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator), filter_func=filter_by_full_soc, key='onet_soc_code')
+    corpus = Doc2VecGensimCorpusCreator(job_postings_generator, filter_func=filter_by_full_soc, key='onet_soc_code')
 
     Attributes:
         generator (generator): a job posting generator
