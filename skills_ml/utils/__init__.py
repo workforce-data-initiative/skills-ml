@@ -1,5 +1,4 @@
 """Common utilities"""
-
 def safe_get(dct, *keys):
 	"""Extract value from nested dictionary
 	Args:

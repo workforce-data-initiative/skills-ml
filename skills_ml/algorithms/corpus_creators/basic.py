@@ -2,6 +2,7 @@ import json
 from random import randint
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 import gensim
+from skills_ml.utils import safe_get
 
 class CorpusCreator(object):
     """
@@ -11,8 +12,10 @@ class CorpusCreator(object):
 
         Subclasses should implement _transform(document)
     """
-    def __init__(self):
+    def __init__(self, generator=None, filter_func=None):
+        self.generator = generator
         self.nlp = NLPTransforms()
+        self.filter = filter_func
 
     def raw_corpora(self, generator):
         """Transforms job listings into corpus format
@@ -55,6 +58,16 @@ class CorpusCreator(object):
         for line in generator:
             document = json.loads(line)
             yield str(randint(0,23))
+
+    def __iter__(self):
+        for line in self.generator:
+            document = json.loads(line)
+            if self.filter:
+                document = self.filter(document)
+                if document:
+                    yield document
+            else:
+                yield document
 
 class SimpleCorpusCreator(CorpusCreator):
     """
@@ -120,7 +133,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     ]
     join_spaces = ' '.join
 
-    def __init__(self, generator=None, occ_classes=None, filter_func=None, key='onet_soc_code'):
+    def __init__(self, generator=None, occ_classes=None, filter_func=None, key=['onet_soc_code']):
         super().__init__()
         self.lookup = {}
         self.generator = generator
@@ -157,7 +170,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
                 if document:
                     words = self._transform(document).split()
                     tag = [self.k]
-                    self.lookup[self.k] = document[self.key]
+                    self.lookup[self.k] = safe_get(document, *self.key)
                     yield gensim.models.doc2vec.TaggedDocument(words, tag)
                     self.k += 1
 
