@@ -1,10 +1,10 @@
 from skills_ml.algorithms.sampling.jobs import JobSampler
-from skills_ml.algorithms.corpus_creators.basic import CorpusCreator
 import gensim
 from collections import Counter
 import random
 import numpy as np
 import json
+
 
 np.random.seed(42)
 random.seed(42)
@@ -43,10 +43,9 @@ doc = {
 
 
 
-class FakeCorpusGenerator(CorpusCreator):
+class FakeCorpusGenerator(object):
     def __init__(self , num=5, occ_num=10):
         self.num = num
-        self.lookup = {}
         self.occ_num = occ_num
 
     def get_corpus(self):
