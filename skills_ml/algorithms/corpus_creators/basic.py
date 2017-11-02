@@ -165,7 +165,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
         ])
 
     def _major_group_filter(self, document):
-        key=self.key
+        key=self.key[0]
         if document[key]:
             if document[key][:2] in self.occ_classes:
                 return document
@@ -175,10 +175,10 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
             document = json.loads(line)
             # Only train on job posting that has onet_soc_code
             if self.occ_classes is None and self.filter.__name__ is self._major_group_filter.__name__:
-                if document[self.key]:
+                if safe_get(document, *self.key):
                     words = self._transform(document).split()
                     tag = [self.k]
-                    self.lookup[self.k] = document[self.key]
+                    self.lookup[self.k] = safe_get(document, *self.key)
                     yield gensim.models.doc2vec.TaggedDocument(words, tag)
                     self.k += 1
             else:
