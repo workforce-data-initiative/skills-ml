@@ -59,15 +59,31 @@ class CorpusCreator(object):
             document = json.loads(line)
             yield str(randint(0,23))
 
+    def _clean(self, document):
+        document_schema_fields = [
+            'description',
+            'experienceRequirements',
+            'qualifications',
+            'skills'
+        ]
+        for f in document_schema_fields:
+            cleaned = self.nlp.clean_html(document[f]).replace('\n','')
+            cleaned = " ".join(cleaned.split())
+            document[f] = cleaned
+        return document
+
+    def _transform(self, document):
+        return self._clean(document)
+
     def __iter__(self):
         for line in self.generator:
             document = json.loads(line)
             if self.filter:
                 document = self.filter(document)
                 if document:
-                    yield document
+                    yield self._transform(document)
             else:
-                yield document
+                yield self._transform(document)
 
 class SimpleCorpusCreator(CorpusCreator):
     """
