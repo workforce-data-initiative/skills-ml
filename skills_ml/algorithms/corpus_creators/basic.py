@@ -1,21 +1,53 @@
 import json
 from random import randint
 from skills_ml.algorithms.string_cleaners import NLPTransforms
-import gensim
+from gensim.models.doc2vec import TaggedDocument
 from skills_ml.utils import safe_get
 
 class CorpusCreator(object):
     """
         A base class for objects that convert common schema
         job listings into a corpus suitable for use by
-        machine learning algorithms.
+        machine learning algorithms or specific tasks.
 
-        Subclasses should implement _transform(document)
+    Example:
+    from airflow.hooks import S3Hook
+    from skills_ml.datasets.job_postings import job_postings, job_postings_chain
+    from skills_ml.algorithms.corpus_creators.basic import CorpusCreator
+
+    s3_conn = S3Hook().get_conn()
+    job_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')
+
+    # Default will include all the cleaned job postings
+    corpus = CorpusCreator(job_postings_generator)
+
+    # For getting a the raw job postings without any cleaning
+    corpus = CorpusCreator(job_postings_generator, raw=True)
+
+    # For using self-defined filter function, one can pass the function like this
+    def filter_by_full_soc(document):
+        if document['onet_soc_code]:
+            if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:
+                return document
+
+    corpus = CorpusCreator(job_postings_generator, filter_func=filter_by_full_soc)
+
+
+    Attributes:
+        generator (generator):  an iterable that generates JSON strings.
+                                Each string is expected to represent a job listing
+                                conforming to the common schema
+                                See sample_job_listing.json for an example of this schema
+        filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
+                                and output a job posting. Default is to filter documents by major group.
+        raw (bool): a flag whether to return the raw documents or transformed documents
     """
-    def __init__(self, generator=None, filter_func=None):
+    def __init__(self, generator=None, filter_func=None, raw=False):
         self.generator = generator
         self.nlp = NLPTransforms()
-        self.filter = filter_func
+        self.filter_func = filter_func
+        self.filter = self.filter_func
+        self.raw = raw
 
     def raw_corpora(self, generator):
         """Transforms job listings into corpus format
@@ -73,7 +105,10 @@ class CorpusCreator(object):
         return document
 
     def _transform(self, document):
-        return self._clean(document)
+        if self.raw:
+            return document
+        else:
+            return self._clean(document)
 
     def __iter__(self):
         for line in self.generator:
@@ -84,6 +119,7 @@ class CorpusCreator(object):
                     yield self._transform(document)
             else:
                 yield self._transform(document)
+
 
 class SimpleCorpusCreator(CorpusCreator):
     """
@@ -99,7 +135,7 @@ class SimpleCorpusCreator(CorpusCreator):
 
     join_spaces = ' '.join
 
-    def _transform(self, document):
+    def _clean(self, document):
         return self.join_spaces([
             self.nlp.lowercase_strip_punc(document.get(field, ''))
             for field in self.document_schema_fields
@@ -120,10 +156,10 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     job_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')
 
     # Default will include all the job postings with O*NET SOC code.
-    corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator))
+    corpus = Doc2VecGensimCorpusCreator(job_postings_generator)
 
-    # For using pre-defined major group filter, one need to specify occ_classes
-    corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator), occ_classes=['11', '13'])
+    # For using pre-defined major group filter, one need to specify major groups
+    corpus = Doc2VecGensimCorpusCreator(job_postings_generator, major_groups=['11', '13'])
 
     # For using self-defined filter function, one can pass the function like this
     def filter_by_full_soc(document):
@@ -131,11 +167,11 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
             if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:
                 return document
 
-    corpus = Doc2VecGensimCorpusCreator(job_postings_generator, filter_func=filter_by_full_soc, key='onet_soc_code')
+    corpus = Doc2VecGensimCorpusCreator(job_postings_generator, filter_func=filter_by_full_soc, key=['onet_soc_code'])
 
     Attributes:
         generator (generator): a job posting generator
-        occ_classes (list): a list of O*NET major group classes you want to include in the corpus being created.
+        major_groups (list): a list of O*NET major group classes you want to include in the corpus being created.
         filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
                                 and output a job posting. Default is to filter documents by major group.
         key (string): a key indicates the label which should exist in common schema of job posting.
@@ -149,16 +185,16 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     ]
     join_spaces = ' '.join
 
-    def __init__(self, generator=None, occ_classes=None, filter_func=None, key=['onet_soc_code']):
+    def __init__(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code']):
         super().__init__()
         self.lookup = {}
         self.generator = generator
         self.k = 0
-        self.occ_classes = occ_classes
+        self.major_groups = major_groups
         self.key = key
-        self.filter = filter_func if filter_func is not None else self._major_group_filter
+        self.filter = self._major_group_filter if isinstance(major_groups, list) else filter_func
 
-    def _transform(self, document):
+    def _clean(self, document):
         return self.join_spaces([
             self.nlp.clean_str(document[field])
             for field in self.document_schema_fields
@@ -167,28 +203,28 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     def _major_group_filter(self, document):
         key=self.key[0]
         if document[key]:
-            if document[key][:2] in self.occ_classes:
+            if document[key][:2] in self.major_groups:
                 return document
+
+    def _transform(self, document):
+        words = self._clean(document).split()
+        tag = [self.k]
+        return TaggedDocument(words, tag)
 
     def __iter__(self):
         for line in self.generator:
             document = json.loads(line)
-            # Only train on job posting that has onet_soc_code
-            if self.occ_classes is None and self.filter.__name__ is self._major_group_filter.__name__:
-                if safe_get(document, *self.key):
-                    words = self._transform(document).split()
-                    tag = [self.k]
-                    self.lookup[self.k] = safe_get(document, *self.key)
-                    yield gensim.models.doc2vec.TaggedDocument(words, tag)
-                    self.k += 1
-            else:
+            if self.filter:
                 document = self.filter(document)
                 if document:
-                    words = self._transform(document).split()
-                    tag = [self.k]
                     self.lookup[self.k] = safe_get(document, *self.key)
-                    yield gensim.models.doc2vec.TaggedDocument(words, tag)
+                    yield self._transform(document)
                     self.k += 1
+            else:
+                self.lookup[self.k] = safe_get(document, *self.key)
+                yield self._transform(document)
+                self.k += 1
+
 
 class Word2VecGensimCorpusCreator(CorpusCreator):
     """
@@ -207,26 +243,12 @@ class Word2VecGensimCorpusCreator(CorpusCreator):
         super().__init__()
         self.generator = generator
 
-    def _transform(self, document):
+    def _clean(self, document):
         return self.join_spaces([
             self.nlp.clean_str(document[field])
             for field in self.document_schema_fields
-        ])
+        ]).split()
 
-    def __iter__(self):
-        """Transforms job listings into corpus format for gensim's word2vec
-
-        Args:
-            generator: an iterable that generates an array of words(strings).
-                Each array is expected to represent a job listing(a doc)
-                including fields of interests
-        Yields:
-            (list) The next job listing transformed into gensim's doc2vec
-
-        """
-        for line in self.generator:
-            document = json.loads(line)
-            yield self._transform(document).split()
 
 class JobCategoryCorpusCreator(CorpusCreator):
     """
