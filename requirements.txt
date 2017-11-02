@@ -18,3 +18,4 @@ retrying
 fiona
 shapely
 filelock
+bs4
