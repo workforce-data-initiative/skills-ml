@@ -99,9 +99,12 @@ class CorpusCreator(object):
             'skills'
         ]
         for f in document_schema_fields:
-            cleaned = self.nlp.clean_html(document[f]).replace('\n','')
-            cleaned = " ".join(cleaned.split())
-            document[f] = cleaned
+            try:
+                cleaned = self.nlp.clean_html(document[f]).replace('\n','')
+                cleaned = " ".join(cleaned.split())
+                document[f] = cleaned
+            except KeyError:
+                pass
         return document
 
     def _transform(self, document):
