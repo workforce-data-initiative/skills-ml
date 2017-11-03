@@ -19,4 +19,4 @@ fiona
 shapely
 filelock
 bs4
-html5lib
+lxml

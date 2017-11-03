@@ -23,7 +23,7 @@ class NLPTransforms(object):
         return unicodedata.normalize('NFKD', document.lower())
 
     def clean_html(self, document):
-        markup = BeautifulSoup(document, "html5lib")
+        markup = BeautifulSoup(document, "lxml")
         return unicodedata.normalize('NFKD', markup.get_text())
 
     def lowercase_strip_punc(self, document):
