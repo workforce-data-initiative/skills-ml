@@ -67,6 +67,7 @@ class FakeCorpusGenerator(object):
          for data in corpus_memory_friendly:
             yield data
 
+
 class JobSamplerWithoutWeightingTest(unittest.TestCase):
     num = 1000
     occ_num = 10
@@ -77,7 +78,6 @@ class JobSamplerWithoutWeightingTest(unittest.TestCase):
     fake_corpus_train = FakeCorpusGenerator(num, occ_num, states, employment_type)
 
     def test_soc(self):
-
         js = JobSampler(job_posting_generator=self.fake_corpus_train)
 
         result = []
@@ -85,7 +85,6 @@ class JobSamplerWithoutWeightingTest(unittest.TestCase):
             result.extend(list(map(lambda x: x[0]['onet_soc_code'], js.sample(self.sample_size))))
 
         counts = dict(Counter(result))
-
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / self.occ_num
 
     def test_state(self):
@@ -96,7 +95,6 @@ class JobSamplerWithoutWeightingTest(unittest.TestCase):
             result.extend(list(map(lambda x: x[1], js.sample(self.sample_size))))
 
         counts = dict(Counter(result))
-        print(counts)
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / len(self.states)
 
     def test_employment_type(self):
@@ -107,7 +105,6 @@ class JobSamplerWithoutWeightingTest(unittest.TestCase):
             result.extend(list(map(lambda x: x[1], js.sample(self.sample_size))))
 
         counts = dict(Counter(result))
-        print(counts)
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / len(self.employment_type)
 
 

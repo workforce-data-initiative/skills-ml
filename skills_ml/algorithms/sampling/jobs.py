@@ -42,7 +42,10 @@ class JobSampler(object):
                 yield (job, job[self.keys])
         elif self.major_group:
             for job in job_posting_generator:
-                yield (job, job['onet_soc_code'][:2])
+                try:
+                    yield (job, job['onet_soc_code'][:2])
+                except TypeError:
+                    yield (job, None)
         else:
             for job in job_posting_generator:
                 yield (job, )
