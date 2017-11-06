@@ -71,7 +71,7 @@ def test_doc2vec_corpus_creator():
         for d in sample_document:
             yield json.dumps(d)
 
-    corpus = Doc2VecGensimCorpusCreator()._transform(sample_document[0])
+    corpus = Doc2VecGensimCorpusCreator()._clean(sample_document[0])
     assert corpus == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'
 
     # Test for Default
@@ -79,7 +79,7 @@ def test_doc2vec_corpus_creator():
     assert len(list(corpus)) == 2
 
     # Test for using pre-defined major group filter
-    corpus = Doc2VecGensimCorpusCreator(it(), occ_classes=['41'])
+    corpus = Doc2VecGensimCorpusCreator(it(), major_groups=['41'])
     assert len(list(corpus)) == 1
 
 

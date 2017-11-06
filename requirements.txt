@@ -18,3 +18,5 @@ retrying
 fiona
 shapely
 filelock
+bs4
+lxml

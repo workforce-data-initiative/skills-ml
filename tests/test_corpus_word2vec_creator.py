@@ -32,5 +32,5 @@ def test_word2vec_corpus_creator():
         "@type": "JobPosting"
     }
 
-    corpus = Word2VecGensimCorpusCreator()._transform(sample_document)
-    assert corpus == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'
+    corpus = Word2VecGensimCorpusCreator()._clean(sample_document)
+    assert corpus == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'.split()

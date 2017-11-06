@@ -3,7 +3,7 @@ Shared Natural Language Processing utilities
 """
 import unicodedata
 import re
-
+from bs4 import BeautifulSoup
 
 class NLPTransforms(object):
     # An object that performs common NLP transformations
@@ -21,6 +21,10 @@ class NLPTransforms(object):
             The document, lowercased and in NFKD normal form
         """
         return unicodedata.normalize('NFKD', document.lower())
+
+    def clean_html(self, document):
+        markup = BeautifulSoup(document, "lxml")
+        return unicodedata.normalize('NFKD', markup.get_text())
 
     def lowercase_strip_punc(self, document):
         """
