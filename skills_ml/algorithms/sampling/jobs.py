@@ -2,7 +2,7 @@ import random
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.sampling.methods import reservoir, reservoir_weighted
 import numpy as np
-from skills_ml.utils import safe_get
+from skills_utils.common import safe_get
 
 
 class JobSampler(object):

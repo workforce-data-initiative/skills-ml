@@ -1,5 +1,5 @@
 from skills_ml.algorithms.sampling.jobs import JobSampler
-from skills_ml.utils import safe_get
+from skills_utils.common import safe_get
 import gensim
 from collections import Counter
 import random

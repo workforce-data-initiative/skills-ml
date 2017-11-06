@@ -2,7 +2,7 @@ import json
 from random import randint
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from gensim.models.doc2vec import TaggedDocument
-from skills_ml.utils import safe_get
+from skills_utils.common import safe_get
 
 class CorpusCreator(object):
     """
