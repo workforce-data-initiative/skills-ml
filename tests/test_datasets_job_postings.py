@@ -1,8 +1,9 @@
-from skills_ml.datasets.job_postings import job_postings, job_postings_highmem
+from skills_ml.datasets.job_postings import job_postings, job_postings_highmem, job_postings_chain
 import moto
 import boto
 from unittest import mock
-
+import random
+import string
 
 @moto.mock_s3
 def test_job_postings():
@@ -92,3 +93,114 @@ def test_job_postings_highmem_retry():
             '{}/{}'.format(bucket_name, path)
         )]
         assert postings == ['test'] * 2
+
+@moto.mock_s3
+def test_job_postings_choosing_source():
+    s3_conn = boto.connect_s3()
+    bucket_name = 'test-bucket'
+    path = 'postings'
+    quarter = '2014Q1'
+    bucket = s3_conn.create_bucket(bucket_name)
+    sources = ["CB", "NLX", "VA"]
+    files = []
+    for i in range(0, 10):
+        random_hash = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(12)])
+        random_source = random.choice(sources)
+        files.append(random_source + '_' + random_hash)
+
+    for f in files:
+        key = boto.s3.key.Key(
+            bucket=bucket,
+            name='{}/{}/{}'.format(path, quarter, f)
+        )
+        key.set_contents_from_string(str(f))
+
+    jp = job_postings(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'all')
+    jp = list(jp)
+    assert set(jp) == set(files)
+
+    jp = job_postings(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'va')
+    assert set([j for j in files if 'VA' in j.split('_')]) == set(jp)
+
+    jp = job_postings(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'nlx')
+    assert set([j for j in files if 'NLX' in j.split('_')]) == set(jp)
+
+    jp = job_postings(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'cb')
+    assert set([j for j in files if 'CB' in j.split('_')]) == set(jp)
+
+    jp = job_postings(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'abc')
+    assert set([j for j in files if 'ABC' in j.split('_')]) == set(jp)
+
+    jp = job_postings(s3_conn, quarter, '{}/{}'.format(bucket_name, path), ['nlx', 'cb'])
+    assert set([j for j in files if ('NLX' in j.split('_') or 'CB' in j.split('_'))]) == set(jp)
+
+
+@moto.mock_s3
+def test_job_postings_highmem_choosing_source():
+    s3_conn = boto.connect_s3()
+    bucket_name = 'test-bucket'
+    path = 'postings'
+    quarter = '2014Q1'
+    bucket = s3_conn.create_bucket(bucket_name)
+    sources = ["CB", "NLX", "VA"]
+    files = []
+    for i in range(0, 10):
+        random_hash = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(12)])
+        random_source = random.choice(sources)
+        files.append(random_source + '_' + random_hash)
+
+    for f in files:
+        key = boto.s3.key.Key(
+            bucket=bucket,
+            name='{}/{}/{}'.format(path, quarter, f)
+        )
+        key.set_contents_from_string(str(f))
+
+    jp = job_postings_highmem(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'all')
+    assert set(jp) == set(files)
+
+    jp = job_postings_highmem(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'va')
+    assert set([j for j in files if 'VA' in j.split('_')]) == set(jp)
+
+    jp = job_postings_highmem(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'nlx')
+    assert set([j for j in files if 'NLX' in j.split('_')]) == set(jp)
+
+    jp = job_postings_highmem(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'cb')
+    assert set([j for j in files if 'CB' in j.split('_')]) == set(jp)
+
+    jp = job_postings_highmem(s3_conn, quarter, '{}/{}'.format(bucket_name, path), 'abc')
+    assert set([j for j in files if 'abc' in j.split('_')]) == set(jp)
+
+    jp = job_postings_highmem(s3_conn, quarter, '{}/{}'.format(bucket_name, path), ['va', 'nlx'])
+    assert set([j for j in files if ('VA' in j.split('_') or 'NLX' in j.split('_'))]) == set(jp)
+
+@moto.mock_s3
+def test_job_postings_chain():
+    s3_conn = boto.connect_s3()
+    bucket_name = 'test-bucket'
+    path = 'postings'
+    quarters = ['2011Q1', '2011Q2', '2011Q3']
+    bucket = s3_conn.create_bucket(bucket_name)
+    sources = ["CB", "NLX", "VA"]
+    files = []
+    for i in range(0, 9):
+        random_hash = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(12)])
+        random_source = random.choice(sources)
+        files.append(random_source + '_' + random_hash)
+
+    for i, quarter in enumerate(quarters):
+        for f in files[i*3:(i+1)*3]:
+            key = boto.s3.key.Key(
+                bucket=bucket,
+                name='{}/{}/{}'.format(path, quarter, f)
+            )
+            key.set_contents_from_string(str(f))
+
+    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), 'all')
+    assert len(list(jp)) == len(files)
+
+    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), 'nlx')
+    assert len(list(jp)) == len([j for j in files if 'NLX' in j.split('_')])
+
+    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), ['va', 'nlx'])
+    assert len(list(jp)) == len([j for j in files if ('VA' in j.split('_') or 'NLX' in j.split('_'))])
