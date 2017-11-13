@@ -122,13 +122,17 @@ for line in f:
             sent = sent.encode('utf-8')
             #print(skill+"\t"+sent)
             #sent = sent.encode('utf-8')
+            
+            #Exact matching
             if len_skill ==1:
                 sent = sent.decode('utf-8')
                 if re.search(r'\b'+skill +r'\b', sent, re.IGNORECASE):
                     skills[skill] = [100]
                     skills[skill].append(sent)
+            #Fuzzy matching
             else:        
                 ratio = fuzz.partial_ratio(skill,sent)
+                # You can adjust the partial of matching here: 100 => exact matching 0 => no matching
                 if ratio > 88:
                     skills[skill] = [ratio]
                     skills[skill].append(sent)
