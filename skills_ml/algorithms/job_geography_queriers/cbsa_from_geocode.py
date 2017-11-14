@@ -56,7 +56,7 @@ class JobCBSAFromGeocodeQuerier(object):
             )
             return (None, None, state_code)
 
-        cbsa_results = [self.cbsa_results[search_string] for search_string in search_strings]
+        cbsa_results = [self.cbsa_results.get(search_string, None) for search_string in search_strings]
         first_result_with_cbsa = None
         for cbsa_result in cbsa_results:
             if cbsa_result:
