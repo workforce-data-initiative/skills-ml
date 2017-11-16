@@ -1,7 +1,7 @@
 import csv
 import logging
 from collections import Counter, defaultdict
-import smart_open
+from smart_open import smart_open
 
 import nltk
 try:
@@ -51,7 +51,7 @@ class FreetextSkillExtractor(object):
         Returns: (set) skill names
         """
         logging.info('Creating skills lookup from %s', self.skills_filename)
-        with open(self.skills_filename) as infile:
+        with smart_open(self.skills_filename) as infile:
             reader = csv.reader(infile, delimiter='\t')
             header = next(reader)
             index = header.index(self.nlp.transforms[0])
@@ -258,5 +258,5 @@ if __name__ == '__main__':
     sample_path_config = 'open-skills-private/sampled_jobpostings'
     candidates_path_config = 'open-skills-private/skill_candidates'
     sample = Sample(sample_path_config, 'samples_300_v1')
-    skill_extractor = FuzzySkillExtractor("output/skills_master_table.tsv")
+    skill_extractor = FuzzySkillExtractor('open-skills-public/pipeline/tables/skills_master_table.tsv')
     generate_skill_candidates(candidates_path_config, sample, skill_extractor)
