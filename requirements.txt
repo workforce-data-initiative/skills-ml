@@ -21,3 +21,4 @@ filelock
 bs4
 lxml
 fuzzywuzzy
+python-Levenshtein

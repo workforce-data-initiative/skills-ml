@@ -1,7 +1,9 @@
-import csv
+import unicodecsv as csv
 import logging
 from collections import Counter, defaultdict
+from functools import partial
 from smart_open import smart_open
+from multiprocessing import Pool
 
 import nltk
 try:
@@ -9,8 +11,8 @@ try:
 except LookupError:
     nltk.download('punkt')
 
-from skills_ml.algorithms.string_cleaners import NLPTransforms
-
+from skills_utils.s3 import split_s3_path
+import boto
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
 
@@ -157,7 +159,7 @@ class FuzzySkillExtractor(FreetextSkillExtractor):
 
         Returns: (set) skill names
         """
-        with open(self.skills_filename) as infile:
+        with smart_open(self.skills_filename) as infile:
             reader = csv.reader(infile, delimiter='\t')
             header = next(reader)
             index=3
@@ -194,7 +196,7 @@ class FuzzySkillExtractor(FreetextSkillExtractor):
         sentences = self.ie_preprocess(document)
         
         skills = defaultdict(list)
-        for skill in available_skills:
+        for skill in self.lookup:
             len_skill = len(skill.split())
             for sent in sentences:
                 sent = sent.encode('utf-8')
@@ -211,52 +213,59 @@ class FuzzySkillExtractor(FreetextSkillExtractor):
                     # You can adjust the partial of matching here: 100 => exact matching 0 => no matching
                     if ratio > 88:
                         skills[skill] = [ratio]
-                        skills[skill].append(sent)
+                        skills[skill].append(sent.decode('utf-8'))
         return skills
 
 class Sample(object):
     def __init__(self, base_path, sample_name):
         self.base_path = base_path
-        self.sample_name = sample_name
-        self.full_path = '/'.join([self.base_path, sample_name])
+        self.name = sample_name
+        self.full_path = '/'.join([self.base_path, self.name])
 
     def __iter__(self):
+        lines = []
         with smart_open(self.full_path) as f:
-            for line in f:
-                yield line
+            lines = [line for line in f]
+        for line in lines:
+            yield line
 
-def generate_skill_candidates(candidates_path, sample, skill_extractor):
+def process_line(candidates_path, skill_extractor, line):
     corpus_creator = SimpleCorpusCreator()
     corpus_creator.document_schema_fields = ['description']
-    for job_posting_string in sample:
-        job_posting = json.loads(job_posting_string)
-        document = corpus_creator._join(job_posting)
-        candidate_skills = skill_extractor.candidate_skills(document)
-        for candidate_skill, metadata in candidate_skills.items():
-            cs_id = str(uuid.uuid4())
-            candidate_filename = '/'.join([candidates_path, sample.name, skill_extractor.name, cs_id])
-            with open(candidate_filename, 'w') as candidate_file:
-                candidate_metadata = {
-                    'job_posting_id': job_posting['id'],
-                    'candidate_skill': candidate_skill,
-                    'confidence': metadata[0],
-                    'context': metadata[1],
-                    'skill_extractor_name': skill_extractor.name
-                }
-                json.dump(obj, candidate_file)
+    job_posting = json.loads(line.decode('utf-8'))
+    document = corpus_creator._join(job_posting)
+    logging.info('Extracting skills for job posting %s', job_posting['id'])
+    candidate_skills = skill_extractor.candidate_skills(document)
+    logging.info('Found skills: %s', candidate_skills)
+    for candidate_skill, metadata in candidate_skills.items():
+        cs_id = str(uuid.uuid4())
+        bucket_name, prefix = split_s3_path(candidates_path)
+        s3_conn = boto.connect_s3()
+        bucket = s3_conn.get_bucket(bucket_name)
+        candidate_filename = '/'.join([prefix, sample.name, skill_extractor.name, cs_id]) + '.json'
+        key = boto.s3.key.Key(bucket=bucket, name=candidate_filename)
+        key.set_contents_from_string(json.dumps({
+            'job_posting_id': job_posting['id'],
+            'key': 'description',
+            'candidate_skill': candidate_skill,
+    	    'confidence': metadata[0],
+	    'context': metadata[1],
+	    'skill_extractor_name': skill_extractor.name,
+            'skill_type': 'onet_ksat'
+        }))
+    logging.info('Saved skills')
+
+def generate_skill_candidates(candidates_path, sample, skill_extractor):
+    pool = Pool(3)
+    results_it = pool.imap(partial(process_line, candidates_path, skill_extractor), sample)
+    for result in results_it:
+        logging.info(result)
         
 
-# TODO: define name attribute on skill extractor
-
-# one invocation:
-# get 24k sample into list
-# call skill candidate generator with 24k sample and exact match
-# 
-# call skill candidate generator
-
 if __name__ == '__main__':
-    sample_path_config = 'open-skills-private/sampled_jobpostings'
+    logging.basicConfig(level=logging.INFO)
+    sample_path_config = 's3://open-skills-private/sampled_jobpostings'
     candidates_path_config = 'open-skills-private/skill_candidates'
-    sample = Sample(sample_path_config, 'samples_300_v1')
-    skill_extractor = FuzzySkillExtractor('open-skills-public/pipeline/tables/skills_master_table.tsv')
+    sample = Sample(sample_path_config, 'samples_24k_v1')
+    skill_extractor = FuzzySkillExtractor('s3://open-skills-public/pipeline/tables/skills_master_table.tsv')
     generate_skill_candidates(candidates_path_config, sample, skill_extractor)
