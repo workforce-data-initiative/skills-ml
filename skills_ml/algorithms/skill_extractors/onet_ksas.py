@@ -5,6 +5,47 @@ import logging
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
 
+class OnetKExtractor(object):
+    def run(self):
+        """
+            Creates a skills CSV based on ONET Knowledge data,
+            with descriptions fetched from the content model reference
+        """
+        nlp = NLPTransforms()
+        # create dataframes for each KSA type
+        standard_columns = ['O*NET-SOC Code', 'Element ID', 'Element Name']
+        knowledge = self.onet_to_pandas('Knowledge.txt', standard_columns, 'knowledge')
+
+        # Concat KSA dataframes into one table
+        # note significant duplications since it's by ONET SOC Code
+        new_columns = ['O*NET-SOC Code', 'Element ID', 'ONET KSA', 'ksa_type']
+        knowledge.columns = new_columns
+
+        # ... concat KSA descriptions
+        # (useful for users wanting to know what this skill is about)
+        onet_modelreference = self.onet_to_pandas(
+            'Content Model Reference.txt',
+            ['Element ID', 'Description'],
+            ksa_type=None,
+            use_relevance=False
+        )
+
+        onet_ksas = pd.merge(
+            knowledge,
+            onet_modelreference,
+            how='left',
+            on=['Element ID']
+        )
+
+        logging.info('Uniqifying skills')
+        onet_ksas.drop_duplicates('ONET KSA', inplace=True)
+        onet_ksas['skill_uuid'] = onet_ksas['ONET KSA']\
+            .apply(self.hash_function)
+        onet_ksas[nlp.transforms[0]] = onet_ksas['ONET KSA']\
+            .apply(nlp.lowercase_strip_punc)
+
+        onet_ksas.to_csv(self.output_filename, sep='\t')
+
 class OnetSkillExtractor(object):
     """
     An object that creates a skills CSV based on ONET data

@@ -16,11 +16,11 @@ from skills_ml.algorithms.aggregators import \
 from skills_ml.algorithms.aggregators.title import GeoTitleAggregator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.skill_extractors.freetext import \
-    FreetextSkillExtractor, OccupationScopedSkillExtractor
+    ExactMatchSkillExtractor, OccupationScopedSkillExtractor
 from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
 
 
-class FakeFreetextSkillExtractor(FreetextSkillExtractor):
+class FakeExactMatchSkillExtractor(ExactMatchSkillExtractor):
     """A skill extractor that takes a list of skills
     instead of reading from a filename
     """
@@ -185,7 +185,7 @@ def test_multiprocessing():
 def test_geo_title_aggregator_save_counts():
     job_aggregators = OrderedDict()
     job_aggregators['skills'] = SkillAggregator(
-        skill_extractor=FakeFreetextSkillExtractor(
+        skill_extractor=FakeExactMatchSkillExtractor(
             skills=['slicing', 'dicing', 'jquery']
         ),
         corpus_creator=SimpleCorpusCreator(),
@@ -264,7 +264,7 @@ def test_geo_title_aggregator_save_counts():
 def test_geo_title_aggregator_save_rollup():
     job_aggregators = OrderedDict()
     job_aggregators['skills'] = SkillAggregator(
-        skill_extractor=FakeFreetextSkillExtractor(
+        skill_extractor=FakeExactMatchSkillExtractor(
             skills=['slicing', 'dicing', 'jquery']
         ),
         corpus_creator=SimpleCorpusCreator(),
@@ -303,7 +303,7 @@ def test_geo_title_aggregator_with_cleaning():
     nlp = NLPTransforms()
     job_aggregators = {
         'skills': SkillAggregator(
-            skill_extractor=FakeFreetextSkillExtractor(
+            skill_extractor=FakeExactMatchSkillExtractor(
                 skills=['slicing', 'dicing', 'jquery']
             ),
             corpus_creator=SimpleCorpusCreator()

@@ -1,9 +1,8 @@
 import unicodecsv as csv
 import logging
 from collections import Counter, defaultdict
-from functools import partial
 from smart_open import smart_open
-from multiprocessing import Pool
+import re
 
 import nltk
 try:
@@ -11,29 +10,16 @@ try:
 except LookupError:
     nltk.download('punkt')
 
-from skills_utils.s3 import split_s3_path
-import boto
-from skills_ml.algorithms.string_cleaners import NLPTransforms
-from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
-
-import json
-from collections import Counter, OrderedDict, defaultdict
-import uuid
-
 from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
 
-import re
+from skills_ml.algorithms.string_cleaners import NLPTransforms
+from skills_ml.algorithms.skill_extractors import CandidateSkill
 
 
-class FreetextSkillExtractor(object):
-    """Extract skills from unstructured text
-
-    Originally written by Kwame Porter Robinson
-    """
-    name = 'onet_ksat_exact'
-    def __init__(self, skills_filename):
-        self.skills_filename = skills_filename
+class UnstructuredTextSkillExtractor(object):
+    def __init__(self, skill_lookup_path, skill_lookup_type='onet_ksat'):
+        self.skill_lookup_path = skill_lookup_path
+        self.skill_lookup_type = skill_lookup_type
         self.tracker = {
             'total_skills': 0,
             'jobs_with_skills': 0
@@ -45,6 +31,50 @@ class FreetextSkillExtractor(object):
             len(self.lookup)
         )
 
+    def document_skill_counts(self, document):
+        """Count skills in the document
+
+        Args:
+            document (string) A document for searching, such as a job posting
+
+        Returns: (collections.Counter) skills found in the document, all
+            values set to 1 (multiple occurrences of a skill do not count)
+        """
+        return self._document_skills_in_lookup(document, self.lookup)
+
+    def ie_preprocess(self, document):
+        """This function takes raw text and chops and then connects the process to break
+           it down into sentences"""
+
+        # Pre-processing
+        # e.g.","exempli gratia"
+        document = document.replace("e.g.", "exempli gratia")
+
+        # Sentence tokenizer out of nltk.sent_tokenize
+        split = re.split('\n|\*', document)
+
+        # Sentence tokenizer
+        sentences = []
+        for sent in split:
+            sents = nltk.sent_tokenize(sent)
+            length = len(sents)
+            if length == 0:
+                next
+            elif length == 1:
+                sentences.append(sents[0])
+            else:
+                for i in range(length):
+                    sentences.append(sents[i])
+        return sentences
+
+
+class ExactMatchSkillExtractor(UnstructuredTextSkillExtractor):
+    """Extract skills from unstructured text
+
+    Originally written by Kwame Porter Robinson
+    """
+    name = 'exact'
+
     def _skills_lookup(self):
         """Create skills lookup
 
@@ -52,8 +82,8 @@ class FreetextSkillExtractor(object):
 
         Returns: (set) skill names
         """
-        logging.info('Creating skills lookup from %s', self.skills_filename)
-        with smart_open(self.skills_filename) as infile:
+        logging.info('Creating skills lookup from %s', self.skill_lookup_path)
+        with smart_open(self.skill_lookup_path) as infile:
             reader = csv.reader(infile, delimiter='\t')
             header = next(reader)
             index = header.index(self.nlp.transforms[0])
@@ -92,23 +122,33 @@ class FreetextSkillExtractor(object):
             start_idx += offset
         return skills
 
-    def document_skill_counts(self, document):
-        """Count skills in the document
+    def candidate_skills(self, job_posting):
+        document = job_posting.text
+        sentences = self.ie_preprocess(document)
 
-        Args:
-            document (string) A document for searching, such as a job posting
+        for skill in self.lookup:
+            len_skill = len(skill.split())
+            for sent in sentences:
+                sent = sent.encode('utf-8')
 
-        Returns: (collections.Counter) skills found in the document, all
-            values set to 1 (multiple occurrences of a skill do not count)
-        """
-        return self._document_skills_in_lookup(document, self.lookup)
+                # Exact matching
+                if len_skill == 1:
+                    sent = sent.decode('utf-8')
+                    if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
+                        yield CandidateSkill(
+                            skill_name=skill,
+                            matched_skill=skill,
+                            confidence=100,
+                            context=sent
+                        )
 
 
-class OccupationScopedSkillExtractor(FreetextSkillExtractor):
+class OccupationScopedSkillExtractor(ExactMatchSkillExtractor):
     """Extract skills from unstructured text,
     but only return matches that agree with a known taxonomy
     """
-    name = 'onet_ksat_occscoped_exact'
+    name = 'occscoped_exact'
+
     def _skills_lookup(self):
         """Create skills lookup
 
@@ -116,9 +156,9 @@ class OccupationScopedSkillExtractor(FreetextSkillExtractor):
 
         Returns: (set) skill names
         """
-        logging.info('Creating skills lookup from %s', self.skills_filename)
+        logging.info('Creating skills lookup from %s', self.skill_lookup_path)
         lookup = defaultdict(set)
-        with open(self.skills_filename) as infile:
+        with smart_open(self.skill_lookup_path) as infile:
             reader = csv.reader(infile, delimiter='\t')
             header = next(reader)
             ksa_index = header.index(self.nlp.transforms[0])
@@ -140,16 +180,41 @@ class OccupationScopedSkillExtractor(FreetextSkillExtractor):
         """
         return self._document_skills_in_lookup(document, self.lookup[soc_code])
 
+    def candidate_skills(self, job_posting):
+        document = job_posting.text
+        sentences = self.ie_preprocess(document)
 
-class FuzzySkillExtractor(FreetextSkillExtractor):
-    name = 'onet_ksat_fuzzy'
+        soc_code = job_posting.onet_soc_code
+        if not soc_code or soc_code not in self.lookup:
+            return
+
+        for skill in self.lookup[soc_code]:
+            len_skill = len(skill.split())
+            for sent in sentences:
+                sent = sent.encode('utf-8')
+
+                # Exact matching
+                if len_skill == 1:
+                    sent = sent.decode('utf-8')
+                    if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
+                        yield CandidateSkill(
+                            skill_name=skill,
+                            matched_skill=skill,
+                            confidence=100,
+                            context=sent
+                        )
+
+
+class FuzzyMatchSkillExtractor(UnstructuredTextSkillExtractor):
+    name = 'fuzzy'
+
     def reg_ex(self, s):
-        s = s.replace(".","\.")
-        s = s.replace("^","\^")
-        s = s.replace("$","\$")
-        s = s.replace("*","\*")
-        s = s.replace("+","\+")
-        s = s.replace("?","\?")
+        s = s.replace(".", "\.")
+        s = s.replace("^", "\^")
+        s = s.replace("$", "\$")
+        s = s.replace("*", "\*")
+        s = s.replace("+", "\+")
+        s = s.replace("?", "\?")
         return s
 
     def _skills_lookup(self):
@@ -159,113 +224,60 @@ class FuzzySkillExtractor(FreetextSkillExtractor):
 
         Returns: (set) skill names
         """
-        with smart_open(self.skills_filename) as infile:
+        with smart_open(self.skill_lookup_path) as infile:
             reader = csv.reader(infile, delimiter='\t')
-            header = next(reader)
-            index=3
+            next(reader)
+            index = 3
             generator = (self.reg_ex(row[index]) for row in reader)
-            
+
             return set(generator)
 
-    def ie_preprocess(self, document):
-        """This function takes raw text and chops and then connects the process to break     
-           it down into sentences"""
-        
-        # Pre-processing
-        # e.g.","exempli gratia"
-        document=document.replace("e.g.","exempli gratia")
-        
-        # Sentence tokenizer out of nltk.sent_tokenize
-        split = re.split('\n|\*', document)
-        
-        # Sentence tokenizer
-        sentences=[]
-        for sent in split:
-            sents = nltk.sent_tokenize(sent)
-            length = len(sents)
-            if length == 0:
-                next
-            elif length == 1:
-                sentences.append(sents[0])
-            else:
-                for i in range(length):
-                    sentences.append(sents[i])
-        return sentences
+    def ngrams(self, sent, n):
+        sent_input = sent.split()
+        output = []
+        for i in range(len(sent_input)-n+1):
+            output.append(sent_input[i:i+n])
+        return output
 
-    def candidate_skills(self, document):
+    def fuzzy_matches_in_sentence(self, skill, sentence):
+        N = len(skill.split())
+        doc = self.ngrams(sentence, N)
+        doc_join = [b" ".join(d) for d in doc]
+
+        for dj in doc_join:
+            ratio = fuzz.partial_ratio(skill, dj)
+            if ratio > 88:
+                yield CandidateSkill(
+                    skill_name=skill,
+                    matched_skill=dj,
+                    confidence=ratio,
+                    context=sentence.decode('utf-8')
+                )
+
+    def candidate_skills(self, job_posting):
+        document = job_posting.text
         sentences = self.ie_preprocess(document)
-        
-        skills = defaultdict(list)
+
         for skill in self.lookup:
             len_skill = len(skill.split())
             for sent in sentences:
                 sent = sent.encode('utf-8')
-                
-                #Exact matching
-                if len_skill ==1:
+
+                # Exact matching
+                if len_skill == 1:
                     sent = sent.decode('utf-8')
-                    if re.search(r'\b'+skill +r'\b', sent, re.IGNORECASE):
-                        skills[skill] = [100]
-                        skills[skill].append(sent)
-                #Fuzzy matching
-                else:        
-                    ratio = fuzz.partial_ratio(skill,sent)
-                    # You can adjust the partial of matching here: 100 => exact matching 0 => no matching
+                    if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
+                        yield CandidateSkill(
+                            skill_name=skill,
+                            matched_skill=skill,
+                            confidence=100,
+                            context=sent
+                        )
+                # Fuzzy matching
+                else:
+                    ratio = fuzz.partial_ratio(skill, sent)
+                    # You can adjust the partial of matching here:
+                    # 100 => exact matching 0 => no matching
                     if ratio > 88:
-                        skills[skill] = [ratio]
-                        skills[skill].append(sent.decode('utf-8'))
-        return skills
-
-class Sample(object):
-    def __init__(self, base_path, sample_name):
-        self.base_path = base_path
-        self.name = sample_name
-        self.full_path = '/'.join([self.base_path, self.name])
-
-    def __iter__(self):
-        lines = []
-        with smart_open(self.full_path) as f:
-            lines = [line for line in f]
-        for line in lines:
-            yield line
-
-def process_line(candidates_path, skill_extractor, line):
-    corpus_creator = SimpleCorpusCreator()
-    corpus_creator.document_schema_fields = ['description']
-    job_posting = json.loads(line.decode('utf-8'))
-    document = corpus_creator._join(job_posting)
-    logging.info('Extracting skills for job posting %s', job_posting['id'])
-    candidate_skills = skill_extractor.candidate_skills(document)
-    logging.info('Found skills: %s', candidate_skills)
-    for candidate_skill, metadata in candidate_skills.items():
-        cs_id = str(uuid.uuid4())
-        bucket_name, prefix = split_s3_path(candidates_path)
-        s3_conn = boto.connect_s3()
-        bucket = s3_conn.get_bucket(bucket_name)
-        candidate_filename = '/'.join([prefix, sample.name, skill_extractor.name, cs_id]) + '.json'
-        key = boto.s3.key.Key(bucket=bucket, name=candidate_filename)
-        key.set_contents_from_string(json.dumps({
-            'job_posting_id': job_posting['id'],
-            'key': 'description',
-            'candidate_skill': candidate_skill,
-    	    'confidence': metadata[0],
-	    'context': metadata[1],
-	    'skill_extractor_name': skill_extractor.name,
-            'skill_type': 'onet_ksat'
-        }))
-    logging.info('Saved skills')
-
-def generate_skill_candidates(candidates_path, sample, skill_extractor):
-    pool = Pool(3)
-    results_it = pool.imap(partial(process_line, candidates_path, skill_extractor), sample)
-    for result in results_it:
-        logging.info(result)
-        
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    sample_path_config = 's3://open-skills-private/sampled_jobpostings'
-    candidates_path_config = 'open-skills-private/skill_candidates'
-    sample = Sample(sample_path_config, 'samples_24k_v1')
-    skill_extractor = FuzzySkillExtractor('s3://open-skills-public/pipeline/tables/skills_master_table.tsv')
-    generate_skill_candidates(candidates_path_config, sample, skill_extractor)
+                        for match in self.fuzzy_matches_in_sentence(skill, sent):
+                            yield match
