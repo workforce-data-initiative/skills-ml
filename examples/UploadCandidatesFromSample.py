@@ -9,13 +9,13 @@ from skills_ml.algorithms.skill_extractors.freetext import \
     FuzzyMatchSkillExtractor,\
     ExactMatchSkillExtractor,\
     OccupationScopedSkillExtractor
-from skills_ml.algorithms.skill_extractors import upload_candidates_from_sample
+from skills_ml.algorithms.skill_extractors import upload_candidates_from_job_posting_json
 
 
 def generate_skill_candidates(candidates_path, sample, skill_extractor, n_jobs):
     pool = Pool(n_jobs)
     for result in pool.imap(
-        partial(upload_candidates_from_sample, candidates_path, skill_extractor, sample.name),
+        partial(upload_candidates_from_job_posting_json, candidates_path, skill_extractor, sample.name),
         sample
     ):
         logging.info(result)
