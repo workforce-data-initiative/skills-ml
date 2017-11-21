@@ -33,7 +33,6 @@ if __name__ == '__main__':
     ]
     sample_path = 's3://open-skills-private/sampled_jobpostings'
     candidates_path = 'open-skills-private/skill_candidates'
-    skills_master_table_path = 
     skill_tables = [
         #('s3://open-skills-public/pipeline/tables/skills_master_table.tsv', 'onet_ksat'),
         ('s3://open-skills-public/skill_lists/onet_knowledge.tsv', 'onet_knowledge'),
