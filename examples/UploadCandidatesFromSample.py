@@ -12,7 +12,7 @@ from skills_ml.algorithms.skill_extractors.freetext import \
 from skills_ml.algorithms.skill_extractors import upload_candidates_from_job_posting_json
 
 
-def generate_skill_candidates(candidates_path, sample, skill_extractor, n_jobs):
+def generate_skill_candidates_multiprocess(candidates_path, sample, skill_extractor, n_jobs):
     pool = Pool(n_jobs)
     for result in pool.imap(
         partial(upload_candidates_from_job_posting_json, candidates_path, skill_extractor, sample.name),
@@ -20,6 +20,9 @@ def generate_skill_candidates(candidates_path, sample, skill_extractor, n_jobs):
     ):
         logging.info(result)
 
+def generate_skill_candidates_oneprocess(candidates_path, sample, skill_extractor):
+    for job_posting_json in sample:
+        upload_candidates_from_job_posting_json(candidates_path, skill_extractor, job_posting_json, sample.name)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
@@ -46,4 +49,4 @@ if __name__ == '__main__':
             skill_lookup_path=skill_table[0],
             skill_lookup_type=skill_table[1]
         )
-    generate_skill_candidates(candidates_path, sample, skill_extractor, n_jobs)
+        generate_skill_candidates_oneprocess(candidates_path, sample, skill_extractor)

@@ -13,6 +13,8 @@ class CandidateSkill(object):
     def __init__(self, skill_name, matched_skill, context, confidence):
         self.skill_name = skill_name
         self.matched_skill = matched_skill
+        if isinstance(self.matched_skill, (bytes, bytearray)):
+            self.matched_skill = matched_skill.decode('utf-8')
         self.context = context
         self.confidence = confidence
 
@@ -20,14 +22,11 @@ class CandidateSkill(object):
 class JobPosting(object):
     def __init__(self, job_posting_json, corpus_creator=None):
         self.job_posting_json = job_posting_json
+        self.properties = json.loads(self.job_posting_json.decode('utf-8'))
         if corpus_creator:
             self.corpus_creator = corpus_creator
         else:
             self.corpus_creator = SimpleCorpusCreator()
-
-    @cachedproperty
-    def properties(self):
-        return json.loads(self.job_posting_json.decode('utf-8'))
 
     @cachedproperty
     def text(self):
