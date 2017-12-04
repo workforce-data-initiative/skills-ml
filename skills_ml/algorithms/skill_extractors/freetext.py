@@ -131,7 +131,7 @@ class ExactMatchSkillExtractor(UnstructuredTextSkillExtractor):
             for sent in sentences:
                 sent = sent.encode('utf-8')
 
-                # Exact matching
+                # Exact matching for len(skill) == 1
                 if len_skill == 1:
                     sent = sent.decode('utf-8')
                     if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
