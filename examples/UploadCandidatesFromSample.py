@@ -24,24 +24,23 @@ def generate_skill_candidates_oneprocess(candidates_path, sample, skill_extracto
     for job_posting_json in sample:
         upload_candidates_from_job_posting_json(candidates_path, skill_extractor, job_posting_json, sample.name)
 
+PRIVATE_BUCKET = 'sample-private'
+PUBLIC_BUCKET = 'sample-public'
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     n_jobs = 3
-    #sample_names = ['samples_24k_v1', 'samples_10k_v1', 'samples_300_v1']
-    sample_names = ['samples_300_v1']
+    sample_names = ['samples_300_v1', 'samples_10k_v1']
     skill_extractor_classes = [
         FuzzyMatchSkillExtractor,
         ExactMatchSkillExtractor,
-        #OccupationScopedSkillExtractor
     ]
-    sample_path = 's3://open-skills-private/sampled_jobpostings'
-    candidates_path = 'open-skills-private/skill_candidates'
+    sample_path = 's3://{}/sampled_jobpostings'.format(PRIVATE_BUCKET)
+    candidates_path = '{}/skill_candidates'.format(PRIVATE_BUCKET)
     skill_tables = [
-        #('s3://open-skills-public/pipeline/tables/skills_master_table.tsv', 'onet_ksat'),
-        ('s3://open-skills-public/skill_lists/onet_knowledge.tsv', 'onet_knowledge'),
-        ('s3://open-skills-public/skill_lists/onet_skill.tsv', 'onet_skill'),
-        ('s3://open-skills-public/skill_lists/onet_ability.tsv', 'onet_ability'),
-        #('s3://open-skills-public/skill_lists/onet_tools_tech.tsv', 'onet_tools_tech'),
+        ('s3://{}/skill_lists/onet_knowledge.tsv'.format(PUBLIC_BUCKET), 'onet_knowledge'),
+        ('s3://{}/skill_lists/onet_skill.tsv'.format(PUBLIC_BUCKET), 'onet_skill'),
+        ('s3://{}/skill_lists/onet_ability.tsv'.format(PUBLIC_BUCKET), 'onet_ability'),
     ]
     for sample_name, skill_extractor_class, skill_table in product(sample_names, skill_extractor_classes, skill_tables):
         sample = Sample(sample_path, sample_name)
