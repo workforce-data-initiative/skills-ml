@@ -5,22 +5,33 @@ import logging
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
 
+KSA_TYPE_CONFIG = {
+    'skill': ('Skills.txt', ['O*NET-SOC Code', 'Element ID', 'Element Name'], 'skill'),
+    'ability': ('Abilities.txt', ['O*NET-SOC Code', 'Element ID', 'Element Name'], 'ability'),
+    'knowledge': ('Knowledge.txt', ['O*NET-SOC Code', 'Element ID', 'Element Name'], 'knowledge'),
+    'tool': ('Tools and Technology.txt', ['O*NET-SOC Code', 'Commodity Code', 'T2 Example'], 'tool', False)
+}
+
 class OnetSkillExtractor(object):
     """
     An object that creates a skills CSV based on ONET data
 
     Originally written by Kwame Porter Robinson
     """
-    def __init__(self, onet_source, output_filename, hash_function):
+    def __init__(self, onet_source, output_filename, hash_function, ksa_types=None):
         """
         Args:
             output_filename: A filename to write the final dataset
             onet_source: An object that is able to fetch ONET files by name
             hash_function: A function that can hash a given string
+            ksa_types: A list of onet skill types to include.
+                All strings must be keys in KSA_TYPE_CONFIG.
+                Defaults to all keys in KSA_TYPE_CONFIG
         """
         self.output_filename = output_filename
         self.onet_source = onet_source
         self.hash_function = hash_function
+        self.ksa_types = ksa_types or KSA_TYPE_CONFIG.keys()
 
     def onet_to_pandas(self, filename, col_name, ksa_type, use_relevance=True):
         """
@@ -58,6 +69,7 @@ class OnetSkillExtractor(object):
             onet[col] = onet[col].astype(str).str.lower()
         return onet[col_name]
 
+
     def run(self):
         """
             Creates a skills CSV based on ONET KSAT data,
@@ -65,24 +77,16 @@ class OnetSkillExtractor(object):
         """
         nlp = NLPTransforms()
         # create dataframes for each KSA type
-        standard_columns = ['O*NET-SOC Code', 'Element ID', 'Element Name']
-        skills = self.onet_to_pandas('Skills.txt', standard_columns, 'skill')
-        ability = self.onet_to_pandas('Abilities.txt', standard_columns, 'ability')
-        knowledge = self.onet_to_pandas('Knowledge.txt', standard_columns, 'knowledge')
-        tools = self.onet_to_pandas(
-            'Tools and Technology.txt',
-            ['O*NET-SOC Code', 'Commodity Code', 'T2 Example'],
-            'tool',
-            use_relevance=False
-        )
+        dataframes = [
+            self.onet_to_pandas(*(KSA_TYPE_CONFIG[ksa_type]))
+            for ksa_type in self.ksa_types
+        ]
 
         # Concat KSA dataframes into one table
         # note significant duplications since it's by ONET SOC Code
         new_columns = ['O*NET-SOC Code', 'Element ID', 'ONET KSA', 'ksa_type']
-        skills.columns = new_columns
-        ability.columns = new_columns
-        knowledge.columns = new_columns
-        tools.columns = new_columns
+        for df in dataframes:
+            df.columns = new_columns
 
         # ... concat KSA descriptions
         # (useful for users wanting to know what this skill is about)
@@ -94,7 +98,7 @@ class OnetSkillExtractor(object):
         )
 
         onet_ksas = pd.concat(
-            (skills, ability, knowledge, tools),
+            dataframes,
             ignore_index=True
         )
         onet_ksas = pd.merge(

@@ -113,6 +113,11 @@ class CorpusCreator(object):
         else:
             return self._clean(document)
 
+    def _join(self, document):
+       return self.join_spaces([
+           document.get(field, '') for field in self.document_schema_fields
+       ])
+
     def __iter__(self):
         for line in self.generator:
             document = json.loads(line)
