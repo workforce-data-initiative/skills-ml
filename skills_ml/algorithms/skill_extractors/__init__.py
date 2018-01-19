@@ -4,40 +4,13 @@ import uuid
 
 import boto
 
-from descriptors import cachedproperty
 from skills_utils.s3 import split_s3_path
 from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
 
-
-class CandidateSkill(object):
-    def __init__(self, skill_name, matched_skill, context, confidence):
-        self.skill_name = skill_name
-        self.matched_skill = matched_skill
-        if isinstance(self.matched_skill, (bytes, bytearray)):
-            self.matched_skill = matched_skill.decode('utf-8')
-        self.context = context
-        self.confidence = confidence
-
-
-class JobPosting(object):
-    def __init__(self, job_posting_json, corpus_creator=None):
-        self.job_posting_json = job_posting_json
-        self.properties = json.loads(self.job_posting_json.decode('utf-8'))
-        if corpus_creator:
-            self.corpus_creator = corpus_creator
-        else:
-            self.corpus_creator = SimpleCorpusCreator()
-
-    @cachedproperty
-    def text(self):
-        return self.corpus_creator._join(self.properties)
-
-    @cachedproperty
-    def id(self):
-        return self.properties['id']
-
-    def __getattr__(self, attr):
-        return self.properties.get(attr, None)
+from .base import JobPosting
+from .fuzzy_match import FuzzyMatchSkillExtractor
+from .exact_match import ExactMatchSkillExtractor
+from .soc_exact import SocScopedExactMatchSkillExtractor
 
 
 def upload_candidates_from_job_posting_json(
@@ -77,3 +50,9 @@ def upload_candidates_from_job_posting_json(
             'skill_type': skill_extractor.skill_lookup_type
         }))
     logging.info('Saved skills')
+
+__all__ = [
+    'ExactMatchSkillExtractor',
+    'FuzzyMatchSkillExtractor',
+    'SocScopedExactMatchSkillExtractor'
+]
