@@ -3,6 +3,9 @@ skill-ml
 
 [![Build Status](https://travis-ci.org/workforce-data-initiative/skills-ml.svg?branch=master)](https://travis-ci.org/workforce-data-initiative/skills-ml)
 [![Code Coverage](https://codecov.io/gh/workforce-data-initiative/skills-ml/branch/master/graph/badge.svg)](https://codecov.io/gh/workforce-data-initiative/skills-ml)
+[![Updates](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/shield.svg)](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/)
+[![Python 3](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/python-3-shield.svg)](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/)
+
 
 **Open Skills Project - Machine Learning**
 
