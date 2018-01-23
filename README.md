@@ -40,12 +40,16 @@ pip install skills-ml
 import skills_ml
 ```
 
+skills-ml doesn't have a tutorial yet, but here are some useful places to start.
+- There are a couple of examples of specific uses of components to perform specific tasks in [examples](examples/).
+- Check out the descriptions of different algorithm types in [algorithms/](skills_ml/algorithms/) and look at any individual directories that match what you'd like to do (e.g. skill extraction, job title normalization)
+- [skills-airflow](https://github.com/workforce-data-initiative/skills-airflow) is the open-source production system that uses skills-ml algorithms in an Airflow pipeline to generate open datasets
+
 Structure
 ----------
-- [algorithms/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/algorithms) - Core algorithmic module. Each submodule is meant to contain a different type of component, such as a job title normalizer or a skill tagger, with a common interface so different pipelines can try out different versions of the components.
-- [api_sync/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/api_sync) - Module to manage integrating workforce data into a relational database suitable for powering the Open SkillsAPI.
-- [datasets/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/datasets) - Wrappers for interfacing with different datasets, such as ONET, Urbanized Area.
-- [evaluation/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/evaluation) - Code for testing different components against each other.
+- [algorithms/](skills_ml/algorithms/) - Core algorithmic module. Each submodule is meant to contain a different type of component, such as a job title normalizer or a skill tagger, with a common interface so different pipelines can try out different versions of the components.
+- [datasets/](skills_ml/datasets/) - Wrappers for interfacing with different datasets, such as ONET, Urbanized Area.
+- [evaluation/](skills_ml/evaluation/) - Code for testing different components against each other.
 
 
 Contributors

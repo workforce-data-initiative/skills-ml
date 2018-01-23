@@ -4,9 +4,9 @@ algorithms
 
 - `corpus_creators` - Methods for different corpus creation.
 
-- `elasticsearch_indexers` - Elasticsearch indexers for different corpra. 
+- `elasticsearch_indexers` - Elasticsearch indexers for different corpora. 
 
-- `file_sampler` - Methods for sampling files from certain directory.
+- `geocoders` - Methods for geocoding locations from job postings
 
 - `job_geography_queriers` - Method for querying the Core-Based Statistical Area for a job.
 
@@ -18,7 +18,11 @@ algorithms
 
 - `jobtitle_cleaner` - Methods for cleaning job titles into a more reasonable form. 
 
+- `occupation_classifiers` - Methods for classifying the occupation of a job posting
+
 - `representativeness_calculators` - Methods for calculating geographic representativeness of SOC Codes.
+
+- `sampling` - Methods for sampling from a corpus
 
 - `skill_extractors` - Methods for extracting skills from structured or unstructured data sources
 
