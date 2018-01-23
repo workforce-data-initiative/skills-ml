@@ -40,7 +40,10 @@ pip install skills-ml
 import skills_ml
 ```
 
-skills-ml is a library of different standalone algorithms side-by-side, so as such there isn't a beginning tutorial. There are, however, a couple of examples of specific uses of components in [examples](examples/), which are helpful. Otherwise check out the [algorithms/](skills_ml/algorithms/) directory and check out any individual directories that match what you'd like to do (e.g. skill extraction, job title normalization), or [skills-airflow](https://github.com/workforce-data-initiative/skills-airflow) for an example of a production system using skills-ml.
+skills-ml doesn't have a tutorial yet, but here are some useful places to start.
+- There are a couple of examples of specific uses of components to perform specific tasks in [examples](examples/).
+- Check out the descriptions of different algorithm types in [algorithms/](skills_ml/algorithms/) and look at any individual directories that match what you'd like to do (e.g. skill extraction, job title normalization)
+- [skills-airflow](https://github.com/workforce-data-initiative/skills-airflow) is the open-source production system that uses skills-ml algorithms in an Airflow pipeline to generate open datasets
 
 Structure
 ----------
