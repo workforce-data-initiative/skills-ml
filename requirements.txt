@@ -9,7 +9,7 @@ Elasticsearch==6.1.1
 gensim==3.2.0
 annoy==1.11.1
 unicodecsv==0.14.1
-us
+us==1.0.0
 Sqlalchemy
 geocoder
 psycopg2
