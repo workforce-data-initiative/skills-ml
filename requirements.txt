@@ -2,7 +2,7 @@ pandas==0.22.0
 requests==2.18.4
 scikit-learn==0.19.1
 scipy==1.0.0
-nltk
+nltk==3.2.5
 pytest
 PyYAML
 Elasticsearch
