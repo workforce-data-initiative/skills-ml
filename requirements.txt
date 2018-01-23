@@ -12,7 +12,7 @@ unicodecsv==0.14.1
 us==1.0.0
 Sqlalchemy==1.2.1
 geocoder==1.34.0
-psycopg2
+psycopg2==2.7.3.2
 alembic
 retrying
 fiona
