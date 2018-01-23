@@ -16,7 +16,7 @@ psycopg2==2.7.3.2
 alembic==0.9.7
 retrying==1.3.3
 fiona==1.7.11
-shapely
+shapely==1.6.3
 filelock
 bs4
 lxml
