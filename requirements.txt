@@ -15,7 +15,7 @@ geocoder==1.34.0
 psycopg2==2.7.3.2
 alembic==0.9.7
 retrying==1.3.3
-fiona
+fiona==1.7.11
 shapely
 filelock
 bs4
