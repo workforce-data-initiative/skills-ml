@@ -4,7 +4,7 @@ freezegun
 mock
 moto<1.0
 pytest-cov
-pytest
+pytest==3.3.2
 Sphinx
 testing.postgresql
 tox
