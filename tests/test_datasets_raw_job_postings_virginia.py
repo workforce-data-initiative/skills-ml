@@ -4,14 +4,14 @@ Test the Virginia ETL transformer
 from skills_utils.testing import ImporterTest
 from skills_ml.datasets.raw_job_postings import VirginiaTransformer
 
-from moto import mock_s3
+from moto import mock_s3_deprecated
 import boto
 
 from io import StringIO
 import json
 
 
-@mock_s3
+@mock_s3_deprecated
 class VirginiaTest(ImporterTest):
     transformer_class = VirginiaTransformer
 

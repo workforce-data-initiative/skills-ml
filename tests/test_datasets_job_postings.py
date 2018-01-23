@@ -5,7 +5,7 @@ from unittest import mock
 import random
 import string
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_job_postings():
     s3_conn = boto.connect_s3()
     bucket_name = 'test-bucket'
@@ -31,7 +31,7 @@ def test_job_postings():
 raise_error = True
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_job_postings_retry():
     s3_conn = boto.connect_s3()
     bucket_name = 'test-bucket'
@@ -63,7 +63,7 @@ def test_job_postings_retry():
         assert postings == ['test'] * 2
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_job_postings_highmem_retry():
     s3_conn = boto.connect_s3()
     bucket_name = 'test-bucket'
@@ -94,7 +94,7 @@ def test_job_postings_highmem_retry():
         )]
         assert postings == ['test'] * 2
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_job_postings_choosing_source():
     s3_conn = boto.connect_s3()
     bucket_name = 'test-bucket'
@@ -135,7 +135,7 @@ def test_job_postings_choosing_source():
     assert set([j for j in files if ('NLX' in j.split('_') or 'CB' in j.split('_'))]) == set(jp)
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_job_postings_highmem_choosing_source():
     s3_conn = boto.connect_s3()
     bucket_name = 'test-bucket'
@@ -174,7 +174,7 @@ def test_job_postings_highmem_choosing_source():
     jp = job_postings_highmem(s3_conn, quarter, '{}/{}'.format(bucket_name, path), ['va', 'nlx'])
     assert set([j for j in files if ('VA' in j.split('_') or 'NLX' in j.split('_'))]) == set(jp)
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_job_postings_chain():
     s3_conn = boto.connect_s3()
     bucket_name = 'test-bucket'
