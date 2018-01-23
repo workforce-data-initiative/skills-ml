@@ -1,5 +1,5 @@
 codecov==2.0.14
-httpretty==0.8.10
+httpretty==0.8.14
 freezegun
 mock
 moto<1.0
