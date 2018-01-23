@@ -6,6 +6,7 @@ skill-ml
 [![Updates](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/shield.svg)](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/)
 [![Python 3](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/python-3-shield.svg)](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/)
 [![PyPI](https://img.shields.io/pypi/v/skills-ml.svg)]()
+[![Code Climate](https://img.shields.io/codeclimate/github/workforce-data-initiative/skills-ml.svg)]()
 
 
 **Open Skills Project - Machine Learning**
