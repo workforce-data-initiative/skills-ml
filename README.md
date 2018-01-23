@@ -40,12 +40,13 @@ pip install skills-ml
 import skills_ml
 ```
 
+skills-ml is a library of different standalone algorithms side-by-side, so as such there isn't a beginning tutorial. There are, however, a couple of examples of specific uses of components in [examples](examples/), which are helpful. Otherwise check out the [algorithms/](algorithms/) directory and check out any individual directories that match what you'd like to do (e.g. skill extraction, job title normalization), or [skills-airflow](https://github.com/workforce-data-initiative/skills-airflow) for an example of a production system using skills-ml.
+
 Structure
 ----------
-- [algorithms/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/algorithms) - Core algorithmic module. Each submodule is meant to contain a different type of component, such as a job title normalizer or a skill tagger, with a common interface so different pipelines can try out different versions of the components.
-- [api_sync/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/api_sync) - Module to manage integrating workforce data into a relational database suitable for powering the Open SkillsAPI.
-- [datasets/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/datasets) - Wrappers for interfacing with different datasets, such as ONET, Urbanized Area.
-- [evaluation/](https://github.com/workforce-data-initiative/skills-ml/tree/documentation/skills_ml/evaluation) - Code for testing different components against each other.
+- [algorithms/](algorithms/) - Core algorithmic module. Each submodule is meant to contain a different type of component, such as a job title normalizer or a skill tagger, with a common interface so different pipelines can try out different versions of the components.
+- [datasets/](datasets/) - Wrappers for interfacing with different datasets, such as ONET, Urbanized Area.
+- [evaluation/](evaluation/) - Code for testing different components against each other.
 
 
 Contributors
