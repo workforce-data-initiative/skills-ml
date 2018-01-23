@@ -1,5 +1,5 @@
 pandas==0.22.0
-requests
+requests==2.18.4
 scikit-learn
 scipy
 nltk
