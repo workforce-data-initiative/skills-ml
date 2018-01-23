@@ -1,7 +1,7 @@
 from skills_ml.algorithms.job_vectorizers.doc2vec_vectorizer import Doc2Vectorizer
 import gensim
 import os
-from moto import mock_s3
+from moto import mock_s3_deprecated
 from mock import patch
 
 import pytest
@@ -23,7 +23,7 @@ class FakeCorpusGenerator(object):
                 yield self.corpus.split()
 
 
-@mock_s3
+@mock_s3_deprecated
 @patch('algorithms.job_vectorizers.doc2vec_vectorizer.download')
 @pytest.mark.skip('Gensim/boto versioning needs figuring out')
 def test_job_vectorizer(load_mock):

@@ -38,7 +38,7 @@ def test_dataset_stats_counter():
     assert counter.stats['input_counts']['jobdesc'] == 1
     assert counter.stats['input_counts']['extra'] == 1
 
-    with moto.mock_s3():
+    with moto.mock_s3_deprecated():
         with freeze_time('2017-01-10'):
             s3_conn = boto.connect_s3()
             s3_conn.create_bucket('test-bucket')
@@ -75,7 +75,7 @@ def test_dataset_stats_counter():
 
 def test_dataset_stats_counter_empty():
     counter = DatasetStatsCounter(quarter='2013Q1', dataset_id='VA')
-    with moto.mock_s3():
+    with moto.mock_s3_deprecated():
         with freeze_time('2017-01-10'):
             s3_conn = boto.connect_s3()
             s3_conn.create_bucket('test-bucket')
@@ -154,7 +154,7 @@ def sample_dataset_stats():
 
 
 def test_dataset_stats_aggregator():
-    with moto.mock_s3():
+    with moto.mock_s3_deprecated():
         s3_conn = boto.connect_s3()
         aggregator = DatasetStatsAggregator(dataset_id='CB', s3_conn=s3_conn)
 
@@ -180,7 +180,7 @@ def test_dataset_stats_aggregator():
 
 
 def test_global_stats_aggregator():
-    with moto.mock_s3():
+    with moto.mock_s3_deprecated():
         s3_conn = boto.connect_s3()
         aggregator = GlobalStatsAggregator(s3_conn=s3_conn)
 
@@ -247,7 +247,7 @@ def upload_quarterly_dataset_counts(bucket, dataset_id, quarter, num_total):
 
 
 def test_total_job_postings():
-    with moto.mock_s3():
+    with moto.mock_s3_deprecated():
         s3_conn = boto.connect_s3()
         s3_conn.create_bucket('stats-bucket')
         bucket = s3_conn.get_bucket('stats-bucket')
@@ -274,7 +274,7 @@ def test_total_job_postings():
 
 
 def test_quarterly_posting_stats():
-    with moto.mock_s3():
+    with moto.mock_s3_deprecated():
         s3_conn = boto.connect_s3()
         s3_conn.create_bucket('stats-bucket')
         bucket = s3_conn.get_bucket('stats-bucket')
@@ -319,7 +319,7 @@ def upload_partner_rollup(bucket, dataset_id, num_total):
     }))
 
 def test_partner_list():
-    with moto.mock_s3():
+    with moto.mock_s3_deprecated():
         s3_conn = boto.connect_s3()
         s3_conn.create_bucket('stats-bucket')
         bucket = s3_conn.get_bucket('stats-bucket')

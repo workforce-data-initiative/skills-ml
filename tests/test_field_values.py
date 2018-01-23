@@ -16,7 +16,7 @@ def test_field_value_counter():
     assert counter.accumulator['jobdesc']['test'] == 1
     assert counter.accumulator['jobdesc'][''] == 1
 
-    with moto.mock_s3():
+    with moto.mock_s3_deprecated():
         s3_conn = boto.connect_s3()
         s3_conn.create_bucket('test-bucket')
         counter.save(s3_conn, 'test-bucket/stats')

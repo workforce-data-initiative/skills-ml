@@ -4,7 +4,7 @@ Test the USAJobs ETL transformer
 from skills_utils.testing import ImporterTest
 from skills_ml.datasets.raw_job_postings import USAJobsTransformer
 
-from moto import mock_s3
+from moto import mock_s3_deprecated
 import boto
 import uuid
 
@@ -12,7 +12,7 @@ from io import StringIO
 import json
 
 
-@mock_s3
+@mock_s3_deprecated
 class USAJobsTest(ImporterTest):
     transformer_class = USAJobsTransformer
 

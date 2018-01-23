@@ -8,7 +8,7 @@ import moto
 import boto
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_geocode_cacher():
     with patch('time.sleep') as time_mock:
         with open('tests/sample_geocode_result.json') as f:
@@ -49,7 +49,7 @@ def test_geocode_cacher():
         }
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_geocode_job_postings():
     with open('tests/sample_geocode_result.json') as f:
         sample_geocode_result = json.load(f)
@@ -109,7 +109,7 @@ def test_job_posting_search_string_no_location():
     assert job_posting_search_strings('{}') == []
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_cbsa_finder_onehit():
     s3_conn = boto.connect_s3()
     s3_conn.create_bucket('geobucket')
@@ -148,7 +148,7 @@ def test_cbsa_finder_onehit():
     )
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_cbsa_finder_nohits():
     s3_conn = boto.connect_s3()
     s3_conn.create_bucket('geobucket')
@@ -167,7 +167,7 @@ def test_cbsa_finder_nohits():
     assert finder.query(sample_input) == None
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_cbsa_finder_twohits():
     s3_conn = boto.connect_s3()
     s3_conn.create_bucket('geobucket')
@@ -189,7 +189,7 @@ def test_cbsa_finder_twohits():
     )
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_cbsa_finder_cache():
     s3_conn = boto.connect_s3()
     s3_conn.create_bucket('geobucket')
@@ -230,7 +230,7 @@ def test_cbsa_finder_cache():
     }
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_cbsa_finder_sanity_check():
     s3_conn = boto.connect_s3()
     s3_conn.create_bucket('geobucket')
@@ -282,7 +282,7 @@ def test_cbsa_finder_sanity_check():
     }
 
 
-@moto.mock_s3
+@moto.mock_s3_deprecated
 def test_cbsa_finder_empty_cache():
     s3_conn = boto.connect_s3()
     geobucket = s3_conn.create_bucket('geobucket')

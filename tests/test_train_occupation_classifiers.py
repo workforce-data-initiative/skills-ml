@@ -2,7 +2,7 @@ from skills_ml.algorithms.occupation_classifiers.train import RepresentationTrai
 
 from skills_utils.s3 import upload, list_files, download
 
-from moto import mock_s3
+from moto import mock_s3_deprecated
 import tempfile
 import boto
 import os
@@ -40,7 +40,7 @@ sample_document = {
     "@type": "JobPosting"
 }
 
-@mock_s3
+@mock_s3_deprecated
 def test_representation_trainer():
     s3_conn = boto.connect_s3()
     bucket_name = 'fake-jb-bucket'
