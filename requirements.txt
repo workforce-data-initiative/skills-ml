@@ -20,7 +20,7 @@ shapely==1.6.3
 filelock==3.0.0
 bs4==0.0.1
 lxml==4.1.1
-fuzzywuzzy
+fuzzywuzzy==0.16.0
 python-Levenshtein
 dickens
 skills-utils ~= 0.2
