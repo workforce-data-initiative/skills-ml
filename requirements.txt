@@ -7,7 +7,7 @@ pytest==3.3.2
 PyYAML==3.12
 Elasticsearch==6.1.1
 gensim==3.2.0
-annoy
+annoy==1.11.1
 unicodecsv
 us
 Sqlalchemy
