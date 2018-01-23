@@ -5,6 +5,7 @@ skill-ml
 [![Code Coverage](https://codecov.io/gh/workforce-data-initiative/skills-ml/branch/master/graph/badge.svg)](https://codecov.io/gh/workforce-data-initiative/skills-ml)
 [![Updates](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/shield.svg)](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/)
 [![Python 3](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/python-3-shield.svg)](https://pyup.io/repos/github/workforce-data-initiative/skills-ml/)
+[![PyPI](https://img.shields.io/pypi/v/skills-ml.svg)]()
 
 
 **Open Skills Project - Machine Learning**
@@ -29,31 +30,9 @@ source venv/bin/activate
 
 ### 2. Installation
 
-There are two ways to install **skills-ml**. You can either install from the source code or install with `pip install`
-
-#### Install from source code
-
-**skills-ml** is available through cloning the repository. First you need to install all the requirements.
 
 ```bash
-git clone https://github.com/workforce-data-initiative/skills-ml.git
-cd skills-ml
-pip install -r requirements.txt
-pip install -r requirements_dev.txt
-```
-
-Then install with `setup.py`
-
-```bash
-python setup.py install
-```
-
-#### Install with `pip`
-
-Or use `pip install`
-
-```bash
-pip install git+git://github.com/workforce-data-initiative/skills-ml.git@master
+pip install skills-ml
 ```
 
 ### 3. Import skills_ml
