@@ -19,7 +19,7 @@ fiona==1.7.11
 shapely==1.6.3
 filelock==3.0.0
 bs4==0.0.1
-lxml
+lxml==4.1.1
 fuzzywuzzy
 python-Levenshtein
 dickens
