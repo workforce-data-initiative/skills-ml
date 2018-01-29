@@ -10,7 +10,7 @@ gensim==3.2.0
 annoy==1.11.1
 unicodecsv==0.14.1
 us==1.0.0
-Sqlalchemy==1.2.1
+Sqlalchemy==1.2.2
 geocoder==1.34.0
 psycopg2==2.7.3.2
 alembic==0.9.7
