@@ -2,6 +2,11 @@ class FeatureCreator(object):
     """ Feature Creator Factory that help users to instantiate different
     types of feature at once and combine them together.
 
+    Example:
+        doc = "some job posting..."
+        feature_vector = FeatureCreate(doc).combine(features="all")
+        feature_vector = FeatureCreate(doc).combine(features=["StructuralFeature", "EmbeddingFeature"])
+
     Args:
         doc (string): job posting data.
     """
@@ -52,7 +57,7 @@ class StructuralFeature(FeatureCreator):
     """ Sturctural features
     """
     def output(self):
-        """ Output a feature vector. Now it's just an simple example.
+        """ Output a feature vector. Now it's just a simple example.
         """
         return ["StructuralFeature" + "_" + self.doc]
 
@@ -61,7 +66,7 @@ class ContextualFeature(FeatureCreator):
     """ Contextual features
     """
     def output(self):
-        """ Output a feature vector. Now it's just an simple example.
+        """ Output a feature vector. Now it's just a simple example.
         """
         return ["ContextualFeature" + "_" + self.doc]
 
@@ -70,7 +75,7 @@ class EmbeddingFeature(FeatureCreator):
     """ Embedding features
     """
     def output(self):
-        """ Output a feature vector. Now it's just an simple example.
+        """ Output a feature vector. Now it's just a simple example.
         """
         return ["EmbeddingFeature" + "_" + self.doc]
 
