@@ -1,3 +1,5 @@
+from functools import reduce
+
 from skills_ml.algorithms.job_vectorizers.doc2vec_vectorizer import Doc2Vectorizer
 
 class FeatureCreator(object):
@@ -5,9 +7,15 @@ class FeatureCreator(object):
     types of feature at once and combine them together.
 
     Example:
-        doc = "some job posting..."
-        feature_vector = FeatureCreator().combine(features="all")
-        feature_vector = FeatureCreator().combine(features=["StructuralFeature", "EmbeddingFeature"])
+        from airflow.hooks import S3Hook
+        from skills_ml.algorithms.skill_feature_creator import FeatureCreator
+
+        s3_conn = S3Hook().get_conn()
+
+        docs=["something", "something2"]
+
+        feature_vector_generator = FeatureCreator(s3_conn, features="all").transform(docs)
+        feature_vector_generator = FeatureCreator(s3_conn, features=["StructuralFeature", "EmbeddingFeature"]).transform(docs)
 
     Args:
         doc (string): job posting data.
@@ -15,6 +23,7 @@ class FeatureCreator(object):
     def __init__(
             self,
             s3_conn=None,
+            features="all",
             embedding_model_name="gensim_doc2vec_va_0605",
             embedding_model_path="open-skills-private/model_cache/va_0605/"):
         self.all_features = [ f.__name__ for f in FeatureFactory.__subclasses__()]
@@ -23,8 +32,23 @@ class FeatureCreator(object):
             "embedding_model_name": embedding_model_name,
             "embedding_model_path": embedding_model_path
         }
-    def combine(self, docs, features="all"):
-        """ Methods to combine different type of features.
+        self.features = features
+
+    @property
+    def selected_features(self):
+        if self.features == "all":
+            return self.all_features
+        elif isinstance(self.features, list):
+            if not (set(self.features) < set(self.all_features)):
+                not_supported = list(set(self.features) - set(self.all_features))
+                raise Exception("\"{}\" not supported!".format(", ".join(not_supported)))
+            else:
+                return self.features
+        else:
+            raise Exception(TypeError)
+
+    def transform(self, docs, combine="concat"):
+        """ Methods to combine different types of feature and transform to a vector as a generator.
         We might want to have different way to combine vectors in the future (eg. concat, average...).
 
         Args:
@@ -33,22 +57,15 @@ class FeatureCreator(object):
                                     If it's a list of feature types, it will return the combined result of the feature
                                     types that one specifies.
         Return:
-            (list): a combined feature vector
+            (generator): a combined feature vector generator
         """
-        if features == "all":
-            features_to_be_combined = self.all_features
-        elif isinstance(features, list):
-            if not (set(features) < set(self.all_features)):
-                not_supported = list(set(features) - set(self.all_features))
-                raise Exception("{} not supported!".format(", ".join(not_supported)))
-            else:
-                features_to_be_combined = features
-        else:
-            raise Exception(TypeError)
-
+        features_to_be_combined = self.selected_features
         feature_objects = [FeatureFactory._factory(feature, **self.params) for feature in features_to_be_combined]
-        for doc in docs:
-            yield list(map(lambda x: x.output(doc), feature_objects))
+        if combine == "concat":
+            for doc in docs:
+                yield reduce(lambda x, y: x+y, map(lambda x: x.output(doc), feature_objects))
+        else:
+            raise Exception("\"{}\" not supported!".format(combine))
 
 
 class FeatureFactory(object):
@@ -64,7 +81,8 @@ class FeatureFactory(object):
             return EmbeddingFeature(**kwargs)
 
         else:
-            raise ValueError('Bad feature type {}'.format(type))
+            raise ValueError('Bad feature type \"{}\"'.format(type))
+
 
 class StructuralFeature(FeatureFactory):
     """ Sturctural features
@@ -97,4 +115,7 @@ class EmbeddingFeature(FeatureFactory):
     def output(self, doc):
         """ Output a feature vector.
         """
-        return self.embedding_model.model.infer_vector(doc)
+        if type(self.embedding_model.model).__name__ == "Doc2Vec":
+            return list(self.embedding_model.model.infer_vector(doc))
+        else:
+            raise Exception('Bad model type!')
