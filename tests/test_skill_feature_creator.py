@@ -2,7 +2,7 @@ from skills_ml.algorithms.skill_feature_creator import FeatureCreator
 from skills_utils.s3 import upload
 import gensim
 import os
-from moto import mock_s3
+from moto import mock_s3_deprecated
 from mock import patch
 import boto
 import tempfile
@@ -54,7 +54,7 @@ class FakeCorpusGenerator(object):
             yield gensim.models.doc2vec.TaggedDocument(words, label)
             k += 1
 
-@mock_s3
+@mock_s3_deprecated
 def test_occupation_classifier():
     s3_conn = boto.connect_s3()
 
