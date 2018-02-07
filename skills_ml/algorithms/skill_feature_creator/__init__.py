@@ -88,7 +88,7 @@ class StructuralFeature(FeatureFactory):
     """ Sturctural features
     """
     def output(self, doc):
-        """ Output a feature vector. Now it's just a simple example.
+        """ Output a feature vector. Need to be implemented! Now it's just a simple example.
         """
         return ["StructuralFeature_" + doc]
 
@@ -97,7 +97,7 @@ class ContextualFeature(FeatureFactory):
     """ Contextual features
     """
     def output(self, doc):
-        """ Output a feature vector. Now it's just a simple example.
+        """ Output a feature vector. Need to be implemented! Now it's just a simple example.
         """
         return ["ContextualFeature_" + doc]
 
