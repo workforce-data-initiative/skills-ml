@@ -55,9 +55,10 @@ Structure
 
 Contributors
 ----------
-Kwame Porter Robinson - [Github](https://github.com/robinsonkwame)
-Eddie Lin - [Github](https://github.com/tweddielin)
-Tristan Crockett - [Github](https://github.com/thcrock)
+- Kwame Porter Robinson - [Github](https://github.com/robinsonkwame)
+- Eddie Lin - [Github](https://github.com/tweddielin)
+- Tristan Crockett - [Github](https://github.com/thcrock)
+- Zoo Chai - [Github](https://github.com/zoochai)
 
 
 License

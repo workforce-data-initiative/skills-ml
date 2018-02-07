@@ -12,7 +12,7 @@ KSA_TYPE_CONFIG = {
     'tool': ('Tools and Technology.txt', ['O*NET-SOC Code', 'Commodity Code', 'T2 Example'], 'tool', False)
 }
 
-class OnetSkillExtractor(object):
+class OnetSkillListProcessor(object):
     """
     An object that creates a skills CSV based on ONET data
 

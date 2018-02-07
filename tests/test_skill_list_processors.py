@@ -4,7 +4,7 @@ import pandas as pd
 
 from tests import utils
 
-from skills_ml.algorithms.skill_extractors.onet_ksas import OnetSkillExtractor
+from skills_ml.algorithms.skill_list_processors import OnetSkillListProcessor
 from skills_utils.hash import md5
 
 
@@ -73,7 +73,7 @@ class MockOnetSkillCache(object):
 
 def test_onet_skill_extractor_all():
     with tempfile.NamedTemporaryFile(mode='w+') as outputfile:
-        extractor = OnetSkillExtractor(
+        extractor = OnetSkillListProcessor(
             output_filename=outputfile.name,
             onet_source=MockOnetSkillCache(),
             hash_function=md5
@@ -123,7 +123,7 @@ def test_onet_skill_extractor_all():
 
 def test_onet_skill_extractor_knowledge():
     with tempfile.NamedTemporaryFile(mode='w+') as outputfile:
-        extractor = OnetSkillExtractor(
+        extractor = OnetSkillListProcessor(
             output_filename=outputfile.name,
             onet_source=MockOnetSkillCache(),
             hash_function=md5,
