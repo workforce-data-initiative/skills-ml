@@ -15,8 +15,8 @@ from skills_ml.algorithms.aggregators import \
     GivenSocCodeAggregator
 from skills_ml.algorithms.aggregators.title import GeoTitleAggregator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
-from skills_ml.algorithms.skill_extractors.freetext import \
-    ExactMatchSkillExtractor, OccupationScopedSkillExtractor
+from skills_ml.algorithms.skill_extractors import \
+    ExactMatchSkillExtractor, SocScopedExactMatchSkillExtractor
 from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
 
 
@@ -36,7 +36,7 @@ class FakeExactMatchSkillExtractor(ExactMatchSkillExtractor):
         return set(self.skills)
 
 
-class FakeOccupationScopedSkillExtractor(OccupationScopedSkillExtractor):
+class FakeOccupationScopedSkillExtractor(SocScopedExactMatchSkillExtractor):
     """A skill extractor that takes a list of skills
     instead of reading from a filename
     """
