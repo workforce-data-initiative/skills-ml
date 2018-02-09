@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+from abc import ABCMeta, abstractmethod
 
 import nltk
 
@@ -41,15 +42,32 @@ class JobPosting(object):
         return self.properties.get(attr, None)
 
 
-class ListBasedSkillExtractor(object):
-    def __init__(self, skill_lookup_path, skill_lookup_type='onet_ksat'):
-        self.skill_lookup_path = skill_lookup_path
-        self.skill_lookup_type = skill_lookup_type
+class SkillExtractor(object, metaclass=ABCMeta):
+    def __init__(self):
         self.tracker = {
             'total_skills': 0,
             'jobs_with_skills': 0
         }
         self.nlp = NLPTransforms()
+
+    @abstractmethod
+    def document_skill_counts(self, document):
+        """Count skills in the document
+
+        Args:
+            document (string) A document for searching, such as a job posting
+
+        Returns: (collections.Counter) skills found in the document, all
+            values set to 1 (multiple occurrences of a skill do not count)
+        """
+        pass
+
+
+class ListBasedSkillExtractor(SkillExtractor):
+    def __init__(self, skill_lookup_path, skill_lookup_type='onet_ksat'):
+        super(ListBasedSkillExtractor, self).__init__()
+        self.skill_lookup_path = skill_lookup_path
+        self.skill_lookup_type = skill_lookup_type
         self.lookup = self._skills_lookup()
         logging.info(
             'Done creating skills lookup with %d entries',
