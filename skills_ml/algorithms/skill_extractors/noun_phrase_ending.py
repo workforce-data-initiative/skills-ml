@@ -74,7 +74,6 @@ def noun_phrases_in_line_with_context(line):
             - the context of the noun phrase (currently defined as the surrounding sentence)
     """
     if line.strip() != "\n":
-        detokenizer = MosesDetokenizer()
         output = sentences_words_pos(line)
 
         grammar = r"""
@@ -93,10 +92,8 @@ def noun_phrases_in_line_with_context(line):
                             except:
                                 np += node[0] + ' '
                         np = np.strip()
-
-                        logging.info('Yielding noun phrase %s with context %s', np, sent)
-                        de_pos_tagged = [t[0] for t in sent]
-                        yield (np, detokenizer.detokenize(de_pos_tagged, return_str=True))
+                        logging.debug('Yielding noun phrase %s with context %s', np, sent)
+                        yield np, sent
 
 
 BULLETS = ['+', '*', '-']
@@ -172,6 +169,7 @@ class NPEndPatternExtractor(SkillExtractor):
         self.endings = endings
         self.stop_phrases = stop_phrases
         self.only_bulleted_lines = only_bulleted_lines
+        self.detokenizer = MosesDetokenizer()
 
     def document_skill_counts(self, document):
         """Count skills in the document
@@ -197,11 +195,17 @@ class NPEndPatternExtractor(SkillExtractor):
         """
         document = job_posting.text
         for cleaned_phrase, context in self.noun_phrases_matching_endings(document):
+            orig_context = self.detokenizer.detokenize([t[0] for t in context], return_str=True)
+            logging.info(
+                'Yielding candidate skill %s in context %s',
+                cleaned_phrase,
+                orig_context
+            )
             yield CandidateSkill(
                 skill_name=cleaned_phrase,
                 matched_skill=cleaned_phrase,
                 confidence=95,
-                context=context
+                context=orig_context
             )
 
     def noun_phrases_matching_endings(self, document):
