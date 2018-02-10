@@ -9,6 +9,12 @@ try:
 except LookupError:
     nltk.download('averaged_perceptron_tagger')
 
+try:
+    from nltk.tokenize.moses import MosesDetokenizer
+except LookupError:
+    nltk.download('perluniprops') 
+    from nltk.tokenize.moses import MosesDetokenizer
+
 from .base import SkillExtractor, CandidateSkill
 
 
@@ -68,6 +74,7 @@ def noun_phrases_in_line_with_context(line):
             - the context of the noun phrase (currently defined as the surrounding sentence)
     """
     if line.strip() != "\n":
+        detokenizer = MosesDetokenizer()
         output = sentences_words_pos(line)
 
         grammar = r"""
@@ -88,7 +95,8 @@ def noun_phrases_in_line_with_context(line):
                         np = np.strip()
 
                         logging.info('Yielding noun phrase %s with context %s', np, sent)
-                        yield (np, sent)
+                        de_pos_tagged = [t[0] for t in sent]
+                        yield (np, detokenizer.detokenize(de_pos_tagged, return_str=True))
 
 
 BULLETS = ['+', '*', '-']
