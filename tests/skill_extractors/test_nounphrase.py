@@ -1,4 +1,5 @@
-from skills_ml.algorithms.skill_extractors.NP_extraction import SkillPatternExtractor
+from skills_ml.algorithms.skill_extractors.noun_phrase_ending import \
+    SkillEndingPatternExtractor, AbilityEndingPatternExtractor
 
 
 posting_string = """Project Product Manager, ESPN.com Content
@@ -6,7 +7,7 @@ Job Description *This is a project position with an estimated length of 1 year*
 
 The Product Manager will join the ESPN.com product management team. This role will directly manage key parts of the product vision, development and execution of the product experience for our Spanish language digital experience (e.g. Deportes). They will be responsible for creating a consistent and compelling experience across ESPN\u2019s Spanish language web, tablet and mobile experiences.
 
-This role requires close collaboration with other vertical product owners, including ESPN.com web and native, platform, personalization, video, audio and more. The role is based in Bristol, CT.
+This role requires close collaboration with other vertical product owners, including ESPN.com web and native, platform, personalization, video, audio and more. The role requires strong spanish language skills and deductive reasoning ability. The role is based in Bristol, CT.
 
 ESPN, Inc., The Worldwide Leader in Sports, is the leading multinational, multimedia sports entertainment company featuring the broadest portfolio of multimedia sports assets with over 50 business entities. Headquartered in Bristol, Connecticut, ESPN is 80% owned by ABC, Inc. (a subsidiary of The Walt Disney Company), and 20% by the Hearst Corporation.
 
@@ -49,6 +50,25 @@ Auto req ID 274081BR"""
 
 
 def test_skill_pattern_extractor():
-    extractor = SkillPatternExtractor()
+    extractor = SkillEndingPatternExtractor()
     counts = extractor.document_skill_counts(posting_string)
-    assert counts == {'strong analytical skills': 1, 'strong communication skills': 1}
+    assert counts == {
+        'strong analytical skills': 1,
+        'strong communication skills': 1
+    }
+
+def test_skill_pattern_extractor_not_just_bullets():
+    extractor = SkillEndingPatternExtractor(only_bulleted_lines=False)
+    counts = extractor.document_skill_counts(posting_string)
+    assert counts == {
+        'strong analytical skills': 1,
+        'strong communication skills': 1,
+        'strong spanish language skills': 1
+    }
+
+def test_ability_pattern_extractor_not_just_bullets():
+    extractor = AbilityEndingPatternExtractor(only_bulleted_lines=False)
+    counts = extractor.document_skill_counts(posting_string)
+    assert counts == {
+        'deductive reasoning ability': 1,
+    }
