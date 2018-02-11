@@ -1,6 +1,5 @@
 # coding: utf-8
 import logging
-import re
 from collections import Counter
 
 import nltk
@@ -12,7 +11,7 @@ except LookupError:
 try:
     from nltk.tokenize.moses import MosesDetokenizer
 except LookupError:
-    nltk.download('perluniprops') 
+    nltk.download('perluniprops')
     from nltk.tokenize.moses import MosesDetokenizer
 
 from .base import SkillExtractor, CandidateSkill
@@ -219,7 +218,7 @@ class NPEndPatternExtractor(SkillExtractor):
                 - a noun phrase
                 - the context of the noun phrase (currently defined as the surrounding sentence)
         """
-        lines = re.findall(r'\n.*', document)
+        lines = document.split('\n')
         for line in lines:
             if not self.only_bulleted_lines or is_bulleted(line):
                 for noun_phrase, context in noun_phrases_in_line_with_context(line):
@@ -246,6 +245,7 @@ class SkillEndingPatternExtractor(NPEndPatternExtractor):
         'desired skills',
         'encouraged skills',
         'essential skills',
+        'essential job skills',
         'following requisite skills',
         'following skill',
         'following skills',
