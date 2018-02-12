@@ -6,14 +6,14 @@ from skills_ml.algorithms.string_cleaners import NLPTransforms
 
 from skills_utils.s3 import download
 
-MODEL_NAME = 'gensim_doc2vec'
-PATHTOMODEL = 'skills-private/model_cache/'
+MODEL_NAME = 'gensim_doc2vec_va_0605'
+PATHTOMODEL = 'open-skills-private/model_cache/va_0605/'
 
 
 class Doc2Vectorizer(object):
-    def __init__(self, model_name=MODEL_NAME, path=PATHTOMODEL, s3_conn=None):
-        self.model_name = model_name
-        self.path = path
+    def __init__(self, model_name=None, path=None, s3_conn=None):
+        self.model_name = model_name or MODEL_NAME
+        self.path = path or PATHTOMODEL
         self.nlp = NLPTransforms()
         self.s3_conn = s3_conn
         self.model = self._load_model(modelname=self.model_name)

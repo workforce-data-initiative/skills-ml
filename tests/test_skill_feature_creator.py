@@ -55,7 +55,7 @@ class FakeCorpusGenerator(object):
             k += 1
 
 @mock_s3_deprecated
-def test_occupation_classifier():
+def test_skill_feature_creator():
     s3_conn = boto.connect_s3()
 
     bucket_name = 'fake-bucket'

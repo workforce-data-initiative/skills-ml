@@ -24,8 +24,8 @@ class FeatureCreator(object):
             self,
             s3_conn=None,
             features="all",
-            embedding_model_name="gensim_doc2vec_va_0605",
-            embedding_model_path="open-skills-private/model_cache/va_0605/"):
+            embedding_model_name=None,
+            embedding_model_path=None):
         self.all_features = [ f.__name__ for f in FeatureFactory.__subclasses__()]
         self.params = {
             "s3_conn": s3_conn,
@@ -116,6 +116,6 @@ class EmbeddingFeature(FeatureFactory):
         """ Output a feature vector.
         """
         if type(self.embedding_model.model).__name__ == "Doc2Vec":
-            return list(self.embedding_model.model.infer_vector(doc))
+            return list(list(self.embedding_model.vectorize([doc]))[0])
         else:
             raise Exception('Bad model type!')
