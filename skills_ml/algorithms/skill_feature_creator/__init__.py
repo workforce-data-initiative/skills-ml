@@ -115,7 +115,4 @@ class EmbeddingFeature(FeatureFactory):
     def output(self, doc):
         """ Output a feature vector.
         """
-        if type(self.embedding_model.model).__name__ == "Doc2Vec":
-            return list(list(self.embedding_model.vectorize([doc]))[0])
-        else:
-            raise Exception('Bad model type!')
+        return list(list(self.embedding_model.vectorize([doc]))[0])
