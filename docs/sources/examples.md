@@ -32,3 +32,17 @@ To showcase the interface of training a word2vec embedding model in an online ba
 - A list of quarters for creating the corpus from job posting data
 - A trainer object that specifies some parameters of source, s3 path, batch size, model type ...etc.
 - The train method takes whatever arugments `gensim.models.word2vec.Word2Vec` or `gensim.model.doc2vec.Doc2Vec` has
+
+## [Compute and Aggregate Properties of Job Postings as a Tabular Dataset](https://github.com/workforce-data-initiative/skills-ml/blob/master/examples/ComputeAndAggregateJobPostingProperties.py)
+
+To show job posting property computation and aggregation,
+we calculate job posting counts by cleaned title, and upload
+the resulting CSV to S3.
+
+This is essentially a mini version of the Data@Work Research Hub.
+
+To enable this example to be run with as few dependencies as possible, we use:
+
+- a fake local s3 instance
+- a sample of the Virginia Tech open job postings dataset
+- only title cleaning and job counting.

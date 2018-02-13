@@ -54,14 +54,13 @@ class Classifier(object):
         self.classifier_type = classifier_id.split('_')[0]
         self.s3_conn = s3_conn
         self.s3_path = s3_path + classifier_id
-        self.files  = list_files(self.s3_conn, self.s3_path)
         self.temporary_directory = temporary_directory or tempfile.TemporaryDirectory()
         self.classifier = self._load_classifier(**kwargs) if classifier == None else classifier
         self.classify_kwargs = classify_kwargs if classify_kwargs else {}
 
     def _load_classifier(self, **kwargs):
         if self.classifier_type == 'ann':
-            for f in self.files:
+            for f in list_files(self.s3_conn, self.s3_path):
                 filepath = os.path.join(self.temporary_directory, f)
                 if not os.path.exists(filepath):
                     logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
