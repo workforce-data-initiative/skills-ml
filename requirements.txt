@@ -23,4 +23,4 @@ lxml==4.1.1
 fuzzywuzzy==0.16.0
 python-Levenshtein==0.12.0
 dickens==1.0.1
-skills-utils ~= 0.2
+skills-utils==0.3.1
