@@ -102,7 +102,8 @@ class ContextualFeature(FeatureFactory):
     def output(self, doc):
         """ Output a feature vector. Need to be implemented! Now it's just a simple example.
         """
-        return ["ContextualFeature_" + doc]
+        contextfeaures = localcontextualfeatures(doc)
+        return contextfeaures
 
 
 class EmbeddingFeature(FeatureFactory):
