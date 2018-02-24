@@ -1,3 +1,4 @@
+"""Look up the CBSA for a job posting against a precomputed geocoded CBSA lookup"""
 import json
 import logging
 from skills_ml.algorithms.geocoders import job_posting_search_strings
@@ -16,7 +17,7 @@ class JobCBSAFromGeocodeQuerier(object):
     and dealing with differents kinds of cache misses.
 
     Args:
-        cbsa_results (dict) Geocoding search strings mapping to
+        cbsa_results (dict) A mapping of geocoding search strings to
             (CBSA FIPS, CBSA Name) tuples
     """
 

@@ -1,3 +1,4 @@
+"""Generic sampling methods"""
 import numpy as np
 import heapq as hq
 import random

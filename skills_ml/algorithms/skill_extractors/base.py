@@ -1,3 +1,4 @@
+"""Base classes for skill extraction"""
 import json
 import logging
 import re
@@ -43,6 +44,10 @@ class JobPosting(object):
 
 
 class SkillExtractor(object, metaclass=ABCMeta):
+    """Abstract class for all skill extractors.
+
+    All subclasses must implement document_skill_counts
+    """
     def __init__(self):
         self.tracker = {
             'total_skills': 0,
@@ -64,6 +69,15 @@ class SkillExtractor(object, metaclass=ABCMeta):
 
 
 class ListBasedSkillExtractor(SkillExtractor):
+    """Extract skills by comparing with a known list
+
+
+    Subclasses must implement _skills_lookup and _document_skills_in_lookup
+
+    Args:
+        skill_lookup_path (string) A path to the skill lookup file
+        skill_lookup_type (string, optional) An identifier for the skill lookup type. Defaults to onet_ksat
+    """
     def __init__(self, skill_lookup_path, skill_lookup_type='onet_ksat'):
         super(ListBasedSkillExtractor, self).__init__()
         self.skill_lookup_path = skill_lookup_path

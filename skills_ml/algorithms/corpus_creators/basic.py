@@ -11,6 +11,7 @@ class CorpusCreator(object):
         machine learning algorithms or specific tasks.
 
     Example:
+    ```python
     from airflow.hooks import S3Hook
     from skills_ml.datasets.job_postings import job_postings, job_postings_chain
     from skills_ml.algorithms.corpus_creators.basic import CorpusCreator
@@ -31,6 +32,7 @@ class CorpusCreator(object):
                 return document
 
     corpus = CorpusCreator(job_postings_generator, filter_func=filter_by_full_soc)
+    ```
 
 
     Attributes:
@@ -156,6 +158,8 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     important schema fields and returns them as one large cleaned array of words
 
     Example:
+    ```python
+
     from airflow.hooks import S3Hook
     from skills_ml.datasets.job_postings import job_postings, job_postings_chain
     from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator
@@ -176,6 +180,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
                 return document
 
     corpus = Doc2VecGensimCorpusCreator(job_postings_generator, filter_func=filter_by_full_soc, key=['onet_soc_code'])
+    ```
 
     Attributes:
         generator (generator): a job posting generator

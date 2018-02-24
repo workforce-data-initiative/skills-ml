@@ -1,3 +1,4 @@
+"""Aggregates job geographies"""
 import csv
 
 

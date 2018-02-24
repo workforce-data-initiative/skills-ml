@@ -1,6 +1,4 @@
-"""
-Shared Natural Language Processing utilities
-"""
+"""String transformations for cleaning"""
 import unicodedata
 import re
 from bs4 import BeautifulSoup

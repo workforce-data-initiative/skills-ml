@@ -1,7 +1,12 @@
+"""Aggregate properties of job postings.
+
+Classes in this module generally wrap calls to some code in `skills_ml.algorithms` for some arbitrary set of job postings (in schema.org JobPosting format as a Python dict), accumulating the output in a Counter.
+"""
 from collections import Counter, defaultdict
 
-
 class JobAggregator(object):
+    """Base class for different aggregators. Provides a useful interface for subclasses to benefit from.
+    """
     def __init__(self, output_count=1, output_total=False):
         self.initialize_counts()
         self.output_count = output_count
@@ -51,6 +56,11 @@ class JobAggregator(object):
         return outputs
 
     def output_header_row(self, prefix):
+        """Generate a CSV output header row for this aggregator
+
+        Args:
+            prefix (str) A prefix for each column
+        """
         output_header_row = [
             '{}_{}'.format(prefix, str(i))
             for i in range(1, self.output_count+1)

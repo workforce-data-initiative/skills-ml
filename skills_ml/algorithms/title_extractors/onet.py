@@ -1,3 +1,4 @@
+"""Process ONET job titles into a common format"""
 import pandas as pd
 
 from skills_ml.algorithms.string_cleaners import NLPTransforms

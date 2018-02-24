@@ -1,0 +1,49 @@
+additional_search_paths: [..]
+docs_dir: sources
+generate:
+- skills_ml.algorithms.md: [skills_ml.algorithms.aggregators+, skills_ml.algorithms.aggregators.dataset_transform+,
+    skills_ml.algorithms.aggregators.field_values+, skills_ml.algorithms.aggregators.geo+,
+    skills_ml.algorithms.aggregators.soc_code+, skills_ml.algorithms.aggregators.title+,
+    skills_ml.algorithms.corpus_creators+, skills_ml.algorithms.corpus_creators.basic+,
+    skills_ml.algorithms.elasticsearch_indexers+, skills_ml.algorithms.elasticsearch_indexers.base+,
+    skills_ml.algorithms.elasticsearch_indexers.job_titles_master+, skills_ml.algorithms.elasticsearch_indexers.normalize_topn+,
+    skills_ml.algorithms.geocoders+, skills_ml.algorithms.geocoders.cbsa+, skills_ml.algorithms.job_geography_queriers+,
+    skills_ml.algorithms.job_geography_queriers.cbsa+, skills_ml.algorithms.job_geography_queriers.cbsa_from_geocode+,
+    skills_ml.algorithms.job_labelers+, skills_ml.algorithms.job_normalizers+, skills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer+,
+    skills_ml.algorithms.job_vectorizers+, skills_ml.algorithms.job_vectorizers.doc2vec_vectorizer+,
+    skills_ml.algorithms.jobtitle_cleaner+, skills_ml.algorithms.jobtitle_cleaner.clean+,
+    skills_ml.algorithms.occupation_classifiers+, skills_ml.algorithms.occupation_classifiers.base+,
+    skills_ml.algorithms.occupation_classifiers.classifiers+, skills_ml.algorithms.occupation_classifiers.train+,
+    skills_ml.algorithms.representativeness_calculators+, skills_ml.algorithms.representativeness_calculators.geo_occupation+,
+    skills_ml.algorithms.sampling+, skills_ml.algorithms.sampling.jobs+, skills_ml.algorithms.sampling.methods+,
+    skills_ml.algorithms.skill_extractors+, skills_ml.algorithms.skill_extractors.base+,
+    skills_ml.algorithms.skill_extractors.exact_match+, skills_ml.algorithms.skill_extractors.fuzzy_match+,
+    skills_ml.algorithms.skill_extractors.noun_phrase_ending+, skills_ml.algorithms.skill_extractors.soc_exact+,
+    skills_ml.algorithms.skill_importance_extractors+, skills_ml.algorithms.skill_importance_extractors.onet+,
+    skills_ml.algorithms.skill_list_processors+, skills_ml.algorithms.skill_list_processors.onet_ksat+,
+    skills_ml.algorithms.skill_taggers+, skills_ml.algorithms.skill_taggers.base+,
+    skills_ml.algorithms.skill_taggers.simple+, skills_ml.algorithms.string_cleaners+,
+    skills_ml.algorithms.string_cleaners.nlp+, skills_ml.algorithms.title_extractors+,
+    skills_ml.algorithms.title_extractors.onet+]
+- skills_ml.datasets.md: [skills_ml.datasets.cbsa_shapefile+, skills_ml.datasets.cousub_ua+,
+    skills_ml.datasets.job_postings+, skills_ml.datasets.nber_county_cbsa+, skills_ml.datasets.negative_positive_dict+,
+    skills_ml.datasets.onet_cache+, skills_ml.datasets.onet_source+, skills_ml.datasets.partner_updaters+,
+    skills_ml.datasets.partner_updaters.usa_jobs+, skills_ml.datasets.place_ua+, skills_ml.datasets.raw_job_postings+,
+    skills_ml.datasets.raw_job_postings.usajobs+, skills_ml.datasets.raw_job_postings.virginia+,
+    skills_ml.datasets.sba_city_county+, skills_ml.datasets.ua_cbsa+]
+- skills_ml.evaluation.md: [skills_ml.evaluation.query+]
+gens_dir: _build/pydocmd
+loader: pydocmd.loader.PythonLoader
+markdown_extensions:
+- toc: {anchorlink: true, baselevel: 2, permalink: true}
+pages:
+- {Home: index.md << ../README.md}
+- {Examples: examples.md}
+- {Job Posting Common Schema: common_schema.md}
+- {Evaluation Tools: skills_ml.evaluation.md}
+- {Algorithms: skills_ml.algorithms.md}
+- {Dataset Processors: skills_ml.datasets.md}
+preprocessor: pydocmd.preprocessor.Preprocessor
+site_dir: _build/site
+site_name: skills-ml documentation
+theme: material
