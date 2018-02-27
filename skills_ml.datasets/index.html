@@ -1,0 +1,1015 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-0.17.2, mkdocs-material-2.6.6">
+    
+    
+      
+        <title>Dataset Processors - skills-ml documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.78aab2dc.css">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+      
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <a href="#skills_mldatasetscbsa_shapefile" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="skills-ml documentation" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                skills-ml documentation
+              </span>
+              <span class="md-header-nav__topic">
+                Dataset Processors
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <span class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </span>
+    skills-ml documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../examples/" title="Examples" class="md-nav__link">
+      Examples
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../common_schema/" title="Job Posting Common Schema" class="md-nav__link">
+      Job Posting Common Schema
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml.evaluation/" title="Evaluation Tools" class="md-nav__link">
+      Evaluation Tools
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml.algorithms/" title="Algorithms" class="md-nav__link">
+      Algorithms
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Dataset Processors
+      </label>
+    
+    <a href="./" title="Dataset Processors" class="md-nav__link md-nav__link--active">
+      Dataset Processors
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetscbsa_shapefile" title="skills_ml.datasets.cbsa_shapefile" class="md-nav__link">
+    skills_ml.datasets.cbsa_shapefile
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download_shapefile" title="download_shapefile" class="md-nav__link">
+    download_shapefile
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetscousub_ua" title="skills_ml.datasets.cousub_ua" class="md-nav__link">
+    skills_ml.datasets.cousub_ua
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cousub_ua" title="cousub_ua" class="md-nav__link">
+    cousub_ua
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsjob_postings" title="skills_ml.datasets.job_postings" class="md-nav__link">
+    skills_ml.datasets.job_postings
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#job_postings_chain" title="job_postings_chain" class="md-nav__link">
+    job_postings_chain
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job_postings" title="job_postings" class="md-nav__link">
+    job_postings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job_postings_highmem" title="job_postings_highmem" class="md-nav__link">
+    job_postings_highmem
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsnber_county_cbsa" title="skills_ml.datasets.nber_county_cbsa" class="md-nav__link">
+    skills_ml.datasets.nber_county_cbsa
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cbsa_lookup" title="cbsa_lookup" class="md-nav__link">
+    cbsa_lookup
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsnegative_positive_dict" title="skills_ml.datasets.negative_positive_dict" class="md-nav__link">
+    skills_ml.datasets.negative_positive_dict
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#negative_positive_dict" title="negative_positive_dict" class="md-nav__link">
+    negative_positive_dict
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsonet_cache" title="skills_ml.datasets.onet_cache" class="md-nav__link">
+    skills_ml.datasets.onet_cache
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#onetcache" title="OnetCache" class="md-nav__link">
+    OnetCache
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsonet_source" title="skills_ml.datasets.onet_source" class="md-nav__link">
+    skills_ml.datasets.onet_source
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetspartner_updaters" title="skills_ml.datasets.partner_updaters" class="md-nav__link">
+    skills_ml.datasets.partner_updaters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetspartner_updatersusa_jobs" title="skills_ml.datasets.partner_updaters.usa_jobs" class="md-nav__link">
+    skills_ml.datasets.partner_updaters.usa_jobs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsplace_ua" title="skills_ml.datasets.place_ua" class="md-nav__link">
+    skills_ml.datasets.place_ua
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#place_ua" title="place_ua" class="md-nav__link">
+    place_ua
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsraw_job_postings" title="skills_ml.datasets.raw_job_postings" class="md-nav__link">
+    skills_ml.datasets.raw_job_postings
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsraw_job_postingsusajobs" title="skills_ml.datasets.raw_job_postings.usajobs" class="md-nav__link">
+    skills_ml.datasets.raw_job_postings.usajobs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsraw_job_postingsvirginia" title="skills_ml.datasets.raw_job_postings.virginia" class="md-nav__link">
+    skills_ml.datasets.raw_job_postings.virginia
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetssba_city_county" title="skills_ml.datasets.sba_city_county" class="md-nav__link">
+    skills_ml.datasets.sba_city_county
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#county_lookup" title="county_lookup" class="md-nav__link">
+    county_lookup
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsua_cbsa" title="skills_ml.datasets.ua_cbsa" class="md-nav__link">
+    skills_ml.datasets.ua_cbsa
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ua_cbsa" title="ua_cbsa" class="md-nav__link">
+    ua_cbsa
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetscbsa_shapefile" title="skills_ml.datasets.cbsa_shapefile" class="md-nav__link">
+    skills_ml.datasets.cbsa_shapefile
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#download_shapefile" title="download_shapefile" class="md-nav__link">
+    download_shapefile
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetscousub_ua" title="skills_ml.datasets.cousub_ua" class="md-nav__link">
+    skills_ml.datasets.cousub_ua
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cousub_ua" title="cousub_ua" class="md-nav__link">
+    cousub_ua
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsjob_postings" title="skills_ml.datasets.job_postings" class="md-nav__link">
+    skills_ml.datasets.job_postings
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#job_postings_chain" title="job_postings_chain" class="md-nav__link">
+    job_postings_chain
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job_postings" title="job_postings" class="md-nav__link">
+    job_postings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job_postings_highmem" title="job_postings_highmem" class="md-nav__link">
+    job_postings_highmem
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsnber_county_cbsa" title="skills_ml.datasets.nber_county_cbsa" class="md-nav__link">
+    skills_ml.datasets.nber_county_cbsa
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cbsa_lookup" title="cbsa_lookup" class="md-nav__link">
+    cbsa_lookup
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsnegative_positive_dict" title="skills_ml.datasets.negative_positive_dict" class="md-nav__link">
+    skills_ml.datasets.negative_positive_dict
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#negative_positive_dict" title="negative_positive_dict" class="md-nav__link">
+    negative_positive_dict
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsonet_cache" title="skills_ml.datasets.onet_cache" class="md-nav__link">
+    skills_ml.datasets.onet_cache
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#onetcache" title="OnetCache" class="md-nav__link">
+    OnetCache
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsonet_source" title="skills_ml.datasets.onet_source" class="md-nav__link">
+    skills_ml.datasets.onet_source
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetspartner_updaters" title="skills_ml.datasets.partner_updaters" class="md-nav__link">
+    skills_ml.datasets.partner_updaters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetspartner_updatersusa_jobs" title="skills_ml.datasets.partner_updaters.usa_jobs" class="md-nav__link">
+    skills_ml.datasets.partner_updaters.usa_jobs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsplace_ua" title="skills_ml.datasets.place_ua" class="md-nav__link">
+    skills_ml.datasets.place_ua
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#place_ua" title="place_ua" class="md-nav__link">
+    place_ua
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsraw_job_postings" title="skills_ml.datasets.raw_job_postings" class="md-nav__link">
+    skills_ml.datasets.raw_job_postings
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsraw_job_postingsusajobs" title="skills_ml.datasets.raw_job_postings.usajobs" class="md-nav__link">
+    skills_ml.datasets.raw_job_postings.usajobs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsraw_job_postingsvirginia" title="skills_ml.datasets.raw_job_postings.virginia" class="md-nav__link">
+    skills_ml.datasets.raw_job_postings.virginia
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetssba_city_county" title="skills_ml.datasets.sba_city_county" class="md-nav__link">
+    skills_ml.datasets.sba_city_county
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#county_lookup" title="county_lookup" class="md-nav__link">
+    county_lookup
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skills_mldatasetsua_cbsa" title="skills_ml.datasets.ua_cbsa" class="md-nav__link">
+    skills_ml.datasets.ua_cbsa
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ua_cbsa" title="ua_cbsa" class="md-nav__link">
+    ua_cbsa
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>Dataset Processors</h1>
+                
+                <div class="toc">
+<ul>
+<li><a href="#skills_mldatasetscbsa_shapefile">skills_ml.datasets.cbsa_shapefile</a><ul>
+<li><a href="#download_shapefile">download_shapefile</a></li>
+</ul>
+</li>
+<li><a href="#skills_mldatasetscousub_ua">skills_ml.datasets.cousub_ua</a><ul>
+<li><a href="#cousub_ua">cousub_ua</a></li>
+</ul>
+</li>
+<li><a href="#skills_mldatasetsjob_postings">skills_ml.datasets.job_postings</a><ul>
+<li><a href="#job_postings_chain">job_postings_chain</a></li>
+<li><a href="#job_postings">job_postings</a></li>
+<li><a href="#job_postings_highmem">job_postings_highmem</a></li>
+</ul>
+</li>
+<li><a href="#skills_mldatasetsnber_county_cbsa">skills_ml.datasets.nber_county_cbsa</a><ul>
+<li><a href="#cbsa_lookup">cbsa_lookup</a></li>
+</ul>
+</li>
+<li><a href="#skills_mldatasetsnegative_positive_dict">skills_ml.datasets.negative_positive_dict</a><ul>
+<li><a href="#negative_positive_dict">negative_positive_dict</a></li>
+</ul>
+</li>
+<li><a href="#skills_mldatasetsonet_cache">skills_ml.datasets.onet_cache</a><ul>
+<li><a href="#onetcache">OnetCache</a></li>
+</ul>
+</li>
+<li><a href="#skills_mldatasetsonet_source">skills_ml.datasets.onet_source</a></li>
+<li><a href="#skills_mldatasetspartner_updaters">skills_ml.datasets.partner_updaters</a></li>
+<li><a href="#skills_mldatasetspartner_updatersusa_jobs">skills_ml.datasets.partner_updaters.usa_jobs</a></li>
+<li><a href="#skills_mldatasetsplace_ua">skills_ml.datasets.place_ua</a><ul>
+<li><a href="#place_ua">place_ua</a></li>
+</ul>
+</li>
+<li><a href="#skills_mldatasetsraw_job_postings">skills_ml.datasets.raw_job_postings</a></li>
+<li><a href="#skills_mldatasetsraw_job_postingsusajobs">skills_ml.datasets.raw_job_postings.usajobs</a></li>
+<li><a href="#skills_mldatasetsraw_job_postingsvirginia">skills_ml.datasets.raw_job_postings.virginia</a></li>
+<li><a href="#skills_mldatasetssba_city_county">skills_ml.datasets.sba_city_county</a><ul>
+<li><a href="#county_lookup">county_lookup</a></li>
+</ul>
+</li>
+<li><a href="#skills_mldatasetsua_cbsa">skills_ml.datasets.ua_cbsa</a><ul>
+<li><a href="#ua_cbsa">ua_cbsa</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2 id="skills_mldatasetscbsa_shapefile"><a class="toclink" href="#skills_mldatasetscbsa_shapefile">skills_ml.datasets.cbsa_shapefile <a href="../skills_ml.datasets.cbsa_shapefile"></a></a><a class="headerlink" href="#skills_mldatasetscbsa_shapefile" title="Permanent link">&para;</a></h2>
+<p>Use the Census CBSA shapefile</p>
+<h3 id="download_shapefile"><a class="toclink" href="#download_shapefile">download_shapefile <a href="../skills_ml.datasets.cbsa_shapefile.download_shapefile"></a></a><a class="headerlink" href="#download_shapefile" title="Permanent link">&para;</a></h3>
+<pre><code class="python">download_shapefile(cache_dir)
+</code></pre>
+
+<p>Download Tiger 2015 CBSA Shapefile</p>
+<p>Downloads the zip archive and unzips the contents</p>
+<p><strong>Args</strong></p>
+<pre><code>cache_dir (string) local path to download files to
+</code></pre>
+<ul>
+<li><strong>Returns</strong>: (string) Path to the extracted shapefile</li>
+</ul>
+<h2 id="skills_mldatasetscousub_ua"><a class="toclink" href="#skills_mldatasetscousub_ua">skills_ml.datasets.cousub_ua <a href="../skills_ml.datasets.cousub_ua"></a></a><a class="headerlink" href="#skills_mldatasetscousub_ua" title="Permanent link">&para;</a></h2>
+<p>Retrieve County Subdivision-&gt;Urbanized Area crosswalk</p>
+<h3 id="cousub_ua"><a class="toclink" href="#cousub_ua">cousub_ua <a href="../skills_ml.datasets.cousub_ua.cousub_ua"></a></a><a class="headerlink" href="#cousub_ua" title="Permanent link">&para;</a></h3>
+<pre><code class="python">cousub_ua(city_cleaner)
+</code></pre>
+
+<p>Construct a County Subdivision-&gt;UA Lookup table from Census data
+Returns: dict
+{ StateCode: { CountySubdivisionName: UA Code } }</p>
+<h2 id="skills_mldatasetsjob_postings"><a class="toclink" href="#skills_mldatasetsjob_postings">skills_ml.datasets.job_postings <a href="../skills_ml.datasets.job_postings"></a></a><a class="headerlink" href="#skills_mldatasetsjob_postings" title="Permanent link">&para;</a></h2>
+<h3 id="job_postings_chain"><a class="toclink" href="#job_postings_chain">job_postings_chain <a href="../skills_ml.datasets.job_postings.job_postings_chain"></a></a><a class="headerlink" href="#job_postings_chain" title="Permanent link">&para;</a></h3>
+<pre><code class="python">job_postings_chain(s3_conn, quarters, s3_path, source='all')
+</code></pre>
+
+<p>Chain the generators of a list of multiple quarters
+<strong>Args</strong></p>
+<ul>
+<li><strong>s3_conn</strong>: a boto s3 connection</li>
+<li><strong>quarters</strong>: a list of quarters</li>
+<li><strong>s3_path</strong>: path to the job listings</li>
+<li><strong>source</strong>: should be a string or a subset of "nlx", "va", "cb" or "all"</li>
+</ul>
+<p><strong>Return</strong></p>
+<pre><code>a generator that all generators are chained together into
+</code></pre>
+<h3 id="job_postings"><a class="toclink" href="#job_postings">job_postings <a href="../skills_ml.datasets.job_postings.job_postings"></a></a><a class="headerlink" href="#job_postings" title="Permanent link">&para;</a></h3>
+<pre><code class="python">job_postings(s3_conn, quarter, s3_path, source='all')
+</code></pre>
+
+<p>Stream all job listings from s3 for a given quarter
+<strong>Args</strong></p>
+<ul>
+<li><strong>s3_conn</strong>: a boto s3 connection</li>
+<li><strong>quarter</strong>: a string representing a quarter (2015Q1)</li>
+<li><strong>s3_path</strong>: path to the job listings.</li>
+<li><strong>source</strong>: should be a string or a subset of "nlx", "va", "cb" or "all"</li>
+</ul>
+<p><strong>Yields</strong></p>
+<pre><code>string in json format representing the next job listing
+    Refer to sample_job_listing.json for example structure
+</code></pre>
+<h3 id="job_postings_highmem"><a class="toclink" href="#job_postings_highmem">job_postings_highmem <a href="../skills_ml.datasets.job_postings.job_postings_highmem"></a></a><a class="headerlink" href="#job_postings_highmem" title="Permanent link">&para;</a></h3>
+<pre><code class="python">job_postings_highmem(s3_conn, quarter, s3_path, source='all')
+</code></pre>
+
+<p>Stream all job listings from s3 for a given quarter
+<strong>Args</strong></p>
+<ul>
+<li><strong>s3_conn</strong>: a boto s3 connection</li>
+<li><strong>quarter</strong>: a string representing a quarter (2015Q1)</li>
+<li><strong>s3_path</strong>: path to the job listings.</li>
+<li><strong>source</strong>: should be a string or a subset of "nlx", "va", "cb" or "all"</li>
+</ul>
+<p><strong>Yields</strong></p>
+<pre><code>string in json format representing the next job listing
+    Refer to sample_job_listing.json for example structure
+</code></pre>
+<h2 id="skills_mldatasetsnber_county_cbsa"><a class="toclink" href="#skills_mldatasetsnber_county_cbsa">skills_ml.datasets.nber_county_cbsa <a href="../skills_ml.datasets.nber_county_cbsa"></a></a><a class="headerlink" href="#skills_mldatasetsnber_county_cbsa" title="Permanent link">&para;</a></h2>
+<p>Retrieve county-&gt;CBSA crosswalk file from the NBER</p>
+<h3 id="cbsa_lookup"><a class="toclink" href="#cbsa_lookup">cbsa_lookup <a href="../skills_ml.datasets.nber_county_cbsa.cbsa_lookup"></a></a><a class="headerlink" href="#cbsa_lookup" title="Permanent link">&para;</a></h3>
+<pre><code class="python">cbsa_lookup()
+</code></pre>
+
+<p>Construct a County-&gt;CBSA Lookup table from NBER data
+Returns: dict
+    each key is a (State Code, County FIPS code) tuple
+    each value is a (CBSA FIPS code, CBSA Name) tuple</p>
+<h2 id="skills_mldatasetsnegative_positive_dict"><a class="toclink" href="#skills_mldatasetsnegative_positive_dict">skills_ml.datasets.negative_positive_dict <a href="../skills_ml.datasets.negative_positive_dict"></a></a><a class="headerlink" href="#skills_mldatasetsnegative_positive_dict" title="Permanent link">&para;</a></h2>
+<h3 id="negative_positive_dict"><a class="toclink" href="#negative_positive_dict">negative_positive_dict <a href="../skills_ml.datasets.negative_positive_dict.negative_positive_dict"></a></a><a class="headerlink" href="#negative_positive_dict" title="Permanent link">&para;</a></h3>
+<pre><code class="python">negative_positive_dict()
+</code></pre>
+
+<p>Construct a dictionary of terms that are considered not to be in job title, including
+states, states abv, cities
+Returns: dictionary of set</p>
+<h2 id="skills_mldatasetsonet_cache"><a class="toclink" href="#skills_mldatasetsonet_cache">skills_ml.datasets.onet_cache <a href="../skills_ml.datasets.onet_cache"></a></a><a class="headerlink" href="#skills_mldatasetsonet_cache" title="Permanent link">&para;</a></h2>
+<h3 id="onetcache"><a class="toclink" href="#onetcache">OnetCache <a href="../skills_ml.datasets.onet_cache.OnetCache"></a></a><a class="headerlink" href="#onetcache" title="Permanent link">&para;</a></h3>
+<pre><code class="python">OnetCache(self, s3_conn, s3_path, cache_dir)
+</code></pre>
+
+<p>An object that downloads and caches ONET files from S3</p>
+<h2 id="skills_mldatasetsonet_source"><a class="toclink" href="#skills_mldatasetsonet_source">skills_ml.datasets.onet_source <a href="../skills_ml.datasets.onet_source"></a></a><a class="headerlink" href="#skills_mldatasetsonet_source" title="Permanent link">&para;</a></h2>
+<p>Download ONET files from their site</p>
+<h2 id="skills_mldatasetspartner_updaters"><a class="toclink" href="#skills_mldatasetspartner_updaters">skills_ml.datasets.partner_updaters <a href="../skills_ml.datasets.partner_updaters"></a></a><a class="headerlink" href="#skills_mldatasetspartner_updaters" title="Permanent link">&para;</a></h2>
+<p>Update raw job postings from external partners</p>
+<h2 id="skills_mldatasetspartner_updatersusa_jobs"><a class="toclink" href="#skills_mldatasetspartner_updatersusa_jobs">skills_ml.datasets.partner_updaters.usa_jobs <a href="../skills_ml.datasets.partner_updaters.usa_jobs"></a></a><a class="headerlink" href="#skills_mldatasetspartner_updatersusa_jobs" title="Permanent link">&para;</a></h2>
+<p>Update raw job postings from the USAJobs API</p>
+<h2 id="skills_mldatasetsplace_ua"><a class="toclink" href="#skills_mldatasetsplace_ua">skills_ml.datasets.place_ua <a href="../skills_ml.datasets.place_ua"></a></a><a class="headerlink" href="#skills_mldatasetsplace_ua" title="Permanent link">&para;</a></h2>
+<p>Retrieve Census Place-&gt;Urbanized Area crosswalk</p>
+<h3 id="place_ua"><a class="toclink" href="#place_ua">place_ua <a href="../skills_ml.datasets.place_ua.place_ua"></a></a><a class="headerlink" href="#place_ua" title="Permanent link">&para;</a></h3>
+<pre><code class="python">place_ua(city_cleaner)
+</code></pre>
+
+<p>Construct a Place-&gt;UA Lookup table from Census data
+Returns: dict
+{ StateCode: { PlaceName: UA Code } }</p>
+<h2 id="skills_mldatasetsraw_job_postings"><a class="toclink" href="#skills_mldatasetsraw_job_postings">skills_ml.datasets.raw_job_postings <a href="../skills_ml.datasets.raw_job_postings"></a></a><a class="headerlink" href="#skills_mldatasetsraw_job_postings" title="Permanent link">&para;</a></h2>
+<h2 id="skills_mldatasetsraw_job_postingsusajobs"><a class="toclink" href="#skills_mldatasetsraw_job_postingsusajobs">skills_ml.datasets.raw_job_postings.usajobs <a href="../skills_ml.datasets.raw_job_postings.usajobs"></a></a><a class="headerlink" href="#skills_mldatasetsraw_job_postingsusajobs" title="Permanent link">&para;</a></h2>
+<p>Import USAJobs postings into the Open Skills common schema</p>
+<h2 id="skills_mldatasetsraw_job_postingsvirginia"><a class="toclink" href="#skills_mldatasetsraw_job_postingsvirginia">skills_ml.datasets.raw_job_postings.virginia <a href="../skills_ml.datasets.raw_job_postings.virginia"></a></a><a class="headerlink" href="#skills_mldatasetsraw_job_postingsvirginia" title="Permanent link">&para;</a></h2>
+<h2 id="skills_mldatasetssba_city_county"><a class="toclink" href="#skills_mldatasetssba_city_county">skills_ml.datasets.sba_city_county <a href="../skills_ml.datasets.sba_city_county"></a></a><a class="headerlink" href="#skills_mldatasetssba_city_county" title="Permanent link">&para;</a></h2>
+<p>Retrieve county lookup tables from the SBA for each state</p>
+<h3 id="county_lookup"><a class="toclink" href="#county_lookup">county_lookup <a href="../skills_ml.datasets.sba_city_county.county_lookup"></a></a><a class="headerlink" href="#county_lookup" title="Permanent link">&para;</a></h3>
+<pre><code class="python">county_lookup()
+</code></pre>
+
+<p>Retrieve county lookup tables if they are not already cached</p>
+<p>Returns: (dict) each key is a state, each value is a dict {city_name: (fips_county_code, county_name)}</p>
+<h2 id="skills_mldatasetsua_cbsa"><a class="toclink" href="#skills_mldatasetsua_cbsa">skills_ml.datasets.ua_cbsa <a href="../skills_ml.datasets.ua_cbsa"></a></a><a class="headerlink" href="#skills_mldatasetsua_cbsa" title="Permanent link">&para;</a></h2>
+<p><code>Retrieve</code> Urbanized Area-&gt;CBSA crosswalk</p>
+<h3 id="ua_cbsa"><a class="toclink" href="#ua_cbsa">ua_cbsa <a href="../skills_ml.datasets.ua_cbsa.ua_cbsa"></a></a><a class="headerlink" href="#ua_cbsa" title="Permanent link">&para;</a></h3>
+<pre><code class="python">ua_cbsa()
+</code></pre>
+
+<p>Construct a UA-&gt;CBSA Lookup table from Census data
+Returns: dict
+{ UA Fips: [(CBSA FIPS, CBSA Name)] }</p>
+                
+                  
+                
+              
+              
+                
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../skills_ml.algorithms/" title="Algorithms" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Algorithms
+              </span>
+            </div>
+          </a>
+        
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="http://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.02434462.js"></script>
+      
+      <script>app.initialize({version:"0.17.2",url:{base:".."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>
