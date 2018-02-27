@@ -10,10 +10,20 @@ from skills_utils.s3 import upload
 from datetime import datetime
 from glob import glob
 
+from itertools import tee
+
 import os
 import json
 import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
+class Reiterable(object):
+    def __init__(self, iterable):
+        self.iterable = iterable
+
+    def __iter__(self):
+        self.iterable, t = tee(self.iterable)
+        return t
 
 class RepresentationTrainer(object):
     """A representation learning object using gensim doc2vec model.
@@ -48,22 +58,24 @@ class RepresentationTrainer(object):
         self.lookupname = 'lookup_' + self.training_time
         self.lookup_path = 'tmp/' + self.lookupname + '.json'
 
-    def train(self, size=500, min_count=3, iter=8, window=6, workers=2, **kwargs):
+    def train(self, size=500, min_count=3, iter=4, window=6, workers=3, **kwargs):
         """Train a doc2vec model, build a lookup table and model metadata. After training, they will be saved to S3.
 
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
         job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path)
-        corpus = Doc2VecGensimCorpusCreator(list(job_postings_generator))
-        corpus_list = list(corpus)
+        corpus = Doc2VecGensimCorpusCreator(job_postings_generator)
+        reiterable_corpus = Reiterable(corpus)
         model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
-        model.build_vocab(corpus_list)
-        model.train(corpus_list, total_examples=model.corpus_count, epochs=model.iter)
-        
+        model.build_vocab(reiterable_corpus)
+        model.train(reiterable_corpus, total_examples=model.corpus_count, epochs=model.iter)
+
+        if not os.path.exists('tmp'):
+            os.makedirs('tmp')
+
         self.model = model
         model.save(self.model_path)
-        
         with open(self.lookup_path, 'w') as handle:
             json.dump(corpus.lookup, handle)
 
@@ -104,8 +116,8 @@ class RepresentationTrainer(object):
             meta_dict['metadata']['model_name'] = 'doc2vec' + self.training_time
             meta_dict['metadata']['gensim_version']  = gensim_name + gensim_version
             meta_dict['metadata']['training_time'] = self.training_time
-            
+
         else:
             print("Need to train first")
-        
-        return meta_dict          
+
+        return meta_dict
