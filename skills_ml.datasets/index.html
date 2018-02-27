@@ -298,6 +298,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#job_postings_highmem" title="job_postings_highmem" class="md-nav__link">
+    job_postings_highmem
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#job_postings_chain" title="job_postings_chain" class="md-nav__link">
     job_postings_chain
   </a>
@@ -307,13 +314,6 @@
           <li class="md-nav__item">
   <a href="#job_postings" title="job_postings" class="md-nav__link">
     job_postings
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#job_postings_highmem" title="job_postings_highmem" class="md-nav__link">
-    job_postings_highmem
   </a>
   
 </li>
@@ -563,6 +563,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#job_postings_highmem" title="job_postings_highmem" class="md-nav__link">
+    job_postings_highmem
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#job_postings_chain" title="job_postings_chain" class="md-nav__link">
     job_postings_chain
   </a>
@@ -572,13 +579,6 @@
           <li class="md-nav__item">
   <a href="#job_postings" title="job_postings" class="md-nav__link">
     job_postings
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#job_postings_highmem" title="job_postings_highmem" class="md-nav__link">
-    job_postings_highmem
   </a>
   
 </li>
@@ -780,9 +780,9 @@
 </ul>
 </li>
 <li><a href="#skills_mldatasetsjob_postings">skills_ml.datasets.job_postings</a><ul>
+<li><a href="#job_postings_highmem">job_postings_highmem</a></li>
 <li><a href="#job_postings_chain">job_postings_chain</a></li>
 <li><a href="#job_postings">job_postings</a></li>
-<li><a href="#job_postings_highmem">job_postings_highmem</a></li>
 </ul>
 </li>
 <li><a href="#skills_mldatasetsnber_county_cbsa">skills_ml.datasets.nber_county_cbsa</a><ul>
@@ -841,6 +841,22 @@
 Returns: dict
 { StateCode: { CountySubdivisionName: UA Code } }</p>
 <h2 id="skills_mldatasetsjob_postings"><a class="toclink" href="#skills_mldatasetsjob_postings">skills_ml.datasets.job_postings <a href="../skills_ml.datasets.job_postings"></a></a><a class="headerlink" href="#skills_mldatasetsjob_postings" title="Permanent link">&para;</a></h2>
+<h3 id="job_postings_highmem"><a class="toclink" href="#job_postings_highmem">job_postings_highmem <a href="../skills_ml.datasets.job_postings.job_postings_highmem"></a></a><a class="headerlink" href="#job_postings_highmem" title="Permanent link">&para;</a></h3>
+<pre><code class="python">job_postings_highmem(s3_conn, quarter, s3_path, source='all')
+</code></pre>
+
+<p>Stream all job listings from s3 for a given quarter
+<strong>Args</strong></p>
+<ul>
+<li><strong>s3_conn</strong>: a boto s3 connection</li>
+<li><strong>quarter</strong>: a string representing a quarter (2015Q1)</li>
+<li><strong>s3_path</strong>: path to the job listings.</li>
+<li><strong>source</strong>: should be a string or a subset of "nlx", "va", "cb" or "all"</li>
+</ul>
+<p><strong>Yields</strong></p>
+<pre><code>string in json format representing the next job listing
+    Refer to sample_job_listing.json for example structure
+</code></pre>
 <h3 id="job_postings_chain"><a class="toclink" href="#job_postings_chain">job_postings_chain <a href="../skills_ml.datasets.job_postings.job_postings_chain"></a></a><a class="headerlink" href="#job_postings_chain" title="Permanent link">&para;</a></h3>
 <pre><code class="python">job_postings_chain(s3_conn, quarters, s3_path, source='all')
 </code></pre>
@@ -858,22 +874,6 @@ Returns: dict
 </code></pre>
 <h3 id="job_postings"><a class="toclink" href="#job_postings">job_postings <a href="../skills_ml.datasets.job_postings.job_postings"></a></a><a class="headerlink" href="#job_postings" title="Permanent link">&para;</a></h3>
 <pre><code class="python">job_postings(s3_conn, quarter, s3_path, source='all')
-</code></pre>
-
-<p>Stream all job listings from s3 for a given quarter
-<strong>Args</strong></p>
-<ul>
-<li><strong>s3_conn</strong>: a boto s3 connection</li>
-<li><strong>quarter</strong>: a string representing a quarter (2015Q1)</li>
-<li><strong>s3_path</strong>: path to the job listings.</li>
-<li><strong>source</strong>: should be a string or a subset of "nlx", "va", "cb" or "all"</li>
-</ul>
-<p><strong>Yields</strong></p>
-<pre><code>string in json format representing the next job listing
-    Refer to sample_job_listing.json for example structure
-</code></pre>
-<h3 id="job_postings_highmem"><a class="toclink" href="#job_postings_highmem">job_postings_highmem <a href="../skills_ml.datasets.job_postings.job_postings_highmem"></a></a><a class="headerlink" href="#job_postings_highmem" title="Permanent link">&para;</a></h3>
-<pre><code class="python">job_postings_highmem(s3_conn, quarter, s3_path, source='all')
 </code></pre>
 
 <p>Stream all job listings from s3 for a given quarter

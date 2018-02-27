@@ -198,6 +198,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#documentation" title="Documentation" class="md-nav__link">
+    Documentation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#quick-start" title="Quick Start" class="md-nav__link">
     Quick Start
   </a>
@@ -228,6 +235,13 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-the-documentation" title="Building the Documentation" class="md-nav__link">
+    Building the Documentation
+  </a>
   
 </li>
         
@@ -355,6 +369,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#documentation" title="Documentation" class="md-nav__link">
+    Documentation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#quick-start" title="Quick Start" class="md-nav__link">
     Quick Start
   </a>
@@ -385,6 +406,13 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-the-documentation" title="Building the Documentation" class="md-nav__link">
+    Building the Documentation
+  </a>
   
 </li>
         
@@ -442,6 +470,8 @@
 <a href="https://codeclimate.com/github/workforce-data-initiative/skills-ml"><img alt="Code Climate" src="https://codeclimate.com/github/workforce-data-initiative/skills-ml.png" /></a></p>
 <p><strong>Open Skills Project - Machine Learning</strong></p>
 <p>This is the library for the methods usable by the Open Skills API, including processing algorithms and utilities for computing our jobs and skills taxonomy.</p>
+<h3 id="documentation"><a class="toclink" href="#documentation">Documentation</a><a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
+<p><a href="https://workforce-data-initiative.github.io/skills-ml/">Hosted on Github Pages</a></p>
 <h3 id="quick-start"><a class="toclink" href="#quick-start">Quick Start</a><a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h3>
 <h4 id="1-virtualenv"><a class="toclink" href="#1-virtualenv">1. Virtualenv</a><a class="headerlink" href="#1-virtualenv" title="Permanent link">&para;</a></h4>
 <p><strong>skills-ml</strong> depends on python3, so create a virtual environment using a python3 executable.</p>
@@ -464,6 +494,12 @@
 - There are a couple of examples of specific uses of components to perform specific tasks in <a href="./examples/">examples</a>.
 - Check out the descriptions of different algorithm types in <a href="./skills_ml/algorithms/">algorithms/</a> and look at any individual directories that match what you'd like to do (e.g. skill extraction, job title normalization)
 - <a href="https://github.com/workforce-data-initiative/skills-airflow">skills-airflow</a> is the open-source production system that uses skills-ml algorithms in an Airflow pipeline to generate open datasets</p>
+<h3 id="building-the-documentation"><a class="toclink" href="#building-the-documentation">Building the Documentation</a><a class="headerlink" href="#building-the-documentation" title="Permanent link">&para;</a></h3>
+<p>skills-ml uses a forked version of pydocmd, and a custom script to keep the pydocmd config file up to date. Here's how to keep the docs updated before you push:</p>
+<p>$ cd docs
+$ PYTHONPATH="../" python update_docs.py # this will update docs/pydocmd.yml with the package/module structure
+$ pydocmd serve # will serve local documentation that you can check in your browser
+$ pydocmd gh-deploy # will update the gh-pages branch</p>
 <h3 id="structure"><a class="toclink" href="#structure">Structure</a><a class="headerlink" href="#structure" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="./skills_ml/algorithms/">algorithms/</a> - Core algorithmic module. Each submodule is meant to contain a different type of component, such as a job title normalizer or a skill tagger, with a common interface so different pipelines can try out different versions of the components.</li>
