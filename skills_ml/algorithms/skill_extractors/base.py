@@ -8,7 +8,7 @@ import nltk
 
 from descriptors import cachedproperty
 
-from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
+from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
 
@@ -20,27 +20,6 @@ class CandidateSkill(object):
             self.matched_skill = matched_skill.decode('utf-8')
         self.context = context
         self.confidence = confidence
-
-
-class JobPosting(object):
-    def __init__(self, job_posting_json, corpus_creator=None):
-        self.job_posting_json = job_posting_json
-        self.properties = json.loads(self.job_posting_json.decode('utf-8'))
-        if corpus_creator:
-            self.corpus_creator = corpus_creator
-        else:
-            self.corpus_creator = SimpleCorpusCreator()
-
-    @cachedproperty
-    def text(self):
-        return self.corpus_creator._join(self.properties)
-
-    @cachedproperty
-    def id(self):
-        return self.properties['id']
-
-    def __getattr__(self, attr):
-        return self.properties.get(attr, None)
 
 
 class SkillExtractor(object, metaclass=ABCMeta):

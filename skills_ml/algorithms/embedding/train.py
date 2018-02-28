@@ -4,8 +4,8 @@ from gensim import __name__ as gensim_name
 import gensim.models.doc2vec
 assert gensim.models.doc2vec.FAST_VERSION > -1
 
-from skills_ml.datasets.job_postings import job_postings_chain, batches_generator
-from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+from skills_ml.job_postings.common_schema import job_postings_chain, batches_generator
+from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 from skills_ml.algorithms.embedding.base import Word2VecModel
 
 from skills_utils.s3 import upload

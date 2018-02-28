@@ -189,7 +189,7 @@ class NPEndPatternExtractor(SkillExtractor):
         """Generate candidate skills from the job posting
 
         Args:
-            job_posting (algorithms.skill_extractors.base.JobPosting) A single job posting
+            job_posting (job_postings.JobPosting) A single job posting
 
         Yields: all candidate skills (algorithms.skill_extractors.base.CandidateSkill)
             found in the job posting
