@@ -25,8 +25,6 @@ def _compute_percentages(counts, total):
 
 
 class DatasetStatsCounter(object):
-    directory = 'quarterly'
-
     """Accumulate data Dataset ETL statistics for a quarter
     to show presence and absence of different fields,
     and the total count of rows
@@ -35,6 +33,8 @@ class DatasetStatsCounter(object):
         dataset_id (string) A dataset id
         quarter (string) The quarter being analyzed
     """
+    directory = 'quarterly'
+
     def __init__(self, dataset_id, quarter):
         self.dataset_id = dataset_id
         self.quarter = quarter
@@ -103,14 +103,14 @@ class DatasetStatsCounter(object):
 
 
 class DatasetStatsAggregator(object):
-    directory = 'dataset_summaries'
-
     """Aggregate data Dataset ETL statistics up to the dataset level
 
     Args:
         dataset_id (string) A dataset id
         s3_conn (boto.Connection) an s3 connection
     """
+    directory = 'dataset_summaries'
+
     def __init__(self, dataset_id, s3_conn):
         self.dataset_id = dataset_id
         self.s3_conn = s3_conn
@@ -195,12 +195,13 @@ class DatasetStatsAggregator(object):
 
 
 class GlobalStatsAggregator(object):
-    filename = 'summary.json'
     """Aggregate Dataset ETL statistics up to the global level
 
     Args:
         s3_conn (boto.Connection) an s3 connection
     """
+    filename = 'summary.json'
+
     def __init__(self, s3_conn):
         self.s3_conn = s3_conn
         self.stats = {

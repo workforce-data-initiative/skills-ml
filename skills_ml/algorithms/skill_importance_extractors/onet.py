@@ -1,3 +1,4 @@
+"""Process ONET data to create a dataset with occupations and their skill importances"""
 import csv
 import pandas as pd
 import logging

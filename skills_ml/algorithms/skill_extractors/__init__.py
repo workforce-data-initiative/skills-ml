@@ -1,3 +1,4 @@
+"""Extract skills from text corpora, such as job postings"""
 import json
 import logging
 import uuid
@@ -19,6 +20,14 @@ def upload_candidates_from_job_posting_json(
     job_posting_json,
     sample_name
 ):
+    """Extract and upload to s3 skill candidates from a sample
+
+    Args:
+        candidates_path (str) A base s3 path to store skill candidates
+        skill_extractor (skills_ml.algorithms.skill_extractors) An object that implements .candidate_skills to return skill candidates from a job posting
+        job_posting_json (unicode) Valid JSON representing a job posting in the common schema
+        sample_name (string) The name of a computed sample stored on s3
+    """
     corpus_creator = SimpleCorpusCreator()
     corpus_creator.document_schema_fields = ['description']
     job_posting = JobPosting(job_posting_json, corpus_creator)

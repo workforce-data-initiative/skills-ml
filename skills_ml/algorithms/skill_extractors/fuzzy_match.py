@@ -1,3 +1,4 @@
+"""Use fuzzy matching with a source list to extract skills from a job posting"""
 import unicodecsv as csv
 import logging
 from smart_open import smart_open
@@ -15,6 +16,7 @@ from .base import CandidateSkill, ListBasedSkillExtractor
 
 
 class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
+    """Extract skills from unstructured text using fuzzy matching"""
     name = 'fuzzy'
     match_threshold = 88
 

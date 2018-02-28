@@ -1,3 +1,4 @@
+"""Process ONET skill lists of various types into a common format"""
 import csv
 import pandas as pd
 import logging

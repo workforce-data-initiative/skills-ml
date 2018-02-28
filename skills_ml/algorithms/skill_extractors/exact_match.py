@@ -1,3 +1,5 @@
+"""Use exact matching with a source list to find skills"""
+
 import unicodecsv as csv
 import logging
 from collections import Counter

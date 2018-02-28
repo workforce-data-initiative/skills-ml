@@ -1,3 +1,5 @@
+"""Look up the CBSA for a job posting from a census crosswalk (job location -> Census Place -> Census UA -> Census CBSA)
+"""
 import logging
 
 from skills_ml.datasets import ua_cbsa, place_ua, cousub_ua
@@ -16,8 +18,12 @@ misc_lookup = {
 
 
 class JobCBSAQuerier(object):
-    """
-    Queries the Core-Based Statistical Area for a job
+    """Queries the Core-Based Statistical Area for a job using a census crosswalk
+
+    First looks up a Place or County Subdivision by the job posting's state and city.
+    If it finds a result, it will then take the Urbanized Area for that Place or County Subdivison and find CBSAs associated with it.
+
+    Queries return all hits, so there may be multiple CBSAs for a given query.
     """
 
     # The columns that are returned for each row

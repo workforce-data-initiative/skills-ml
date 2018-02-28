@@ -1,3 +1,5 @@
+"""Update raw job postings from the USAJobs API"""
+
 import logging
 import requests
 from requests.adapters import HTTPAdapter

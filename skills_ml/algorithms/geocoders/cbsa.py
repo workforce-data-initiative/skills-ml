@@ -1,3 +1,4 @@
+"""Given geocode results, find matching Core-Based Statistical Areas."""
 from collections import namedtuple
 import json
 import logging
@@ -19,16 +20,18 @@ class S3CachedCBSAFinder(object):
     `geocoder` module, with a 'bbox'
 
     The highest-level interface is the 'find_all_cbsas_and_save' method, which
-    provides S3 caching. An minimal call looks like:
+    provides S3 caching. A minimal call looks like
 
+    ```python
     cbsa_finder = S3CachedCBSAFinder(s3_conn=..., cache_s3_path='some-bucket/cbsas.json')
     cbsa_finder.find_all_cbsas_and_save({
         "Flushing, NY": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }
         "Houston, TX": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }
     })
 
-    This usage of 'bbox' is what you can retrieve from a `geocoder` call, such as:
+    # This usage of 'bbox' is what you can retrieve from a `geocoder` call, such as:
     geocoder.osm('Flushing, NY').json()
+    ```
 
     The keys in the resulting cache will be the original search strings.
     

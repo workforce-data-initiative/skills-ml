@@ -1,4 +1,6 @@
 # coding: utf-8
+"""Use noun phrases with specific endings to extract skills from job postings"""
+
 import logging
 from collections import Counter
 

@@ -1,4 +1,6 @@
-"""Originally written by Kwame Porter Robinson
+"""Normalize a job title through Explicit Semantic Analysis
+
+Originally written by Kwame Porter Robinson
 """
 
 import pandas as pd
@@ -10,7 +12,7 @@ import nltk
 import re
 import numpy as np
 import logging
-from skills_ml.datasets import OnetSourceDownloader
+from skills_ml.datasets.onet_source import OnetSourceDownloader
 
 ONET_VERSIONS = [
     'db_21_0_text',
@@ -35,6 +37,10 @@ ONET_VERSIONS = [
 
 
 class ESANormalizer(object):
+    """Normalize a job title to ONET occupation titles using explicit semantic analysis.
+
+    Uses ONET occupation titles and descriptions.
+    """
     def __init__(self, onet_source=OnetSourceDownloader):
         self.onet_downloader = onet_source()
         self.onet_titles = self.retrieve_onet_titles()

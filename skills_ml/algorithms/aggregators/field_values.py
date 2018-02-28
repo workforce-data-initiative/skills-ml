@@ -10,8 +10,6 @@ from skills_utils.s3 import split_s3_path
 
 
 class FieldValueCounter(object):
-    directory = 'field_values'
-
     """Accumulate field distribution statistics for common schema job postings
 
     Args:
@@ -20,6 +18,9 @@ class FieldValueCounter(object):
             1. a field key
             2. a tuple, first value field key, second value function to fetch value or values from document
     """
+
+    directory = 'field_values'
+
     def __init__(self, quarter, field_values):
         self.quarter = quarter
         self.field_values = field_values

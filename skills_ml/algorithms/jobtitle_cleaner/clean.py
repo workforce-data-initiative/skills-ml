@@ -1,3 +1,6 @@
+"""Clean job titles by utilizing a list of stopwords
+"""
+
 import pandas as pd
 import re
 from collections import OrderedDict
@@ -6,11 +9,12 @@ import logging
 from skills_ml.datasets import negative_positive_dict
 
 def clean_by_rules(jobtitle):
-    """
-    Remove numbers
-    :params string jobtitle: A job title string
-    :return: A cleaned version of job title
-    :rtype: string
+    """Remove numbers and normalize spaces
+
+    Args:
+        jobtitle (string) A string
+
+    Returns: (string) the string with numbers removes and spaces normalized
     """
     # remove any words with number in it
     jobtitle = re.sub('\w*\d\w*', ' ', jobtitle).strip()
@@ -21,11 +25,14 @@ def clean_by_rules(jobtitle):
     return jobtitle
 
 def clean_by_neg_dic(jobtitle, negative_list, positive_list):
-    """
-    Remove words from the negative dictionary
-    :params string jobtitle: A job title string
-    :return: A cleaned version of job title
-    :rtype: string
+    """Remove words from the negative dictionary
+
+    Args:
+        jobtitle (string) A job title string
+        negative_list (collection) A list of stop words
+        positive_list (collection) A list of positive words to override stop words
+
+    Returns: (string) The cleaned job title
     """
     # Exact matching
     result = []
@@ -42,21 +49,20 @@ def clean_by_neg_dic(jobtitle, negative_list, positive_list):
     return result2str
 
 def aggregate(df_jobtitles, groupby_keys):
-        """
-        Args:
-            df_jobtitles: job titles in pandas DataFrame
-            groupby_keys: a list of keys to be grouped by. should be something like ['title', 'geo']
-        Returns:
-            agg_cleaned_jobtitles: a aggregated verison of job title in pandas DataFrame
-        """
-        agg_cleaned_jobtitles = pd.DataFrame(df_jobtitles.groupby(groupby_keys, as_index=False)['count'].sum())
-        agg_cleaned_jobtitles = agg_cleaned_jobtitles.fillna('without jobtitle')
+    """
+    Args:
+        df_jobtitles: job titles in pandas DataFrame
+        groupby_keys: a list of keys to be grouped by. should be something like ['title', 'geo']
+    Returns:
+        agg_cleaned_jobtitles: a aggregated verison of job title in pandas DataFrame
+    """
+    agg_cleaned_jobtitles = pd.DataFrame(df_jobtitles.groupby(groupby_keys, as_index=False)['count'].sum())
+    agg_cleaned_jobtitles = agg_cleaned_jobtitles.fillna('without jobtitle')
 
-        return agg_cleaned_jobtitles
+    return agg_cleaned_jobtitles
 
 class JobTitleStringClean(object):
-    """
-    Clean job titles
+    """Clean job titles by stripping numbers, and removing place/state names (unless they are also ONET jobs)
     """
 
     def __init__(self):

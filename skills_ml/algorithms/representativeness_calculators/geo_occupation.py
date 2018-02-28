@@ -10,6 +10,11 @@ class GeoOccupationRepresentativenessCalculator(object):
     Calculates geographic representativeness of SOC Codes.
     If a job normalizer is given, will attempt to compute SOC codes
     of jobs that have missing SOC codes
+
+    Args:
+        geo_querier (skills_ml.algorithms.job_geography_queriers) An object that can return a CBSA from a job posting
+        normalizer (skills_ml.algorithms.occupation_classifiers) An object that can return the SOC code from a job posting
+
     """
     def __init__(self, geo_querier=None, normalizer=None):
         self.normalizer = normalizer
