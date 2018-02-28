@@ -6,13 +6,15 @@ import yaml
 import skills_ml.algorithms
 import skills_ml.datasets
 import skills_ml.evaluation
+import skills_ml.job_postings
 
 
 def generate_api_docs():
     pkgs = [
         (skills_ml.algorithms, 'Algorithms'),
-        (skills_ml.datasets, 'Dataset Processors'),
+        (skills_ml.datasets, 'External Dataset Processors'),
         (skills_ml.evaluation, 'Evaluation Tools'),
+        (skills_ml.job_postings, 'Job Posting Dataset Processors'),
     ]
     generate = []
     pages = []

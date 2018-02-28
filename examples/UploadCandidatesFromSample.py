@@ -8,7 +8,7 @@ from skills_ml.algorithms.sampling import Sample
 from skills_ml.algorithms.skill_extractors import \
     FuzzyMatchSkillExtractor,\
     ExactMatchSkillExtractor,\
-    upload_candidates_from_job_posting_json
+from skills_ml.evaluation.skill_extractors import upload_candidates_from_job_posting_json
 
 
 def generate_skill_candidates_multiprocess(candidates_path, sample, skill_extractor, n_jobs):

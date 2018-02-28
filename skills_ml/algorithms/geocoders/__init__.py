@@ -4,41 +4,10 @@ import logging
 import time
 import geocoder
 import boto
-import us
 import traceback
 
 from skills_utils.s3 import split_s3_path
 
-STATE_NAME_LOOKUP = us.states.mapping('abbr', 'name')
-
-
-def job_posting_search_strings(job_posting):
-    """Convert a job posting to a geocode-ready search string
-
-    Includes city and state if present, or just city
-
-    Args:
-        job_posting (string) A job posting in schema.org/JobPosting json form
-
-    Returns: (string) A geocode-ready search string
-    """
-    location = json.loads(job_posting).get('jobLocation', None)
-    if not location:
-        return []
-    locality = location.get('address', {}).get('addressLocality', None)
-    region = location.get('address', {}).get('addressRegion', None)
-    if locality and region:
-        # lookup state name, if it's not there just use whatever they typed
-
-        lookups = ['{}, {}'.format(locality, region)]
-        formatted_region = STATE_NAME_LOOKUP.get(region, None)
-        if formatted_region:
-            lookups.append('{}, {}'.format(locality, formatted_region))
-        return lookups
-    elif locality:
-        return [locality]
-    else:
-        return []
 
 
 class S3CachedGeocoder(object):
@@ -89,7 +58,7 @@ class S3CachedGeocoder(object):
             self.cache = {}
         assert isinstance(self.cache, dict)
 
-    def retrieve_from_cache(self, job_posting):
+    def retrieve_from_cache(self, search_strings):
         """Retrieve a saved geocode result from the cache if it exists
 
         Usable in parallel, since it will not perform geocoding on its own.
@@ -102,7 +71,6 @@ class S3CachedGeocoder(object):
         """
         if not self.cache:
             self._load()
-        search_strings = job_posting_search_strings(job_posting)
         cache_results = [
             self.cache.get(search_string, None)
             for search_string in search_strings
@@ -151,24 +119,18 @@ class S3CachedGeocoder(object):
             self._load()
         return self.cache
 
-    def geocode_job_postings_and_save(self, job_postings, save_every=100000):
+    def geocode_search_strings_and_save(self, search_strings, save_every=100000):
         """Geocode job postings and save the results to S3
 
         Args:
-            job_postings (iterable) Job postings in common schema format
+            search_strings (iterable) Strings to geocode
             save_every (int) How frequently to defensively save the cache
                 Defaults to every 100000 job postings
         """
-        skipped = 0
         processed = 0
         try:
-            for i, job_posting in enumerate(job_postings):
-                search_strings = job_posting_search_strings(job_posting)
-                if not search_strings:
-                    skipped += 1
-                    continue
-                for search_string in search_strings:
-                    self.geocode(search_string)
+            for i, search_string in enumerate(search_strings):
+                self.geocode(search_string)
                 processed += 1
                 if i % save_every == 0:
                     logging.info(
@@ -181,9 +143,5 @@ class S3CachedGeocoder(object):
         except Exception:
             logging.error('Quitting geocoding due to %s', traceback.format_exc())
 
-        logging.info(
-            'Geocoded %s, skipped %s due to lack of location',
-            processed,
-            skipped
-        )
+        logging.info('Geocoded %s', processed)
         self.save()
