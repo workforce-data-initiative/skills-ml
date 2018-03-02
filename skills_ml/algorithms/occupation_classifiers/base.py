@@ -23,7 +23,7 @@ class VectorModel(object):
     vector_model = VectorModel(s3_conn=s3_conn)
 
     """
-    def __init__(self, model_id='va_0605', model_type='gensim_doc2vec_', saved =True,
+    def __init__(self, model_name='doc2vec_2017-07-14T11:32:00.997426', saved =True,
         lookup=None, model=None, s3_conn=None, s3_path='open-skills-private/model_cache/'):
         """To initialize the SocClassifier Object, the model and lookup disctionary
         will be downloaded to the tmp/ directory and loaded to the memory.
@@ -42,12 +42,12 @@ class VectorModel(object):
             training_data (np.ndarray): a document vector array where each row is a document vector.
             target (np.ndarray): a label array.
         """
-        self.model_id = model_id
-        self.model_type = model_type
-        self.model_name = self.model_type + self.model_id
+        # self.model_id = model_id
+        # self.model_type = model_type
+        self.model_name = model_name
         self.saved = saved
-        self.lookup_name = 'lookup_' + self.model_id + '.json'
-        self.s3_path = s3_path + self.model_id
+        self.lookup_name = 'lookup_' + self.model_name + '.json'
+        self.s3_path = s3_path + self.model_name
         self.s3_conn = s3_conn
         self.model = self._load_model() if model == None else model
         self.lookup = self._load_lookup() if lookup == None else lookup
@@ -63,30 +63,15 @@ class VectorModel(object):
         Returns:
             gensim.models.doc2vec.Doc2Vec: The word-embedding model object.
         """
-        try:
-            model = Doc2Vec.load(os.path.join(LOCAL_CACHE_DIRECTORY, self.model_name))
-            return model
-
-        except:
-            files  = list_files(self.s3_conn, self.s3_path)
-            if not self.saved:
-                with tempfile.TemporaryDirectory() as td:
-                    for f in files:
-                        filepath = os.path.join(td, f)
-                        if not os.path.exists(filepath):
-                            logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
-                            download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
-                    model = Doc2Vec.load(os.path.join(td, self.model_name))
-
-            else:
-                if not os.path.isdir(LOCAL_CACHE_DIRECTORY):
-                    os.mkdir(LOCAL_CACHE_DIRECTORY)
-                for f in files:
-                    filepath = os.path.join(LOCAL_CACHE_DIRECTORY, f)
-                    if not os.path.exists(filepath) and self.saved:
-                        logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
-                        download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
-                model = Doc2Vec.load(os.path.join(LOCAL_CACHE_DIRECTORY, self.model_name))
+        files  = list_files(self.s3_conn, self.s3_path)
+        with tempfile.TemporaryDirectory() as td:
+            for f in files:
+                filepath = os.path.join(td, f)
+                print(filepath)
+                if not os.path.exists(filepath):
+                    logging.info('calling download from %s to %s', self.s3_path + f, filepath)
+                    download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
+            model = Doc2Vec.load(os.path.join(td, self.model_name+".model"))
 
             return model
 
@@ -96,31 +81,22 @@ class VectorModel(object):
         Returns:
             dict: a lookup table for mapping gensim index to soc code.
         """
-        try:
-            filepath = os.path.join(LOCAL_CACHE_DIRECTORY, self.lookup_name)
+        with tempfile.TemporaryDirectory() as td:
+            filepath = os.path.join(td, self.lookup_name)
+            print(filepath)
+            logging.warning('calling download from %s to %s', self.s3_path + self.lookup_name, filepath)
+            download(self.s3_conn, filepath, os.path.join(self.s3_path, self.lookup_name))
             with open(filepath, 'r') as handle:
                 lookup = json.load(handle)
-            return lookup
-        except:
-
-            if not self.saved:
-                with tempfile.TemporaryDirectory() as td:
-                    filepath = os.path.join(td, self.lookup_name)
-                    print(filepath)
-                    logging.warning('calling download from %s to %s', self.s3_path + self.lookup_name, filepath)
-                    download(self.s3_conn, filepath, os.path.join(self.s3_path, self.lookup_name))
-                    with open(filepath, 'r') as handle:
-                        lookup = json.load(handle)
-
-            else:
-                filepath = os.path.join(LOCAL_CACHE_DIRECTORY, self.lookup_name)
-                if not os.path.exists(filepath):
-                    logging.warning('calling download from %s to %s', self.s3_path + self.lookup_name, filepath)
-                    download(self.s3_conn, filepath , os.join(self.s3_path, self.lookup_name))
-                with open(filepath, 'r') as handle:
-                    lookup = json.load(handle)
 
             return lookup
+
+    def save():
+        pass
+
+    @property
+    def target_data(self):
+        return self._create_target_data
 
     def _create_target_data(self):
         """To create a label array by mapping each doc vector to the lookup table.
@@ -130,6 +106,7 @@ class VectorModel(object):
         """
         y = []
         for i in range(len(self.training_data)):
-            y.append(self.lookup[self.model.docvecs.index_to_doctag(i)])
+            # print(type(self.model.docvecs.index_to_doctag(i)))
+            y.append(self.lookup[str(self.model.docvecs.index_to_doctag(i))])
 
         return np.array(y)

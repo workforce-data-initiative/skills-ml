@@ -1,9 +1,13 @@
 from gensim.models.doc2vec import Doc2Vec
 from gensim import __version__ as gensim_version
 from gensim import __name__ as gensim_name
+import gensim.models.doc2vec
+assert gensim.models.doc2vec.FAST_VERSION > -1
 
 from skills_ml.datasets.job_postings import job_postings, job_postings_chain
 from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator
+from skills_ml.algorithms.occupation_classifiers.base import VectorModel
+
 
 from skills_utils.s3 import upload
 
@@ -36,12 +40,13 @@ class RepresentationTrainer(object):
     trainer = RepresentationTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')
     trainer.train()
     """
-    def __init__(self, s3_conn, quarters, jp_s3_path, model_s3_path='open-skills-private/model_cache'):
+    def __init__(self, s3_conn, quarters, jp_s3_path, source='all', model_s3_path='open-skills-private/model_cache'):
         """Initialization
 
         Attributes:
             s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
             quarters (:obj: `list` of (str)): quarters will be trained on
+            source (:str): job posting source, should be "all", "nlx" or "cb".
             jp_s3_path (:str): job posting path on S3
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             metadata (:dict): model metadata
@@ -53,10 +58,17 @@ class RepresentationTrainer(object):
         self.model = None
         self.training_time = datetime.today().isoformat()
         self.model_s3_path = model_s3_path
-        self.modelname = 'doc2vec_' + self.training_time
+        self.modelname = 'gensim_doc2vec_' + self.training_time
         self.model_path = 'tmp/' + self.modelname + '.model'
-        self.lookupname = 'lookup_' + self.training_time
+        self.lookupname = 'lookup_' + self.modelname
         self.lookup_path = 'tmp/' + self.lookupname + '.json'
+        self.source = source
+
+    def load(self, model_name):
+        self.model = VectorModel(model_name=model_name, s3_conn=self.s3_conn)
+
+    def save(self):
+        pass
 
     def train(self, size=500, min_count=3, iter=4, window=6, workers=3, **kwargs):
         """Train a doc2vec model, build a lookup table and model metadata. After training, they will be saved to S3.
@@ -64,24 +76,30 @@ class RepresentationTrainer(object):
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
-        job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path)
+        job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path, highmem=False, source=self.source)
         corpus = Doc2VecGensimCorpusCreator(job_postings_generator)
         reiterable_corpus = Reiterable(corpus)
-        model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
-        model.build_vocab(reiterable_corpus)
+
+        if not self.model:
+            model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
+            model.build_vocab(reiterable_corpus)
+        else:
+            model = self.model.model
+            model.build_vocab(reiterable_corpus, update=True)
+
         model.train(reiterable_corpus, total_examples=model.corpus_count, epochs=model.iter)
+
+        self.model = model
 
         if not os.path.exists('tmp'):
             os.makedirs('tmp')
-
-        self.model = model
         model.save(self.model_path)
         with open(self.lookup_path, 'w') as handle:
             json.dump(corpus.lookup, handle)
 
 
         meta_dict = self.metadata
-        metaname = 'metadata_' + self.training_time
+        metaname = 'metadata_' + self.modelname
         meta_path = 'tmp/' + metaname + '.json'
         with open(meta_path, 'w') as handle:
             json.dump(meta_dict, handle, indent=4, separators=(',', ': '))

@@ -193,11 +193,11 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     ]
     join_spaces = ' '.join
 
-    def __init__(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code']):
+    def __init__(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code'], lookup={}):
         super().__init__()
-        self.lookup = {}
+        self.lookup = lookup
         self.generator = generator
-        self.k = 0
+        self.k = 0 if not self.lookup else max(self.lookup.keys()) + 1
         self.major_groups = major_groups
         self.key = key
         self.filter = self._major_group_filter if isinstance(major_groups, list) else filter_func
@@ -232,7 +232,6 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
                 self.lookup[self.k] = safe_get(document, *self.key)
                 yield self._transform(document)
                 self.k += 1
-
 
 class Word2VecGensimCorpusCreator(CorpusCreator):
     """

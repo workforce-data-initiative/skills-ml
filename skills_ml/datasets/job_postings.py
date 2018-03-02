@@ -97,7 +97,7 @@ def job_postings_highmem(s3_conn, quarter, s3_path, source="all"):
                 yield line.decode('utf-8')
 
 
-def job_postings_chain(s3_conn, quarters, s3_path, source='all'):
+def job_postings_chain(s3_conn, quarters, s3_path, highmem=False, source='all'):
     """
     Chain the generators of a list of multiple quarters
     Args:
@@ -110,8 +110,12 @@ def job_postings_chain(s3_conn, quarters, s3_path, source='all'):
         a generator that all generators are chained together into
     """
     generators = []
-    for quarter in quarters:
-        generators.append(job_postings(s3_conn, quarter, s3_path, source))
+    if highmem:
+        for quarter in quarters:
+            generators.append(job_postings(s3_conn, quarter, s3_path, source))
+    else:
+        for quarter in quarters:
+            generators.append(job_postings_highmem(s3_conn, quarter, s3_path, source))
 
     job_postings_generator = chain(*generators)
 
