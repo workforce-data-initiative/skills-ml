@@ -148,7 +148,7 @@ def job_postings_chain(s3_conn, quarters, s3_path, highmem=False, source='all'):
 #         batchiter = islice(sourceiter, batch_num)
 #         yield chain([next(batchiter)], batchiter)
 
-def batch(iterable, batch_num):
+def batch_generator(iterable, batch_num):
     def ticker(x, s=batch_num, a=[-1]):
         r = a[0] = a[0] + 1
         return r // s

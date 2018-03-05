@@ -4,7 +4,7 @@ from gensim import __name__ as gensim_name
 import gensim.models.doc2vec
 assert gensim.models.doc2vec.FAST_VERSION > -1
 
-from skills_ml.datasets.job_postings import job_postings, job_postings_chain, job_postings_highmem, batch
+from skills_ml.datasets.job_postings import job_postings, job_postings_chain, job_postings_highmem, batch_generator
 from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 from skills_ml.algorithms.occupation_classifiers.base import VectorModel
 
@@ -64,6 +64,7 @@ class RepresentationTrainer(object):
         self.lookup_path = 'tmp/' + self.lookupname + '.json'
         self.source = source
         self.update = False
+        self.batch_size = 2000
 
     def load(self, model_name):
         self.model = VectorModel(model_name=model_name, s3_conn=self.s3_conn)
@@ -87,10 +88,13 @@ class RepresentationTrainer(object):
             model = Word2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
             for quarter in self.quarters:
                 job_postings_generator = job_postings_highmem(self.s3_conn, quarter, self.jp_s3_path, source=self.source)
-                batch_gen = batch(Word2VecGensimCorpusCreator(job_postings_generator), 100)
+                batch_gen = batch_generator(Word2VecGensimCorpusCreator(job_postings_generator), self.batch_size)
                 # corpus = Word2VecGensimCorpusCreator(job_postings_generator)
                 # reiterable_corpus = Reiterable(corpus)
+                batch_iter = 1
                 for batch in batch_gen:
+                    logging.info("Training batch #{} ".format(batch_iter))
+                    batch = Reiterable(batch)
                     if not self.update:
                         model.build_vocab(batch, update=self.update)
                         model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
@@ -98,6 +102,8 @@ class RepresentationTrainer(object):
                     else:
                         model.build_vocab(batch, update=self.update)
                         model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
+
+                    batch_iter += 1
 
         else:
             model = self.model.model
