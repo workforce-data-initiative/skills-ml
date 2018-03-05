@@ -6,7 +6,7 @@ assert gensim.models.doc2vec.FAST_VERSION > -1
 
 from skills_ml.datasets.job_postings import job_postings, job_postings_chain, job_postings_highmem, batch_generator
 from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
-from skills_ml.algorithms.occupation_classifiers.base import VectorModel
+from skills_ml.algorithms.occupation_classifiers.base import VectorModel, Word2VecModel
 
 
 from skills_utils.s3 import upload
@@ -40,7 +40,7 @@ class RepresentationTrainer(object):
     trainer = RepresentationTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')
     trainer.train()
     """
-    def __init__(self, s3_conn, quarters, jp_s3_path, source='all', model_s3_path='open-skills-private/model_cache'):
+    def __init__(self, s3_conn, quarters, jp_s3_path, source='all', model_s3_path='open-skills-private/model_cache', batch_size=2000):
         """Initialization
 
         Attributes:
@@ -64,10 +64,11 @@ class RepresentationTrainer(object):
         self.lookup_path = 'tmp/' + self.lookupname + '.json'
         self.source = source
         self.update = False
-        self.batch_size = 2000
+        self.batch_size = batch_size
+        self.vocab_size_cumu = []
 
     def load(self, model_name):
-        self.model = VectorModel(model_name=model_name, s3_conn=self.s3_conn)
+        self.model = Word2VecModel(model_name=model_name, s3_conn=self.s3_conn)
 
     def save(self):
         pass
@@ -86,30 +87,28 @@ class RepresentationTrainer(object):
 
         if not self.model:
             model = Word2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
-            for quarter in self.quarters:
-                job_postings_generator = job_postings_highmem(self.s3_conn, quarter, self.jp_s3_path, source=self.source)
-                batch_gen = batch_generator(Word2VecGensimCorpusCreator(job_postings_generator), self.batch_size)
-                # corpus = Word2VecGensimCorpusCreator(job_postings_generator)
-                # reiterable_corpus = Reiterable(corpus)
-                batch_iter = 1
-                for batch in batch_gen:
-                    logging.info("Training batch #{} ".format(batch_iter))
-                    batch = Reiterable(batch)
-                    if not self.update:
-                        model.build_vocab(batch, update=self.update)
-                        model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
-                        self.update = True
-                    else:
-                        model.build_vocab(batch, update=self.update)
-                        model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
-
-                    batch_iter += 1
-
         else:
+            logging.info("Model existed")
             model = self.model.model
-            model.build_vocab(reiterable_corpus, update=True)
+            self.update = True
 
-        # model.train(reiterable_corpus, total_examples=model.corpus_count, epochs=model.iter)
+        for quarter in self.quarters:
+            job_postings_generator = job_postings_highmem(self.s3_conn, quarter, self.jp_s3_path, source=self.source)
+            batch_gen = batch_generator(Word2VecGensimCorpusCreator(job_postings_generator), self.batch_size)
+            batch_iter = 1
+            for batch in batch_gen:
+                batch = Reiterable(batch)
+                logging.info('\n')
+                logging.info("Training batch #{} ".format(batch_iter))
+                if not self.update:
+                    model.build_vocab(batch, update=False)
+                    self.update = True
+                else:
+                    model.build_vocab(batch, update=True)
+
+                model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
+                self.vocab_size_cumu.append(len(model.wv.vocab))
+                batch_iter += 1
 
         self.model = model
 
@@ -158,6 +157,7 @@ class RepresentationTrainer(object):
             meta_dict['metadata']['model_name'] = 'doc2vec' + self.training_time
             meta_dict['metadata']['gensim_version']  = gensim_name + gensim_version
             meta_dict['metadata']['training_time'] = self.training_time
+            meta_dict['metadata']['vocab_size_cumu'] = self.vocab_size_cumu
 
         else:
             print("Need to train first")
