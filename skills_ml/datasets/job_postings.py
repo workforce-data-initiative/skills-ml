@@ -2,7 +2,7 @@ import logging
 import tempfile
 from retrying import Retrying
 from io import BytesIO
-from itertools import chain
+from itertools import chain, islice, groupby
 
 from skills_utils.s3 import split_s3_path
 from skills_utils.s3 import log_download_progress
@@ -87,14 +87,15 @@ def job_postings_highmem(s3_conn, quarter, s3_path, source="all"):
             keys.append(bucket.list(prefix='{}/{}/{}_'.format(prefix, quarter, s.upper())))
         keys = chain(*keys)
 
-
+    condition_func = lambda x: x % 5 == 0
     for key in keys:
         logging.info('Extracting job postings from key {}'.format(key.name))
         with tempfile.NamedTemporaryFile() as outfile:
             retrier.call(key.get_contents_to_file, outfile, cb=log_download_progress)
             outfile.seek(0)
-            for line in outfile:
-                yield line.decode('utf-8')
+            for num, line in enumerate(outfile):
+                if condition_func(num):
+                    yield line.decode('utf-8')
 
 
 def job_postings_chain(s3_conn, quarters, s3_path, highmem=False, source='all'):
@@ -120,3 +121,36 @@ def job_postings_chain(s3_conn, quarters, s3_path, highmem=False, source='all'):
     job_postings_generator = chain(*generators)
 
     return job_postings_generator
+
+
+# def batch(iterable, condition_func=(lambda x:True), max_in_batch=None):
+#     iterator = iter(iterable)
+#     def Generator():
+#         nonlocal n, on_going, iterator, condition_func, max_in_batch
+#         yield n
+#         # Start enumerate at 1 because we already yielded n
+#         for num_in_batch, item in enumerate(iterator, 1):
+#             n = item
+#             if num_in_batch == max_in_batch or condition_func(num_in_batch):
+#                 break
+#             yield item
+#         else:
+#             on_going = False
+
+#     n = next(iterator)
+#     on_going = True
+#     while on_going:
+#         yield Generator()
+
+# def batch(iterable, batch_num):
+#     sourceiter = iter(iterable)
+#     while True:
+#         batchiter = islice(sourceiter, batch_num)
+#         yield chain([next(batchiter)], batchiter)
+
+def batch(iterable, batch_num):
+    def ticker(x, s=batch_num, a=[-1]):
+        r = a[0] = a[0] + 1
+        return r // s
+    for k, g in groupby(iterable, ticker):
+         yield g

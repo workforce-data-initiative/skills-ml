@@ -1,11 +1,11 @@
-from gensim.models.doc2vec import Doc2Vec
+from gensim.models.doc2vec import Doc2Vec, Word2Vec
 from gensim import __version__ as gensim_version
 from gensim import __name__ as gensim_name
 import gensim.models.doc2vec
 assert gensim.models.doc2vec.FAST_VERSION > -1
 
-from skills_ml.datasets.job_postings import job_postings, job_postings_chain
-from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator
+from skills_ml.datasets.job_postings import job_postings, job_postings_chain, job_postings_highmem, batch
+from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 from skills_ml.algorithms.occupation_classifiers.base import VectorModel
 
 
@@ -58,11 +58,12 @@ class RepresentationTrainer(object):
         self.model = None
         self.training_time = datetime.today().isoformat()
         self.model_s3_path = model_s3_path
-        self.modelname = 'gensim_doc2vec_' + self.training_time
+        self.modelname = 'gensim_' + self.training_time
         self.model_path = 'tmp/' + self.modelname + '.model'
         self.lookupname = 'lookup_' + self.modelname
         self.lookup_path = 'tmp/' + self.lookupname + '.json'
         self.source = source
+        self.update = False
 
     def load(self, model_name):
         self.model = VectorModel(model_name=model_name, s3_conn=self.s3_conn)
@@ -76,26 +77,43 @@ class RepresentationTrainer(object):
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
-        job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path, highmem=False, source=self.source)
-        corpus = Doc2VecGensimCorpusCreator(job_postings_generator)
-        reiterable_corpus = Reiterable(corpus)
+        # job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path, highmem=False, source=self.source)
+
+
+        # corpus = Word2VecGensimCorpusCreator(job_postings_generator)
+        # reiterable_corpus = Reiterable(corpus)
 
         if not self.model:
-            model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
-            model.build_vocab(reiterable_corpus)
+            model = Word2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
+            for quarter in self.quarters:
+                job_postings_generator = job_postings_highmem(self.s3_conn, quarter, self.jp_s3_path, source=self.source)
+                batch_gen = batch(Word2VecGensimCorpusCreator(job_postings_generator), 100)
+                # corpus = Word2VecGensimCorpusCreator(job_postings_generator)
+                # reiterable_corpus = Reiterable(corpus)
+                for batch in batch_gen:
+                    if not self.update:
+                        model.build_vocab(batch, update=self.update)
+                        model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
+                        self.update = True
+                    else:
+                        model.build_vocab(batch, update=self.update)
+                        model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
+
         else:
             model = self.model.model
             model.build_vocab(reiterable_corpus, update=True)
 
-        model.train(reiterable_corpus, total_examples=model.corpus_count, epochs=model.iter)
+        # model.train(reiterable_corpus, total_examples=model.corpus_count, epochs=model.iter)
 
         self.model = model
 
         if not os.path.exists('tmp'):
             os.makedirs('tmp')
         model.save(self.model_path)
-        with open(self.lookup_path, 'w') as handle:
-            json.dump(corpus.lookup, handle)
+
+
+        # with open(self.lookup_path, 'w') as handle:
+        #     json.dump(corpus.lookup, handle)
 
 
         meta_dict = self.metadata
@@ -125,10 +143,10 @@ class RepresentationTrainer(object):
                                             'negative': self.model.negative,
                                             'dm_mean': self.model.dm_mean if 'dm_mean' in self.model else None,
                                             'cbow_mean': self.model.cbow_mean if 'cbow_mean' in self.model else None,
-                                            'dm': self.model.dm,
-                                            'dbow_words': self.model.dbow_words,
-                                            'dm_concat': self.model.dm_concat,
-                                            'dm_tag_count': self.model.dm_tag_count
+                                            'dm': self.model.dm if hasattr(self.model, 'dm') else None,
+                                            'dbow_words': self.model.dbow_words if hasattr(self.model, 'dbow_words') else None,
+                                            'dm_concat': self.model.dm_concat if hasattr(self.model, 'dm_concat') else None,
+                                            'dm_tag_count': self.model.dm_tag_count if hasattr(self.model, 'dm_tag_count') else None
                                             }
             meta_dict['metadata']['quarters'] = self.quarters
             meta_dict['metadata']['model_name'] = 'doc2vec' + self.training_time

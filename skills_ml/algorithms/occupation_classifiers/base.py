@@ -3,6 +3,7 @@ import logging
 import json
 import tempfile
 import numpy as np
+import boto
 
 from gensim.models import Doc2Vec
 
@@ -51,8 +52,8 @@ class VectorModel(object):
         self.s3_conn = s3_conn
         self.model = self._load_model() if model == None else model
         self.lookup = self._load_lookup() if lookup == None else lookup
-        self.training_data = self.model.docvecs.doctag_syn0
-        self.target = self._create_target_data()
+        self.training_data = self.model.docvecs.doctag_syn0 if hasattr(self.model, 'docvecs') else None
+        self.target = self._create_target_data() if hasattr(self.model, 'docvecs') else None
 
     def _load_model(self):
         """The method to download the model from S3 and load to the memory.
@@ -84,10 +85,13 @@ class VectorModel(object):
         with tempfile.TemporaryDirectory() as td:
             filepath = os.path.join(td, self.lookup_name)
             print(filepath)
-            logging.warning('calling download from %s to %s', self.s3_path + self.lookup_name, filepath)
-            download(self.s3_conn, filepath, os.path.join(self.s3_path, self.lookup_name))
-            with open(filepath, 'r') as handle:
-                lookup = json.load(handle)
+            logging.info('calling download from %s to %s', self.s3_path + self.lookup_name, filepath)
+            try:
+                download(self.s3_conn, filepath, os.path.join(self.s3_path, self.lookup_name))
+                with open(filepath, 'r') as handle:
+                    lookup = json.load(handle)
+            except boto.exception.S3ResponseError:
+                lookup = None
 
             return lookup
 
