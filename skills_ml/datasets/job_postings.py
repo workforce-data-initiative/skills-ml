@@ -87,15 +87,13 @@ def job_postings_highmem(s3_conn, quarter, s3_path, source="all"):
             keys.append(bucket.list(prefix='{}/{}/{}_'.format(prefix, quarter, s.upper())))
         keys = chain(*keys)
 
-    condition_func = lambda x: x % 5 == 0
     for key in keys:
         logging.info('Extracting job postings from key {}'.format(key.name))
-        with tempfile.NamedTemporaryFile() as outfile:
+        with BytesIO() as outfile:
             retrier.call(key.get_contents_to_file, outfile, cb=log_download_progress)
             outfile.seek(0)
             for num, line in enumerate(outfile):
-                if condition_func(num):
-                    yield line.decode('utf-8')
+                yield line.decode('utf-8')
 
 
 def job_postings_chain(s3_conn, quarters, s3_path, highmem=False, source='all'):
@@ -148,9 +146,17 @@ def job_postings_chain(s3_conn, quarters, s3_path, highmem=False, source='all'):
 #         batchiter = islice(sourceiter, batch_num)
 #         yield chain([next(batchiter)], batchiter)
 
-def batch_generator(iterable, batch_num):
-    def ticker(x, s=batch_num, a=[-1]):
+def batch_generator(iterable, batch_size):
+    def ticker(x, s=batch_size, a=[-1]):
         r = a[0] = a[0] + 1
         return r // s
     for k, g in groupby(iterable, ticker):
          yield g
+
+def batches_generator(iterable, batch_size):
+    source = iter(iterable)
+    while True:
+        chunk = [val for _, val in zip(range(batch_size), source) if val is not None]
+        if not chunk:
+            raise StopIteration
+        yield chunk

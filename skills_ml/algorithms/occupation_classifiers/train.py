@@ -4,7 +4,7 @@ from gensim import __name__ as gensim_name
 import gensim.models.doc2vec
 assert gensim.models.doc2vec.FAST_VERSION > -1
 
-from skills_ml.datasets.job_postings import job_postings, job_postings_chain, job_postings_highmem, batch_generator
+from skills_ml.datasets.job_postings import job_postings, job_postings_chain, job_postings_highmem, batch_generator, batches_generator
 from skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 from skills_ml.algorithms.occupation_classifiers.base import VectorModel, Word2VecModel
 
@@ -40,7 +40,7 @@ class RepresentationTrainer(object):
     trainer = RepresentationTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')
     trainer.train()
     """
-    def __init__(self, s3_conn, quarters, jp_s3_path, source='all', model_s3_path='open-skills-private/model_cache', batch_size=2000):
+    def __init__(self, s3_conn, quarters, jp_s3_path, source='all', model_s3_path='open-skills-private/model_cache', batch_size=2000, highmem=True):
         """Initialization
 
         Attributes:
@@ -66,6 +66,7 @@ class RepresentationTrainer(object):
         self.update = False
         self.batch_size = batch_size
         self.vocab_size_cumu = []
+        self.highmem = highmem
 
     def load(self, model_name):
         self.model = Word2VecModel(model_name=model_name, s3_conn=self.s3_conn)
@@ -79,12 +80,6 @@ class RepresentationTrainer(object):
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
-        # job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path, highmem=False, source=self.source)
-
-
-        # corpus = Word2VecGensimCorpusCreator(job_postings_generator)
-        # reiterable_corpus = Reiterable(corpus)
-
         if not self.model:
             model = Word2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
         else:
@@ -92,23 +87,22 @@ class RepresentationTrainer(object):
             model = self.model.model
             self.update = True
 
-        for quarter in self.quarters:
-            job_postings_generator = job_postings_highmem(self.s3_conn, quarter, self.jp_s3_path, source=self.source)
-            batch_gen = batch_generator(Word2VecGensimCorpusCreator(job_postings_generator), self.batch_size)
-            batch_iter = 1
-            for batch in batch_gen:
-                batch = Reiterable(batch)
-                logging.info('\n')
-                logging.info("Training batch #{} ".format(batch_iter))
-                if not self.update:
-                    model.build_vocab(batch, update=False)
-                    self.update = True
-                else:
-                    model.build_vocab(batch, update=True)
+        batch_iter = 1
+        job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path, highmem=self.highmem, source=self.source)
+        batch_gen = batch_generator(Word2VecGensimCorpusCreator(job_postings_generator), self.batch_size)
+        for batch in batch_gen:
+            batch = Reiterable(batch)
+            logging.info("Training batch #{} ".format(batch_iter))
+            if not self.update:
+                model.build_vocab(batch, update=False)
+                self.update = True
+            else:
+                model.build_vocab(batch, update=True)
 
-                model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
-                self.vocab_size_cumu.append(len(model.wv.vocab))
-                batch_iter += 1
+            model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
+            self.vocab_size_cumu.append(len(model.wv.vocab))
+            batch_iter += 1
+            logging.info('\n')
 
         self.model = model
 
