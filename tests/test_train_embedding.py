@@ -1,4 +1,4 @@
-from skills_ml.algorithms.occupation_classifiers.train import RepresentationTrainer
+from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 
 from skills_utils.s3 import upload, list_files, download
 
@@ -7,6 +7,10 @@ import tempfile
 import boto
 import os
 import json
+
+import logging
+logging.getLogger('boto').setLevel(logging.CRITICAL)
+
 
 sample_document = {
     "incentiveCompensation": "",
@@ -48,7 +52,7 @@ def test_representation_trainer():
 
     job_posting_name = 'FAKE_jobposting'
     s3_prefix_jb = 'fake-jb-bucket/job_postings'
-    s3_prefix_model = 'fake-jb-bucket/model_cache'
+    s3_prefix_model = 'fake-jb-bucket/model_cache/embedding/'
     quarters = '2011Q1'
 
     with tempfile.TemporaryDirectory() as td:
@@ -57,12 +61,25 @@ def test_representation_trainer():
         upload(s3_conn, os.path.join(td, job_posting_name), os.path.join(s3_prefix_jb, quarters))
 
 
-    trainer = RepresentationTrainer(s3_conn, ['2011Q1'], s3_prefix_jb, s3_prefix_model)
+    # Doc2Vec
+    trainer = EmbeddingTrainer(s3_conn=s3_conn, quarters=['2011Q1'], jp_s3_path=s3_prefix_jb, model_s3_path=s3_prefix_model, model_type='doc2vec')
     trainer.train()
-    files = list_files(s3_conn, s3_prefix_model)
+    files = list_files(s3_conn, os.path.join(s3_prefix_model, 'doc2vec_gensim_' + trainer.training_time))
     assert len(files) == 3
 
+    assert files == ['doc2vec_gensim_' + trainer.training_time + '.model',
+                     'lookup_doc2vec_gensim_' + trainer.training_time + '.json',
+                     'metadata_doc2vec_gensim_' + trainer.training_time + '.json']
 
-    assert files == ['doc2vec_' + trainer.training_time + '.model',
-                     'lookup_' + trainer.training_time + '.json',
-                     'metadata_' + trainer.training_time + '.json']
+
+    # Word2Vec
+    trainer = EmbeddingTrainer(s3_conn=s3_conn, quarters=['2011Q1'], jp_s3_path=s3_prefix_jb, model_s3_path=s3_prefix_model, model_type='word2vec')
+    trainer.train()
+    files = list_files(s3_conn, os.path.join(s3_prefix_model, 'word2vec_gensim_' + trainer.training_time))
+    assert len(files) == 2
+    assert files == ['metadata_word2vec_gensim_' + trainer.training_time + '.json',
+                     'word2vec_gensim_' + trainer.training_time + '.model']
+
+    new_trainer = EmbeddingTrainer(s3_conn=s3_conn, quarters=['2011Q1'], jp_s3_path=s3_prefix_jb, model_s3_path=s3_prefix_model, model_type='word2vec')
+    new_trainer.load(trainer.modelname, s3_prefix_model)
+    assert new_trainer.metadata['metadata']['hyperparameters'] == trainer.metadata['metadata']['hyperparameters']

@@ -196,11 +196,11 @@ def test_job_postings_chain():
             )
             key.set_contents_from_string(str(f))
 
-    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), 'all')
+    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), True, 'all')
     assert len(list(jp)) == len(files)
 
-    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), 'nlx')
+    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), True, 'nlx')
     assert len(list(jp)) == len([j for j in files if 'NLX' in j.split('_')])
 
-    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), ['va', 'nlx'])
+    jp = job_postings_chain(s3_conn, quarters, '{}/{}'.format(bucket_name, path), True, ['va', 'nlx'])
     assert len(list(jp)) == len([j for j in files if ('VA' in j.split('_') or 'NLX' in j.split('_'))])

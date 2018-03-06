@@ -3,8 +3,9 @@ import json
 import logging
 
 import boto
-import fiona
+
 import shapely.geometry
+import fiona
 
 from skills_ml.datasets.cbsa_shapefile import download_shapefile
 from skills_utils.s3 import split_s3_path
@@ -15,7 +16,7 @@ Match = namedtuple('Match', ['index', 'area'])
 class S3CachedCBSAFinder(object):
     """Find CBSAs associated with geocode results and save them to S3
 
-    Geocode results are expected in the json format provided by the python 
+    Geocode results are expected in the json format provided by the python
     `geocoder` module, with a 'bbox'
 
     The highest-level interface is the 'find_all_cbsas_and_save' method, which
@@ -31,12 +32,12 @@ class S3CachedCBSAFinder(object):
     geocoder.osm('Flushing, NY').json()
 
     The keys in the resulting cache will be the original search strings.
-    
+
     Warning: The caching is not parallel-safe! It is recommended you should run
     only one copy of `find_all_cbsas_and_save` at a time to avoid overwriting
     the S3 cache file.
 
-    Args: 
+    Args:
         s3_conn (boto.s3.connection) an s3 connection
         cache_s3_path (string) path (including bucket) to the json cache on s3
         shapefile_name (string) local path to a CBSA shapefile to use

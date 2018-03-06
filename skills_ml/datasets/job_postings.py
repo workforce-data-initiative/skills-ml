@@ -2,7 +2,7 @@ import logging
 import tempfile
 from retrying import Retrying
 from io import BytesIO
-from itertools import chain, islice, groupby
+from itertools import chain, islice, groupby, count
 
 from skills_utils.s3 import split_s3_path
 from skills_utils.s3 import log_download_progress
@@ -121,39 +121,20 @@ def job_postings_chain(s3_conn, quarters, s3_path, highmem=False, source='all'):
     return job_postings_generator
 
 
-# def batch(iterable, condition_func=(lambda x:True), max_in_batch=None):
-#     iterator = iter(iterable)
-#     def Generator():
-#         nonlocal n, on_going, iterator, condition_func, max_in_batch
-#         yield n
-#         # Start enumerate at 1 because we already yielded n
-#         for num_in_batch, item in enumerate(iterator, 1):
-#             n = item
-#             if num_in_batch == max_in_batch or condition_func(num_in_batch):
-#                 break
-#             yield item
-#         else:
-#             on_going = False
+def batches_generator(iterable, batch_size):
+    sourceiter = iter(iterable)
+    while True:
+        batchiter = islice(sourceiter, batch_size)
+        yield chain([next(batchiter)], batchiter)
 
-#     n = next(iterator)
-#     on_going = True
-#     while on_going:
-#         yield Generator()
 
-# def batch(iterable, batch_num):
-#     sourceiter = iter(iterable)
-#     while True:
-#         batchiter = islice(sourceiter, batch_num)
-#         yield chain([next(batchiter)], batchiter)
-
-def batch_generator(iterable, batch_size):
-    def ticker(x, s=batch_size, a=[-1]):
-        r = a[0] = a[0] + 1
-        return r // s
-    for k, g in groupby(iterable, ticker):
+def batch_generator_groupby(iterable, batch_size):
+    c = count()
+    for k, g in groupby(iterable, lambda x: next(c) // batch_size):
          yield g
 
-def batches_generator(iterable, batch_size):
+
+def batches_generator_highmem(iterable, batch_size):
     source = iter(iterable)
     while True:
         chunk = [val for _, val in zip(range(batch_size), source) if val is not None]
