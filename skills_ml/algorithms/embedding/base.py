@@ -63,7 +63,6 @@ class Word2VecModel(object):
         with tempfile.TemporaryDirectory() as td:
             for f in files:
                 filepath = os.path.join(td, f)
-                print(filepath)
                 if not os.path.exists(filepath):
                     logging.info('calling download from %s to %s', self.s3_path + f, filepath)
                     download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
@@ -125,7 +124,6 @@ class Doc2VecModel(object):
         with tempfile.TemporaryDirectory() as td:
             for f in files:
                 filepath = os.path.join(td, f)
-                print(filepath)
                 if not os.path.exists(filepath):
                     logging.info('calling download from %s to %s', self.s3_path + f, filepath)
                     download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
@@ -141,7 +139,6 @@ class Doc2VecModel(object):
         """
         with tempfile.TemporaryDirectory() as td:
             filepath = os.path.join(td, self.lookup_name)
-            print(filepath)
             logging.info('calling download from %s to %s', self.s3_path + self.lookup_name, filepath)
             try:
                 download(self.s3_conn, filepath, os.path.join(self.s3_path, self.lookup_name))
