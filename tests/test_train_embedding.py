@@ -45,7 +45,7 @@ sample_document = {
 }
 
 @mock_s3_deprecated
-def test_representation_trainer():
+def test_embedding_trainer():
     s3_conn = boto.connect_s3()
     bucket_name = 'fake-jb-bucket'
     bucket = s3_conn.create_bucket(bucket_name)
@@ -73,9 +73,9 @@ def test_representation_trainer():
 
     with tempfile.TemporaryDirectory() as td:
         trainer.save_model(td)
-        assert os.listdir(td) == ['doc2vec_gensim_' + trainer.training_time + '.model',
-                                  'lookup_doc2vec_gensim_' + trainer.training_time + '.json',
-                                  'metadata_doc2vec_gensim_' + trainer.training_time + '.json']
+        assert set(os.listdir(td)) == set(['doc2vec_gensim_' + trainer.training_time + '.model',
+                                           'lookup_doc2vec_gensim_' + trainer.training_time + '.json',
+                                           'metadata_doc2vec_gensim_' + trainer.training_time + '.json'])
 
     # Word2Vec
     trainer = EmbeddingTrainer(s3_conn=s3_conn, quarters=['2011Q1'], jp_s3_path=s3_prefix_jb, model_s3_path=s3_prefix_model, model_type='word2vec')
