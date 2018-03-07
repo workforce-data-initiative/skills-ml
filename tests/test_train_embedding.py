@@ -71,6 +71,11 @@ def test_representation_trainer():
                      'lookup_doc2vec_gensim_' + trainer.training_time + '.json',
                      'metadata_doc2vec_gensim_' + trainer.training_time + '.json']
 
+    with tempfile.TemporaryDirectory() as td:
+        trainer.save_model(td)
+        assert os.listdir(td) == ['doc2vec_gensim_' + trainer.training_time + '.model',
+                                  'lookup_doc2vec_gensim_' + trainer.training_time + '.json',
+                                  'metadata_doc2vec_gensim_' + trainer.training_time + '.json']
 
     # Word2Vec
     trainer = EmbeddingTrainer(s3_conn=s3_conn, quarters=['2011Q1'], jp_s3_path=s3_prefix_jb, model_s3_path=s3_prefix_model, model_type='word2vec')

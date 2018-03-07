@@ -96,19 +96,9 @@ class EmbeddingTrainer(object):
         elif 'doc2vec' in model_name.split('_'):
             raise NotImplementedError("Couldn't load doc2vec model. Current gensim doc2vec model doesn't support online learning")
 
-    def _save_and_upload(self):
+    def _upload(self):
         with tempfile.TemporaryDirectory() as td:
-            self._model.save(os.path.join(td, self.modelname + '.model'))
-            meta_dict = self.metadata
-            metaname = 'metadata_' + self.modelname + '.json'
-            with open(os.path.join(td, metaname), 'w') as handle:
-                json.dump(meta_dict, handle, indent=4, separators=(',', ': '))
-
-            if self.model_type == 'doc2vec':
-                lookup_name = 'lookup_' + self.modelname + '.json'
-                with open(os.path.join(td, lookup_name), 'w') as handle:
-                    json.dump(self._lookup, handle)
-
+            self.save_model(td)
             for f in glob(os.path.join(td, '*{}*'.format(self.training_time))):
                 upload(self.s3_conn, f, os.path.join(self.model_s3_path, self.modelname))
 
@@ -120,6 +110,10 @@ class EmbeddingTrainer(object):
         """
         model_name = self.modelname + '.model'
         self._model.save(os.path.join(path, model_name))
+        meta_dict = self.metadata
+        metaname = 'metadata_' + self.modelname + '.json'
+        with open(os.path.join(path, metaname), 'w') as handle:
+            json.dump(meta_dict, handle, indent=4, separators=(',', ': '))
 
         if self.model_type == 'doc2vec':
             lookup_name = 'lookup_' + self.modelname + '.json'
@@ -167,7 +161,7 @@ class EmbeddingTrainer(object):
             self._lookup = corpus_gen.lookup
 
         self._model = model
-        self._save_and_upload()
+        self._upload()
 
 
     @property
