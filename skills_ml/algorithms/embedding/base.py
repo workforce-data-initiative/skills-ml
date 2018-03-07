@@ -152,9 +152,6 @@ class Doc2VecModel(object):
 
             return lookup
 
-    def save():
-        pass
-
     @property
     def target_data(self):
         return self._create_target_data

@@ -54,9 +54,12 @@ class EmbeddingTrainer(object):
             quarters (:obj: `list` of (str)): quarters will be trained on
             source (:str): job posting source, should be "all", "nlx" or "cb".
             jp_s3_path (:str): job posting path on S3
-            model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
+            _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             metadata (:dict): model metadata
             training_time (:str): training time
+            batch_size (:int): batch size
+            highmem (:bool): choose for job posting generator
+            model_type (:str): 'word2vec' or 'doc2vec'
         """
         if model_type not in ['word2vec', 'doc2vec']:
             raise ValueError('"{}"" model_type is not supported!'.format(model_type))
@@ -83,6 +86,7 @@ class EmbeddingTrainer(object):
         self.vocab_size_cumu = []
         self.highmem = highmem
         self._model = None
+        self._lookup = None
 
     def load(self, model_name, s3_path=S3_PATH_EMBEDDING_MODEL):
         if 'word2vec' in model_name.split('_'):
@@ -92,7 +96,7 @@ class EmbeddingTrainer(object):
         elif 'doc2vec' in model_name.split('_'):
             raise NotImplementedError("Couldn't load doc2vec model. Current gensim doc2vec model doesn't support online learning")
 
-    def _save_and_upload(self, lookup=None):
+    def _save_and_upload(self):
         with tempfile.TemporaryDirectory() as td:
             self._model.save(os.path.join(td, self.modelname + '.model'))
             meta_dict = self.metadata
@@ -103,13 +107,24 @@ class EmbeddingTrainer(object):
             if self.model_type == 'doc2vec':
                 lookup_name = 'lookup_' + self.modelname + '.json'
                 with open(os.path.join(td, lookup_name), 'w') as handle:
-                    json.dump(lookup, handle)
+                    json.dump(self._lookup, handle)
 
             for f in glob(os.path.join(td, '*{}*'.format(self.training_time))):
                 upload(self.s3_conn, f, os.path.join(self.model_s3_path, self.modelname))
 
     def save_model(self, path):
-        self._model.save(path)
+        """Save model locally
+
+        Args:
+            path (:str): path to save model files and lookup
+        """
+        model_name = self.modelname + '.model'
+        self._model.save(os.path.join(path, model_name))
+
+        if self.model_type == 'doc2vec':
+            lookup_name = 'lookup_' + self.modelname + '.json'
+            with open(os.path.join(path, lookup_name), 'w') as handle:
+                json.dump(self._lookup, handle)
 
     def train(self, size=500, min_count=3, iter=4, window=6, workers=3, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
@@ -143,17 +158,16 @@ class EmbeddingTrainer(object):
                 batch_iter += 1
                 logging.info('\n')
 
-            self._model = model
-            self._save_and_upload()
-
         elif self.model_type == 'doc2vec':
             model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
             corpus_gen = Doc2VecGensimCorpusCreator(job_postings_generator)
             reiter_corpus_gen = Reiterable(corpus_gen)
             model.build_vocab(reiter_corpus_gen)
             model.train(reiter_corpus_gen, total_examples=model.corpus_count, epochs=model.iter)
-            self._model = model
-            self._save_and_upload(lookup=corpus_gen.lookup)
+            self._lookup = corpus_gen.lookup
+
+        self._model = model
+        self._save_and_upload()
 
 
     @property
