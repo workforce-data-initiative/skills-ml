@@ -92,7 +92,7 @@ def job_postings_highmem(s3_conn, quarter, s3_path, source="all"):
         with BytesIO() as outfile:
             retrier.call(key.get_contents_to_file, outfile, cb=log_download_progress)
             outfile.seek(0)
-            for num, line in enumerate(outfile):
+            for line in outfile:
                 yield line.decode('utf-8')
 
 
