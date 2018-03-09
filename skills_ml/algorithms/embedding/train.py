@@ -46,7 +46,7 @@ class EmbeddingTrainer(object):
     def __init__(
         self, s3_conn, quarters, jp_s3_path, source='all',
         model_s3_path=S3_PATH_EMBEDDING_MODEL, batch_size=2000,
-        highmem=True, model_type='word2vec'):
+        model_type='word2vec'):
         """Initialization
 
         Attributes:
@@ -58,7 +58,6 @@ class EmbeddingTrainer(object):
             metadata (:dict): model metadata
             training_time (:str): training time
             batch_size (:int): batch size
-            highmem (:bool): choose for job posting generator
             model_type (:str): 'word2vec' or 'doc2vec'
         """
         if model_type not in ['word2vec', 'doc2vec']:
@@ -84,7 +83,6 @@ class EmbeddingTrainer(object):
         self.update = False
         self.batch_size = batch_size
         self.vocab_size_cumu = []
-        self.highmem = highmem
         self._model = None
         self._lookup = None
 
@@ -126,7 +124,7 @@ class EmbeddingTrainer(object):
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
-        job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path, highmem=self.highmem, source=self.source)
+        job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path, source=self.source)
 
         if self.model_type == 'word2vec':
             if not self._model:

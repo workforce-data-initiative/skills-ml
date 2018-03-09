@@ -62,13 +62,13 @@ class Doc2VecModel(object):
     """The Doc2VecModel Object is a base object which specifies which word-embeding model.
 
     Example:
-
+    ```
     from airflow.hooks import S3Hook
     from skills_ml.algorithms.embedding.base import Doc2VecModel
 
     s3_conn = S3Hook().get_conn()
     doc2vec_model = Doc2VecModel(s3_conn=s3_conn)
-
+    ```
     """
     def __init__(self, model_name='doc2vec_2017-07-14T11:32:00.997426',
         lookup=None, model=None, s3_conn=None, s3_path=S3_PATH_EMBEDDING_MODEL):
