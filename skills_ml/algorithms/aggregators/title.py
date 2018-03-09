@@ -1,5 +1,4 @@
-"""Aggregates job titles
-"""
+"""Aggregates job titles"""
 import logging
 import json
 from skills_ml.algorithms.aggregators.geo import GeoAggregator

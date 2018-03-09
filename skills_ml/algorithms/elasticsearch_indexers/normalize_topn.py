@@ -8,6 +8,21 @@ from skills_ml.algorithms.elasticsearch_indexers.base import ElasticsearchIndexe
 
 
 class NormalizeTopNIndexer(ElasticsearchIndexerBase):
+    """Creates an index that stores data for job title normalization.
+    
+    Depends on a previously created index with job titles and occupations.
+
+    Queries the job title/occupation index for
+    1. job titles or occupations that match the job description
+    2. Occupation matches
+
+    The top three results are indexed.
+
+    Args:
+        quarter (string) the quarter from which to retrieve job postings
+        job_postings_generator (iterable) an iterable of job postings
+        job_title_index (string) The name of an already existing job title/occupation index
+    """
     settings = {
         "number_of_shards": 1,
         "index.codec": "best_compression",
@@ -64,11 +79,6 @@ class NormalizeTopNIndexer(ElasticsearchIndexerBase):
         alias_name,
         **kwargs
     ):
-        """
-        Args:
-            quarter (string) the quarter from which to retrieve job postings
-            job_postings_generator (iterable) an iterable of job postings
-        """
         super(NormalizeTopNIndexer, self).__init__(**kwargs)
         self.quarter = quarter
         self.job_postings_generator = job_postings_generator

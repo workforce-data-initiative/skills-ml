@@ -1,14 +1,3 @@
-from abc import ABCMeta, abstractmethod
-import csv
-import pandas as pd
-import json
-import random
-import requests
-
-from skills_ml.algorithms.job_normalizers import esa_jobtitle_normalizer
-
-from enum import IntEnum
-
 """Test job normalizers
 
 Requires 'interesting_job_titles.csv' to be populated, of format:
@@ -21,14 +10,27 @@ and the former is for testing those results against the normalizer's
 Originally written by Kwame Porter Robinson
 """
 
+from abc import ABCMeta, abstractmethod
+import csv
+import pandas as pd
+import json
+import random
+import requests
+
+from skills_ml.algorithms.job_normalizers import esa_jobtitle_normalizer
+
+from enum import IntEnum
+
 
 class InputSchema(IntEnum):
+    """An enumeration listing the data elements and indices taken from source data"""
     job_title = 0
     description = 1
     soc_code = 2
 
 
 class InterimSchema(IntEnum):
+    """An enumeration listing the data elements and indices after normalization"""
     job_title = 0
     description = 1
     soc_code = 2
@@ -40,9 +42,10 @@ class NormalizerResponse(metaclass=ABCMeta):
     Abstract interface for enforcing common iteration, access patterns
     to a variety of possible normalizers.
 
-    access should be a CSV with column order:
-
-    job_title, description, soc_code
+    Args:
+        name (string): A name for the normalizer
+        access (filename or file object): A tab-delimited CSV with column order {job_title, description, soc_code}
+        num_examples (int, optional): Number of top responses to include
 
     Normalizers should return a list of results, ordered by relevance,
     with 'title' and optional 'relevance_score' keys

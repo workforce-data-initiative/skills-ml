@@ -1,3 +1,5 @@
+"""Sample job postings"""
+
 import random
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.sampling.methods import reservoir, reservoir_weighted

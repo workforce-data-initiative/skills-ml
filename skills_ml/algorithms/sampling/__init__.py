@@ -1,3 +1,5 @@
+"""Generate and store samples of datasets"""
+
 from smart_open import smart_open
 
 
