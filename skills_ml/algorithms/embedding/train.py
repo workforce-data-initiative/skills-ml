@@ -35,13 +35,14 @@ class Reiterable(object):
 class EmbeddingTrainer(object):
     """An embedding learning object using gensim word2vec/doc2vec model.
     Example:
-
+    ```
     from airflow.hooks import S3Hook
     from skills_ml.algorithms.occupation_classifiers.train import EmbeddingTrainer
 
     s3_conn = S3Hook().get_conn()
     trainer = EmbeddingTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')
     trainer.train()
+    ```
     """
     def __init__(
         self, s3_conn, quarters, jp_s3_path, source='all',
