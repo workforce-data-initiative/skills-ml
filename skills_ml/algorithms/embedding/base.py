@@ -1,3 +1,4 @@
+"""Embedding model class interfacing with with gensim and tensorflow"""
 import os
 import logging
 import json
@@ -12,49 +13,35 @@ from skills_utils.s3 import download, split_s3_path, list_files
 S3_PATH_EMBEDDING_MODEL = 'open-skills-private/model_cache/embedding/'
 
 class Word2VecModel(object):
-    """The VectorModel Object is a base object which specifies which word-embeding model to be used in
-       the soc code classification.
+    """The Word2VecModel Object is a base object which specifies which word-embeding model.
 
     Example:
-
+    ```
     from airflow.hooks import S3Hook
-    from skills_ml.algorithms.occupation_classifiers.base import VectorModel
+    from skills_ml.algorithms.embedding.base import Word2VecModel
 
     s3_conn = S3Hook().get_conn()
-    vector_model = VectorModel(s3_conn=s3_conn)
-
+    word2vec_model = Word2VecModel(s3_conn=s3_conn)
+    ```
     """
-    def __init__(self, model_name='word2vec_gensim_2017-07-14T11:32:00.997426', saved =True,
+    def __init__(self, model_name='word2vec_gensim_2017-07-14T11:32:00.997426',
         model=None, s3_conn=None, s3_path=S3_PATH_EMBEDDING_MODEL):
-        """To initialize the SocClassifier Object, the model and lookup disctionary
-        will be downloaded to the tmp/ directory and loaded to the memory.
-
+        """
         Attributes:
             model_name (str): name of the model to be used.
-            saved (bool): save the model or not
-            lookup_name (str): name of the lookup file
             s3_path (str): the path of the model on S3.
             s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
             files (:obj: `list` of (str)): model files need to be downloaded/loaded.
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
             lookup (dict): lookup table for mapping each jobposting index to soc code.
-            training_data (np.ndarray): a document vector array where each row is a document vector.
-            target (np.ndarray): a label array.
         """
         self.model_name = model_name
-        self.saved = saved
-        self.lookup_name = 'lookup_' + self.model_name + '.json'
         self.s3_path = s3_path + self.model_name
         self.s3_conn = s3_conn
         self.model = self._load_model() if model == None else model
-        self.training_data = self.model.docvecs.doctag_syn0 if hasattr(self.model, 'docvecs') else None
-        self.target = self._create_target_data() if hasattr(self.model, 'docvecs') else None
 
     def _load_model(self):
         """The method to download the model from S3 and load to the memory.
-
-        Args:
-            saved (bool): wether to save the model files or just load it to the memory.
 
         Returns:
             gensim.models.doc2vec.Doc2Vec: The word-embedding model object.
@@ -72,37 +59,31 @@ class Word2VecModel(object):
 
 
 class Doc2VecModel(object):
-    """The VectorModel Object is a base object which specifies which word-embeding model to be used in
-       the soc code classification.
+    """The Doc2VecModel Object is a base object which specifies which word-embeding model.
 
     Example:
 
     from airflow.hooks import S3Hook
-    from skills_ml.algorithms.occupation_classifiers.base import VectorModel
+    from skills_ml.algorithms.embedding.base import Doc2VecModel
 
     s3_conn = S3Hook().get_conn()
-    vector_model = VectorModel(s3_conn=s3_conn)
+    doc2vec_model = Doc2VecModel(s3_conn=s3_conn)
 
     """
-    def __init__(self, model_name='doc2vec_2017-07-14T11:32:00.997426', saved =True,
+    def __init__(self, model_name='doc2vec_2017-07-14T11:32:00.997426',
         lookup=None, model=None, s3_conn=None, s3_path=S3_PATH_EMBEDDING_MODEL):
-        """To initialize the SocClassifier Object, the model and lookup disctionary
-        will be downloaded to the tmp/ directory and loaded to the memory.
-
+        """
         Attributes:
             model_name (str): name of the model to be used.
-            saved (bool): save the model or not
             lookup_name (str): name of the lookup file
             s3_path (str): the path of the model on S3.
             s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
-            files (:obj: `list` of (str)): model files need to be downloaded/loaded.
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
             lookup (dict): lookup table for mapping each jobposting index to soc code.
             training_data (np.ndarray): a document vector array where each row is a document vector.
             target (np.ndarray): a label array.
         """
         self.model_name = model_name
-        self.saved = saved
         self.lookup_name = 'lookup_' + self.model_name + '.json'
         self.s3_path = s3_path + self.model_name
         self.s3_conn = s3_conn
@@ -113,9 +94,6 @@ class Doc2VecModel(object):
 
     def _load_model(self):
         """The method to download the model from S3 and load to the memory.
-
-        Args:
-            saved (bool): wether to save the model files or just load it to the memory.
 
         Returns:
             gensim.models.doc2vec.Doc2Vec: The word-embedding model object.

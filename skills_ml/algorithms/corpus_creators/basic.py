@@ -193,9 +193,9 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     ]
     join_spaces = ' '.join
 
-    def __init__(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code'], lookup={}):
+    def __init__(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code']):
         super().__init__()
-        self.lookup = lookup
+        self.lookup = {}
         self.generator = generator
         self.k = 0 if not self.lookup else max(self.lookup.keys()) + 1
         self.major_groups = major_groups
