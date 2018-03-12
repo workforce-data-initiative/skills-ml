@@ -6,7 +6,7 @@ import filelock
 
 from gensim.similarities.index import AnnoyIndexer
 
-from skills_ml.algorithms.occupation_classifiers import base
+from skills_ml.algorithms.embedding import base
 from skills_utils.s3 import download, split_s3_path, list_files
 
 
@@ -38,7 +38,7 @@ class Classifier(object):
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
     def __init__(self, classifier_id='ann_0614', classifier=None,
-        s3_conn=None, s3_path='open-skills-private/model_cache/', classify_kwargs=None, temporary_directory=None, **kwargs):
+        s3_conn=None, s3_path='open-skills-private/model_cache/occupation_classifiers/', classify_kwargs=None, temporary_directory=None, **kwargs):
         """Initialization of Classifier
 
         Attributes:
@@ -81,7 +81,7 @@ class Classifier(object):
         return self.classifier.predict_soc(jobposting, **(self.classify_kwargs))
 
 
-class NearestNeighbors(base.VectorModel):
+class NearestNeighbors(base.Doc2VecModel):
     """Nearest neightbors model to classify the jobposting data into soc code.
     If the indexer is passed, then NearestNeighbors will use approximate nearest
     neighbor approach which is much faster than the built-in knn in gensim.
