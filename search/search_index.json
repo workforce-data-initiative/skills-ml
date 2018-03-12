@@ -92,28 +92,13 @@
         },
         {
             "location": "/skills_ml.evaluation/",
-            "text": "skills_ml.evaluation.query\n\n\nInputSchema\n\n\nInterimSchema\n\n\nNormalizerResponse\n\n\nMiniNormalizer\n\n\n\n\n\n\n\n\n\n\nskills_ml.evaluation.query \n\u00b6\n\n\nTest job normalizers\n\n\nRequires 'interesting_job_titles.csv' to be populated, of format\n\n\ninput job title description of job  ONET code\n\n\nEach task will output two CSV files, one with the normalizer's ranks\nand one without ranks. The latter is for sending to people to fill out\nand the former is for testing those results against the normalizer's\n\n\nOriginally written by Kwame Porter Robinson\n\n\nInputSchema \n\u00b6\n\n\nInputSchema(self, /, *args, **kwargs)\n\n\n\n\nAn enumeration listing the data elements and indices taken from source data\n\n\nInterimSchema \n\u00b6\n\n\nInterimSchema(self, /, *args, **kwargs)\n\n\n\n\nAn enumeration listing the data elements and indices after normalization\n\n\nNormalizerResponse \n\u00b6\n\n\nNormalizerResponse(self, name=None, access=None, num_examples=3)\n\n\n\n\nAbstract interface for enforcing common iteration, access patterns\nto a variety of possible normalizers.\n\n\nArgs\n\n\n\n\nname (string)\n: A name for the normalizer\n\n\naccess (filename or file object)\n: A tab-delimited CSV with column order {job_title, description, soc_code}\n\n\nnum_examples (int, optional)\n: Number of top responses to include\n\n\n\n\nNormalizers should return a list of results, ordered by relevance,\nwith 'title' and optional 'relevance_score' keys\n\n\nMiniNormalizer \n\u00b6\n\n\nMiniNormalizer(self, name, access, normalize_class)\n\n\n\n\nAccess normalizer classes which can be instantiated and\nimplement 'normalize_job_title(job_title)'",
+            "text": "skills_ml.evaluation.job_title_normalizers\n\n\nMiniNormalizer\n\n\nNormalizerResponse\n\n\nInterimSchema\n\n\nInputSchema\n\n\n\n\n\n\nskills_ml.evaluation.representativeness_calculators\n\n\nskills_ml.evaluation.representativeness_calculators.geo_occupation\n\n\nGeoOccupationRepresentativenessCalculator\n\n\n\n\n\n\n\n\n\n\nskills_ml.evaluation.job_title_normalizers \n\u00b6\n\n\nTest job normalizers\n\n\nRequires 'interesting_job_titles.csv' to be populated, of format\n\n\ninput job title description of job  ONET code\n\n\nEach task will output two CSV files, one with the normalizer's ranks\nand one without ranks. The latter is for sending to people to fill out\nand the former is for testing those results against the normalizer's\n\n\nOriginally written by Kwame Porter Robinson\n\n\nMiniNormalizer \n\u00b6\n\n\nMiniNormalizer(self, name, access, normalize_class)\n\n\n\n\nAccess normalizer classes which can be instantiated and\nimplement 'normalize_job_title(job_title)'\n\n\nNormalizerResponse \n\u00b6\n\n\nNormalizerResponse(self, name=None, access=None, num_examples=3)\n\n\n\n\nAbstract interface for enforcing common iteration, access patterns\nto a variety of possible normalizers.\n\n\nArgs\n\n\n\n\nname (string)\n: A name for the normalizer\n\n\naccess (filename or file object)\n: A tab-delimited CSV with column order {job_title, description, soc_code}\n\n\nnum_examples (int, optional)\n: Number of top responses to include\n\n\n\n\nNormalizers should return a list of results, ordered by relevance,\nwith 'title' and optional 'relevance_score' keys\n\n\nInterimSchema \n\u00b6\n\n\nInterimSchema(self, /, *args, **kwargs)\n\n\n\n\nAn enumeration listing the data elements and indices after normalization\n\n\nInputSchema \n\u00b6\n\n\nInputSchema(self, /, *args, **kwargs)\n\n\n\n\nAn enumeration listing the data elements and indices taken from source data\n\n\nskills_ml.evaluation.representativeness_calculators \n\u00b6\n\n\nCalculate representativeness of a dataset, such as job postings\n\n\nskills_ml.evaluation.representativeness_calculators.geo_occupation \n\u00b6\n\n\nComputes geographic representativeness of job postings based on ONET SOC Code\n\n\nGeoOccupationRepresentativenessCalculator \n\u00b6\n\n\nGeoOccupationRepresentativenessCalculator(self, geo_querier=None, normalizer=None)\n\n\n\n\nCalculates geographic representativeness of SOC Codes.\nIf a job normalizer is given, will attempt to compute SOC codes\nof jobs that have missing SOC codes\n\n\nArgs\n\n\ngeo_querier (skills_ml.job_postings.geography_queriers) An object that can return a CBSA from a job posting\nnormalizer (skills_ml.algorithms.occupation_classifiers) An object that can return the SOC code from a job posting",
             "title": "Evaluation Tools"
         },
         {
-            "location": "/skills_ml.evaluation/#skills_mlevaluationquery",
+            "location": "/skills_ml.evaluation/#skills_mlevaluationjob_title_normalizers",
             "text": "Test job normalizers  Requires 'interesting_job_titles.csv' to be populated, of format  input job title description of job  ONET code  Each task will output two CSV files, one with the normalizer's ranks\nand one without ranks. The latter is for sending to people to fill out\nand the former is for testing those results against the normalizer's  Originally written by Kwame Porter Robinson",
-            "title": "skills_ml.evaluation.query"
-        },
-        {
-            "location": "/skills_ml.evaluation/#inputschema",
-            "text": "InputSchema(self, /, *args, **kwargs)  An enumeration listing the data elements and indices taken from source data",
-            "title": "InputSchema"
-        },
-        {
-            "location": "/skills_ml.evaluation/#interimschema",
-            "text": "InterimSchema(self, /, *args, **kwargs)  An enumeration listing the data elements and indices after normalization",
-            "title": "InterimSchema"
-        },
-        {
-            "location": "/skills_ml.evaluation/#normalizerresponse",
-            "text": "NormalizerResponse(self, name=None, access=None, num_examples=3)  Abstract interface for enforcing common iteration, access patterns\nto a variety of possible normalizers.  Args   name (string) : A name for the normalizer  access (filename or file object) : A tab-delimited CSV with column order {job_title, description, soc_code}  num_examples (int, optional) : Number of top responses to include   Normalizers should return a list of results, ordered by relevance,\nwith 'title' and optional 'relevance_score' keys",
-            "title": "NormalizerResponse"
+            "title": "skills_ml.evaluation.job_title_normalizers"
         },
         {
             "location": "/skills_ml.evaluation/#mininormalizer",
@@ -121,169 +106,39 @@
             "title": "MiniNormalizer"
         },
         {
+            "location": "/skills_ml.evaluation/#normalizerresponse",
+            "text": "NormalizerResponse(self, name=None, access=None, num_examples=3)  Abstract interface for enforcing common iteration, access patterns\nto a variety of possible normalizers.  Args   name (string) : A name for the normalizer  access (filename or file object) : A tab-delimited CSV with column order {job_title, description, soc_code}  num_examples (int, optional) : Number of top responses to include   Normalizers should return a list of results, ordered by relevance,\nwith 'title' and optional 'relevance_score' keys",
+            "title": "NormalizerResponse"
+        },
+        {
+            "location": "/skills_ml.evaluation/#interimschema",
+            "text": "InterimSchema(self, /, *args, **kwargs)  An enumeration listing the data elements and indices after normalization",
+            "title": "InterimSchema"
+        },
+        {
+            "location": "/skills_ml.evaluation/#inputschema",
+            "text": "InputSchema(self, /, *args, **kwargs)  An enumeration listing the data elements and indices taken from source data",
+            "title": "InputSchema"
+        },
+        {
+            "location": "/skills_ml.evaluation/#skills_mlevaluationrepresentativeness_calculators",
+            "text": "Calculate representativeness of a dataset, such as job postings",
+            "title": "skills_ml.evaluation.representativeness_calculators"
+        },
+        {
+            "location": "/skills_ml.evaluation/#skills_mlevaluationrepresentativeness_calculatorsgeo_occupation",
+            "text": "Computes geographic representativeness of job postings based on ONET SOC Code",
+            "title": "skills_ml.evaluation.representativeness_calculators.geo_occupation"
+        },
+        {
+            "location": "/skills_ml.evaluation/#geooccupationrepresentativenesscalculator",
+            "text": "GeoOccupationRepresentativenessCalculator(self, geo_querier=None, normalizer=None)  Calculates geographic representativeness of SOC Codes.\nIf a job normalizer is given, will attempt to compute SOC codes\nof jobs that have missing SOC codes  Args  geo_querier (skills_ml.job_postings.geography_queriers) An object that can return a CBSA from a job posting\nnormalizer (skills_ml.algorithms.occupation_classifiers) An object that can return the SOC code from a job posting",
+            "title": "GeoOccupationRepresentativenessCalculator"
+        },
+        {
             "location": "/skills_ml.algorithms/",
-            "text": "skills_ml.algorithms.aggregators\n\n\nCountAggregator\n\n\nSocCodeAggregator\n\n\nSkillAggregator\n\n\nGivenSocCodeAggregator\n\n\nJobAggregator\n\n\nOccupationScopedSkillAggregator\n\n\n\n\n\n\nskills_ml.algorithms.aggregators.dataset_transform\n\n\nDatasetStatsCounter\n\n\nDatasetStatsAggregator\n\n\nGlobalStatsAggregator\n\n\n\n\n\n\nskills_ml.algorithms.aggregators.field_values\n\n\nFieldValueCounter\n\n\n\n\n\n\nskills_ml.algorithms.aggregators.geo\n\n\nGeoAggregator\n\n\n\n\n\n\nskills_ml.algorithms.aggregators.soc_code\n\n\nGeoSocAggregator\n\n\n\n\n\n\nskills_ml.algorithms.aggregators.title\n\n\nGeoTitleAggregator\n\n\n\n\n\n\nskills_ml.algorithms.corpus_creators\n\n\nskills_ml.algorithms.corpus_creators.basic\n\n\nJobCategoryCorpusCreator\n\n\nDoc2VecGensimCorpusCreator\n\n\nSimpleCorpusCreator\n\n\nWord2VecGensimCorpusCreator\n\n\nCorpusCreator\n\n\n\n\n\n\nskills_ml.algorithms.elasticsearch_indexers\n\n\nskills_ml.algorithms.elasticsearch_indexers.base\n\n\nskills_ml.algorithms.elasticsearch_indexers.job_titles_master\n\n\nJobTitlesMasterIndexer\n\n\n\n\n\n\nskills_ml.algorithms.elasticsearch_indexers.normalize_topn\n\n\nNormalizeTopNIndexer\n\n\n\n\n\n\nskills_ml.algorithms.embedding\n\n\nskills_ml.algorithms.embedding.base\n\n\nDoc2VecModel\n\n\nWord2VecModel\n\n\n\n\n\n\nskills_ml.algorithms.embedding.train\n\n\nEmbeddingTrainer\n\n\n\n\n\n\nskills_ml.algorithms.geocoders\n\n\njob_posting_search_strings\n\n\nS3CachedGeocoder\n\n\n\n\n\n\nskills_ml.algorithms.geocoders.cbsa\n\n\nS3CachedCBSAFinder\n\n\nMatch\n\n\n\n\n\n\nskills_ml.algorithms.job_geography_queriers\n\n\nskills_ml.algorithms.job_geography_queriers.cbsa\n\n\nJobCBSAQuerier\n\n\n\n\n\n\nskills_ml.algorithms.job_geography_queriers.cbsa_from_geocode\n\n\nJobCBSAFromGeocodeQuerier\n\n\n\n\n\n\nskills_ml.algorithms.job_labelers\n\n\nskills_ml.algorithms.job_normalizers\n\n\nskills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer\n\n\nESANormalizer\n\n\n\n\n\n\nskills_ml.algorithms.job_vectorizers\n\n\nskills_ml.algorithms.job_vectorizers.doc2vec_vectorizer\n\n\nskills_ml.algorithms.jobtitle_cleaner\n\n\nskills_ml.algorithms.jobtitle_cleaner.clean\n\n\nclean_by_rules\n\n\naggregate\n\n\nclean_by_neg_dic\n\n\nJobTitleStringClean\n\n\n\n\n\n\nskills_ml.algorithms.occupation_classifiers\n\n\nskills_ml.algorithms.occupation_classifiers.classifiers\n\n\nClassifier\n\n\nNearestNeighbors\n\n\n\n\n\n\nskills_ml.algorithms.representativeness_calculators\n\n\nskills_ml.algorithms.representativeness_calculators.geo_occupation\n\n\nGeoOccupationRepresentativenessCalculator\n\n\n\n\n\n\nskills_ml.algorithms.sampling\n\n\nskills_ml.algorithms.sampling.jobs\n\n\nJobSampler\n\n\n\n\n\n\nskills_ml.algorithms.sampling.methods\n\n\nreservoir\n\n\nreservoir_weighted\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors\n\n\nskills_ml.algorithms.skill_extractors.base\n\n\nSkillExtractor\n\n\nListBasedSkillExtractor\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.exact_match\n\n\nExactMatchSkillExtractor\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.fuzzy_match\n\n\nFuzzyMatchSkillExtractor\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.noun_phrase_ending\n\n\nclean_beginning\n\n\nsentences_words_pos\n\n\nSkillEndingPatternExtractor\n\n\nNPEndPatternExtractor\n\n\nnoun_phrases_in_line_with_context\n\n\nAbilityEndingPatternExtractor\n\n\nis_bulleted\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.soc_exact\n\n\nSocScopedExactMatchSkillExtractor\n\n\n\n\n\n\nskills_ml.algorithms.skill_importance_extractors\n\n\nskills_ml.algorithms.skill_importance_extractors.onet\n\n\nOnetSkillImportanceExtractor\n\n\n\n\n\n\nskills_ml.algorithms.skill_list_processors\n\n\nskills_ml.algorithms.skill_list_processors.onet_ksat\n\n\nOnetSkillListProcessor\n\n\n\n\n\n\nskills_ml.algorithms.skill_taggers\n\n\nskills_ml.algorithms.skill_taggers.base\n\n\nSkillTaggerBase\n\n\n\n\n\n\nskills_ml.algorithms.skill_taggers.simple\n\n\nSimpleSkillTagger\n\n\n\n\n\n\nskills_ml.algorithms.string_cleaners\n\n\nskills_ml.algorithms.string_cleaners.nlp\n\n\nskills_ml.algorithms.title_extractors\n\n\nskills_ml.algorithms.title_extractors.onet\n\n\nOnet_Title\n\n\nOnetTitleExtractor\n\n\n\n\n\n\n\n\n\n\nskills_ml.algorithms.aggregators \n\u00b6\n\n\nAggregate properties of job postings.\n\n\nClasses in this module generally wrap calls to some code in \nskills_ml.algorithms\n for some arbitrary set of job postings (in schema.org JobPosting format as a Python dict), accumulating the output in a Counter.\n\n\nCountAggregator \n\u00b6\n\n\nCountAggregator(self, output_count=1, output_total=False)\n\n\n\n\nCounts job postings\n\n\nSocCodeAggregator \n\u00b6\n\n\nSocCodeAggregator(self, occupation_classifier, corpus_creator, *args, **kwargs)\n\n\n\n\nAggregates SOC codes inferred from job posting text\n\n\nArgs\n\n\noccupation_classifier (.occupation_classifiers.SocClassifier)\n    An object that returns a classified SOC code and similarity score\n    from unstructured text\ncorpus creator (object) an object that returns unstructured text\n    from a job posting\n\n\n\nSkillAggregator \n\u00b6\n\n\nSkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)\n\n\n\n\nAggregates skills found in job postings\n\n\nArgs\n\n\nskill_extractor (.skill_extractors.FreetextSkillExtractor)\n    an object that returns skill counts from unstructured text\ncorpus creator (object) an object that returns a text corpus\n    from a job posting\n\n\n\nGivenSocCodeAggregator \n\u00b6\n\n\nGivenSocCodeAggregator(self, output_count=1, output_total=False)\n\n\n\n\nAggregates SOC codes given as an input field\n\n\nCaution! We may or may not know where these came from, and the method\nfor creating them may differ from record to record\n\n\nJobAggregator \n\u00b6\n\n\nJobAggregator(self, output_count=1, output_total=False)\n\n\n\n\nBase class for different aggregators. Provides a useful interface for subclasses to benefit from.\n\n\nOccupationScopedSkillAggregator \n\u00b6\n\n\nOccupationScopedSkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)\n\n\n\n\nAggregates skills found in job postings using the job's occupation\n\n\nArgs\n\n\nskill_extractor (.skill_extractors.FreetextSkillExtractor)\n    an object that returns skill counts from unstructured text\ncorpus creator (object) an object that returns a text corpus\n    from a job posting\n\n\n\nskills_ml.algorithms.aggregators.dataset_transform \n\u00b6\n\n\nTrack stats of job listing datasets, before and after transformation\ninto the common schema.\n\n\nDatasetStatsCounter \n\u00b6\n\n\nDatasetStatsCounter(self, dataset_id, quarter)\n\n\n\n\nAccumulate data Dataset ETL statistics for a quarter\nto show presence and absence of different fields,\nand the total count of rows\n\n\nArgs\n\n\ndataset_id (string) A dataset id\nquarter (string) The quarter being analyzed\n\n\n\nDatasetStatsAggregator \n\u00b6\n\n\nDatasetStatsAggregator(self, dataset_id, s3_conn)\n\n\n\n\nAggregate data Dataset ETL statistics up to the dataset level\n\n\nArgs\n\n\ndataset_id (string) A dataset id\ns3_conn (boto.Connection) an s3 connection\n\n\n\nGlobalStatsAggregator \n\u00b6\n\n\nGlobalStatsAggregator(self, s3_conn)\n\n\n\n\nAggregate Dataset ETL statistics up to the global level\n\n\nArgs\n\n\ns3_conn (boto.Connection) an s3 connection\n\n\n\nskills_ml.algorithms.aggregators.field_values \n\u00b6\n\n\nTrack field value distribution of common schema job postings\n\n\nFieldValueCounter \n\u00b6\n\n\nFieldValueCounter(self, quarter, field_values)\n\n\n\n\nAccumulate field distribution statistics for common schema job postings\n\n\nArgs\n\n\nquarter (string) The quarter being analyzed\n\n\n\n    field_values (list) each entry should be either\n\n\n    1. a field key\n    2. a tuple, first value field key, second value function to fetch value or values from document\n\n\n\nskills_ml.algorithms.aggregators.geo \n\u00b6\n\n\nAggregates job geographies\n\n\nGeoAggregator \n\u00b6\n\n\nGeoAggregator(self, job_aggregators, geo_querier)\n\n\n\n\nAggregates jobs by geography\n\n\njob_aggregators (dict of .JobAggregator objects) - The aggregators\n    that should accumulate data based on geography and title for each\n    job posting\ngeo_querier (object) an object that returns a geography of a given job.\n\n\nskills_ml.algorithms.aggregators.soc_code \n\u00b6\n\n\nAggregates job occupations\n\n\nGeoSocAggregator \n\u00b6\n\n\nGeoSocAggregator(self, occupation_classifier=None, corpus_creator=None, *args, **kwargs)\n\n\n\n\nAggregates job titles by geography\n\n\nArgs\n\n\noccupation_classifier (..occupation_classifiers.classifiers.Classifier,\n    optional)\n    a SOC code classifier,\n    if absent will aggregate using the given SOC code\ncorpus_creator (CorpusCreator, optional) an object that will transform\n    a given common schema job posting into unstructured text for the\n    occupation classifier. Defaults to SimpleCorpusCreator\n\n\n\nskills_ml.algorithms.aggregators.title \n\u00b6\n\n\nAggregates job titles\n\n\nGeoTitleAggregator \n\u00b6\n\n\nGeoTitleAggregator(self, title_cleaner=None, *args, **kwargs)\n\n\n\n\nAggregates job titles by geography\n\n\nArgs\n\n\ntitle_cleaner (function) a function that cleans a given job title\n\n\n\nskills_ml.algorithms.corpus_creators \n\u00b6\n\n\nClasses for converting collections of objects (for instance, common schema job postings) into text corpora suitable for use by natural language processing algorithms.\n\n\nskills_ml.algorithms.corpus_creators.basic \n\u00b6\n\n\nJobCategoryCorpusCreator \n\u00b6\n\n\nJobCategoryCorpusCreator(self, generator=None, filter_func=None, raw=False)\n\n\n\n\nAn object that extract the label of each job listing document which could be onet soc code or\noccupationalCategory and returns them as a lowercased string\n\n\nDoc2VecGensimCorpusCreator \n\u00b6\n\n\nDoc2VecGensimCorpusCreator(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code'])\n\n\n\n\nCorpus for training Gensim Doc2Vec\nAn object that transforms job listing documents by picking\nimportant schema fields and returns them as one large cleaned array of words\n\n\nExample\n\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.datasets.job_postings import job_postings, job_postings_chain\nfrom skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator\n\ns3_conn = S3Hook().get_conn()\njob_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')\n\n# Default will include all the job postings with O*NET SOC code.\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator)\n\n# For using pre-defined major group filter, one need to specify major groups\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator, major_groups=['11', '13'])\n\n# For using self-defined filter function, one can pass the function like this\ndef filter_by_full_soc(document):\n    if document['onet_soc_code]:\n        if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:\n            return document\n\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator, filter_func=filter_by_full_soc, key=['onet_soc_code'])\n\n\n\n\nAttributes\n\n\n\n\ngenerator (generator)\n: a job posting generator\n\n\nmajor_groups (list)\n: a list of O*NET major group classes you want to include in the corpus being created.\n\n\nfilter_func (function)\n: a self-defined function to filter job postings, which takes a job posting as input\n                            and output a job posting. Default is to filter documents by major group.\n\n\nkey (string)\n: a key indicates the label which should exist in common schema of job posting.\n\n\n\n\nSimpleCorpusCreator \n\u00b6\n\n\nSimpleCorpusCreator(self, generator=None, filter_func=None, raw=False)\n\n\n\n\nAn object that transforms job listing documents by picking\nimportant schema fields and returns them as one large lowercased string\n\n\nWord2VecGensimCorpusCreator \n\u00b6\n\n\nWord2VecGensimCorpusCreator(self, generator=None)\n\n\n\n\nAn object that transforms job listing documents by picking\nimportant schema fields and returns them as one large cleaned array of words\n\n\nCorpusCreator \n\u00b6\n\n\nCorpusCreator(self, generator=None, filter_func=None, raw=False)\n\n\n\n\nA base class for objects that convert common schema\njob listings into a corpus suitable for use by\nmachine learning algorithms or specific tasks.\n\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.datasets.job_postings import job_postings, job_postings_chain\nfrom skills_ml.algorithms.corpus_creators.basic import CorpusCreator\n\ns3_conn = S3Hook().get_conn()\njob_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')\n\n# Default will include all the cleaned job postings\ncorpus = CorpusCreator(job_postings_generator)\n\n# For getting a the raw job postings without any cleaning\ncorpus = CorpusCreator(job_postings_generator, raw=True)\n\n# For using self-defined filter function, one can pass the function like this\ndef filter_by_full_soc(document):\nif document['onet_soc_code]:\n    if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:\n        return document\n\ncorpus = CorpusCreator(job_postings_generator, filter_func=filter_by_full_soc)\n\n\n\n\nAttributes\n\n\n\n\ngenerator (generator)\n:  an iterable that generates JSON strings.\n                        Each string is expected to represent a job listing\n                        conforming to the common schema\n                        See sample_job_listing.json for an example of this schema\n\n\nfilter_func (function)\n: a self-defined function to filter job postings, which takes a job posting as input\n                        and output a job posting. Default is to filter documents by major group.\n\n\nraw (bool)\n: a flag whether to return the raw documents or transformed documents\n\n\n\n\nskills_ml.algorithms.elasticsearch_indexers \n\u00b6\n\n\nskills_ml.algorithms.elasticsearch_indexers.base \n\u00b6\n\n\nBase class for Elasticsearch indexers\n\n\nSubclasses implement the index setting definition and transformation of data,\nThe base class handles index management and bulk indexing with ES\n\n\nskills_ml.algorithms.elasticsearch_indexers.job_titles_master \n\u00b6\n\n\nIndex job title/occupation pairs in Elasticsearch.\n\n\nJobTitlesMasterIndexer \n\u00b6\n\n\nJobTitlesMasterIndexer(self, job_title_generator, alias_name, **kwargs)\n\n\n\n\nArgs: job_title_generator (iterable). Each record is expected to be a dict\n    with keys\n    'Title' for the job title and\n    'Original Title' for the occupation\n\n\nskills_ml.algorithms.elasticsearch_indexers.normalize_topn \n\u00b6\n\n\nIndexes job postings for job title normalization\n\n\nNormalizeTopNIndexer \n\u00b6\n\n\nNormalizeTopNIndexer(self, quarter, job_postings_generator, job_titles_index, alias_name, **kwargs)\n\n\n\n\nCreates an index that stores data for job title normalization.\n\n\nDepends on a previously created index with job titles and occupations.\n\n\nQueries the job title/occupation index for\n1. job titles or occupations that match the job description\n2. Occupation matches\n\n\nThe top three results are indexed.\n\n\nArgs\n\n\nquarter (string) the quarter from which to retrieve job postings\njob_postings_generator (iterable) an iterable of job postings\njob_title_index (string) The name of an already existing job title/occupation index\n\n\n\nskills_ml.algorithms.embedding \n\u00b6\n\n\nskills_ml.algorithms.embedding.base \n\u00b6\n\n\nEmbedding model class interfacing with with gensim and tensorflow\n\n\nDoc2VecModel \n\u00b6\n\n\nDoc2VecModel(self, model_name='doc2vec_2017-07-14T11:32:00.997426', lookup=None, model=None, s3_conn=None, s3_path='open-skills-private/model_cache/embedding/')\n\n\n\n\nThe Doc2VecModel Object is a base object which specifies which word-embeding model.\n\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.algorithms.embedding.base import Doc2VecModel\n\ns3_conn = S3Hook().get_conn()\ndoc2vec_model = Doc2VecModel(s3_conn=s3_conn)\n\n\n\n\nWord2VecModel \n\u00b6\n\n\nWord2VecModel(self, model_name='word2vec_gensim_2017-07-14T11:32:00.997426', model=None, s3_conn=None, s3_path='open-skills-private/model_cache/embedding/')\n\n\n\n\nThe Word2VecModel Object is a base object which specifies which word-embeding model.\n\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.algorithms.embedding.base import Word2VecModel\n\ns3_conn = S3Hook().get_conn()\nword2vec_model = Word2VecModel(s3_conn=s3_conn)\n\n\n\n\nskills_ml.algorithms.embedding.train \n\u00b6\n\n\nEmbeddingTrainer \n\u00b6\n\n\nEmbeddingTrainer(self, s3_conn, quarters, jp_s3_path, source='all', model_s3_path='open-skills-private/model_cache/embedding/', batch_size=2000, model_type='word2vec')\n\n\n\n\nAn embedding learning object using gensim word2vec/doc2vec model.\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.algorithms.occupation_classifiers.train import EmbeddingTrainer\n\ns3_conn = S3Hook().get_conn()\ntrainer = EmbeddingTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')\ntrainer.train()\n\n\n\n\nskills_ml.algorithms.geocoders \n\u00b6\n\n\nGeocoders, with caching and throttling\n\n\njob_posting_search_strings \n\u00b6\n\n\njob_posting_search_strings(job_posting)\n\n\n\n\nConvert a job posting to a geocode-ready search string\n\n\nIncludes city and state if present, or just city\n\n\nArgs\n\n\njob_posting (string) A job posting in schema.org/JobPosting json form\n\n\n\n\n\nReturns\n: (string) A geocode-ready search string\n\n\n\n\nS3CachedGeocoder \n\u00b6\n\n\nS3CachedGeocoder(self, s3_conn, cache_s3_path, geocode_func=<function osm at 0x104f84ea0>, sleep_time=1)\n\n\n\n\nGeocoder that uses S3 as a cache.\n\n\nArgs\n\n\ns3_conn (boto.s3.connection) an s3 connection\ncache_s3_path (string) path (including bucket) to the json cache on s3\ngeocode_func (function) a function that geocodes a given search string\n    defaults to the OSM geocoder provided by the geocode library\nsleep_time (int) The time, in seconds, between geocode calls\n\n\n\nskills_ml.algorithms.geocoders.cbsa \n\u00b6\n\n\nGiven geocode results, find matching Core-Based Statistical Areas.\n\n\nS3CachedCBSAFinder \n\u00b6\n\n\nS3CachedCBSAFinder(self, s3_conn, cache_s3_path, shapefile_name=None, cache_dir=None)\n\n\n\n\nFind CBSAs associated with geocode results and save them to S3\n\n\nGeocode results are expected in the json format provided by the python\n\ngeocoder\n module, with a 'bbox'\n\n\nThe highest-level interface is the 'find_all_cbsas_and_save' method, which\nprovides S3 caching. A minimal call looks like\n\n\ncbsa_finder = S3CachedCBSAFinder(s3_conn=..., cache_s3_path='some-bucket/cbsas.json')\ncbsa_finder.find_all_cbsas_and_save({\n    \"Flushing, NY\": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }\n    \"Houston, TX\": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }\n})\n\n# This usage of 'bbox' is what you can retrieve from a `geocoder` call, such as:\ngeocoder.osm('Flushing, NY').json()\n\n\n\n\nThe keys in the resulting cache will be the original search strings.\n\n\nWarning: The caching is not parallel-safe! It is recommended you should run\nonly one copy of \nfind_all_cbsas_and_save\n at a time to avoid overwriting\nthe S3 cache file.\n\n\nArgs\n\n\ns3_conn (boto.s3.connection) an s3 connection\ncache_s3_path (string) path (including bucket) to the json cache on s3\nshapefile_name (string) local path to a CBSA shapefile to use\n    optional, will download TIGER 2015 shapefile if absent\ncache_dir (string) local path to a cache directory to use if the\n    shapefile needs to be downloaded\n    optional, will use 'tmp' in working directory if absent\n\n\n\nMatch \n\u00b6\n\n\nMatch(self, /, *args, **kwargs)\n\n\n\n\nMatch(index, area)\n\n\nskills_ml.algorithms.job_geography_queriers \n\u00b6\n\n\nExtracting geographies from job posting datasets\n\n\nskills_ml.algorithms.job_geography_queriers.cbsa \n\u00b6\n\n\nLook up the CBSA for a job posting from a census crosswalk (job location -> Census Place -> Census UA -> Census CBSA)\n\n\nJobCBSAQuerier \n\u00b6\n\n\nJobCBSAQuerier(self)\n\n\n\n\nQueries the Core-Based Statistical Area for a job using a census crosswalk\n\n\nFirst looks up a Place or County Subdivision by the job posting's state and city.\nIf it finds a result, it will then take the Urbanized Area for that Place or County Subdivison and find CBSAs associated with it.\n\n\nQueries return all hits, so there may be multiple CBSAs for a given query.\n\n\nskills_ml.algorithms.job_geography_queriers.cbsa_from_geocode \n\u00b6\n\n\nLook up the CBSA for a job posting against a precomputed geocoded CBSA lookup\n\n\nJobCBSAFromGeocodeQuerier \n\u00b6\n\n\nJobCBSAFromGeocodeQuerier(self, cbsa_results)\n\n\n\n\nQueries the Core-Based Statistical Area for a job\n\n\nThis object delegates the CBSA-finding algorithm to a passed-in cache.\nIn practice, you can look at the \nskills_ml.algorithms.geocoders.cbsa\n\nmodule for an example of how this can be generated.\n\n\nInstead, this object focuses on the job posting-centric logic necessary,\nsuch as converting the job posting to the form needed to use the cache\nand dealing with differents kinds of cache misses.\n\n\nArgs\n\n\ncbsa_results (dict) A mapping of geocoding search strings to\n    (CBSA FIPS, CBSA Name) tuples\n\n\n\nskills_ml.algorithms.job_labelers \n\u00b6\n\n\nskills_ml.algorithms.job_normalizers \n\u00b6\n\n\nAlgorithms to normalize a job title to a smaller space\n\n\nskills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer \n\u00b6\n\n\nNormalize a job title through Explicit Semantic Analysis\n\n\nOriginally written by Kwame Porter Robinson\n\n\nESANormalizer \n\u00b6\n\n\nESANormalizer(self, onet_source=<class 'skills_ml.datasets.onet_source.OnetSourceDownloader'>)\n\n\n\n\nNormalize a job title to ONET occupation titles using explicit semantic analysis.\n\n\nUses ONET occupation titles and descriptions.\n\n\nskills_ml.algorithms.job_vectorizers \n\u00b6\n\n\nskills_ml.algorithms.job_vectorizers.doc2vec_vectorizer \n\u00b6\n\n\nskills_ml.algorithms.jobtitle_cleaner \n\u00b6\n\n\nClean job titles\n\n\nskills_ml.algorithms.jobtitle_cleaner.clean \n\u00b6\n\n\nClean job titles by utilizing a list of stopwords\n\n\nclean_by_rules \n\u00b6\n\n\nclean_by_rules(jobtitle)\n\n\n\n\nRemove numbers and normalize spaces\n\n\nArgs\n\n\njobtitle (string) A string\n\n\n\n\n\nReturns\n: (string) the string with numbers removes and spaces normalized\n\n\n\n\naggregate \n\u00b6\n\n\naggregate(df_jobtitles, groupby_keys)\n\n\n\n\nArgs\n\n\n\n\ndf_jobtitles\n: job titles in pandas DataFrame\n\n\ngroupby_keys\n: a list of keys to be grouped by. should be something like ['title', 'geo']\n\nReturns\n\n\n\n\nagg_cleaned_jobtitles\n: a aggregated verison of job title in pandas DataFrame\n\n\nclean_by_neg_dic \n\u00b6\n\n\nclean_by_neg_dic(jobtitle, negative_list, positive_list)\n\n\n\n\nRemove words from the negative dictionary\n\n\nArgs\n\n\njobtitle (string) A job title string\nnegative_list (collection) A list of stop words\npositive_list (collection) A list of positive words to override stop words\n\n\n\n\n\nReturns\n: (string) The cleaned job title\n\n\n\n\nJobTitleStringClean \n\u00b6\n\n\nJobTitleStringClean(self)\n\n\n\n\nClean job titles by stripping numbers, and removing place/state names (unless they are also ONET jobs)\n\n\nskills_ml.algorithms.occupation_classifiers \n\u00b6\n\n\nskills_ml.algorithms.occupation_classifiers.classifiers \n\u00b6\n\n\nClassifier \n\u00b6\n\n\nClassifier(self, classifier_id='ann_0614', classifier=None, s3_conn=None, s3_path='open-skills-private/model_cache/occupation_classifiers/', classify_kwargs=None, temporary_directory=None, **kwargs)\n\n\n\n\nThe Classifiers Object to classify each jobposting description to O*Net SOC code.\n\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.algorithms.occupation_classifiers.classifiers import Classifier\n\n\ns3_conn = S3Hook().get_conn()\nSoc = Classifier(s3_conn=s3_conn, classifier_id='ann_0614')\n\n\npredicted_soc = Soc.classify(jobposting, mode='top')\n\n\nNearestNeighbors \n\u00b6\n\n\nNearestNeighbors(self, indexed=False, indexer=None, **kwargs)\n\n\n\n\nNearest neightbors model to classify the jobposting data into soc code.\nIf the indexer is passed, then NearestNeighbors will use approximate nearest\nneighbor approach which is much faster than the built-in knn in gensim.\n\n\nAttributes\n\n\n\n\nindexed (bool)\n: index the data with Annoy or not. Annoy can find approximate nearest neighbors much faster.\n\n\nindexer (:obj:\ngensim.similarities.index\n)\n: Annoy index object should be passed in for faster query.\n\n\n\n\nskills_ml.algorithms.representativeness_calculators \n\u00b6\n\n\nCalculate representativeness of a dataset, such as job postings\n\n\nskills_ml.algorithms.representativeness_calculators.geo_occupation \n\u00b6\n\n\nComputes geographic representativeness of job postings based on ONET SOC Code\n\n\nGeoOccupationRepresentativenessCalculator \n\u00b6\n\n\nGeoOccupationRepresentativenessCalculator(self, geo_querier=None, normalizer=None)\n\n\n\n\nCalculates geographic representativeness of SOC Codes.\nIf a job normalizer is given, will attempt to compute SOC codes\nof jobs that have missing SOC codes\n\n\nArgs\n\n\ngeo_querier (skills_ml.algorithms.job_geography_queriers) An object that can return a CBSA from a job posting\nnormalizer (skills_ml.algorithms.occupation_classifiers) An object that can return the SOC code from a job posting\n\n\n\nskills_ml.algorithms.sampling \n\u00b6\n\n\nGenerate and store samples of datasets\n\n\nskills_ml.algorithms.sampling.jobs \n\u00b6\n\n\nSample job postings\n\n\nJobSampler \n\u00b6\n\n\nJobSampler(self, job_posting_generator, major_group=False, keys=None, weights=None, random_state=None)\n\n\n\n\nJob posting sampler using reservoir sampling methods\n\n\nIt takes a job_posting generator as an input. To sample based on weights, one should sepecify a weight dictionary.\n\n\nAttributes\n\n\n\n\njob_posting_generator (iterator)\n: Job posting iterator to sample from.\n\n\nmajor_group (bool)\n: A flag for using major_group as a label or not\n\n\nkeys (list|str)\n: a key or keys(for nested dictionary) indicates the label which should exist in common schema\n                     of job posting.\n\n\nweights (dict)\n: a dictionary that has key-value pairs as label-weighting pairs. It expects every\n                    label in the iterator to be present as a key in the weights dictionary For example,\n\n\nweights = {'11'\n: 2, '13', 1}. In this case, the label/key is the occupation major\n                    group and the value is the weight you want to sample with.\n\n\nrandom_state (int)\n: the seed used by the random number generator\n\n\n\n\nskills_ml.algorithms.sampling.methods \n\u00b6\n\n\nGeneric sampling methods\n\n\nreservoir \n\u00b6\n\n\nreservoir(it, k)\n\n\n\n\nReservoir sampling with Random Sort from a job posting iterator\n\n\nRandomly choosing a sample of k items from a streaming iterator. Using random sort to implement the algorithm.\nBasically, it's assigning random number as keys to each item and maintain k items with minimum value for keys,\nwhich equals to assigning a random number to each item as key and sort items using these keys and take top k items.\n\n\nArgs\n\n\n\n\nit (iterator)\n: Job posting iterator to sample from\n\n\nk (int)\n: Sample size\n\n\n\n\nReturns\n\n\ngenerator\n: The result sample of k items.\n\n\nreservoir_weighted \n\u00b6\n\n\nreservoir_weighted(it, k, weights)\n\n\n\n\nWeighted reservoir Sampling from job posting iterator\n\n\nRandomly choosing a sample of k items from a streaming iterator based on the weights.\n\n\nArgs\n\n\n\n\nit (iterator)\n: Job posting iterator to sample from. The format should be (job_posting, label)\n\n\nk (int)\n: Sample size\n\n\nweights (dict)\n: a dictionary that has key-value pairs as label-weighting pairs. It expects every\n                    label in the iterator to be present as a key in the weights dictionary For example,\n\n\nweights = {'11'\n: 2, '13', 1}. In this case, the label/key is the occupation major\n                    group and the value is the weight you want to sample with.\n\n\n\n\nReturns\n\n\ngenerator\n: The result sample of k items from weighted reservori sampling.\n\n\nskills_ml.algorithms.skill_extractors \n\u00b6\n\n\nExtract skills from text corpora, such as job postings\n\n\nskills_ml.algorithms.skill_extractors.base \n\u00b6\n\n\nBase classes for skill extraction\n\n\nSkillExtractor \n\u00b6\n\n\nSkillExtractor(self)\n\n\n\n\nAbstract class for all skill extractors.\n\n\nAll subclasses must implement document_skill_counts\n\n\nListBasedSkillExtractor \n\u00b6\n\n\nListBasedSkillExtractor(self, skill_lookup_path, skill_lookup_type='onet_ksat')\n\n\n\n\nExtract skills by comparing with a known list\n\n\nSubclasses must implement _skills_lookup and _document_skills_in_lookup\n\n\nArgs\n\n\nskill_lookup_path (string) A path to the skill lookup file\nskill_lookup_type (string, optional) An identifier for the skill lookup type. Defaults to onet_ksat\n\n\n\nskills_ml.algorithms.skill_extractors.exact_match \n\u00b6\n\n\nUse exact matching with a source list to find skills\n\n\nExactMatchSkillExtractor \n\u00b6\n\n\nExactMatchSkillExtractor(self, skill_lookup_path, skill_lookup_type='onet_ksat')\n\n\n\n\nExtract skills from unstructured text\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.algorithms.skill_extractors.fuzzy_match \n\u00b6\n\n\nUse fuzzy matching with a source list to extract skills from a job posting\n\n\nFuzzyMatchSkillExtractor \n\u00b6\n\n\nFuzzyMatchSkillExtractor(self, skill_lookup_path, skill_lookup_type='onet_ksat')\n\n\n\n\nExtract skills from unstructured text using fuzzy matching\n\n\nskills_ml.algorithms.skill_extractors.noun_phrase_ending \n\u00b6\n\n\nUse noun phrases with specific endings to extract skills from job postings\n\n\nclean_beginning \n\u00b6\n\n\nclean_beginning(string)\n\n\n\n\nClean the beginning of a string of common undesired formatting substrings\n\n\nArgs\n\n\n\n\n\n\nstring (string)\n: Any string\n\n\n\n\n\n\nReturns\n: The string with beginning formatting substrings removed\n\n\n\n\n\n\nsentences_words_pos \n\u00b6\n\n\nsentences_words_pos(document)\n\n\n\n\nChops raw text into part-of-speech (POS)-tagged words in sentences\n\n\nArgs\n\n\ndocument (string) A document in text format\n\n\n\n\n\nReturns\n: (list) of sentences, each being a list of word/POS pair\n\n\n\n\nExample\n\n\nsentences_words_pos(\n    '* Develop and maintain relationship with key members of ' +\n    'ESPN\u2019s Spanish speaking editorial team'\n)\n[ # list of sentences\n    [ # list of word/POS pairs\n        ('*', 'NN'),\n        ('Develop', 'NNP'),\n        ('and', 'CC'),\n        ('maintain', 'VB'),\n        ('relationship', 'NN'),\n        ('with', 'IN'),\n        ('key', 'JJ'),\n        ('members', 'NNS'),\n        ('of', 'IN'),\n        ('ESPN', 'NNP'),\n        ('\u2019', 'NNP'),\n        ('s', 'VBD'),\n        ('Spanish', 'JJ'),\n        ('speaking', 'NN'),\n        ('editorial', 'NN'),\n        ('team', 'NN')\n    ]\n]\n\n\n\nSkillEndingPatternExtractor \n\u00b6\n\n\nSkillEndingPatternExtractor(self, *args, **kwargs)\n\n\n\n\nIdentify noun phrases ending with 'skill' or 'skills' as skills\n\n\nNPEndPatternExtractor \n\u00b6\n\n\nNPEndPatternExtractor(self, endings, stop_phrases, only_bulleted_lines=True, *args, **kwargs)\n\n\n\n\nIdentify noun phrases with certain ending words (e.g 'skills', 'abilities') as skills\n\n\nArgs\n\n\n\n\nendings (list)\n: Single words that should identify the ending of a noun phrase\n        as being a skill\n\n\nstop_phrases (list)\n: Noun phrases that should not be considered skills\n\n\nonly_bulleted_lines (bool, default True)\n: Whether or not to only consider lines\n        that look like they are items in a list\n\n\n\n\nnoun_phrases_in_line_with_context \n\u00b6\n\n\nnoun_phrases_in_line_with_context(line)\n\n\n\n\nGenerate noun phrases in the given line of text\n\n\nArgs\n\n\n\n\ntext (string)\n: A line of raw text\n\n\n\n\nYields\n\n\n    tuples, each with two strings\n\n\n    - a noun phrase\n    - the context of the noun phrase (currently defined as the surrounding sentence)\n\n\n\nAbilityEndingPatternExtractor \n\u00b6\n\n\nAbilityEndingPatternExtractor(self, *args, **kwargs)\n\n\n\n\nIdentify noun phrases ending in 'ability' or 'abilities' as skills\n\n\nis_bulleted \n\u00b6\n\n\nis_bulleted(string)\n\n\n\n\nWhether or not a given string begins a 'bullet' character\n\n\nA bullet character is understood to indicate list membership.\nDiffereing common bullet characters are checked.\n\n\nArgs\n\n\n\n\n\n\nstring (string)\n: Any string\n\n\n\n\n\n\nReturns\n: (bool) whether or not the string begins with one of the characters\n    in a predefined list of common bullets\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.soc_exact \n\u00b6\n\n\nSocScopedExactMatchSkillExtractor \n\u00b6\n\n\nSocScopedExactMatchSkillExtractor(self, skill_lookup_path, skill_lookup_type='onet_ksat')\n\n\n\n\nExtract skills from unstructured text,\nbut only return matches that agree with a known taxonomy\n\n\nskills_ml.algorithms.skill_importance_extractors \n\u00b6\n\n\nProcess lists of occupation skill importances into a common format\n\n\nskills_ml.algorithms.skill_importance_extractors.onet \n\u00b6\n\n\nProcess ONET data to create a dataset with occupations and their skill importances\n\n\nOnetSkillImportanceExtractor \n\u00b6\n\n\nOnetSkillImportanceExtractor(self, onet_source, output_filename, hash_function)\n\n\n\n\nAn object that creates a skills importance CSV based on ONET data\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.algorithms.skill_list_processors \n\u00b6\n\n\nProcess lists of skills into a common format\n\n\nskills_ml.algorithms.skill_list_processors.onet_ksat \n\u00b6\n\n\nProcess ONET skill lists of various types into a common format\n\n\nOnetSkillListProcessor \n\u00b6\n\n\nOnetSkillListProcessor(self, onet_source, output_filename, hash_function, ksa_types=None)\n\n\n\n\nAn object that creates a skills CSV based on ONET data\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.algorithms.skill_taggers \n\u00b6\n\n\nTag skills in text with their md5 hashed value\n\n\nskills_ml.algorithms.skill_taggers.base \n\u00b6\n\n\nSkillTaggerBase \n\u00b6\n\n\nSkillTaggerBase(self, skills_filename)\n\n\n\n\nA base class for objects that tag skills in job listing data\n\n\nskills_ml.algorithms.skill_taggers.simple \n\u00b6\n\n\nSimpleSkillTagger \n\u00b6\n\n\nSimpleSkillTagger(self, hash_function, *args, **kwargs)\n\n\n\n\nTag skills in unstructured text\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.algorithms.string_cleaners \n\u00b6\n\n\nString cleaning algorithms\n\n\nskills_ml.algorithms.string_cleaners.nlp \n\u00b6\n\n\nString transformations for cleaning\n\n\nskills_ml.algorithms.title_extractors \n\u00b6\n\n\nProcess lists of job titles into a common format\n\n\nskills_ml.algorithms.title_extractors.onet \n\u00b6\n\n\nProcess ONET job titles into a common format\n\n\nOnet_Title \n\u00b6\n\n\nOnet_Title(self, onet_cache)\n\n\n\n\nAn object representing job title data from different ONET files\n\n\nOriginally written by Kwame Porter Robinson\n\n\nOnetTitleExtractor \n\u00b6\n\n\nOnetTitleExtractor(self, output_filename, onet_source, hash_function)\n\n\n\n\nAn object that creates a job titles CSV based on ONET data",
+            "text": "skills_ml.algorithms.embedding\n\n\nskills_ml.algorithms.embedding.base\n\n\nWord2VecModel\n\n\nDoc2VecModel\n\n\n\n\n\n\nskills_ml.algorithms.embedding.train\n\n\nEmbeddingTrainer\n\n\n\n\n\n\nskills_ml.algorithms.geocoders\n\n\nS3CachedGeocoder\n\n\n\n\n\n\nskills_ml.algorithms.geocoders.cbsa\n\n\nMatch\n\n\nS3CachedCBSAFinder\n\n\n\n\n\n\nskills_ml.algorithms.job_normalizers\n\n\nskills_ml.algorithms.job_normalizers.elasticsearch\n\n\nNormalizeTopNIndexer\n\n\n\n\n\n\nskills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer\n\n\nESANormalizer\n\n\n\n\n\n\nskills_ml.algorithms.job_vectorizers\n\n\nskills_ml.algorithms.job_vectorizers.doc2vec_vectorizer\n\n\nskills_ml.algorithms.jobtitle_cleaner\n\n\nskills_ml.algorithms.jobtitle_cleaner.clean\n\n\nclean_by_neg_dic\n\n\naggregate\n\n\nJobTitleStringClean\n\n\nclean_by_rules\n\n\n\n\n\n\nskills_ml.algorithms.occupation_classifiers\n\n\nskills_ml.algorithms.occupation_classifiers.classifiers\n\n\nNearestNeighbors\n\n\nClassifier\n\n\n\n\n\n\nskills_ml.algorithms.sampling\n\n\nskills_ml.algorithms.sampling.methods\n\n\nreservoir\n\n\nreservoir_weighted\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors\n\n\nskills_ml.algorithms.skill_extractors.base\n\n\nSkillExtractor\n\n\nListBasedSkillExtractor\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.exact_match\n\n\nExactMatchSkillExtractor\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.fuzzy_match\n\n\nFuzzyMatchSkillExtractor\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.noun_phrase_ending\n\n\nNPEndPatternExtractor\n\n\nAbilityEndingPatternExtractor\n\n\nnoun_phrases_in_line_with_context\n\n\nis_bulleted\n\n\nclean_beginning\n\n\nSkillEndingPatternExtractor\n\n\nsentences_words_pos\n\n\n\n\n\n\nskills_ml.algorithms.skill_extractors.soc_exact\n\n\nSocScopedExactMatchSkillExtractor\n\n\n\n\n\n\nskills_ml.algorithms.string_cleaners\n\n\nskills_ml.algorithms.string_cleaners.nlp\n\n\n\n\n\n\nskills_ml.algorithms.embedding \n\u00b6\n\n\nskills_ml.algorithms.embedding.base \n\u00b6\n\n\nEmbedding model class interfacing with with gensim and tensorflow\n\n\nWord2VecModel \n\u00b6\n\n\nWord2VecModel(self, model_name='word2vec_gensim_2017-07-14T11:32:00.997426', model=None, s3_conn=None, s3_path='open-skills-private/model_cache/embedding/')\n\n\n\n\nThe Word2VecModel Object is a base object which specifies which word-embeding model.\n\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.algorithms.embedding.base import Word2VecModel\n\ns3_conn = S3Hook().get_conn()\nword2vec_model = Word2VecModel(s3_conn=s3_conn)\n\n\n\n\nDoc2VecModel \n\u00b6\n\n\nDoc2VecModel(self, model_name='doc2vec_2017-07-14T11:32:00.997426', lookup=None, model=None, s3_conn=None, s3_path='open-skills-private/model_cache/embedding/')\n\n\n\n\nThe Doc2VecModel Object is a base object which specifies which word-embeding model.\n\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.algorithms.embedding.base import Doc2VecModel\n\ns3_conn = S3Hook().get_conn()\ndoc2vec_model = Doc2VecModel(s3_conn=s3_conn)\n\n\n\n\nskills_ml.algorithms.embedding.train \n\u00b6\n\n\nEmbeddingTrainer \n\u00b6\n\n\nEmbeddingTrainer(self, s3_conn, quarters, jp_s3_path, source='all', model_s3_path='open-skills-private/model_cache/embedding/', batch_size=2000, model_type='word2vec')\n\n\n\n\nAn embedding learning object using gensim word2vec/doc2vec model.\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.algorithms.occupation_classifiers.train import EmbeddingTrainer\n\ns3_conn = S3Hook().get_conn()\ntrainer = EmbeddingTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')\ntrainer.train()\n\n\n\n\nskills_ml.algorithms.geocoders \n\u00b6\n\n\nGeocoders, with caching and throttling\n\n\nS3CachedGeocoder \n\u00b6\n\n\nS3CachedGeocoder(self, s3_conn, cache_s3_path, geocode_func=<function osm at 0x7f7c99d3eae8>, sleep_time=1)\n\n\n\n\nGeocoder that uses S3 as a cache.\n\n\nArgs\n\n\ns3_conn (boto.s3.connection) an s3 connection\ncache_s3_path (string) path (including bucket) to the json cache on s3\ngeocode_func (function) a function that geocodes a given search string\n    defaults to the OSM geocoder provided by the geocode library\nsleep_time (int) The time, in seconds, between geocode calls\n\n\n\nskills_ml.algorithms.geocoders.cbsa \n\u00b6\n\n\nGiven geocode results, find matching Core-Based Statistical Areas.\n\n\nMatch \n\u00b6\n\n\nMatch(self, /, *args, **kwargs)\n\n\n\n\nMatch(index, area)\n\n\nS3CachedCBSAFinder \n\u00b6\n\n\nS3CachedCBSAFinder(self, s3_conn, cache_s3_path, shapefile_name=None, cache_dir=None)\n\n\n\n\nFind CBSAs associated with geocode results and save them to S3\n\n\nGeocode results are expected in the json format provided by the python\n\ngeocoder\n module, with a 'bbox'\n\n\nThe highest-level interface is the 'find_all_cbsas_and_save' method, which\nprovides S3 caching. A minimal call looks like\n\n\ncbsa_finder = S3CachedCBSAFinder(s3_conn=..., cache_s3_path='some-bucket/cbsas.json')\ncbsa_finder.find_all_cbsas_and_save({\n    \"Flushing, NY\": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }\n    \"Houston, TX\": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }\n})\n\n# This usage of 'bbox' is what you can retrieve from a `geocoder` call, such as:\ngeocoder.osm('Flushing, NY').json()\n\n\n\n\nThe keys in the resulting cache will be the original search strings.\n\n\nWarning: The caching is not parallel-safe! It is recommended you should run\nonly one copy of \nfind_all_cbsas_and_save\n at a time to avoid overwriting\nthe S3 cache file.\n\n\nArgs\n\n\ns3_conn (boto.s3.connection) an s3 connection\ncache_s3_path (string) path (including bucket) to the json cache on s3\nshapefile_name (string) local path to a CBSA shapefile to use\n    optional, will download TIGER 2015 shapefile if absent\ncache_dir (string) local path to a cache directory to use if the\n    shapefile needs to be downloaded\n    optional, will use 'tmp' in working directory if absent\n\n\n\nskills_ml.algorithms.job_normalizers \n\u00b6\n\n\nAlgorithms to normalize a job title to a smaller space\n\n\nskills_ml.algorithms.job_normalizers.elasticsearch \n\u00b6\n\n\nIndexes job postings for job title normalization\n\n\nNormalizeTopNIndexer \n\u00b6\n\n\nNormalizeTopNIndexer(self, quarter, job_postings_generator, job_titles_index, alias_name, **kwargs)\n\n\n\n\nCreates an index that stores data for job title normalization.\n\n\nDepends on a previously created index with job titles and occupations.\n\n\nQueries the job title/occupation index for\n1. job titles or occupations that match the job description\n2. Occupation matches\n\n\nThe top three results are indexed.\n\n\nArgs\n\n\nquarter (string) the quarter from which to retrieve job postings\njob_postings_generator (iterable) an iterable of job postings\njob_title_index (string) The name of an already existing job title/occupation index\n\n\n\nskills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer \n\u00b6\n\n\nNormalize a job title through Explicit Semantic Analysis\n\n\nOriginally written by Kwame Porter Robinson\n\n\nESANormalizer \n\u00b6\n\n\nESANormalizer(self, onet_source=<class 'skills_ml.datasets.onet_source.OnetSourceDownloader'>)\n\n\n\n\nNormalize a job title to ONET occupation titles using explicit semantic analysis.\n\n\nUses ONET occupation titles and descriptions.\n\n\nskills_ml.algorithms.job_vectorizers \n\u00b6\n\n\nskills_ml.algorithms.job_vectorizers.doc2vec_vectorizer \n\u00b6\n\n\nskills_ml.algorithms.jobtitle_cleaner \n\u00b6\n\n\nClean job titles\n\n\nskills_ml.algorithms.jobtitle_cleaner.clean \n\u00b6\n\n\nClean job titles by utilizing a list of stopwords\n\n\nclean_by_neg_dic \n\u00b6\n\n\nclean_by_neg_dic(jobtitle, negative_list, positive_list)\n\n\n\n\nRemove words from the negative dictionary\n\n\nArgs\n\n\njobtitle (string) A job title string\nnegative_list (collection) A list of stop words\npositive_list (collection) A list of positive words to override stop words\n\n\n\n\n\nReturns\n: (string) The cleaned job title\n\n\n\n\naggregate \n\u00b6\n\n\naggregate(df_jobtitles, groupby_keys)\n\n\n\n\nArgs\n\n\n\n\ndf_jobtitles\n: job titles in pandas DataFrame\n\n\ngroupby_keys\n: a list of keys to be grouped by. should be something like ['title', 'geo']\n\nReturns\n\n\n\n\nagg_cleaned_jobtitles\n: a aggregated verison of job title in pandas DataFrame\n\n\nJobTitleStringClean \n\u00b6\n\n\nJobTitleStringClean(self)\n\n\n\n\nClean job titles by stripping numbers, and removing place/state names (unless they are also ONET jobs)\n\n\nclean_by_rules \n\u00b6\n\n\nclean_by_rules(jobtitle)\n\n\n\n\nRemove numbers and normalize spaces\n\n\nArgs\n\n\njobtitle (string) A string\n\n\n\n\n\nReturns\n: (string) the string with numbers removes and spaces normalized\n\n\n\n\nskills_ml.algorithms.occupation_classifiers \n\u00b6\n\n\nskills_ml.algorithms.occupation_classifiers.classifiers \n\u00b6\n\n\nNearestNeighbors \n\u00b6\n\n\nNearestNeighbors(self, indexed=False, indexer=None, **kwargs)\n\n\n\n\nNearest neightbors model to classify the jobposting data into soc code.\nIf the indexer is passed, then NearestNeighbors will use approximate nearest\nneighbor approach which is much faster than the built-in knn in gensim.\n\n\nAttributes\n\n\n\n\nindexed (bool)\n: index the data with Annoy or not. Annoy can find approximate nearest neighbors much faster.\n\n\nindexer (:obj:\ngensim.similarities.index\n)\n: Annoy index object should be passed in for faster query.\n\n\n\n\nClassifier \n\u00b6\n\n\nClassifier(self, classifier_id='ann_0614', classifier=None, s3_conn=None, s3_path='open-skills-private/model_cache/occupation_classifiers/', classify_kwargs=None, temporary_directory=None, **kwargs)\n\n\n\n\nThe Classifiers Object to classify each jobposting description to O*Net SOC code.\n\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.algorithms.occupation_classifiers.classifiers import Classifier\n\n\ns3_conn = S3Hook().get_conn()\nSoc = Classifier(s3_conn=s3_conn, classifier_id='ann_0614')\n\n\npredicted_soc = Soc.classify(jobposting, mode='top')\n\n\nskills_ml.algorithms.sampling \n\u00b6\n\n\nGenerate and store samples of datasets\n\n\nskills_ml.algorithms.sampling.methods \n\u00b6\n\n\nGeneric sampling methods\n\n\nreservoir \n\u00b6\n\n\nreservoir(it, k)\n\n\n\n\nReservoir sampling with Random Sort from a job posting iterator\n\n\nRandomly choosing a sample of k items from a streaming iterator. Using random sort to implement the algorithm.\nBasically, it's assigning random number as keys to each item and maintain k items with minimum value for keys,\nwhich equals to assigning a random number to each item as key and sort items using these keys and take top k items.\n\n\nArgs\n\n\n\n\nit (iterator)\n: Job posting iterator to sample from\n\n\nk (int)\n: Sample size\n\n\n\n\nReturns\n\n\ngenerator\n: The result sample of k items.\n\n\nreservoir_weighted \n\u00b6\n\n\nreservoir_weighted(it, k, weights)\n\n\n\n\nWeighted reservoir Sampling from job posting iterator\n\n\nRandomly choosing a sample of k items from a streaming iterator based on the weights.\n\n\nArgs\n\n\n\n\nit (iterator)\n: Job posting iterator to sample from. The format should be (job_posting, label)\n\n\nk (int)\n: Sample size\n\n\nweights (dict)\n: a dictionary that has key-value pairs as label-weighting pairs. It expects every\n                    label in the iterator to be present as a key in the weights dictionary For example,\n\n\nweights = {'11'\n: 2, '13', 1}. In this case, the label/key is the occupation major\n                    group and the value is the weight you want to sample with.\n\n\n\n\nReturns\n\n\ngenerator\n: The result sample of k items from weighted reservori sampling.\n\n\nskills_ml.algorithms.skill_extractors \n\u00b6\n\n\nExtract skills from text corpora, such as job postings\n\n\nskills_ml.algorithms.skill_extractors.base \n\u00b6\n\n\nBase classes for skill extraction\n\n\nSkillExtractor \n\u00b6\n\n\nSkillExtractor(self)\n\n\n\n\nAbstract class for all skill extractors.\n\n\nAll subclasses must implement document_skill_counts\n\n\nListBasedSkillExtractor \n\u00b6\n\n\nListBasedSkillExtractor(self, skill_lookup_path, skill_lookup_type='onet_ksat')\n\n\n\n\nExtract skills by comparing with a known list\n\n\nSubclasses must implement _skills_lookup and _document_skills_in_lookup\n\n\nArgs\n\n\nskill_lookup_path (string) A path to the skill lookup file\nskill_lookup_type (string, optional) An identifier for the skill lookup type. Defaults to onet_ksat\n\n\n\nskills_ml.algorithms.skill_extractors.exact_match \n\u00b6\n\n\nUse exact matching with a source list to find skills\n\n\nExactMatchSkillExtractor \n\u00b6\n\n\nExactMatchSkillExtractor(self, skill_lookup_path, skill_lookup_type='onet_ksat')\n\n\n\n\nExtract skills from unstructured text\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.algorithms.skill_extractors.fuzzy_match \n\u00b6\n\n\nUse fuzzy matching with a source list to extract skills from a job posting\n\n\nFuzzyMatchSkillExtractor \n\u00b6\n\n\nFuzzyMatchSkillExtractor(self, skill_lookup_path, skill_lookup_type='onet_ksat')\n\n\n\n\nExtract skills from unstructured text using fuzzy matching\n\n\nskills_ml.algorithms.skill_extractors.noun_phrase_ending \n\u00b6\n\n\nUse noun phrases with specific endings to extract skills from job postings\n\n\nNPEndPatternExtractor \n\u00b6\n\n\nNPEndPatternExtractor(self, endings, stop_phrases, only_bulleted_lines=True, *args, **kwargs)\n\n\n\n\nIdentify noun phrases with certain ending words (e.g 'skills', 'abilities') as skills\n\n\nArgs\n\n\n\n\nendings (list)\n: Single words that should identify the ending of a noun phrase\n        as being a skill\n\n\nstop_phrases (list)\n: Noun phrases that should not be considered skills\n\n\nonly_bulleted_lines (bool, default True)\n: Whether or not to only consider lines\n        that look like they are items in a list\n\n\n\n\nAbilityEndingPatternExtractor \n\u00b6\n\n\nAbilityEndingPatternExtractor(self, *args, **kwargs)\n\n\n\n\nIdentify noun phrases ending in 'ability' or 'abilities' as skills\n\n\nnoun_phrases_in_line_with_context \n\u00b6\n\n\nnoun_phrases_in_line_with_context(line)\n\n\n\n\nGenerate noun phrases in the given line of text\n\n\nArgs\n\n\n\n\ntext (string)\n: A line of raw text\n\n\n\n\nYields\n\n\n    tuples, each with two strings\n\n\n    - a noun phrase\n    - the context of the noun phrase (currently defined as the surrounding sentence)\n\n\n\nis_bulleted \n\u00b6\n\n\nis_bulleted(string)\n\n\n\n\nWhether or not a given string begins a 'bullet' character\n\n\nA bullet character is understood to indicate list membership.\nDiffereing common bullet characters are checked.\n\n\nArgs\n\n\n\n\n\n\nstring (string)\n: Any string\n\n\n\n\n\n\nReturns\n: (bool) whether or not the string begins with one of the characters\n    in a predefined list of common bullets\n\n\n\n\n\n\nclean_beginning \n\u00b6\n\n\nclean_beginning(string)\n\n\n\n\nClean the beginning of a string of common undesired formatting substrings\n\n\nArgs\n\n\n\n\n\n\nstring (string)\n: Any string\n\n\n\n\n\n\nReturns\n: The string with beginning formatting substrings removed\n\n\n\n\n\n\nSkillEndingPatternExtractor \n\u00b6\n\n\nSkillEndingPatternExtractor(self, *args, **kwargs)\n\n\n\n\nIdentify noun phrases ending with 'skill' or 'skills' as skills\n\n\nsentences_words_pos \n\u00b6\n\n\nsentences_words_pos(document)\n\n\n\n\nChops raw text into part-of-speech (POS)-tagged words in sentences\n\n\nArgs\n\n\ndocument (string) A document in text format\n\n\n\n\n\nReturns\n: (list) of sentences, each being a list of word/POS pair\n\n\n\n\nExample\n\n\nsentences_words_pos(\n    '* Develop and maintain relationship with key members of ' +\n    'ESPN\u2019s Spanish speaking editorial team'\n)\n[ # list of sentences\n    [ # list of word/POS pairs\n        ('*', 'NN'),\n        ('Develop', 'NNP'),\n        ('and', 'CC'),\n        ('maintain', 'VB'),\n        ('relationship', 'NN'),\n        ('with', 'IN'),\n        ('key', 'JJ'),\n        ('members', 'NNS'),\n        ('of', 'IN'),\n        ('ESPN', 'NNP'),\n        ('\u2019', 'NNP'),\n        ('s', 'VBD'),\n        ('Spanish', 'JJ'),\n        ('speaking', 'NN'),\n        ('editorial', 'NN'),\n        ('team', 'NN')\n    ]\n]\n\n\n\nskills_ml.algorithms.skill_extractors.soc_exact \n\u00b6\n\n\nSocScopedExactMatchSkillExtractor \n\u00b6\n\n\nSocScopedExactMatchSkillExtractor(self, skill_lookup_path, skill_lookup_type='onet_ksat')\n\n\n\n\nExtract skills from unstructured text,\nbut only return matches that agree with a known taxonomy\n\n\nskills_ml.algorithms.string_cleaners \n\u00b6\n\n\nString cleaning algorithms\n\n\nskills_ml.algorithms.string_cleaners.nlp \n\u00b6\n\n\nString transformations for cleaning",
             "title": "Algorithms"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsaggregators",
-            "text": "Aggregate properties of job postings.  Classes in this module generally wrap calls to some code in  skills_ml.algorithms  for some arbitrary set of job postings (in schema.org JobPosting format as a Python dict), accumulating the output in a Counter.",
-            "title": "skills_ml.algorithms.aggregators"
-        },
-        {
-            "location": "/skills_ml.algorithms/#countaggregator",
-            "text": "CountAggregator(self, output_count=1, output_total=False)  Counts job postings",
-            "title": "CountAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#soccodeaggregator",
-            "text": "SocCodeAggregator(self, occupation_classifier, corpus_creator, *args, **kwargs)  Aggregates SOC codes inferred from job posting text  Args  occupation_classifier (.occupation_classifiers.SocClassifier)\n    An object that returns a classified SOC code and similarity score\n    from unstructured text\ncorpus creator (object) an object that returns unstructured text\n    from a job posting",
-            "title": "SocCodeAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skillaggregator",
-            "text": "SkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)  Aggregates skills found in job postings  Args  skill_extractor (.skill_extractors.FreetextSkillExtractor)\n    an object that returns skill counts from unstructured text\ncorpus creator (object) an object that returns a text corpus\n    from a job posting",
-            "title": "SkillAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#givensoccodeaggregator",
-            "text": "GivenSocCodeAggregator(self, output_count=1, output_total=False)  Aggregates SOC codes given as an input field  Caution! We may or may not know where these came from, and the method\nfor creating them may differ from record to record",
-            "title": "GivenSocCodeAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#jobaggregator",
-            "text": "JobAggregator(self, output_count=1, output_total=False)  Base class for different aggregators. Provides a useful interface for subclasses to benefit from.",
-            "title": "JobAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#occupationscopedskillaggregator",
-            "text": "OccupationScopedSkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)  Aggregates skills found in job postings using the job's occupation  Args  skill_extractor (.skill_extractors.FreetextSkillExtractor)\n    an object that returns skill counts from unstructured text\ncorpus creator (object) an object that returns a text corpus\n    from a job posting",
-            "title": "OccupationScopedSkillAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsaggregatorsdataset_transform",
-            "text": "Track stats of job listing datasets, before and after transformation\ninto the common schema.",
-            "title": "skills_ml.algorithms.aggregators.dataset_transform"
-        },
-        {
-            "location": "/skills_ml.algorithms/#datasetstatscounter",
-            "text": "DatasetStatsCounter(self, dataset_id, quarter)  Accumulate data Dataset ETL statistics for a quarter\nto show presence and absence of different fields,\nand the total count of rows  Args  dataset_id (string) A dataset id\nquarter (string) The quarter being analyzed",
-            "title": "DatasetStatsCounter"
-        },
-        {
-            "location": "/skills_ml.algorithms/#datasetstatsaggregator",
-            "text": "DatasetStatsAggregator(self, dataset_id, s3_conn)  Aggregate data Dataset ETL statistics up to the dataset level  Args  dataset_id (string) A dataset id\ns3_conn (boto.Connection) an s3 connection",
-            "title": "DatasetStatsAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#globalstatsaggregator",
-            "text": "GlobalStatsAggregator(self, s3_conn)  Aggregate Dataset ETL statistics up to the global level  Args  s3_conn (boto.Connection) an s3 connection",
-            "title": "GlobalStatsAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsaggregatorsfield_values",
-            "text": "Track field value distribution of common schema job postings",
-            "title": "skills_ml.algorithms.aggregators.field_values"
-        },
-        {
-            "location": "/skills_ml.algorithms/#fieldvaluecounter",
-            "text": "FieldValueCounter(self, quarter, field_values)  Accumulate field distribution statistics for common schema job postings  Args  quarter (string) The quarter being analyzed      field_values (list) each entry should be either      1. a field key\n    2. a tuple, first value field key, second value function to fetch value or values from document",
-            "title": "FieldValueCounter"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsaggregatorsgeo",
-            "text": "Aggregates job geographies",
-            "title": "skills_ml.algorithms.aggregators.geo"
-        },
-        {
-            "location": "/skills_ml.algorithms/#geoaggregator",
-            "text": "GeoAggregator(self, job_aggregators, geo_querier)  Aggregates jobs by geography  job_aggregators (dict of .JobAggregator objects) - The aggregators\n    that should accumulate data based on geography and title for each\n    job posting\ngeo_querier (object) an object that returns a geography of a given job.",
-            "title": "GeoAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsaggregatorssoc_code",
-            "text": "Aggregates job occupations",
-            "title": "skills_ml.algorithms.aggregators.soc_code"
-        },
-        {
-            "location": "/skills_ml.algorithms/#geosocaggregator",
-            "text": "GeoSocAggregator(self, occupation_classifier=None, corpus_creator=None, *args, **kwargs)  Aggregates job titles by geography  Args  occupation_classifier (..occupation_classifiers.classifiers.Classifier,\n    optional)\n    a SOC code classifier,\n    if absent will aggregate using the given SOC code\ncorpus_creator (CorpusCreator, optional) an object that will transform\n    a given common schema job posting into unstructured text for the\n    occupation classifier. Defaults to SimpleCorpusCreator",
-            "title": "GeoSocAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsaggregatorstitle",
-            "text": "Aggregates job titles",
-            "title": "skills_ml.algorithms.aggregators.title"
-        },
-        {
-            "location": "/skills_ml.algorithms/#geotitleaggregator",
-            "text": "GeoTitleAggregator(self, title_cleaner=None, *args, **kwargs)  Aggregates job titles by geography  Args  title_cleaner (function) a function that cleans a given job title",
-            "title": "GeoTitleAggregator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmscorpus_creators",
-            "text": "Classes for converting collections of objects (for instance, common schema job postings) into text corpora suitable for use by natural language processing algorithms.",
-            "title": "skills_ml.algorithms.corpus_creators"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmscorpus_creatorsbasic",
-            "text": "",
-            "title": "skills_ml.algorithms.corpus_creators.basic"
-        },
-        {
-            "location": "/skills_ml.algorithms/#jobcategorycorpuscreator",
-            "text": "JobCategoryCorpusCreator(self, generator=None, filter_func=None, raw=False)  An object that extract the label of each job listing document which could be onet soc code or\noccupationalCategory and returns them as a lowercased string",
-            "title": "JobCategoryCorpusCreator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#doc2vecgensimcorpuscreator",
-            "text": "Doc2VecGensimCorpusCreator(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code'])  Corpus for training Gensim Doc2Vec\nAn object that transforms job listing documents by picking\nimportant schema fields and returns them as one large cleaned array of words  Example  \nfrom airflow.hooks import S3Hook\nfrom skills_ml.datasets.job_postings import job_postings, job_postings_chain\nfrom skills_ml.algorithms.corpus_creators.basic import Doc2VecGensimCorpusCreator\n\ns3_conn = S3Hook().get_conn()\njob_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')\n\n# Default will include all the job postings with O*NET SOC code.\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator)\n\n# For using pre-defined major group filter, one need to specify major groups\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator, major_groups=['11', '13'])\n\n# For using self-defined filter function, one can pass the function like this\ndef filter_by_full_soc(document):\n    if document['onet_soc_code]:\n        if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:\n            return document\n\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator, filter_func=filter_by_full_soc, key=['onet_soc_code'])  Attributes   generator (generator) : a job posting generator  major_groups (list) : a list of O*NET major group classes you want to include in the corpus being created.  filter_func (function) : a self-defined function to filter job postings, which takes a job posting as input\n                            and output a job posting. Default is to filter documents by major group.  key (string) : a key indicates the label which should exist in common schema of job posting.",
-            "title": "Doc2VecGensimCorpusCreator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#simplecorpuscreator",
-            "text": "SimpleCorpusCreator(self, generator=None, filter_func=None, raw=False)  An object that transforms job listing documents by picking\nimportant schema fields and returns them as one large lowercased string",
-            "title": "SimpleCorpusCreator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#word2vecgensimcorpuscreator",
-            "text": "Word2VecGensimCorpusCreator(self, generator=None)  An object that transforms job listing documents by picking\nimportant schema fields and returns them as one large cleaned array of words",
-            "title": "Word2VecGensimCorpusCreator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#corpuscreator",
-            "text": "CorpusCreator(self, generator=None, filter_func=None, raw=False)  A base class for objects that convert common schema\njob listings into a corpus suitable for use by\nmachine learning algorithms or specific tasks.  Example  from airflow.hooks import S3Hook\nfrom skills_ml.datasets.job_postings import job_postings, job_postings_chain\nfrom skills_ml.algorithms.corpus_creators.basic import CorpusCreator\n\ns3_conn = S3Hook().get_conn()\njob_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')\n\n# Default will include all the cleaned job postings\ncorpus = CorpusCreator(job_postings_generator)\n\n# For getting a the raw job postings without any cleaning\ncorpus = CorpusCreator(job_postings_generator, raw=True)\n\n# For using self-defined filter function, one can pass the function like this\ndef filter_by_full_soc(document):\nif document['onet_soc_code]:\n    if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:\n        return document\n\ncorpus = CorpusCreator(job_postings_generator, filter_func=filter_by_full_soc)  Attributes   generator (generator) :  an iterable that generates JSON strings.\n                        Each string is expected to represent a job listing\n                        conforming to the common schema\n                        See sample_job_listing.json for an example of this schema  filter_func (function) : a self-defined function to filter job postings, which takes a job posting as input\n                        and output a job posting. Default is to filter documents by major group.  raw (bool) : a flag whether to return the raw documents or transformed documents",
-            "title": "CorpusCreator"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmselasticsearch_indexers",
-            "text": "",
-            "title": "skills_ml.algorithms.elasticsearch_indexers"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmselasticsearch_indexersbase",
-            "text": "Base class for Elasticsearch indexers  Subclasses implement the index setting definition and transformation of data,\nThe base class handles index management and bulk indexing with ES",
-            "title": "skills_ml.algorithms.elasticsearch_indexers.base"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmselasticsearch_indexersjob_titles_master",
-            "text": "Index job title/occupation pairs in Elasticsearch.",
-            "title": "skills_ml.algorithms.elasticsearch_indexers.job_titles_master"
-        },
-        {
-            "location": "/skills_ml.algorithms/#jobtitlesmasterindexer",
-            "text": "JobTitlesMasterIndexer(self, job_title_generator, alias_name, **kwargs)  Args: job_title_generator (iterable). Each record is expected to be a dict\n    with keys\n    'Title' for the job title and\n    'Original Title' for the occupation",
-            "title": "JobTitlesMasterIndexer"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmselasticsearch_indexersnormalize_topn",
-            "text": "Indexes job postings for job title normalization",
-            "title": "skills_ml.algorithms.elasticsearch_indexers.normalize_topn"
-        },
-        {
-            "location": "/skills_ml.algorithms/#normalizetopnindexer",
-            "text": "NormalizeTopNIndexer(self, quarter, job_postings_generator, job_titles_index, alias_name, **kwargs)  Creates an index that stores data for job title normalization.  Depends on a previously created index with job titles and occupations.  Queries the job title/occupation index for\n1. job titles or occupations that match the job description\n2. Occupation matches  The top three results are indexed.  Args  quarter (string) the quarter from which to retrieve job postings\njob_postings_generator (iterable) an iterable of job postings\njob_title_index (string) The name of an already existing job title/occupation index",
-            "title": "NormalizeTopNIndexer"
         },
         {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmsembedding",
@@ -296,14 +151,14 @@
             "title": "skills_ml.algorithms.embedding.base"
         },
         {
-            "location": "/skills_ml.algorithms/#doc2vecmodel",
-            "text": "Doc2VecModel(self, model_name='doc2vec_2017-07-14T11:32:00.997426', lookup=None, model=None, s3_conn=None, s3_path='open-skills-private/model_cache/embedding/')  The Doc2VecModel Object is a base object which specifies which word-embeding model.  Example  from airflow.hooks import S3Hook\nfrom skills_ml.algorithms.embedding.base import Doc2VecModel\n\ns3_conn = S3Hook().get_conn()\ndoc2vec_model = Doc2VecModel(s3_conn=s3_conn)",
-            "title": "Doc2VecModel"
-        },
-        {
             "location": "/skills_ml.algorithms/#word2vecmodel",
             "text": "Word2VecModel(self, model_name='word2vec_gensim_2017-07-14T11:32:00.997426', model=None, s3_conn=None, s3_path='open-skills-private/model_cache/embedding/')  The Word2VecModel Object is a base object which specifies which word-embeding model.  Example  from airflow.hooks import S3Hook\nfrom skills_ml.algorithms.embedding.base import Word2VecModel\n\ns3_conn = S3Hook().get_conn()\nword2vec_model = Word2VecModel(s3_conn=s3_conn)",
             "title": "Word2VecModel"
+        },
+        {
+            "location": "/skills_ml.algorithms/#doc2vecmodel",
+            "text": "Doc2VecModel(self, model_name='doc2vec_2017-07-14T11:32:00.997426', lookup=None, model=None, s3_conn=None, s3_path='open-skills-private/model_cache/embedding/')  The Doc2VecModel Object is a base object which specifies which word-embeding model.  Example  from airflow.hooks import S3Hook\nfrom skills_ml.algorithms.embedding.base import Doc2VecModel\n\ns3_conn = S3Hook().get_conn()\ndoc2vec_model = Doc2VecModel(s3_conn=s3_conn)",
+            "title": "Doc2VecModel"
         },
         {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmsembeddingtrain",
@@ -321,13 +176,8 @@
             "title": "skills_ml.algorithms.geocoders"
         },
         {
-            "location": "/skills_ml.algorithms/#job_posting_search_strings",
-            "text": "job_posting_search_strings(job_posting)  Convert a job posting to a geocode-ready search string  Includes city and state if present, or just city  Args  job_posting (string) A job posting in schema.org/JobPosting json form   Returns : (string) A geocode-ready search string",
-            "title": "job_posting_search_strings"
-        },
-        {
             "location": "/skills_ml.algorithms/#s3cachedgeocoder",
-            "text": "S3CachedGeocoder(self, s3_conn, cache_s3_path, geocode_func=<function osm at 0x104f84ea0>, sleep_time=1)  Geocoder that uses S3 as a cache.  Args  s3_conn (boto.s3.connection) an s3 connection\ncache_s3_path (string) path (including bucket) to the json cache on s3\ngeocode_func (function) a function that geocodes a given search string\n    defaults to the OSM geocoder provided by the geocode library\nsleep_time (int) The time, in seconds, between geocode calls",
+            "text": "S3CachedGeocoder(self, s3_conn, cache_s3_path, geocode_func=<function osm at 0x7f7c99d3eae8>, sleep_time=1)  Geocoder that uses S3 as a cache.  Args  s3_conn (boto.s3.connection) an s3 connection\ncache_s3_path (string) path (including bucket) to the json cache on s3\ngeocode_func (function) a function that geocodes a given search string\n    defaults to the OSM geocoder provided by the geocode library\nsleep_time (int) The time, in seconds, between geocode calls",
             "title": "S3CachedGeocoder"
         },
         {
@@ -336,49 +186,29 @@
             "title": "skills_ml.algorithms.geocoders.cbsa"
         },
         {
-            "location": "/skills_ml.algorithms/#s3cachedcbsafinder",
-            "text": "S3CachedCBSAFinder(self, s3_conn, cache_s3_path, shapefile_name=None, cache_dir=None)  Find CBSAs associated with geocode results and save them to S3  Geocode results are expected in the json format provided by the python geocoder  module, with a 'bbox'  The highest-level interface is the 'find_all_cbsas_and_save' method, which\nprovides S3 caching. A minimal call looks like  cbsa_finder = S3CachedCBSAFinder(s3_conn=..., cache_s3_path='some-bucket/cbsas.json')\ncbsa_finder.find_all_cbsas_and_save({\n    \"Flushing, NY\": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }\n    \"Houston, TX\": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }\n})\n\n# This usage of 'bbox' is what you can retrieve from a `geocoder` call, such as:\ngeocoder.osm('Flushing, NY').json()  The keys in the resulting cache will be the original search strings.  Warning: The caching is not parallel-safe! It is recommended you should run\nonly one copy of  find_all_cbsas_and_save  at a time to avoid overwriting\nthe S3 cache file.  Args  s3_conn (boto.s3.connection) an s3 connection\ncache_s3_path (string) path (including bucket) to the json cache on s3\nshapefile_name (string) local path to a CBSA shapefile to use\n    optional, will download TIGER 2015 shapefile if absent\ncache_dir (string) local path to a cache directory to use if the\n    shapefile needs to be downloaded\n    optional, will use 'tmp' in working directory if absent",
-            "title": "S3CachedCBSAFinder"
-        },
-        {
             "location": "/skills_ml.algorithms/#match",
             "text": "Match(self, /, *args, **kwargs)  Match(index, area)",
             "title": "Match"
         },
         {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsjob_geography_queriers",
-            "text": "Extracting geographies from job posting datasets",
-            "title": "skills_ml.algorithms.job_geography_queriers"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsjob_geography_querierscbsa",
-            "text": "Look up the CBSA for a job posting from a census crosswalk (job location -> Census Place -> Census UA -> Census CBSA)",
-            "title": "skills_ml.algorithms.job_geography_queriers.cbsa"
-        },
-        {
-            "location": "/skills_ml.algorithms/#jobcbsaquerier",
-            "text": "JobCBSAQuerier(self)  Queries the Core-Based Statistical Area for a job using a census crosswalk  First looks up a Place or County Subdivision by the job posting's state and city.\nIf it finds a result, it will then take the Urbanized Area for that Place or County Subdivison and find CBSAs associated with it.  Queries return all hits, so there may be multiple CBSAs for a given query.",
-            "title": "JobCBSAQuerier"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsjob_geography_querierscbsa_from_geocode",
-            "text": "Look up the CBSA for a job posting against a precomputed geocoded CBSA lookup",
-            "title": "skills_ml.algorithms.job_geography_queriers.cbsa_from_geocode"
-        },
-        {
-            "location": "/skills_ml.algorithms/#jobcbsafromgeocodequerier",
-            "text": "JobCBSAFromGeocodeQuerier(self, cbsa_results)  Queries the Core-Based Statistical Area for a job  This object delegates the CBSA-finding algorithm to a passed-in cache.\nIn practice, you can look at the  skills_ml.algorithms.geocoders.cbsa \nmodule for an example of how this can be generated.  Instead, this object focuses on the job posting-centric logic necessary,\nsuch as converting the job posting to the form needed to use the cache\nand dealing with differents kinds of cache misses.  Args  cbsa_results (dict) A mapping of geocoding search strings to\n    (CBSA FIPS, CBSA Name) tuples",
-            "title": "JobCBSAFromGeocodeQuerier"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsjob_labelers",
-            "text": "",
-            "title": "skills_ml.algorithms.job_labelers"
+            "location": "/skills_ml.algorithms/#s3cachedcbsafinder",
+            "text": "S3CachedCBSAFinder(self, s3_conn, cache_s3_path, shapefile_name=None, cache_dir=None)  Find CBSAs associated with geocode results and save them to S3  Geocode results are expected in the json format provided by the python geocoder  module, with a 'bbox'  The highest-level interface is the 'find_all_cbsas_and_save' method, which\nprovides S3 caching. A minimal call looks like  cbsa_finder = S3CachedCBSAFinder(s3_conn=..., cache_s3_path='some-bucket/cbsas.json')\ncbsa_finder.find_all_cbsas_and_save({\n    \"Flushing, NY\": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }\n    \"Houston, TX\": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }\n})\n\n# This usage of 'bbox' is what you can retrieve from a `geocoder` call, such as:\ngeocoder.osm('Flushing, NY').json()  The keys in the resulting cache will be the original search strings.  Warning: The caching is not parallel-safe! It is recommended you should run\nonly one copy of  find_all_cbsas_and_save  at a time to avoid overwriting\nthe S3 cache file.  Args  s3_conn (boto.s3.connection) an s3 connection\ncache_s3_path (string) path (including bucket) to the json cache on s3\nshapefile_name (string) local path to a CBSA shapefile to use\n    optional, will download TIGER 2015 shapefile if absent\ncache_dir (string) local path to a cache directory to use if the\n    shapefile needs to be downloaded\n    optional, will use 'tmp' in working directory if absent",
+            "title": "S3CachedCBSAFinder"
         },
         {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmsjob_normalizers",
             "text": "Algorithms to normalize a job title to a smaller space",
             "title": "skills_ml.algorithms.job_normalizers"
+        },
+        {
+            "location": "/skills_ml.algorithms/#skills_mlalgorithmsjob_normalizerselasticsearch",
+            "text": "Indexes job postings for job title normalization",
+            "title": "skills_ml.algorithms.job_normalizers.elasticsearch"
+        },
+        {
+            "location": "/skills_ml.algorithms/#normalizetopnindexer",
+            "text": "NormalizeTopNIndexer(self, quarter, job_postings_generator, job_titles_index, alias_name, **kwargs)  Creates an index that stores data for job title normalization.  Depends on a previously created index with job titles and occupations.  Queries the job title/occupation index for\n1. job titles or occupations that match the job description\n2. Occupation matches  The top three results are indexed.  Args  quarter (string) the quarter from which to retrieve job postings\njob_postings_generator (iterable) an iterable of job postings\njob_title_index (string) The name of an already existing job title/occupation index",
+            "title": "NormalizeTopNIndexer"
         },
         {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmsjob_normalizersesa_jobtitle_normalizer",
@@ -411,9 +241,9 @@
             "title": "skills_ml.algorithms.jobtitle_cleaner.clean"
         },
         {
-            "location": "/skills_ml.algorithms/#clean_by_rules",
-            "text": "clean_by_rules(jobtitle)  Remove numbers and normalize spaces  Args  jobtitle (string) A string   Returns : (string) the string with numbers removes and spaces normalized",
-            "title": "clean_by_rules"
+            "location": "/skills_ml.algorithms/#clean_by_neg_dic",
+            "text": "clean_by_neg_dic(jobtitle, negative_list, positive_list)  Remove words from the negative dictionary  Args  jobtitle (string) A job title string\nnegative_list (collection) A list of stop words\npositive_list (collection) A list of positive words to override stop words   Returns : (string) The cleaned job title",
+            "title": "clean_by_neg_dic"
         },
         {
             "location": "/skills_ml.algorithms/#aggregate",
@@ -421,14 +251,14 @@
             "title": "aggregate"
         },
         {
-            "location": "/skills_ml.algorithms/#clean_by_neg_dic",
-            "text": "clean_by_neg_dic(jobtitle, negative_list, positive_list)  Remove words from the negative dictionary  Args  jobtitle (string) A job title string\nnegative_list (collection) A list of stop words\npositive_list (collection) A list of positive words to override stop words   Returns : (string) The cleaned job title",
-            "title": "clean_by_neg_dic"
-        },
-        {
             "location": "/skills_ml.algorithms/#jobtitlestringclean",
             "text": "JobTitleStringClean(self)  Clean job titles by stripping numbers, and removing place/state names (unless they are also ONET jobs)",
             "title": "JobTitleStringClean"
+        },
+        {
+            "location": "/skills_ml.algorithms/#clean_by_rules",
+            "text": "clean_by_rules(jobtitle)  Remove numbers and normalize spaces  Args  jobtitle (string) A string   Returns : (string) the string with numbers removes and spaces normalized",
+            "title": "clean_by_rules"
         },
         {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmsoccupation_classifiers",
@@ -441,44 +271,19 @@
             "title": "skills_ml.algorithms.occupation_classifiers.classifiers"
         },
         {
-            "location": "/skills_ml.algorithms/#classifier",
-            "text": "Classifier(self, classifier_id='ann_0614', classifier=None, s3_conn=None, s3_path='open-skills-private/model_cache/occupation_classifiers/', classify_kwargs=None, temporary_directory=None, **kwargs)  The Classifiers Object to classify each jobposting description to O*Net SOC code.  Example  from airflow.hooks import S3Hook\nfrom skills_ml.algorithms.occupation_classifiers.classifiers import Classifier  s3_conn = S3Hook().get_conn()\nSoc = Classifier(s3_conn=s3_conn, classifier_id='ann_0614')  predicted_soc = Soc.classify(jobposting, mode='top')",
-            "title": "Classifier"
-        },
-        {
             "location": "/skills_ml.algorithms/#nearestneighbors",
             "text": "NearestNeighbors(self, indexed=False, indexer=None, **kwargs)  Nearest neightbors model to classify the jobposting data into soc code.\nIf the indexer is passed, then NearestNeighbors will use approximate nearest\nneighbor approach which is much faster than the built-in knn in gensim.  Attributes   indexed (bool) : index the data with Annoy or not. Annoy can find approximate nearest neighbors much faster.  indexer (:obj: gensim.similarities.index ) : Annoy index object should be passed in for faster query.",
             "title": "NearestNeighbors"
         },
         {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsrepresentativeness_calculators",
-            "text": "Calculate representativeness of a dataset, such as job postings",
-            "title": "skills_ml.algorithms.representativeness_calculators"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsrepresentativeness_calculatorsgeo_occupation",
-            "text": "Computes geographic representativeness of job postings based on ONET SOC Code",
-            "title": "skills_ml.algorithms.representativeness_calculators.geo_occupation"
-        },
-        {
-            "location": "/skills_ml.algorithms/#geooccupationrepresentativenesscalculator",
-            "text": "GeoOccupationRepresentativenessCalculator(self, geo_querier=None, normalizer=None)  Calculates geographic representativeness of SOC Codes.\nIf a job normalizer is given, will attempt to compute SOC codes\nof jobs that have missing SOC codes  Args  geo_querier (skills_ml.algorithms.job_geography_queriers) An object that can return a CBSA from a job posting\nnormalizer (skills_ml.algorithms.occupation_classifiers) An object that can return the SOC code from a job posting",
-            "title": "GeoOccupationRepresentativenessCalculator"
+            "location": "/skills_ml.algorithms/#classifier",
+            "text": "Classifier(self, classifier_id='ann_0614', classifier=None, s3_conn=None, s3_path='open-skills-private/model_cache/occupation_classifiers/', classify_kwargs=None, temporary_directory=None, **kwargs)  The Classifiers Object to classify each jobposting description to O*Net SOC code.  Example  from airflow.hooks import S3Hook\nfrom skills_ml.algorithms.occupation_classifiers.classifiers import Classifier  s3_conn = S3Hook().get_conn()\nSoc = Classifier(s3_conn=s3_conn, classifier_id='ann_0614')  predicted_soc = Soc.classify(jobposting, mode='top')",
+            "title": "Classifier"
         },
         {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmssampling",
             "text": "Generate and store samples of datasets",
             "title": "skills_ml.algorithms.sampling"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmssamplingjobs",
-            "text": "Sample job postings",
-            "title": "skills_ml.algorithms.sampling.jobs"
-        },
-        {
-            "location": "/skills_ml.algorithms/#jobsampler",
-            "text": "JobSampler(self, job_posting_generator, major_group=False, keys=None, weights=None, random_state=None)  Job posting sampler using reservoir sampling methods  It takes a job_posting generator as an input. To sample based on weights, one should sepecify a weight dictionary.  Attributes   job_posting_generator (iterator) : Job posting iterator to sample from.  major_group (bool) : A flag for using major_group as a label or not  keys (list|str) : a key or keys(for nested dictionary) indicates the label which should exist in common schema\n                     of job posting.  weights (dict) : a dictionary that has key-value pairs as label-weighting pairs. It expects every\n                    label in the iterator to be present as a key in the weights dictionary For example,  weights = {'11' : 2, '13', 1}. In this case, the label/key is the occupation major\n                    group and the value is the weight you want to sample with.  random_state (int) : the seed used by the random number generator",
-            "title": "JobSampler"
         },
         {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmssamplingmethods",
@@ -541,29 +346,9 @@
             "title": "skills_ml.algorithms.skill_extractors.noun_phrase_ending"
         },
         {
-            "location": "/skills_ml.algorithms/#clean_beginning",
-            "text": "clean_beginning(string)  Clean the beginning of a string of common undesired formatting substrings  Args    string (string) : Any string    Returns : The string with beginning formatting substrings removed",
-            "title": "clean_beginning"
-        },
-        {
-            "location": "/skills_ml.algorithms/#sentences_words_pos",
-            "text": "sentences_words_pos(document)  Chops raw text into part-of-speech (POS)-tagged words in sentences  Args  document (string) A document in text format   Returns : (list) of sentences, each being a list of word/POS pair   Example  sentences_words_pos(\n    '* Develop and maintain relationship with key members of ' +\n    'ESPN\u2019s Spanish speaking editorial team'\n)\n[ # list of sentences\n    [ # list of word/POS pairs\n        ('*', 'NN'),\n        ('Develop', 'NNP'),\n        ('and', 'CC'),\n        ('maintain', 'VB'),\n        ('relationship', 'NN'),\n        ('with', 'IN'),\n        ('key', 'JJ'),\n        ('members', 'NNS'),\n        ('of', 'IN'),\n        ('ESPN', 'NNP'),\n        ('\u2019', 'NNP'),\n        ('s', 'VBD'),\n        ('Spanish', 'JJ'),\n        ('speaking', 'NN'),\n        ('editorial', 'NN'),\n        ('team', 'NN')\n    ]\n]",
-            "title": "sentences_words_pos"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skillendingpatternextractor",
-            "text": "SkillEndingPatternExtractor(self, *args, **kwargs)  Identify noun phrases ending with 'skill' or 'skills' as skills",
-            "title": "SkillEndingPatternExtractor"
-        },
-        {
             "location": "/skills_ml.algorithms/#npendpatternextractor",
             "text": "NPEndPatternExtractor(self, endings, stop_phrases, only_bulleted_lines=True, *args, **kwargs)  Identify noun phrases with certain ending words (e.g 'skills', 'abilities') as skills  Args   endings (list) : Single words that should identify the ending of a noun phrase\n        as being a skill  stop_phrases (list) : Noun phrases that should not be considered skills  only_bulleted_lines (bool, default True) : Whether or not to only consider lines\n        that look like they are items in a list",
             "title": "NPEndPatternExtractor"
-        },
-        {
-            "location": "/skills_ml.algorithms/#noun_phrases_in_line_with_context",
-            "text": "noun_phrases_in_line_with_context(line)  Generate noun phrases in the given line of text  Args   text (string) : A line of raw text   Yields      tuples, each with two strings      - a noun phrase\n    - the context of the noun phrase (currently defined as the surrounding sentence)",
-            "title": "noun_phrases_in_line_with_context"
         },
         {
             "location": "/skills_ml.algorithms/#abilityendingpatternextractor",
@@ -571,9 +356,29 @@
             "title": "AbilityEndingPatternExtractor"
         },
         {
+            "location": "/skills_ml.algorithms/#noun_phrases_in_line_with_context",
+            "text": "noun_phrases_in_line_with_context(line)  Generate noun phrases in the given line of text  Args   text (string) : A line of raw text   Yields      tuples, each with two strings      - a noun phrase\n    - the context of the noun phrase (currently defined as the surrounding sentence)",
+            "title": "noun_phrases_in_line_with_context"
+        },
+        {
             "location": "/skills_ml.algorithms/#is_bulleted",
             "text": "is_bulleted(string)  Whether or not a given string begins a 'bullet' character  A bullet character is understood to indicate list membership.\nDiffereing common bullet characters are checked.  Args    string (string) : Any string    Returns : (bool) whether or not the string begins with one of the characters\n    in a predefined list of common bullets",
             "title": "is_bulleted"
+        },
+        {
+            "location": "/skills_ml.algorithms/#clean_beginning",
+            "text": "clean_beginning(string)  Clean the beginning of a string of common undesired formatting substrings  Args    string (string) : Any string    Returns : The string with beginning formatting substrings removed",
+            "title": "clean_beginning"
+        },
+        {
+            "location": "/skills_ml.algorithms/#skillendingpatternextractor",
+            "text": "SkillEndingPatternExtractor(self, *args, **kwargs)  Identify noun phrases ending with 'skill' or 'skills' as skills",
+            "title": "SkillEndingPatternExtractor"
+        },
+        {
+            "location": "/skills_ml.algorithms/#sentences_words_pos",
+            "text": "sentences_words_pos(document)  Chops raw text into part-of-speech (POS)-tagged words in sentences  Args  document (string) A document in text format   Returns : (list) of sentences, each being a list of word/POS pair   Example  sentences_words_pos(\n    '* Develop and maintain relationship with key members of ' +\n    'ESPN\u2019s Spanish speaking editorial team'\n)\n[ # list of sentences\n    [ # list of word/POS pairs\n        ('*', 'NN'),\n        ('Develop', 'NNP'),\n        ('and', 'CC'),\n        ('maintain', 'VB'),\n        ('relationship', 'NN'),\n        ('with', 'IN'),\n        ('key', 'JJ'),\n        ('members', 'NNS'),\n        ('of', 'IN'),\n        ('ESPN', 'NNP'),\n        ('\u2019', 'NNP'),\n        ('s', 'VBD'),\n        ('Spanish', 'JJ'),\n        ('speaking', 'NN'),\n        ('editorial', 'NN'),\n        ('team', 'NN')\n    ]\n]",
+            "title": "sentences_words_pos"
         },
         {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmsskill_extractorssoc_exact",
@@ -586,61 +391,6 @@
             "title": "SocScopedExactMatchSkillExtractor"
         },
         {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsskill_importance_extractors",
-            "text": "Process lists of occupation skill importances into a common format",
-            "title": "skills_ml.algorithms.skill_importance_extractors"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsskill_importance_extractorsonet",
-            "text": "Process ONET data to create a dataset with occupations and their skill importances",
-            "title": "skills_ml.algorithms.skill_importance_extractors.onet"
-        },
-        {
-            "location": "/skills_ml.algorithms/#onetskillimportanceextractor",
-            "text": "OnetSkillImportanceExtractor(self, onet_source, output_filename, hash_function)  An object that creates a skills importance CSV based on ONET data  Originally written by Kwame Porter Robinson",
-            "title": "OnetSkillImportanceExtractor"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsskill_list_processors",
-            "text": "Process lists of skills into a common format",
-            "title": "skills_ml.algorithms.skill_list_processors"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsskill_list_processorsonet_ksat",
-            "text": "Process ONET skill lists of various types into a common format",
-            "title": "skills_ml.algorithms.skill_list_processors.onet_ksat"
-        },
-        {
-            "location": "/skills_ml.algorithms/#onetskilllistprocessor",
-            "text": "OnetSkillListProcessor(self, onet_source, output_filename, hash_function, ksa_types=None)  An object that creates a skills CSV based on ONET data  Originally written by Kwame Porter Robinson",
-            "title": "OnetSkillListProcessor"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsskill_taggers",
-            "text": "Tag skills in text with their md5 hashed value",
-            "title": "skills_ml.algorithms.skill_taggers"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsskill_taggersbase",
-            "text": "",
-            "title": "skills_ml.algorithms.skill_taggers.base"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skilltaggerbase",
-            "text": "SkillTaggerBase(self, skills_filename)  A base class for objects that tag skills in job listing data",
-            "title": "SkillTaggerBase"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmsskill_taggerssimple",
-            "text": "",
-            "title": "skills_ml.algorithms.skill_taggers.simple"
-        },
-        {
-            "location": "/skills_ml.algorithms/#simpleskilltagger",
-            "text": "SimpleSkillTagger(self, hash_function, *args, **kwargs)  Tag skills in unstructured text  Originally written by Kwame Porter Robinson",
-            "title": "SimpleSkillTagger"
-        },
-        {
             "location": "/skills_ml.algorithms/#skills_mlalgorithmsstring_cleaners",
             "text": "String cleaning algorithms",
             "title": "skills_ml.algorithms.string_cleaners"
@@ -651,28 +401,8 @@
             "title": "skills_ml.algorithms.string_cleaners.nlp"
         },
         {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmstitle_extractors",
-            "text": "Process lists of job titles into a common format",
-            "title": "skills_ml.algorithms.title_extractors"
-        },
-        {
-            "location": "/skills_ml.algorithms/#skills_mlalgorithmstitle_extractorsonet",
-            "text": "Process ONET job titles into a common format",
-            "title": "skills_ml.algorithms.title_extractors.onet"
-        },
-        {
-            "location": "/skills_ml.algorithms/#onet_title",
-            "text": "Onet_Title(self, onet_cache)  An object representing job title data from different ONET files  Originally written by Kwame Porter Robinson",
-            "title": "Onet_Title"
-        },
-        {
-            "location": "/skills_ml.algorithms/#onettitleextractor",
-            "text": "OnetTitleExtractor(self, output_filename, onet_source, hash_function)  An object that creates a job titles CSV based on ONET data",
-            "title": "OnetTitleExtractor"
-        },
-        {
             "location": "/skills_ml.datasets/",
-            "text": "skills_ml.datasets.cbsa_shapefile\n\n\ndownload_shapefile\n\n\n\n\n\n\nskills_ml.datasets.cousub_ua\n\n\ncousub_ua\n\n\n\n\n\n\nskills_ml.datasets.job_postings\n\n\njob_postings\n\n\njob_postings_chain\n\n\n\n\n\n\nskills_ml.datasets.nber_county_cbsa\n\n\ncbsa_lookup\n\n\n\n\n\n\nskills_ml.datasets.negative_positive_dict\n\n\nnegative_positive_dict\n\n\n\n\n\n\nskills_ml.datasets.onet_cache\n\n\nOnetCache\n\n\n\n\n\n\nskills_ml.datasets.onet_source\n\n\nskills_ml.datasets.partner_updaters\n\n\nskills_ml.datasets.partner_updaters.usa_jobs\n\n\nskills_ml.datasets.place_ua\n\n\nplace_ua\n\n\n\n\n\n\nskills_ml.datasets.raw_job_postings\n\n\nskills_ml.datasets.raw_job_postings.usajobs\n\n\nskills_ml.datasets.raw_job_postings.virginia\n\n\nskills_ml.datasets.sba_city_county\n\n\ncounty_lookup\n\n\n\n\n\n\nskills_ml.datasets.ua_cbsa\n\n\nua_cbsa\n\n\n\n\n\n\n\n\n\n\nskills_ml.datasets.cbsa_shapefile \n\u00b6\n\n\nUse the Census CBSA shapefile\n\n\ndownload_shapefile \n\u00b6\n\n\ndownload_shapefile(cache_dir)\n\n\n\n\nDownload Tiger 2015 CBSA Shapefile\n\n\nDownloads the zip archive and unzips the contents\n\n\nArgs\n\n\ncache_dir (string) local path to download files to\n\n\n\n\n\nReturns\n: (string) Path to the extracted shapefile\n\n\n\n\nskills_ml.datasets.cousub_ua \n\u00b6\n\n\nRetrieve County Subdivision->Urbanized Area crosswalk\n\n\ncousub_ua \n\u00b6\n\n\ncousub_ua(city_cleaner)\n\n\n\n\nConstruct a County Subdivision->UA Lookup table from Census data\nReturns: dict\n{ StateCode: { CountySubdivisionName: UA Code } }\n\n\nskills_ml.datasets.job_postings \n\u00b6\n\n\njob_postings \n\u00b6\n\n\njob_postings(s3_conn, quarter, s3_path, source='all')\n\n\n\n\nStream all job listings from s3 for a given quarter\n\nArgs\n\n\n\n\ns3_conn\n: a boto s3 connection\n\n\nquarter\n: a string representing a quarter (2015Q1)\n\n\ns3_path\n: path to the job listings.\n\n\nsource\n: should be a string or a subset of \"nlx\", \"va\", \"cb\" or \"all\"\n\n\n\n\nYields\n\n\nstring in json format representing the next job listing\n    Refer to sample_job_listing.json for example structure\n\n\n\njob_postings_chain \n\u00b6\n\n\njob_postings_chain(s3_conn, quarters, s3_path, source='all')\n\n\n\n\nChain the generators of a list of multiple quarters\n\nArgs\n\n\n\n\ns3_conn\n: a boto s3 connection\n\n\nquarters\n: a list of quarters\n\n\ns3_path\n: path to the job listings\n\n\nsource\n: should be a string or a subset of \"nlx\", \"va\", \"cb\" or \"all\"\n\n\n\n\nReturn\n\n\na generator that all generators are chained together into\n\n\n\nskills_ml.datasets.nber_county_cbsa \n\u00b6\n\n\nRetrieve county->CBSA crosswalk file from the NBER\n\n\ncbsa_lookup \n\u00b6\n\n\ncbsa_lookup()\n\n\n\n\nConstruct a County->CBSA Lookup table from NBER data\nReturns: dict\n    each key is a (State Code, County FIPS code) tuple\n    each value is a (CBSA FIPS code, CBSA Name) tuple\n\n\nskills_ml.datasets.negative_positive_dict \n\u00b6\n\n\nnegative_positive_dict \n\u00b6\n\n\nnegative_positive_dict()\n\n\n\n\nConstruct a dictionary of terms that are considered not to be in job title, including\nstates, states abv, cities\nReturns: dictionary of set\n\n\nskills_ml.datasets.onet_cache \n\u00b6\n\n\nOnetCache \n\u00b6\n\n\nOnetCache(self, s3_conn, s3_path, cache_dir)\n\n\n\n\nAn object that downloads and caches ONET files from S3\n\n\nskills_ml.datasets.onet_source \n\u00b6\n\n\nDownload ONET files from their site\n\n\nskills_ml.datasets.partner_updaters \n\u00b6\n\n\nUpdate raw job postings from external partners\n\n\nskills_ml.datasets.partner_updaters.usa_jobs \n\u00b6\n\n\nUpdate raw job postings from the USAJobs API\n\n\nskills_ml.datasets.place_ua \n\u00b6\n\n\nRetrieve Census Place->Urbanized Area crosswalk\n\n\nplace_ua \n\u00b6\n\n\nplace_ua(city_cleaner)\n\n\n\n\nConstruct a Place->UA Lookup table from Census data\nReturns: dict\n{ StateCode: { PlaceName: UA Code } }\n\n\nskills_ml.datasets.raw_job_postings \n\u00b6\n\n\nskills_ml.datasets.raw_job_postings.usajobs \n\u00b6\n\n\nImport USAJobs postings into the Open Skills common schema\n\n\nskills_ml.datasets.raw_job_postings.virginia \n\u00b6\n\n\nskills_ml.datasets.sba_city_county \n\u00b6\n\n\nRetrieve county lookup tables from the SBA for each state\n\n\ncounty_lookup \n\u00b6\n\n\ncounty_lookup()\n\n\n\n\nRetrieve county lookup tables if they are not already cached\n\n\nReturns: (dict) each key is a state, each value is a dict {city_name: (fips_county_code, county_name)}\n\n\nskills_ml.datasets.ua_cbsa \n\u00b6\n\n\nRetrieve\n Urbanized Area->CBSA crosswalk\n\n\nua_cbsa \n\u00b6\n\n\nua_cbsa()\n\n\n\n\nConstruct a UA->CBSA Lookup table from Census data\nReturns: dict\n{ UA Fips: [(CBSA FIPS, CBSA Name)] }",
+            "text": "skills_ml.datasets.cbsa_shapefile\n\n\ndownload_shapefile\n\n\n\n\n\n\nskills_ml.datasets.cousub_ua\n\n\ncousub_ua\n\n\n\n\n\n\nskills_ml.datasets.job_titles\n\n\nskills_ml.datasets.job_titles.elasticsearch\n\n\nJobTitlesMasterIndexer\n\n\n\n\n\n\nskills_ml.datasets.job_titles.onet\n\n\nOnet_Title\n\n\nOnetTitleExtractor\n\n\n\n\n\n\nskills_ml.datasets.nber_county_cbsa\n\n\ncbsa_lookup\n\n\n\n\n\n\nskills_ml.datasets.negative_positive_dict\n\n\nnegative_positive_dict\n\n\n\n\n\n\nskills_ml.datasets.onet_cache\n\n\nOnetCache\n\n\n\n\n\n\nskills_ml.datasets.onet_source\n\n\nskills_ml.datasets.partner_updaters\n\n\nskills_ml.datasets.partner_updaters.usa_jobs\n\n\nskills_ml.datasets.place_ua\n\n\nplace_ua\n\n\n\n\n\n\nskills_ml.datasets.sba_city_county\n\n\ncounty_lookup\n\n\n\n\n\n\nskills_ml.datasets.skill_importances\n\n\nskills_ml.datasets.skill_importances.onet\n\n\nOnetSkillImportanceExtractor\n\n\n\n\n\n\nskills_ml.datasets.skills\n\n\nskills_ml.datasets.skills.onet_ksat\n\n\nOnetSkillListProcessor\n\n\n\n\n\n\nskills_ml.datasets.ua_cbsa\n\n\nua_cbsa\n\n\n\n\n\n\n\n\n\n\nskills_ml.datasets.cbsa_shapefile \n\u00b6\n\n\nUse the Census CBSA shapefile\n\n\ndownload_shapefile \n\u00b6\n\n\ndownload_shapefile(cache_dir)\n\n\n\n\nDownload Tiger 2015 CBSA Shapefile\n\n\nDownloads the zip archive and unzips the contents\n\n\nArgs\n\n\ncache_dir (string) local path to download files to\n\n\n\n\n\nReturns\n: (string) Path to the extracted shapefile\n\n\n\n\nskills_ml.datasets.cousub_ua \n\u00b6\n\n\nRetrieve County Subdivision->Urbanized Area crosswalk\n\n\ncousub_ua \n\u00b6\n\n\ncousub_ua(city_cleaner)\n\n\n\n\nConstruct a County Subdivision->UA Lookup table from Census data\nReturns: dict\n{ StateCode: { CountySubdivisionName: UA Code } }\n\n\nskills_ml.datasets.job_titles \n\u00b6\n\n\nProcess lists of job titles into a common format\n\n\nskills_ml.datasets.job_titles.elasticsearch \n\u00b6\n\n\nIndex job title/occupation pairs in Elasticsearch.\n\n\nJobTitlesMasterIndexer \n\u00b6\n\n\nJobTitlesMasterIndexer(self, job_title_generator, alias_name, **kwargs)\n\n\n\n\nArgs: job_title_generator (iterable). Each record is expected to be a dict\n    with keys\n    'Title' for the job title and\n    'Original Title' for the occupation\n\n\nskills_ml.datasets.job_titles.onet \n\u00b6\n\n\nProcess ONET job titles into a common format\n\n\nOnet_Title \n\u00b6\n\n\nOnet_Title(self, onet_cache)\n\n\n\n\nAn object representing job title data from different ONET files\n\n\nOriginally written by Kwame Porter Robinson\n\n\nOnetTitleExtractor \n\u00b6\n\n\nOnetTitleExtractor(self, output_filename, onet_source, hash_function)\n\n\n\n\nAn object that creates a job titles CSV based on ONET data\n\n\nskills_ml.datasets.nber_county_cbsa \n\u00b6\n\n\nRetrieve county->CBSA crosswalk file from the NBER\n\n\ncbsa_lookup \n\u00b6\n\n\ncbsa_lookup()\n\n\n\n\nConstruct a County->CBSA Lookup table from NBER data\nReturns: dict\n    each key is a (State Code, County FIPS code) tuple\n    each value is a (CBSA FIPS code, CBSA Name) tuple\n\n\nskills_ml.datasets.negative_positive_dict \n\u00b6\n\n\nnegative_positive_dict \n\u00b6\n\n\nnegative_positive_dict()\n\n\n\n\nConstruct a dictionary of terms that are considered not to be in job title, including\nstates, states abv, cities\nReturns: dictionary of set\n\n\nskills_ml.datasets.onet_cache \n\u00b6\n\n\nOnetCache \n\u00b6\n\n\nOnetCache(self, s3_conn, s3_path, cache_dir)\n\n\n\n\nAn object that downloads and caches ONET files from S3\n\n\nskills_ml.datasets.onet_source \n\u00b6\n\n\nDownload ONET files from their site\n\n\nskills_ml.datasets.partner_updaters \n\u00b6\n\n\nUpdate raw job postings from external partners\n\n\nskills_ml.datasets.partner_updaters.usa_jobs \n\u00b6\n\n\nUpdate raw job postings from the USAJobs API\n\n\nskills_ml.datasets.place_ua \n\u00b6\n\n\nRetrieve Census Place->Urbanized Area crosswalk\n\n\nplace_ua \n\u00b6\n\n\nplace_ua(city_cleaner)\n\n\n\n\nConstruct a Place->UA Lookup table from Census data\nReturns: dict\n{ StateCode: { PlaceName: UA Code } }\n\n\nskills_ml.datasets.sba_city_county \n\u00b6\n\n\nRetrieve county lookup tables from the SBA for each state\n\n\ncounty_lookup \n\u00b6\n\n\ncounty_lookup()\n\n\n\n\nRetrieve county lookup tables if they are not already cached\n\n\nReturns: (dict) each key is a state, each value is a dict {city_name: (fips_county_code, county_name)}\n\n\nskills_ml.datasets.skill_importances \n\u00b6\n\n\nProcess lists of occupation skill importances into a common format\n\n\nskills_ml.datasets.skill_importances.onet \n\u00b6\n\n\nProcess ONET data to create a dataset with occupations and their skill importances\n\n\nOnetSkillImportanceExtractor \n\u00b6\n\n\nOnetSkillImportanceExtractor(self, onet_source, output_filename, hash_function)\n\n\n\n\nAn object that creates a skills importance CSV based on ONET data\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.datasets.skills \n\u00b6\n\n\nProcess lists of skills into a common format\n\n\nskills_ml.datasets.skills.onet_ksat \n\u00b6\n\n\nProcess ONET skill lists of various types into a common format\n\n\nOnetSkillListProcessor \n\u00b6\n\n\nOnetSkillListProcessor(self, onet_source, output_filename, hash_function, ksa_types=None)\n\n\n\n\nAn object that creates a skills CSV based on ONET data\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.datasets.ua_cbsa \n\u00b6\n\n\nRetrieve\n Urbanized Area->CBSA crosswalk\n\n\nua_cbsa \n\u00b6\n\n\nua_cbsa()\n\n\n\n\nConstruct a UA->CBSA Lookup table from Census data\nReturns: dict\n{ UA Fips: [(CBSA FIPS, CBSA Name)] }",
             "title": "Dataset Processors"
         },
         {
@@ -696,19 +426,34 @@
             "title": "cousub_ua"
         },
         {
-            "location": "/skills_ml.datasets/#skills_mldatasetsjob_postings",
-            "text": "",
-            "title": "skills_ml.datasets.job_postings"
+            "location": "/skills_ml.datasets/#skills_mldatasetsjob_titles",
+            "text": "Process lists of job titles into a common format",
+            "title": "skills_ml.datasets.job_titles"
         },
         {
-            "location": "/skills_ml.datasets/#job_postings",
-            "text": "job_postings(s3_conn, quarter, s3_path, source='all')  Stream all job listings from s3 for a given quarter Args   s3_conn : a boto s3 connection  quarter : a string representing a quarter (2015Q1)  s3_path : path to the job listings.  source : should be a string or a subset of \"nlx\", \"va\", \"cb\" or \"all\"   Yields  string in json format representing the next job listing\n    Refer to sample_job_listing.json for example structure",
-            "title": "job_postings"
+            "location": "/skills_ml.datasets/#skills_mldatasetsjob_titleselasticsearch",
+            "text": "Index job title/occupation pairs in Elasticsearch.",
+            "title": "skills_ml.datasets.job_titles.elasticsearch"
         },
         {
-            "location": "/skills_ml.datasets/#job_postings_chain",
-            "text": "job_postings_chain(s3_conn, quarters, s3_path, source='all')  Chain the generators of a list of multiple quarters Args   s3_conn : a boto s3 connection  quarters : a list of quarters  s3_path : path to the job listings  source : should be a string or a subset of \"nlx\", \"va\", \"cb\" or \"all\"   Return  a generator that all generators are chained together into",
-            "title": "job_postings_chain"
+            "location": "/skills_ml.datasets/#jobtitlesmasterindexer",
+            "text": "JobTitlesMasterIndexer(self, job_title_generator, alias_name, **kwargs)  Args: job_title_generator (iterable). Each record is expected to be a dict\n    with keys\n    'Title' for the job title and\n    'Original Title' for the occupation",
+            "title": "JobTitlesMasterIndexer"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsjob_titlesonet",
+            "text": "Process ONET job titles into a common format",
+            "title": "skills_ml.datasets.job_titles.onet"
+        },
+        {
+            "location": "/skills_ml.datasets/#onet_title",
+            "text": "Onet_Title(self, onet_cache)  An object representing job title data from different ONET files  Originally written by Kwame Porter Robinson",
+            "title": "Onet_Title"
+        },
+        {
+            "location": "/skills_ml.datasets/#onettitleextractor",
+            "text": "OnetTitleExtractor(self, output_filename, onet_source, hash_function)  An object that creates a job titles CSV based on ONET data",
+            "title": "OnetTitleExtractor"
         },
         {
             "location": "/skills_ml.datasets/#skills_mldatasetsnber_county_cbsa",
@@ -766,19 +511,369 @@
             "title": "place_ua"
         },
         {
-            "location": "/skills_ml.datasets/#skills_mldatasetsraw_job_postings",
-            "text": "",
-            "title": "skills_ml.datasets.raw_job_postings"
+            "location": "/skills_ml.datasets/#skills_mldatasetssba_city_county",
+            "text": "Retrieve county lookup tables from the SBA for each state",
+            "title": "skills_ml.datasets.sba_city_county"
         },
         {
-            "location": "/skills_ml.datasets/#skills_mldatasetsraw_job_postingsusajobs",
+            "location": "/skills_ml.datasets/#county_lookup",
+            "text": "county_lookup()  Retrieve county lookup tables if they are not already cached  Returns: (dict) each key is a state, each value is a dict {city_name: (fips_county_code, county_name)}",
+            "title": "county_lookup"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsskill_importances",
+            "text": "Process lists of occupation skill importances into a common format",
+            "title": "skills_ml.datasets.skill_importances"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsskill_importancesonet",
+            "text": "Process ONET data to create a dataset with occupations and their skill importances",
+            "title": "skills_ml.datasets.skill_importances.onet"
+        },
+        {
+            "location": "/skills_ml.datasets/#onetskillimportanceextractor",
+            "text": "OnetSkillImportanceExtractor(self, onet_source, output_filename, hash_function)  An object that creates a skills importance CSV based on ONET data  Originally written by Kwame Porter Robinson",
+            "title": "OnetSkillImportanceExtractor"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsskills",
+            "text": "Process lists of skills into a common format",
+            "title": "skills_ml.datasets.skills"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsskillsonet_ksat",
+            "text": "Process ONET skill lists of various types into a common format",
+            "title": "skills_ml.datasets.skills.onet_ksat"
+        },
+        {
+            "location": "/skills_ml.datasets/#onetskilllistprocessor",
+            "text": "OnetSkillListProcessor(self, onet_source, output_filename, hash_function, ksa_types=None)  An object that creates a skills CSV based on ONET data  Originally written by Kwame Porter Robinson",
+            "title": "OnetSkillListProcessor"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsua_cbsa",
+            "text": "Retrieve  Urbanized Area->CBSA crosswalk",
+            "title": "skills_ml.datasets.ua_cbsa"
+        },
+        {
+            "location": "/skills_ml.datasets/#ua_cbsa",
+            "text": "ua_cbsa()  Construct a UA->CBSA Lookup table from Census data\nReturns: dict\n{ UA Fips: [(CBSA FIPS, CBSA Name)] }",
+            "title": "ua_cbsa"
+        },
+        {
+            "location": "/skills_ml.job_postings/",
+            "text": "skills_ml.job_postings.aggregate\n\n\nSocCodeAggregator\n\n\nSkillAggregator\n\n\nCountAggregator\n\n\nOccupationScopedSkillAggregator\n\n\nGivenSocCodeAggregator\n\n\nJobAggregator\n\n\n\n\n\n\nskills_ml.job_postings.aggregate.dataset_transform\n\n\nGlobalStatsAggregator\n\n\nDatasetStatsAggregator\n\n\nDatasetStatsCounter\n\n\n\n\n\n\nskills_ml.job_postings.aggregate.field_values\n\n\nFieldValueCounter\n\n\n\n\n\n\nskills_ml.job_postings.aggregate.geo\n\n\nGeoAggregator\n\n\n\n\n\n\nskills_ml.job_postings.aggregate.soc_code\n\n\nGeoSocAggregator\n\n\n\n\n\n\nskills_ml.job_postings.aggregate.title\n\n\nGeoTitleAggregator\n\n\n\n\n\n\nskills_ml.job_postings.common_schema\n\n\njob_postings_chain\n\n\njob_postings\n\n\n\n\n\n\nskills_ml.job_postings.corpora\n\n\nskills_ml.job_postings.corpora.basic\n\n\nWord2VecGensimCorpusCreator\n\n\nJobCategoryCorpusCreator\n\n\nCorpusCreator\n\n\nDoc2VecGensimCorpusCreator\n\n\nSimpleCorpusCreator\n\n\n\n\n\n\nskills_ml.job_postings.geography_queriers\n\n\njob_posting_search_strings\n\n\n\n\n\n\nskills_ml.job_postings.geography_queriers.cbsa\n\n\nJobCBSAQuerier\n\n\n\n\n\n\nskills_ml.job_postings.geography_queriers.cbsa_from_geocode\n\n\nJobCBSAFromGeocodeQuerier\n\n\n\n\n\n\nskills_ml.job_postings.raw\n\n\nskills_ml.job_postings.raw.usajobs\n\n\nskills_ml.job_postings.raw.virginia\n\n\nskills_ml.job_postings.sample\n\n\nJobSampler\n\n\n\n\n\n\n\n\n\n\nskills_ml.job_postings.aggregate \n\u00b6\n\n\nAggregate properties of job postings.\n\n\nClasses in this module generally wrap calls to some code in \nskills_ml.algorithms\n for some arbitrary set of job postings (in schema.org JobPosting format as a Python dict), accumulating the output in a Counter.\n\n\nSocCodeAggregator \n\u00b6\n\n\nSocCodeAggregator(self, occupation_classifier, corpus_creator, *args, **kwargs)\n\n\n\n\nAggregates SOC codes inferred from job posting text\n\n\nArgs\n\n\noccupation_classifier (.occupation_classifiers.SocClassifier)\n    An object that returns a classified SOC code and similarity score\n    from unstructured text\ncorpus creator (object) an object that returns unstructured text\n    from a job posting\n\n\n\nSkillAggregator \n\u00b6\n\n\nSkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)\n\n\n\n\nAggregates skills found in job postings\n\n\nArgs\n\n\nskill_extractor (.skill_extractors.FreetextSkillExtractor)\n    an object that returns skill counts from unstructured text\ncorpus creator (object) an object that returns a text corpus\n    from a job posting\n\n\n\nCountAggregator \n\u00b6\n\n\nCountAggregator(self, output_count=1, output_total=False)\n\n\n\n\nCounts job postings\n\n\nOccupationScopedSkillAggregator \n\u00b6\n\n\nOccupationScopedSkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)\n\n\n\n\nAggregates skills found in job postings using the job's occupation\n\n\nArgs\n\n\nskill_extractor (.skill_extractors.FreetextSkillExtractor)\n    an object that returns skill counts from unstructured text\ncorpus creator (object) an object that returns a text corpus\n    from a job posting\n\n\n\nGivenSocCodeAggregator \n\u00b6\n\n\nGivenSocCodeAggregator(self, output_count=1, output_total=False)\n\n\n\n\nAggregates SOC codes given as an input field\n\n\nCaution! We may or may not know where these came from, and the method\nfor creating them may differ from record to record\n\n\nJobAggregator \n\u00b6\n\n\nJobAggregator(self, output_count=1, output_total=False)\n\n\n\n\nBase class for different aggregators. Provides a useful interface for subclasses to benefit from.\n\n\nskills_ml.job_postings.aggregate.dataset_transform \n\u00b6\n\n\nTrack stats of job listing datasets, before and after transformation\ninto the common schema.\n\n\nGlobalStatsAggregator \n\u00b6\n\n\nGlobalStatsAggregator(self, s3_conn)\n\n\n\n\nAggregate Dataset ETL statistics up to the global level\n\n\nArgs\n\n\ns3_conn (boto.Connection) an s3 connection\n\n\n\nDatasetStatsAggregator \n\u00b6\n\n\nDatasetStatsAggregator(self, dataset_id, s3_conn)\n\n\n\n\nAggregate data Dataset ETL statistics up to the dataset level\n\n\nArgs\n\n\ndataset_id (string) A dataset id\ns3_conn (boto.Connection) an s3 connection\n\n\n\nDatasetStatsCounter \n\u00b6\n\n\nDatasetStatsCounter(self, dataset_id, quarter)\n\n\n\n\nAccumulate data Dataset ETL statistics for a quarter\nto show presence and absence of different fields,\nand the total count of rows\n\n\nArgs\n\n\ndataset_id (string) A dataset id\nquarter (string) The quarter being analyzed\n\n\n\nskills_ml.job_postings.aggregate.field_values \n\u00b6\n\n\nTrack field value distribution of common schema job postings\n\n\nFieldValueCounter \n\u00b6\n\n\nFieldValueCounter(self, quarter, field_values)\n\n\n\n\nAccumulate field distribution statistics for common schema job postings\n\n\nArgs\n\n\nquarter (string) The quarter being analyzed\n\n\n\n    field_values (list) each entry should be either\n\n\n    1. a field key\n    2. a tuple, first value field key, second value function to fetch value or values from document\n\n\n\nskills_ml.job_postings.aggregate.geo \n\u00b6\n\n\nAggregates job geographies\n\n\nGeoAggregator \n\u00b6\n\n\nGeoAggregator(self, job_aggregators, geo_querier)\n\n\n\n\nAggregates jobs by geography\n\n\njob_aggregators (dict of .JobAggregator objects) - The aggregators\n    that should accumulate data based on geography and title for each\n    job posting\ngeo_querier (object) an object that returns a geography of a given job.\n\n\nskills_ml.job_postings.aggregate.soc_code \n\u00b6\n\n\nAggregates job occupations\n\n\nGeoSocAggregator \n\u00b6\n\n\nGeoSocAggregator(self, occupation_classifier=None, corpus_creator=None, *args, **kwargs)\n\n\n\n\nAggregates job titles by geography\n\n\nArgs\n\n\noccupation_classifier (..occupation_classifiers.classifiers.Classifier,\n    optional)\n    a SOC code classifier,\n    if absent will aggregate using the given SOC code\ncorpus_creator (CorpusCreator, optional) an object that will transform\n    a given common schema job posting into unstructured text for the\n    occupation classifier. Defaults to SimpleCorpusCreator\n\n\n\nskills_ml.job_postings.aggregate.title \n\u00b6\n\n\nAggregates job titles\n\n\nGeoTitleAggregator \n\u00b6\n\n\nGeoTitleAggregator(self, title_cleaner=None, *args, **kwargs)\n\n\n\n\nAggregates job titles by geography\n\n\nArgs\n\n\ntitle_cleaner (function) a function that cleans a given job title\n\n\n\nskills_ml.job_postings.common_schema \n\u00b6\n\n\njob_postings_chain \n\u00b6\n\n\njob_postings_chain(s3_conn, quarters, s3_path, source='all')\n\n\n\n\nChain the generators of a list of multiple quarters\n\nArgs\n\n\n\n\ns3_conn\n: a boto s3 connection\n\n\nquarters\n: a list of quarters\n\n\ns3_path\n: path to the job listings\n\n\nsource\n: should be a string or a subset of \"nlx\", \"va\", \"cb\" or \"all\"\n\n\n\n\nReturn\n\n\na generator that all generators are chained together into\n\n\n\njob_postings \n\u00b6\n\n\njob_postings(s3_conn, quarter, s3_path, source='all')\n\n\n\n\nStream all job listings from s3 for a given quarter\n\nArgs\n\n\n\n\ns3_conn\n: a boto s3 connection\n\n\nquarter\n: a string representing a quarter (2015Q1)\n\n\ns3_path\n: path to the job listings.\n\n\nsource\n: should be a string or a subset of \"nlx\", \"va\", \"cb\" or \"all\"\n\n\n\n\nYields\n\n\nstring in json format representing the next job listing\n    Refer to sample_job_listing.json for example structure\n\n\n\nskills_ml.job_postings.corpora \n\u00b6\n\n\nClasses for converting collections of objects (for instance, common schema job postings) into text corpora suitable for use by natural language processing algorithms.\n\n\nskills_ml.job_postings.corpora.basic \n\u00b6\n\n\nWord2VecGensimCorpusCreator \n\u00b6\n\n\nWord2VecGensimCorpusCreator(self, generator=None)\n\n\n\n\nAn object that transforms job listing documents by picking\nimportant schema fields and returns them as one large cleaned array of words\n\n\nJobCategoryCorpusCreator \n\u00b6\n\n\nJobCategoryCorpusCreator(self, generator=None, filter_func=None, raw=False)\n\n\n\n\nAn object that extract the label of each job listing document which could be onet soc code or\noccupationalCategory and returns them as a lowercased string\n\n\nCorpusCreator \n\u00b6\n\n\nCorpusCreator(self, generator=None, filter_func=None, raw=False)\n\n\n\n\nA base class for objects that convert common schema\njob listings into a corpus suitable for use by\nmachine learning algorithms or specific tasks.\n\n\nExample\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.job_postings.common_schema import job_postings, job_postings_chain\nfrom skills_ml.job_postings.corpora.basic import CorpusCreator\n\ns3_conn = S3Hook().get_conn()\njob_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')\n\n# Default will include all the cleaned job postings\ncorpus = CorpusCreator(job_postings_generator)\n\n# For getting a the raw job postings without any cleaning\ncorpus = CorpusCreator(job_postings_generator, raw=True)\n\n# For using self-defined filter function, one can pass the function like this\ndef filter_by_full_soc(document):\nif document['onet_soc_code]:\n    if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:\n        return document\n\ncorpus = CorpusCreator(job_postings_generator, filter_func=filter_by_full_soc)\n\n\n\n\nAttributes\n\n\n\n\ngenerator (generator)\n:  an iterable that generates JSON strings.\n                        Each string is expected to represent a job listing\n                        conforming to the common schema\n                        See sample_job_listing.json for an example of this schema\n\n\nfilter_func (function)\n: a self-defined function to filter job postings, which takes a job posting as input\n                        and output a job posting. Default is to filter documents by major group.\n\n\nraw (bool)\n: a flag whether to return the raw documents or transformed documents\n\n\n\n\nDoc2VecGensimCorpusCreator \n\u00b6\n\n\nDoc2VecGensimCorpusCreator(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code'])\n\n\n\n\nCorpus for training Gensim Doc2Vec\nAn object that transforms job listing documents by picking\nimportant schema fields and returns them as one large cleaned array of words\n\n\nExample\n\n\n\nfrom airflow.hooks import S3Hook\nfrom skills_ml.job_postings.common_schema import job_postings, job_postings_chain\nfrom skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator\n\ns3_conn = S3Hook().get_conn()\njob_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')\n\n# Default will include all the job postings with O*NET SOC code.\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator)\n\n# For using pre-defined major group filter, one need to specify major groups\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator, major_groups=['11', '13'])\n\n# For using self-defined filter function, one can pass the function like this\ndef filter_by_full_soc(document):\n    if document['onet_soc_code]:\n        if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:\n            return document\n\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator, filter_func=filter_by_full_soc, key=['onet_soc_code'])\n\n\n\n\nAttributes\n\n\n\n\ngenerator (generator)\n: a job posting generator\n\n\nmajor_groups (list)\n: a list of O*NET major group classes you want to include in the corpus being created.\n\n\nfilter_func (function)\n: a self-defined function to filter job postings, which takes a job posting as input\n                            and output a job posting. Default is to filter documents by major group.\n\n\nkey (string)\n: a key indicates the label which should exist in common schema of job posting.\n\n\n\n\nSimpleCorpusCreator \n\u00b6\n\n\nSimpleCorpusCreator(self, generator=None, filter_func=None, raw=False)\n\n\n\n\nAn object that transforms job listing documents by picking\nimportant schema fields and returns them as one large lowercased string\n\n\nskills_ml.job_postings.geography_queriers \n\u00b6\n\n\nExtracting geographies from job posting datasets\n\n\njob_posting_search_strings \n\u00b6\n\n\njob_posting_search_strings(job_posting)\n\n\n\n\nConvert a job posting to a geocode-ready search string\n\n\nIncludes city and state if present, or just city\n\n\nArgs\n\n\njob_posting (string) A job posting in schema.org/JobPosting json form\n\n\n\n\n\nReturns\n: (string) A geocode-ready search string\n\n\n\n\nskills_ml.job_postings.geography_queriers.cbsa \n\u00b6\n\n\nLook up the CBSA for a job posting from a census crosswalk (job location -> Census Place -> Census UA -> Census CBSA)\n\n\nJobCBSAQuerier \n\u00b6\n\n\nJobCBSAQuerier(self)\n\n\n\n\nQueries the Core-Based Statistical Area for a job using a census crosswalk\n\n\nFirst looks up a Place or County Subdivision by the job posting's state and city.\nIf it finds a result, it will then take the Urbanized Area for that Place or County Subdivison and find CBSAs associated with it.\n\n\nQueries return all hits, so there may be multiple CBSAs for a given query.\n\n\nskills_ml.job_postings.geography_queriers.cbsa_from_geocode \n\u00b6\n\n\nLook up the CBSA for a job posting against a precomputed geocoded CBSA lookup\n\n\nJobCBSAFromGeocodeQuerier \n\u00b6\n\n\nJobCBSAFromGeocodeQuerier(self, cbsa_results)\n\n\n\n\nQueries the Core-Based Statistical Area for a job\n\n\nThis object delegates the CBSA-finding algorithm to a passed-in cache.\nIn practice, you can look at the \nskills_ml.algorithms.geocoders.cbsa\n\nmodule for an example of how this can be generated.\n\n\nInstead, this object focuses on the job posting-centric logic necessary,\nsuch as converting the job posting to the form needed to use the cache\nand dealing with differents kinds of cache misses.\n\n\nArgs\n\n\ncbsa_results (dict) A mapping of geocoding search strings to\n    (CBSA FIPS, CBSA Name) tuples\n\n\n\nskills_ml.job_postings.raw \n\u00b6\n\n\nskills_ml.job_postings.raw.usajobs \n\u00b6\n\n\nImport USAJobs postings into the Open Skills common schema\n\n\nskills_ml.job_postings.raw.virginia \n\u00b6\n\n\nskills_ml.job_postings.sample \n\u00b6\n\n\nSample job postings\n\n\nJobSampler \n\u00b6\n\n\nJobSampler(self, job_posting_generator, major_group=False, keys=None, weights=None, random_state=None)\n\n\n\n\nJob posting sampler using reservoir sampling methods\n\n\nIt takes a job_posting generator as an input. To sample based on weights, one should sepecify a weight dictionary.\n\n\nAttributes\n\n\n\n\njob_posting_generator (iterator)\n: Job posting iterator to sample from.\n\n\nmajor_group (bool)\n: A flag for using major_group as a label or not\n\n\nkeys (list|str)\n: a key or keys(for nested dictionary) indicates the label which should exist in common schema\n                     of job posting.\n\n\nweights (dict)\n: a dictionary that has key-value pairs as label-weighting pairs. It expects every\n                    label in the iterator to be present as a key in the weights dictionary For example,\n\n\nweights = {'11'\n: 2, '13', 1}. In this case, the label/key is the occupation major\n                    group and the value is the weight you want to sample with.\n\n\nrandom_state (int)\n: the seed used by the random number generator",
+            "title": "Job Posting Dataset Processors"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsaggregate",
+            "text": "Aggregate properties of job postings.  Classes in this module generally wrap calls to some code in  skills_ml.algorithms  for some arbitrary set of job postings (in schema.org JobPosting format as a Python dict), accumulating the output in a Counter.",
+            "title": "skills_ml.job_postings.aggregate"
+        },
+        {
+            "location": "/skills_ml.job_postings/#soccodeaggregator",
+            "text": "SocCodeAggregator(self, occupation_classifier, corpus_creator, *args, **kwargs)  Aggregates SOC codes inferred from job posting text  Args  occupation_classifier (.occupation_classifiers.SocClassifier)\n    An object that returns a classified SOC code and similarity score\n    from unstructured text\ncorpus creator (object) an object that returns unstructured text\n    from a job posting",
+            "title": "SocCodeAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skillaggregator",
+            "text": "SkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)  Aggregates skills found in job postings  Args  skill_extractor (.skill_extractors.FreetextSkillExtractor)\n    an object that returns skill counts from unstructured text\ncorpus creator (object) an object that returns a text corpus\n    from a job posting",
+            "title": "SkillAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#countaggregator",
+            "text": "CountAggregator(self, output_count=1, output_total=False)  Counts job postings",
+            "title": "CountAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#occupationscopedskillaggregator",
+            "text": "OccupationScopedSkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)  Aggregates skills found in job postings using the job's occupation  Args  skill_extractor (.skill_extractors.FreetextSkillExtractor)\n    an object that returns skill counts from unstructured text\ncorpus creator (object) an object that returns a text corpus\n    from a job posting",
+            "title": "OccupationScopedSkillAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#givensoccodeaggregator",
+            "text": "GivenSocCodeAggregator(self, output_count=1, output_total=False)  Aggregates SOC codes given as an input field  Caution! We may or may not know where these came from, and the method\nfor creating them may differ from record to record",
+            "title": "GivenSocCodeAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#jobaggregator",
+            "text": "JobAggregator(self, output_count=1, output_total=False)  Base class for different aggregators. Provides a useful interface for subclasses to benefit from.",
+            "title": "JobAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsaggregatedataset_transform",
+            "text": "Track stats of job listing datasets, before and after transformation\ninto the common schema.",
+            "title": "skills_ml.job_postings.aggregate.dataset_transform"
+        },
+        {
+            "location": "/skills_ml.job_postings/#globalstatsaggregator",
+            "text": "GlobalStatsAggregator(self, s3_conn)  Aggregate Dataset ETL statistics up to the global level  Args  s3_conn (boto.Connection) an s3 connection",
+            "title": "GlobalStatsAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#datasetstatsaggregator",
+            "text": "DatasetStatsAggregator(self, dataset_id, s3_conn)  Aggregate data Dataset ETL statistics up to the dataset level  Args  dataset_id (string) A dataset id\ns3_conn (boto.Connection) an s3 connection",
+            "title": "DatasetStatsAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#datasetstatscounter",
+            "text": "DatasetStatsCounter(self, dataset_id, quarter)  Accumulate data Dataset ETL statistics for a quarter\nto show presence and absence of different fields,\nand the total count of rows  Args  dataset_id (string) A dataset id\nquarter (string) The quarter being analyzed",
+            "title": "DatasetStatsCounter"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsaggregatefield_values",
+            "text": "Track field value distribution of common schema job postings",
+            "title": "skills_ml.job_postings.aggregate.field_values"
+        },
+        {
+            "location": "/skills_ml.job_postings/#fieldvaluecounter",
+            "text": "FieldValueCounter(self, quarter, field_values)  Accumulate field distribution statistics for common schema job postings  Args  quarter (string) The quarter being analyzed      field_values (list) each entry should be either      1. a field key\n    2. a tuple, first value field key, second value function to fetch value or values from document",
+            "title": "FieldValueCounter"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsaggregategeo",
+            "text": "Aggregates job geographies",
+            "title": "skills_ml.job_postings.aggregate.geo"
+        },
+        {
+            "location": "/skills_ml.job_postings/#geoaggregator",
+            "text": "GeoAggregator(self, job_aggregators, geo_querier)  Aggregates jobs by geography  job_aggregators (dict of .JobAggregator objects) - The aggregators\n    that should accumulate data based on geography and title for each\n    job posting\ngeo_querier (object) an object that returns a geography of a given job.",
+            "title": "GeoAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsaggregatesoc_code",
+            "text": "Aggregates job occupations",
+            "title": "skills_ml.job_postings.aggregate.soc_code"
+        },
+        {
+            "location": "/skills_ml.job_postings/#geosocaggregator",
+            "text": "GeoSocAggregator(self, occupation_classifier=None, corpus_creator=None, *args, **kwargs)  Aggregates job titles by geography  Args  occupation_classifier (..occupation_classifiers.classifiers.Classifier,\n    optional)\n    a SOC code classifier,\n    if absent will aggregate using the given SOC code\ncorpus_creator (CorpusCreator, optional) an object that will transform\n    a given common schema job posting into unstructured text for the\n    occupation classifier. Defaults to SimpleCorpusCreator",
+            "title": "GeoSocAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsaggregatetitle",
+            "text": "Aggregates job titles",
+            "title": "skills_ml.job_postings.aggregate.title"
+        },
+        {
+            "location": "/skills_ml.job_postings/#geotitleaggregator",
+            "text": "GeoTitleAggregator(self, title_cleaner=None, *args, **kwargs)  Aggregates job titles by geography  Args  title_cleaner (function) a function that cleans a given job title",
+            "title": "GeoTitleAggregator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingscommon_schema",
+            "text": "",
+            "title": "skills_ml.job_postings.common_schema"
+        },
+        {
+            "location": "/skills_ml.job_postings/#job_postings_chain",
+            "text": "job_postings_chain(s3_conn, quarters, s3_path, source='all')  Chain the generators of a list of multiple quarters Args   s3_conn : a boto s3 connection  quarters : a list of quarters  s3_path : path to the job listings  source : should be a string or a subset of \"nlx\", \"va\", \"cb\" or \"all\"   Return  a generator that all generators are chained together into",
+            "title": "job_postings_chain"
+        },
+        {
+            "location": "/skills_ml.job_postings/#job_postings",
+            "text": "job_postings(s3_conn, quarter, s3_path, source='all')  Stream all job listings from s3 for a given quarter Args   s3_conn : a boto s3 connection  quarter : a string representing a quarter (2015Q1)  s3_path : path to the job listings.  source : should be a string or a subset of \"nlx\", \"va\", \"cb\" or \"all\"   Yields  string in json format representing the next job listing\n    Refer to sample_job_listing.json for example structure",
+            "title": "job_postings"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingscorpora",
+            "text": "Classes for converting collections of objects (for instance, common schema job postings) into text corpora suitable for use by natural language processing algorithms.",
+            "title": "skills_ml.job_postings.corpora"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingscorporabasic",
+            "text": "",
+            "title": "skills_ml.job_postings.corpora.basic"
+        },
+        {
+            "location": "/skills_ml.job_postings/#word2vecgensimcorpuscreator",
+            "text": "Word2VecGensimCorpusCreator(self, generator=None)  An object that transforms job listing documents by picking\nimportant schema fields and returns them as one large cleaned array of words",
+            "title": "Word2VecGensimCorpusCreator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#jobcategorycorpuscreator",
+            "text": "JobCategoryCorpusCreator(self, generator=None, filter_func=None, raw=False)  An object that extract the label of each job listing document which could be onet soc code or\noccupationalCategory and returns them as a lowercased string",
+            "title": "JobCategoryCorpusCreator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#corpuscreator",
+            "text": "CorpusCreator(self, generator=None, filter_func=None, raw=False)  A base class for objects that convert common schema\njob listings into a corpus suitable for use by\nmachine learning algorithms or specific tasks.  Example  from airflow.hooks import S3Hook\nfrom skills_ml.job_postings.common_schema import job_postings, job_postings_chain\nfrom skills_ml.job_postings.corpora.basic import CorpusCreator\n\ns3_conn = S3Hook().get_conn()\njob_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')\n\n# Default will include all the cleaned job postings\ncorpus = CorpusCreator(job_postings_generator)\n\n# For getting a the raw job postings without any cleaning\ncorpus = CorpusCreator(job_postings_generator, raw=True)\n\n# For using self-defined filter function, one can pass the function like this\ndef filter_by_full_soc(document):\nif document['onet_soc_code]:\n    if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:\n        return document\n\ncorpus = CorpusCreator(job_postings_generator, filter_func=filter_by_full_soc)  Attributes   generator (generator) :  an iterable that generates JSON strings.\n                        Each string is expected to represent a job listing\n                        conforming to the common schema\n                        See sample_job_listing.json for an example of this schema  filter_func (function) : a self-defined function to filter job postings, which takes a job posting as input\n                        and output a job posting. Default is to filter documents by major group.  raw (bool) : a flag whether to return the raw documents or transformed documents",
+            "title": "CorpusCreator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#doc2vecgensimcorpuscreator",
+            "text": "Doc2VecGensimCorpusCreator(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code'])  Corpus for training Gensim Doc2Vec\nAn object that transforms job listing documents by picking\nimportant schema fields and returns them as one large cleaned array of words  Example  \nfrom airflow.hooks import S3Hook\nfrom skills_ml.job_postings.common_schema import job_postings, job_postings_chain\nfrom skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator\n\ns3_conn = S3Hook().get_conn()\njob_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')\n\n# Default will include all the job postings with O*NET SOC code.\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator)\n\n# For using pre-defined major group filter, one need to specify major groups\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator, major_groups=['11', '13'])\n\n# For using self-defined filter function, one can pass the function like this\ndef filter_by_full_soc(document):\n    if document['onet_soc_code]:\n        if document['onet_soc_code] in ['11-9051.00', '13-1079.99']:\n            return document\n\ncorpus = Doc2VecGensimCorpusCreator(job_postings_generator, filter_func=filter_by_full_soc, key=['onet_soc_code'])  Attributes   generator (generator) : a job posting generator  major_groups (list) : a list of O*NET major group classes you want to include in the corpus being created.  filter_func (function) : a self-defined function to filter job postings, which takes a job posting as input\n                            and output a job posting. Default is to filter documents by major group.  key (string) : a key indicates the label which should exist in common schema of job posting.",
+            "title": "Doc2VecGensimCorpusCreator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#simplecorpuscreator",
+            "text": "SimpleCorpusCreator(self, generator=None, filter_func=None, raw=False)  An object that transforms job listing documents by picking\nimportant schema fields and returns them as one large lowercased string",
+            "title": "SimpleCorpusCreator"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsgeography_queriers",
+            "text": "Extracting geographies from job posting datasets",
+            "title": "skills_ml.job_postings.geography_queriers"
+        },
+        {
+            "location": "/skills_ml.job_postings/#job_posting_search_strings",
+            "text": "job_posting_search_strings(job_posting)  Convert a job posting to a geocode-ready search string  Includes city and state if present, or just city  Args  job_posting (string) A job posting in schema.org/JobPosting json form   Returns : (string) A geocode-ready search string",
+            "title": "job_posting_search_strings"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsgeography_querierscbsa",
+            "text": "Look up the CBSA for a job posting from a census crosswalk (job location -> Census Place -> Census UA -> Census CBSA)",
+            "title": "skills_ml.job_postings.geography_queriers.cbsa"
+        },
+        {
+            "location": "/skills_ml.job_postings/#jobcbsaquerier",
+            "text": "JobCBSAQuerier(self)  Queries the Core-Based Statistical Area for a job using a census crosswalk  First looks up a Place or County Subdivision by the job posting's state and city.\nIf it finds a result, it will then take the Urbanized Area for that Place or County Subdivison and find CBSAs associated with it.  Queries return all hits, so there may be multiple CBSAs for a given query.",
+            "title": "JobCBSAQuerier"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsgeography_querierscbsa_from_geocode",
+            "text": "Look up the CBSA for a job posting against a precomputed geocoded CBSA lookup",
+            "title": "skills_ml.job_postings.geography_queriers.cbsa_from_geocode"
+        },
+        {
+            "location": "/skills_ml.job_postings/#jobcbsafromgeocodequerier",
+            "text": "JobCBSAFromGeocodeQuerier(self, cbsa_results)  Queries the Core-Based Statistical Area for a job  This object delegates the CBSA-finding algorithm to a passed-in cache.\nIn practice, you can look at the  skills_ml.algorithms.geocoders.cbsa \nmodule for an example of how this can be generated.  Instead, this object focuses on the job posting-centric logic necessary,\nsuch as converting the job posting to the form needed to use the cache\nand dealing with differents kinds of cache misses.  Args  cbsa_results (dict) A mapping of geocoding search strings to\n    (CBSA FIPS, CBSA Name) tuples",
+            "title": "JobCBSAFromGeocodeQuerier"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsraw",
+            "text": "",
+            "title": "skills_ml.job_postings.raw"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsrawusajobs",
             "text": "Import USAJobs postings into the Open Skills common schema",
-            "title": "skills_ml.datasets.raw_job_postings.usajobs"
+            "title": "skills_ml.job_postings.raw.usajobs"
         },
         {
-            "location": "/skills_ml.datasets/#skills_mldatasetsraw_job_postingsvirginia",
+            "location": "/skills_ml.job_postings/#skills_mljob_postingsrawvirginia",
             "text": "",
-            "title": "skills_ml.datasets.raw_job_postings.virginia"
+            "title": "skills_ml.job_postings.raw.virginia"
+        },
+        {
+            "location": "/skills_ml.job_postings/#skills_mljob_postingssample",
+            "text": "Sample job postings",
+            "title": "skills_ml.job_postings.sample"
+        },
+        {
+            "location": "/skills_ml.job_postings/#jobsampler",
+            "text": "JobSampler(self, job_posting_generator, major_group=False, keys=None, weights=None, random_state=None)  Job posting sampler using reservoir sampling methods  It takes a job_posting generator as an input. To sample based on weights, one should sepecify a weight dictionary.  Attributes   job_posting_generator (iterator) : Job posting iterator to sample from.  major_group (bool) : A flag for using major_group as a label or not  keys (list|str) : a key or keys(for nested dictionary) indicates the label which should exist in common schema\n                     of job posting.  weights (dict) : a dictionary that has key-value pairs as label-weighting pairs. It expects every\n                    label in the iterator to be present as a key in the weights dictionary For example,  weights = {'11' : 2, '13', 1}. In this case, the label/key is the occupation major\n                    group and the value is the weight you want to sample with.  random_state (int) : the seed used by the random number generator",
+            "title": "JobSampler"
+        },
+        {
+            "location": "/skills_ml.datasets/",
+            "text": "skills_ml.datasets.cbsa_shapefile\n\n\ndownload_shapefile\n\n\n\n\n\n\nskills_ml.datasets.cousub_ua\n\n\ncousub_ua\n\n\n\n\n\n\nskills_ml.datasets.job_titles\n\n\nskills_ml.datasets.job_titles.elasticsearch\n\n\nJobTitlesMasterIndexer\n\n\n\n\n\n\nskills_ml.datasets.job_titles.onet\n\n\nOnet_Title\n\n\nOnetTitleExtractor\n\n\n\n\n\n\nskills_ml.datasets.nber_county_cbsa\n\n\ncbsa_lookup\n\n\n\n\n\n\nskills_ml.datasets.negative_positive_dict\n\n\nnegative_positive_dict\n\n\n\n\n\n\nskills_ml.datasets.onet_cache\n\n\nOnetCache\n\n\n\n\n\n\nskills_ml.datasets.onet_source\n\n\nskills_ml.datasets.partner_updaters\n\n\nskills_ml.datasets.partner_updaters.usa_jobs\n\n\nskills_ml.datasets.place_ua\n\n\nplace_ua\n\n\n\n\n\n\nskills_ml.datasets.sba_city_county\n\n\ncounty_lookup\n\n\n\n\n\n\nskills_ml.datasets.skill_importances\n\n\nskills_ml.datasets.skill_importances.onet\n\n\nOnetSkillImportanceExtractor\n\n\n\n\n\n\nskills_ml.datasets.skills\n\n\nskills_ml.datasets.skills.onet_ksat\n\n\nOnetSkillListProcessor\n\n\n\n\n\n\nskills_ml.datasets.ua_cbsa\n\n\nua_cbsa\n\n\n\n\n\n\n\n\n\n\nskills_ml.datasets.cbsa_shapefile \n\u00b6\n\n\nUse the Census CBSA shapefile\n\n\ndownload_shapefile \n\u00b6\n\n\ndownload_shapefile(cache_dir)\n\n\n\n\nDownload Tiger 2015 CBSA Shapefile\n\n\nDownloads the zip archive and unzips the contents\n\n\nArgs\n\n\ncache_dir (string) local path to download files to\n\n\n\n\n\nReturns\n: (string) Path to the extracted shapefile\n\n\n\n\nskills_ml.datasets.cousub_ua \n\u00b6\n\n\nRetrieve County Subdivision->Urbanized Area crosswalk\n\n\ncousub_ua \n\u00b6\n\n\ncousub_ua(city_cleaner)\n\n\n\n\nConstruct a County Subdivision->UA Lookup table from Census data\nReturns: dict\n{ StateCode: { CountySubdivisionName: UA Code } }\n\n\nskills_ml.datasets.job_titles \n\u00b6\n\n\nProcess lists of job titles into a common format\n\n\nskills_ml.datasets.job_titles.elasticsearch \n\u00b6\n\n\nIndex job title/occupation pairs in Elasticsearch.\n\n\nJobTitlesMasterIndexer \n\u00b6\n\n\nJobTitlesMasterIndexer(self, job_title_generator, alias_name, **kwargs)\n\n\n\n\nArgs: job_title_generator (iterable). Each record is expected to be a dict\n    with keys\n    'Title' for the job title and\n    'Original Title' for the occupation\n\n\nskills_ml.datasets.job_titles.onet \n\u00b6\n\n\nProcess ONET job titles into a common format\n\n\nOnet_Title \n\u00b6\n\n\nOnet_Title(self, onet_cache)\n\n\n\n\nAn object representing job title data from different ONET files\n\n\nOriginally written by Kwame Porter Robinson\n\n\nOnetTitleExtractor \n\u00b6\n\n\nOnetTitleExtractor(self, output_filename, onet_source, hash_function)\n\n\n\n\nAn object that creates a job titles CSV based on ONET data\n\n\nskills_ml.datasets.nber_county_cbsa \n\u00b6\n\n\nRetrieve county->CBSA crosswalk file from the NBER\n\n\ncbsa_lookup \n\u00b6\n\n\ncbsa_lookup()\n\n\n\n\nConstruct a County->CBSA Lookup table from NBER data\nReturns: dict\n    each key is a (State Code, County FIPS code) tuple\n    each value is a (CBSA FIPS code, CBSA Name) tuple\n\n\nskills_ml.datasets.negative_positive_dict \n\u00b6\n\n\nnegative_positive_dict \n\u00b6\n\n\nnegative_positive_dict()\n\n\n\n\nConstruct a dictionary of terms that are considered not to be in job title, including\nstates, states abv, cities\nReturns: dictionary of set\n\n\nskills_ml.datasets.onet_cache \n\u00b6\n\n\nOnetCache \n\u00b6\n\n\nOnetCache(self, s3_conn, s3_path, cache_dir)\n\n\n\n\nAn object that downloads and caches ONET files from S3\n\n\nskills_ml.datasets.onet_source \n\u00b6\n\n\nDownload ONET files from their site\n\n\nskills_ml.datasets.partner_updaters \n\u00b6\n\n\nUpdate raw job postings from external partners\n\n\nskills_ml.datasets.partner_updaters.usa_jobs \n\u00b6\n\n\nUpdate raw job postings from the USAJobs API\n\n\nskills_ml.datasets.place_ua \n\u00b6\n\n\nRetrieve Census Place->Urbanized Area crosswalk\n\n\nplace_ua \n\u00b6\n\n\nplace_ua(city_cleaner)\n\n\n\n\nConstruct a Place->UA Lookup table from Census data\nReturns: dict\n{ StateCode: { PlaceName: UA Code } }\n\n\nskills_ml.datasets.sba_city_county \n\u00b6\n\n\nRetrieve county lookup tables from the SBA for each state\n\n\ncounty_lookup \n\u00b6\n\n\ncounty_lookup()\n\n\n\n\nRetrieve county lookup tables if they are not already cached\n\n\nReturns: (dict) each key is a state, each value is a dict {city_name: (fips_county_code, county_name)}\n\n\nskills_ml.datasets.skill_importances \n\u00b6\n\n\nProcess lists of occupation skill importances into a common format\n\n\nskills_ml.datasets.skill_importances.onet \n\u00b6\n\n\nProcess ONET data to create a dataset with occupations and their skill importances\n\n\nOnetSkillImportanceExtractor \n\u00b6\n\n\nOnetSkillImportanceExtractor(self, onet_source, output_filename, hash_function)\n\n\n\n\nAn object that creates a skills importance CSV based on ONET data\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.datasets.skills \n\u00b6\n\n\nProcess lists of skills into a common format\n\n\nskills_ml.datasets.skills.onet_ksat \n\u00b6\n\n\nProcess ONET skill lists of various types into a common format\n\n\nOnetSkillListProcessor \n\u00b6\n\n\nOnetSkillListProcessor(self, onet_source, output_filename, hash_function, ksa_types=None)\n\n\n\n\nAn object that creates a skills CSV based on ONET data\n\n\nOriginally written by Kwame Porter Robinson\n\n\nskills_ml.datasets.ua_cbsa \n\u00b6\n\n\nRetrieve\n Urbanized Area->CBSA crosswalk\n\n\nua_cbsa \n\u00b6\n\n\nua_cbsa()\n\n\n\n\nConstruct a UA->CBSA Lookup table from Census data\nReturns: dict\n{ UA Fips: [(CBSA FIPS, CBSA Name)] }",
+            "title": "External Dataset Processors"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetscbsa_shapefile",
+            "text": "Use the Census CBSA shapefile",
+            "title": "skills_ml.datasets.cbsa_shapefile"
+        },
+        {
+            "location": "/skills_ml.datasets/#download_shapefile",
+            "text": "download_shapefile(cache_dir)  Download Tiger 2015 CBSA Shapefile  Downloads the zip archive and unzips the contents  Args  cache_dir (string) local path to download files to   Returns : (string) Path to the extracted shapefile",
+            "title": "download_shapefile"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetscousub_ua",
+            "text": "Retrieve County Subdivision->Urbanized Area crosswalk",
+            "title": "skills_ml.datasets.cousub_ua"
+        },
+        {
+            "location": "/skills_ml.datasets/#cousub_ua",
+            "text": "cousub_ua(city_cleaner)  Construct a County Subdivision->UA Lookup table from Census data\nReturns: dict\n{ StateCode: { CountySubdivisionName: UA Code } }",
+            "title": "cousub_ua"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsjob_titles",
+            "text": "Process lists of job titles into a common format",
+            "title": "skills_ml.datasets.job_titles"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsjob_titleselasticsearch",
+            "text": "Index job title/occupation pairs in Elasticsearch.",
+            "title": "skills_ml.datasets.job_titles.elasticsearch"
+        },
+        {
+            "location": "/skills_ml.datasets/#jobtitlesmasterindexer",
+            "text": "JobTitlesMasterIndexer(self, job_title_generator, alias_name, **kwargs)  Args: job_title_generator (iterable). Each record is expected to be a dict\n    with keys\n    'Title' for the job title and\n    'Original Title' for the occupation",
+            "title": "JobTitlesMasterIndexer"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsjob_titlesonet",
+            "text": "Process ONET job titles into a common format",
+            "title": "skills_ml.datasets.job_titles.onet"
+        },
+        {
+            "location": "/skills_ml.datasets/#onet_title",
+            "text": "Onet_Title(self, onet_cache)  An object representing job title data from different ONET files  Originally written by Kwame Porter Robinson",
+            "title": "Onet_Title"
+        },
+        {
+            "location": "/skills_ml.datasets/#onettitleextractor",
+            "text": "OnetTitleExtractor(self, output_filename, onet_source, hash_function)  An object that creates a job titles CSV based on ONET data",
+            "title": "OnetTitleExtractor"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsnber_county_cbsa",
+            "text": "Retrieve county->CBSA crosswalk file from the NBER",
+            "title": "skills_ml.datasets.nber_county_cbsa"
+        },
+        {
+            "location": "/skills_ml.datasets/#cbsa_lookup",
+            "text": "cbsa_lookup()  Construct a County->CBSA Lookup table from NBER data\nReturns: dict\n    each key is a (State Code, County FIPS code) tuple\n    each value is a (CBSA FIPS code, CBSA Name) tuple",
+            "title": "cbsa_lookup"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsnegative_positive_dict",
+            "text": "",
+            "title": "skills_ml.datasets.negative_positive_dict"
+        },
+        {
+            "location": "/skills_ml.datasets/#negative_positive_dict",
+            "text": "negative_positive_dict()  Construct a dictionary of terms that are considered not to be in job title, including\nstates, states abv, cities\nReturns: dictionary of set",
+            "title": "negative_positive_dict"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsonet_cache",
+            "text": "",
+            "title": "skills_ml.datasets.onet_cache"
+        },
+        {
+            "location": "/skills_ml.datasets/#onetcache",
+            "text": "OnetCache(self, s3_conn, s3_path, cache_dir)  An object that downloads and caches ONET files from S3",
+            "title": "OnetCache"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsonet_source",
+            "text": "Download ONET files from their site",
+            "title": "skills_ml.datasets.onet_source"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetspartner_updaters",
+            "text": "Update raw job postings from external partners",
+            "title": "skills_ml.datasets.partner_updaters"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetspartner_updatersusa_jobs",
+            "text": "Update raw job postings from the USAJobs API",
+            "title": "skills_ml.datasets.partner_updaters.usa_jobs"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsplace_ua",
+            "text": "Retrieve Census Place->Urbanized Area crosswalk",
+            "title": "skills_ml.datasets.place_ua"
+        },
+        {
+            "location": "/skills_ml.datasets/#place_ua",
+            "text": "place_ua(city_cleaner)  Construct a Place->UA Lookup table from Census data\nReturns: dict\n{ StateCode: { PlaceName: UA Code } }",
+            "title": "place_ua"
         },
         {
             "location": "/skills_ml.datasets/#skills_mldatasetssba_city_county",
@@ -789,6 +884,36 @@
             "location": "/skills_ml.datasets/#county_lookup",
             "text": "county_lookup()  Retrieve county lookup tables if they are not already cached  Returns: (dict) each key is a state, each value is a dict {city_name: (fips_county_code, county_name)}",
             "title": "county_lookup"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsskill_importances",
+            "text": "Process lists of occupation skill importances into a common format",
+            "title": "skills_ml.datasets.skill_importances"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsskill_importancesonet",
+            "text": "Process ONET data to create a dataset with occupations and their skill importances",
+            "title": "skills_ml.datasets.skill_importances.onet"
+        },
+        {
+            "location": "/skills_ml.datasets/#onetskillimportanceextractor",
+            "text": "OnetSkillImportanceExtractor(self, onet_source, output_filename, hash_function)  An object that creates a skills importance CSV based on ONET data  Originally written by Kwame Porter Robinson",
+            "title": "OnetSkillImportanceExtractor"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsskills",
+            "text": "Process lists of skills into a common format",
+            "title": "skills_ml.datasets.skills"
+        },
+        {
+            "location": "/skills_ml.datasets/#skills_mldatasetsskillsonet_ksat",
+            "text": "Process ONET skill lists of various types into a common format",
+            "title": "skills_ml.datasets.skills.onet_ksat"
+        },
+        {
+            "location": "/skills_ml.datasets/#onetskilllistprocessor",
+            "text": "OnetSkillListProcessor(self, onet_source, output_filename, hash_function, ksa_types=None)  An object that creates a skills CSV based on ONET data  Originally written by Kwame Porter Robinson",
+            "title": "OnetSkillListProcessor"
         },
         {
             "location": "/skills_ml.datasets/#skills_mldatasetsua_cbsa",
