@@ -55,6 +55,7 @@ class EmbeddingTrainer(object):
             quarters (:obj: `list` of (str)): quarters will be trained on
             source (:str): job posting source, should be "all", "nlx" or "cb".
             jp_s3_path (:str): job posting path on S3
+            model_s3_path (:str): model path to store on S3
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             metadata (:dict): model metadata
             training_time (:str): training time
