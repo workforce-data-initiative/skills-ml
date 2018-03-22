@@ -38,7 +38,6 @@ pages:
 - {Job Posting Common Schema: common_schema.md}
 - {Evaluation Tools: skills_ml.evaluation.md}
 - {Algorithms: skills_ml.algorithms.md}
-- {Dataset Processors: skills_ml.datasets.md}
 - {Job Posting Dataset Processors: skills_ml.job_postings.md}
 - {External Dataset Processors: skills_ml.datasets.md}
 preprocessor: pydocmd.preprocessor.Preprocessor
