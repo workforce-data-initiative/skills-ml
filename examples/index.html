@@ -230,6 +230,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#train-an-word2vec-embedding-model-using-quarterly-jobposting-data" title="Train an Word2Vec Embedding Model using Quarterly Jobposting Data" class="md-nav__link">
+    Train an Word2Vec Embedding Model using Quarterly Jobposting Data
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -365,6 +372,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#train-an-word2vec-embedding-model-using-quarterly-jobposting-data" title="Train an Word2Vec Embedding Model using Quarterly Jobposting Data" class="md-nav__link">
+    Train an Word2Vec Embedding Model using Quarterly Jobposting Data
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -410,6 +424,13 @@ In the end, we have the most commonly occurring noun phrases ending in
 <li>Samples (a 300 job posting sample, a 10k job posting sample)</li>
 </ul>
 <p>For each combination of the above parameters, we upload the extracted skill candidates to S3 for further evaluation, for instance by a human labeller. In addition, this example shows how to parallelize the skill extraction.</p>
+<h3 id="train-an-word2vec-embedding-model-using-quarterly-jobposting-data"><a class="toclink" href="#train-an-word2vec-embedding-model-using-quarterly-jobposting-data"><a href="https://github.com/workforce-data-initiative/skills-ml/blob/master/examples/TrainEmbedding.py">Train an Word2Vec Embedding Model using Quarterly Jobposting Data</a></a><a class="headerlink" href="#train-an-word2vec-embedding-model-using-quarterly-jobposting-data" title="Permanent link">&para;</a></h3>
+<p>To showcase the interface of training a word2vec embedding model in an online batch learning fashion:</p>
+<ul>
+<li>A list of quarters for creating the corpus from job posting data</li>
+<li>A trainer object that specifies some parameters of source, s3 path, batch size, model type ...etc.</li>
+<li>The train method takes whatever arugments <code>gensim.models.word2vec.Word2Vec</code> or <code>gensim.model.doc2vec.Doc2Vec</code> has</li>
+</ul>
                 
                   
                 
