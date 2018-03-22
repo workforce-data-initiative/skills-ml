@@ -43,14 +43,6 @@
 
     
     <url>
-     <loc>/skills_ml.datasets/</loc>
-     <lastmod>2018-03-22</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    
-
-    
-    <url>
      <loc>/skills_ml.job_postings/</loc>
      <lastmod>2018-03-22</lastmod>
      <changefreq>daily</changefreq>
