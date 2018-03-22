@@ -237,6 +237,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#compute-and-aggregate-properties-of-job-postings-as-a-tabular-dataset" title="Compute and Aggregate Properties of Job Postings as a Tabular Dataset" class="md-nav__link">
+    Compute and Aggregate Properties of Job Postings as a Tabular Dataset
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -367,6 +374,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#compute-and-aggregate-properties-of-job-postings-as-a-tabular-dataset" title="Compute and Aggregate Properties of Job Postings as a Tabular Dataset" class="md-nav__link">
+    Compute and Aggregate Properties of Job Postings as a Tabular Dataset
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -418,6 +432,17 @@ In the end, we have the most commonly occurring noun phrases ending in
 <li>A list of quarters for creating the corpus from job posting data</li>
 <li>A trainer object that specifies some parameters of source, s3 path, batch size, model type ...etc.</li>
 <li>The train method takes whatever arugments <code>gensim.models.word2vec.Word2Vec</code> or <code>gensim.model.doc2vec.Doc2Vec</code> has</li>
+</ul>
+<h3 id="compute-and-aggregate-properties-of-job-postings-as-a-tabular-dataset"><a class="toclink" href="#compute-and-aggregate-properties-of-job-postings-as-a-tabular-dataset"><a href="https://github.com/workforce-data-initiative/skills-ml/blob/master/examples/ComputeAndAggregateJobPostingProperties.py">Compute and Aggregate Properties of Job Postings as a Tabular Dataset</a></a><a class="headerlink" href="#compute-and-aggregate-properties-of-job-postings-as-a-tabular-dataset" title="Permanent link">&para;</a></h3>
+<p>To show job posting property computation and aggregation,
+we calculate job posting counts by cleaned title, and upload
+the resulting CSV to S3.</p>
+<p>This is essentially a mini version of the Data@Work Research Hub.</p>
+<p>To enable this example to be run with as few dependencies as possible, we use:</p>
+<ul>
+<li>a fake local s3 instance</li>
+<li>a sample of the Virginia Tech open job postings dataset</li>
+<li>only title cleaning and job counting.</li>
 </ul>
                 
                   
