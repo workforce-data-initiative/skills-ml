@@ -24,3 +24,11 @@ To showcase how skill extraction algorithms can be tested, we run extraction sev
 - Samples (a 300 job posting sample, a 10k job posting sample)
 
 For each combination of the above parameters, we upload the extracted skill candidates to S3 for further evaluation, for instance by a human labeller. In addition, this example shows how to parallelize the skill extraction.
+
+## [Train an Word2Vec Embedding Model using Quarterly Jobposting Data](https://github.com/workforce-data-initiative/skills-ml/blob/master/examples/TrainEmbedding.py)
+
+To showcase the interface of training a word2vec embedding model in an online batch learning fashion:
+
+- A list of quarters for creating the corpus from job posting data
+- A trainer object that specifies some parameters of source, s3 path, batch size, model type ...etc.
+- The train method takes whatever arugments `gensim.models.word2vec.Word2Vec` or `gensim.model.doc2vec.Doc2Vec` has
