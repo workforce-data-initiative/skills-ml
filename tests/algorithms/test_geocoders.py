@@ -4,23 +4,22 @@ import json
 from unittest.mock import MagicMock, call, patch
 from collections import namedtuple
 import moto
-import boto
+import boto3
 
 
-@moto.mock_s3_deprecated
+@moto.mock_s3
 def test_geocode_cacher():
     with patch('time.sleep') as time_mock:
         with open('tests/sample_geocode_result.json') as f:
             sample_geocode_result = json.load(f)
-        s3_conn = boto.connect_s3()
-        s3_conn.create_bucket('geobucket')
+        client = boto3.resource('s3')
+        client.create_bucket(Bucket='geobucket')
 
         geocode_result = namedtuple('GeocodeResult', ['json'])
         geocode_func = MagicMock(
             return_value=geocode_result(json=sample_geocode_result)
         )
         geocoder = S3CachedGeocoder(
-            s3_conn=s3_conn,
             cache_s3_path='geobucket/geocodes.json',
             geocode_func=geocode_func,
             sleep_time=1
@@ -37,7 +36,6 @@ def test_geocode_cacher():
         assert time_mock.call_count == 2
 
         new_geocoder = S3CachedGeocoder(
-            s3_conn=s3_conn,
             cache_s3_path='geobucket/geocodes.json',
             geocode_func=geocode_func,
             sleep_time=1
@@ -48,40 +46,37 @@ def test_geocode_cacher():
         }
 
 
-@moto.mock_s3_deprecated
+@moto.mock_s3
 def test_geocode_search_strings():
     with open('tests/sample_geocode_result.json') as f:
         sample_geocode_result = json.load(f)
-    s3_conn = boto.connect_s3()
-    s3_conn.create_bucket('geobucket')
+    client = boto3.resource('s3')
+    client.create_bucket(Bucket='geobucket')
 
     geocode_result = namedtuple('GeocodeResult', ['json'])
     geocode_func = MagicMock(
         return_value=geocode_result(json=sample_geocode_result)
     )
     geocoder = S3CachedGeocoder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/geocodes.json',
         geocode_func=geocode_func,
         sleep_time=0
     )
-    geocoder.geocode_search_strings_and_save(['string1', 'string2'], save_every=1)
+    geocoder.geocode_search_strings_and_save(['string1', 'string2'])
 
     new_geocoder = S3CachedGeocoder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/geocodes.json',
     )
     assert next(iter(new_geocoder.all_cached_geocodes.values()))\
         == sample_geocode_result
 
 
-@moto.mock_s3_deprecated
+@moto.mock_s3
 def test_cbsa_finder_onehit():
-    s3_conn = boto.connect_s3()
-    s3_conn.create_bucket('geobucket')
+    client = boto3.resource('s3')
+    client.create_bucket(Bucket='geobucket')
     shapefile_name = 'tests/sample_cbsa_shapefile.shp'
     finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/cbsas.json',
         shapefile_name=shapefile_name
     )
@@ -114,13 +109,12 @@ def test_cbsa_finder_onehit():
     )
 
 
-@moto.mock_s3_deprecated
+@moto.mock_s3
 def test_cbsa_finder_nohits():
-    s3_conn = boto.connect_s3()
-    s3_conn.create_bucket('geobucket')
+    client = boto3.resource('s3')
+    client.create_bucket(Bucket='geobucket')
     shapefile_name = 'tests/sample_cbsa_shapefile.shp'
     finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/cbsas.json',
         shapefile_name=shapefile_name
     )
@@ -133,13 +127,12 @@ def test_cbsa_finder_nohits():
     assert finder.query(sample_input) == None
 
 
-@moto.mock_s3_deprecated
+@moto.mock_s3
 def test_cbsa_finder_twohits():
-    s3_conn = boto.connect_s3()
-    s3_conn.create_bucket('geobucket')
+    client = boto3.resource('s3')
+    client.create_bucket(Bucket='geobucket')
     shapefile_name = 'tests/sample_cbsa_shapefile.shp'
     finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/cbsas.json',
         shapefile_name=shapefile_name
     )
@@ -155,13 +148,12 @@ def test_cbsa_finder_twohits():
     )
 
 
-@moto.mock_s3_deprecated
+@moto.mock_s3
 def test_cbsa_finder_cache():
-    s3_conn = boto.connect_s3()
-    s3_conn.create_bucket('geobucket')
+    client = boto3.resource('s3')
+    client.create_bucket(Bucket='geobucket')
 
     cbsa_finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/cbsas.json',
         shapefile_name='tests/sample_cbsa_shapefile.shp'
     )
@@ -183,7 +175,6 @@ def test_cbsa_finder_cache():
     cbsa_finder.find_all_cbsas_and_save(geocode_results)
 
     new_finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/cbsas.json',
         shapefile_name='tests/sample_cbsa_shapefile.shp'
     )
@@ -196,71 +187,17 @@ def test_cbsa_finder_cache():
     }
 
 
-@moto.mock_s3_deprecated
-def test_cbsa_finder_sanity_check():
-    s3_conn = boto.connect_s3()
-    s3_conn.create_bucket('geobucket')
-
-    cbsa_finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
-        cache_s3_path='geobucket/cbsas.json',
-        shapefile_name='tests/sample_cbsa_shapefile.shp'
-    )
-    geocode_results = {
-        'East of Charlotte, NC': {
-            "bbox": {
-                "northeast": [35.2268961, -80.8461711],
-                "southwest": [35.2267961, -80.8462711]
-            },
-        },
-        'Flushing, NY': {
-            "bbox": {
-                "northeast": [40.7654801, -73.8173791],
-                "southwest": [40.7653801, -73.8174791]
-            },
-        }
-    }
-
-    cbsa_finder.find_all_cbsas_and_save(geocode_results)
-
-    new_finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
-        cache_s3_path='geobucket/cbsas.json',
-        shapefile_name='tests/sample_cbsa_shapefile.shp'
-    )
-    assert new_finder.all_cached_cbsa_results == {
-        'East of Charlotte, NC': [
-            '16740',
-            'Charlotte-Concord-Gastonia, NC-SC Metro Area',
-        ],
-        'Flushing, NY': None
-    }
-    new_finder.cache = {}
-    # simulate something happening to the cache
-    new_finder.save()
-
-    assert new_finder.all_cached_cbsa_results == {
-        'East of Charlotte, NC': [
-            '16740',
-            'Charlotte-Concord-Gastonia, NC-SC Metro Area',
-        ],
-        'Flushing, NY': None
-    }
-
-
-@moto.mock_s3_deprecated
+@moto.mock_s3
 def test_cbsa_finder_empty_cache():
-    s3_conn = boto.connect_s3()
-    geobucket = s3_conn.create_bucket('geobucket')
+    client = boto3.resource('s3')
+    geobucket = client.create_bucket(Bucket='geobucket')
 
     cbsa_finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/cbsas.json',
         shapefile_name='tests/sample_cbsa_shapefile.shp'
     )
-    cache_key = boto.s3.key.Key(bucket=geobucket, name='geobucket/cbsas.json')
     # set the cache to something that JSON loads as None, not empty dict
-    cache_key.set_contents_from_string('')
+    geobucket.put_object(Body='', Key='cbsas.json')
     geocode_results = {
         'East of Charlotte, NC': {
             "bbox": {
@@ -279,7 +216,6 @@ def test_cbsa_finder_empty_cache():
     cbsa_finder.find_all_cbsas_and_save(geocode_results)
 
     new_finder = S3CachedCBSAFinder(
-        s3_conn=s3_conn,
         cache_s3_path='geobucket/cbsas.json',
         shapefile_name='tests/sample_cbsa_shapefile.shp'
     )

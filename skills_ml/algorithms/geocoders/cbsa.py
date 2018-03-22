@@ -4,12 +4,12 @@ import json
 import logging
 
 import boto
-
+import s3fs
 import shapely.geometry
 import fiona
 
 from skills_ml.datasets.cbsa_shapefile import download_shapefile
-from skills_utils.s3 import split_s3_path
+from skills_utils.s3 import split_s3_path, S3BackedJsonDict
 
 Match = namedtuple('Match', ['index', 'area'])
 
@@ -24,7 +24,7 @@ class S3CachedCBSAFinder(object):
     provides S3 caching. A minimal call looks like
 
     ```python
-    cbsa_finder = S3CachedCBSAFinder(s3_conn=..., cache_s3_path='some-bucket/cbsas.json')
+    cbsa_finder = S3CachedCBSAFinder(cache_s3_path='some-bucket/cbsas.json')
     cbsa_finder.find_all_cbsas_and_save({
         "Flushing, NY": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }
         "Houston, TX": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }
@@ -40,8 +40,7 @@ class S3CachedCBSAFinder(object):
     only one copy of `find_all_cbsas_and_save` at a time to avoid overwriting
     the S3 cache file.
 
-    Args:
-        s3_conn (boto.s3.connection) an s3 connection
+    Args: 
         cache_s3_path (string) path (including bucket) to the json cache on s3
         shapefile_name (string) local path to a CBSA shapefile to use
             optional, will download TIGER 2015 shapefile if absent
@@ -51,61 +50,25 @@ class S3CachedCBSAFinder(object):
     """
     def __init__(
         self,
-        s3_conn,
         cache_s3_path,
         shapefile_name=None,
         cache_dir=None
     ):
-        self.s3_conn = s3_conn
         self.cache_s3_path = cache_s3_path
         self.shapes = []
         self.properties = []
-        self.cache = None
-        self.cache_original_size = 0
-        self.shapefile_name = shapefile_name or download_shapefile(cache_dir or 'tmp')
-
-    @property
-    def _key(self):
-        bucket_name, path = split_s3_path(self.cache_s3_path)
-        return boto.s3.key.Key(
-            bucket=self.s3_conn.get_bucket(bucket_name),
-            name=path
-        )
-
-    def _load_cache(self):
-        """Load the result cache into memory"""
-        try:
-            cache_json = self._key.get_contents_as_string().decode('utf-8')
-            self.cache = json.loads(cache_json)
-            if not self.cache:
-                self.cache = {}
-            self.cache_original_size = len(cache_json)
-        except boto.exception.S3ResponseError as e:
-            logging.warning(
-                'CBSA finder cachefile load failed with exception %s,' +
-                'will overwrite', e
-            )
-            self.cache = {}
+        self.cache = S3BackedJsonDict(path=self.cache_s3_path)
+        self.cache_dir = cache_dir
+        self.shapefile_name = shapefile_name
 
     def _load_shapefile(self):
         """Load the CBSA Shapefile into memory"""
+        if not self.shapefile_name:
+            download_shapefile(self.cache_dir or 'tmp')
         with fiona.collection(self.shapefile_name) as input:
             for row in input:
                 self.shapes.append(shapely.geometry.shape(row['geometry']))
                 self.properties.append(row['properties'])
-
-        try:
-            cache_json = self._key.get_contents_as_string().decode('utf-8')
-            self.cache = json.loads(cache_json)
-            if not self.cache:
-                self.cache = {}
-            self.cache_original_size = len(cache_json)
-        except boto.exception.S3ResponseError as e:
-            logging.warning(
-                'CBSA finder cachefile load failed with exception %s,' +
-                'will overwrite', e
-            )
-            self.cache = {}
 
     def query(self, geocode_result):
         """Find the geographically closest CBSA to the given geocode result
@@ -172,20 +135,7 @@ class S3CachedCBSAFinder(object):
 
     def save(self):
         """Save the cbsa finding cache to S3"""
-        cache_json = json.dumps(self.cache)
-        if len(cache_json) >= self.cache_original_size:
-            new_cache_json = json.dumps(self.cache)
-            self._key.set_contents_from_string(new_cache_json)
-            logging.info(
-                'Successfully saved cbsa finding cache to %s',
-                self.cache_s3_path
-            )
-        else:
-            logging.error(
-                'New cache size: %s smaller than existing cache size: %s, aborting',
-                len(cache_json),
-                self.cache_original_size
-            )
+        self.cache.save()
 
     @property
     def all_cached_cbsa_results(self):
@@ -193,6 +143,4 @@ class S3CachedCBSAFinder(object):
 
         Returns: (dict) search strings mapping to their (tuple) results
         """
-        if not self.cache:
-            self._load_cache()
         return self.cache
