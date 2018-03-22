@@ -24,3 +24,4 @@ fuzzywuzzy==0.16.0
 python-Levenshtein==0.12.0
 dickens==1.0.1
 skills-utils==0.4.0
+s3fs==0.1.4
