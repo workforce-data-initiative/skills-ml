@@ -5,7 +5,7 @@ scipy==1.0.1
 nltk==3.2.5
 pytest==3.5.0
 PyYAML==3.12
-Elasticsearch==6.1.1
+Elasticsearch==6.2.0
 gensim==3.2.0 # pyup: ignore
 annoy==1.11.4
 unicodecsv==0.14.1
