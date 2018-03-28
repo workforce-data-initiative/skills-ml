@@ -41,7 +41,7 @@ class EmbeddingTrainer(object):
     from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 
     s3_conn = S3Hook().get_conn()
-    job_postings_generator = JobPostingGenerator(s3_conn, quarters, jp_s3_path, source="all")
+    job_postings_generator = JobPostingGenerator(s3_conn, quarters, s3_path, source="all")
     corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
     trainer = EmbeddingTrainer(corpus_generator, s3_conn, 'open-skills-private/test_corpus')
     trainer.train()

@@ -8,6 +8,22 @@ from skills_utils.s3 import split_s3_path
 from skills_utils.s3 import log_download_progress
 
 class JobPostingGenerator(object):
+    """
+    Stream job posting from s3 for given quarters
+    Example:
+    ```
+    from airflow.hooks import S3Hook
+    s3_conn = S3Hook().get_conn()
+    quarters = ['2011Q1', '2011Q2', '2011Q3']
+    job_postings_generator = JobPostingGenerator(s3_conn, quarters, s3_path='open-skills-private/job_postings_common', source="all")
+    ```
+
+    Attributes:
+        s3_conn: a boto s3 connection
+        quarters: a list of quarters
+        s3_path: path to the job listings
+        source: should be a string or a subset of "nlx", "va", "cb" or "all"
+    """
     def __init__(self, s3_conn, quarters, s3_path, source='all'):
         self.s3_conn = s3_conn
         self.quarters = quarters
@@ -97,6 +113,12 @@ def job_postings_chain(s3_conn, quarters, s3_path, source='all'):
 
 
 def batches_generator(iterable, batch_size):
+    """
+    Batch generator
+    Args:
+        iterable: an iterable
+        batch_size: batch size
+    """
     sourceiter = iter(iterable)
     while True:
         batchiter = islice(sourceiter, batch_size)
