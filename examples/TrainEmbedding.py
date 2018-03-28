@@ -1,11 +1,8 @@
 import sys
 sys.path.append('../')
 
-# import boto
-# s3_conn = boto.connect_s3()
-
-from airflow.hooks import S3Hook
-s3_conn = S3Hook().get_conn()
+import boto
+s3_conn = boto.connect_s3()
 
 import multiprocessing
 cores = multiprocessing.cpu_count()
