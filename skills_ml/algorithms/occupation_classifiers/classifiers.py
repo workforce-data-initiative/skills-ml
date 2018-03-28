@@ -6,7 +6,7 @@ import filelock
 
 from gensim.similarities.index import AnnoyIndexer
 
-from skills_ml.algorithms.occupation_classifiers import base
+from skills_ml.algorithms.embedding import base
 from skills_utils.s3 import download, split_s3_path, list_files
 
 
@@ -38,7 +38,7 @@ class Classifier(object):
     predicted_soc = Soc.classify(jobposting, mode='top')
     """
     def __init__(self, classifier_id='ann_0614', classifier=None,
-        s3_conn=None, s3_path='open-skills-private/model_cache/', classify_kwargs=None, temporary_directory=None, **kwargs):
+        s3_conn=None, s3_path='open-skills-private/model_cache/occupation_classifiers/', classify_kwargs=None, temporary_directory=None, **kwargs):
         """Initialization of Classifier
 
         Attributes:
@@ -54,14 +54,13 @@ class Classifier(object):
         self.classifier_type = classifier_id.split('_')[0]
         self.s3_conn = s3_conn
         self.s3_path = s3_path + classifier_id
-        self.files  = list_files(self.s3_conn, self.s3_path)
         self.temporary_directory = temporary_directory or tempfile.TemporaryDirectory()
         self.classifier = self._load_classifier(**kwargs) if classifier == None else classifier
         self.classify_kwargs = classify_kwargs if classify_kwargs else {}
 
     def _load_classifier(self, **kwargs):
         if self.classifier_type == 'ann':
-            for f in self.files:
+            for f in list_files(self.s3_conn, self.s3_path):
                 filepath = os.path.join(self.temporary_directory, f)
                 if not os.path.exists(filepath):
                     logging.warning('calling download from %s to %s', self.s3_path + f, filepath)
@@ -81,7 +80,7 @@ class Classifier(object):
         return self.classifier.predict_soc(jobposting, **(self.classify_kwargs))
 
 
-class NearestNeighbors(base.VectorModel):
+class NearestNeighbors(base.Doc2VecModel):
     """Nearest neightbors model to classify the jobposting data into soc code.
     If the indexer is passed, then NearestNeighbors will use approximate nearest
     neighbor approach which is much faster than the built-in knn in gensim.

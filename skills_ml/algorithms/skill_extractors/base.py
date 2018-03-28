@@ -1,12 +1,14 @@
+"""Base classes for skill extraction"""
 import json
 import logging
 import re
+from abc import ABCMeta, abstractmethod
 
 import nltk
 
 from descriptors import cachedproperty
 
-from skills_ml.algorithms.corpus_creators.basic import SimpleCorpusCreator
+from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
 
@@ -20,36 +22,45 @@ class CandidateSkill(object):
         self.confidence = confidence
 
 
-class JobPosting(object):
-    def __init__(self, job_posting_json, corpus_creator=None):
-        self.job_posting_json = job_posting_json
-        self.properties = json.loads(self.job_posting_json.decode('utf-8'))
-        if corpus_creator:
-            self.corpus_creator = corpus_creator
-        else:
-            self.corpus_creator = SimpleCorpusCreator()
+class SkillExtractor(object, metaclass=ABCMeta):
+    """Abstract class for all skill extractors.
 
-    @cachedproperty
-    def text(self):
-        return self.corpus_creator._join(self.properties)
-
-    @cachedproperty
-    def id(self):
-        return self.properties['id']
-
-    def __getattr__(self, attr):
-        return self.properties.get(attr, None)
-
-
-class ListBasedSkillExtractor(object):
-    def __init__(self, skill_lookup_path, skill_lookup_type='onet_ksat'):
-        self.skill_lookup_path = skill_lookup_path
-        self.skill_lookup_type = skill_lookup_type
+    All subclasses must implement document_skill_counts
+    """
+    def __init__(self):
         self.tracker = {
             'total_skills': 0,
             'jobs_with_skills': 0
         }
         self.nlp = NLPTransforms()
+
+    @abstractmethod
+    def document_skill_counts(self, document):
+        """Count skills in the document
+
+        Args:
+            document (string) A document for searching, such as a job posting
+
+        Returns: (collections.Counter) skills found in the document, all
+            values set to 1 (multiple occurrences of a skill do not count)
+        """
+        pass
+
+
+class ListBasedSkillExtractor(SkillExtractor):
+    """Extract skills by comparing with a known list
+
+
+    Subclasses must implement _skills_lookup and _document_skills_in_lookup
+
+    Args:
+        skill_lookup_path (string) A path to the skill lookup file
+        skill_lookup_type (string, optional) An identifier for the skill lookup type. Defaults to onet_ksat
+    """
+    def __init__(self, skill_lookup_path, skill_lookup_type='onet_ksat'):
+        super(ListBasedSkillExtractor, self).__init__()
+        self.skill_lookup_path = skill_lookup_path
+        self.skill_lookup_type = skill_lookup_type
         self.lookup = self._skills_lookup()
         logging.info(
             'Done creating skills lookup with %d entries',
