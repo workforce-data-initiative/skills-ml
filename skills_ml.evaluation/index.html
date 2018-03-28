@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-0.17.2, mkdocs-material-2.6.6">
+      <meta name="generator" content="mkdocs-0.17.3, mkdocs-material-2.7.0">
     
     
       
@@ -241,6 +241,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#inputschema" title="InputSchema" class="md-nav__link">
+    InputSchema
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#normalizerresponse" title="NormalizerResponse" class="md-nav__link">
     NormalizerResponse
   </a>
@@ -250,13 +257,6 @@
           <li class="md-nav__item">
   <a href="#mininormalizer" title="MiniNormalizer" class="md-nav__link">
     MiniNormalizer
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#inputschema" title="InputSchema" class="md-nav__link">
-    InputSchema
   </a>
   
 </li>
@@ -374,6 +374,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#inputschema" title="InputSchema" class="md-nav__link">
+    InputSchema
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#normalizerresponse" title="NormalizerResponse" class="md-nav__link">
     NormalizerResponse
   </a>
@@ -383,13 +390,6 @@
           <li class="md-nav__item">
   <a href="#mininormalizer" title="MiniNormalizer" class="md-nav__link">
     MiniNormalizer
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#inputschema" title="InputSchema" class="md-nav__link">
-    InputSchema
   </a>
   
 </li>
@@ -449,9 +449,9 @@
 <ul>
 <li><a href="#skills_mlevaluationjob_title_normalizers">skills_ml.evaluation.job_title_normalizers</a><ul>
 <li><a href="#interimschema">InterimSchema</a></li>
+<li><a href="#inputschema">InputSchema</a></li>
 <li><a href="#normalizerresponse">NormalizerResponse</a></li>
 <li><a href="#mininormalizer">MiniNormalizer</a></li>
-<li><a href="#inputschema">InputSchema</a></li>
 </ul>
 </li>
 <li><a href="#skills_mlevaluationrepresentativeness_calculators">skills_ml.evaluation.representativeness_calculators</a></li>
@@ -474,6 +474,11 @@ and the former is for testing those results against the normalizer's</p>
 </code></pre>
 
 <p>An enumeration listing the data elements and indices after normalization</p>
+<h3 id="inputschema"><a class="toclink" href="#inputschema">InputSchema <a href="../skills_ml.evaluation.job_title_normalizers.InputSchema"></a></a><a class="headerlink" href="#inputschema" title="Permanent link">&para;</a></h3>
+<pre><code class="python">InputSchema(self, /, *args, **kwargs)
+</code></pre>
+
+<p>An enumeration listing the data elements and indices taken from source data</p>
 <h3 id="normalizerresponse"><a class="toclink" href="#normalizerresponse">NormalizerResponse <a href="../skills_ml.evaluation.job_title_normalizers.NormalizerResponse"></a></a><a class="headerlink" href="#normalizerresponse" title="Permanent link">&para;</a></h3>
 <pre><code class="python">NormalizerResponse(self, name=None, access=None, num_examples=3)
 </code></pre>
@@ -494,11 +499,6 @@ with 'title' and optional 'relevance_score' keys</p>
 
 <p>Access normalizer classes which can be instantiated and
 implement 'normalize_job_title(job_title)'</p>
-<h3 id="inputschema"><a class="toclink" href="#inputschema">InputSchema <a href="../skills_ml.evaluation.job_title_normalizers.InputSchema"></a></a><a class="headerlink" href="#inputschema" title="Permanent link">&para;</a></h3>
-<pre><code class="python">InputSchema(self, /, *args, **kwargs)
-</code></pre>
-
-<p>An enumeration listing the data elements and indices taken from source data</p>
 <h2 id="skills_mlevaluationrepresentativeness_calculators"><a class="toclink" href="#skills_mlevaluationrepresentativeness_calculators">skills_ml.evaluation.representativeness_calculators <a href="../skills_ml.evaluation.representativeness_calculators"></a></a><a class="headerlink" href="#skills_mlevaluationrepresentativeness_calculators" title="Permanent link">&para;</a></h2>
 <p>Calculate representativeness of a dataset, such as job postings</p>
 <h2 id="skills_mlevaluationrepresentativeness_calculatorsgeo_occupation"><a class="toclink" href="#skills_mlevaluationrepresentativeness_calculatorsgeo_occupation">skills_ml.evaluation.representativeness_calculators.geo_occupation <a href="../skills_ml.evaluation.representativeness_calculators.geo_occupation"></a></a><a class="headerlink" href="#skills_mlevaluationrepresentativeness_calculatorsgeo_occupation" title="Permanent link">&para;</a></h2>
@@ -583,9 +583,9 @@ normalizer (skills_ml.algorithms.occupation_classifiers) An object that can retu
       
     </div>
     
-      <script src="../assets/javascripts/application.02434462.js"></script>
+      <script src="../assets/javascripts/application.8eb9be28.js"></script>
       
-      <script>app.initialize({version:"0.17.2",url:{base:".."}})</script>
+      <script>app.initialize({version:"0.17.3",url:{base:".."}})</script>
       
     
     
