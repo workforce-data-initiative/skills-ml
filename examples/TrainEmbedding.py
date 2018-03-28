@@ -1,27 +1,34 @@
 import sys
 sys.path.append('../')
 
-import boto
-s3_conn = boto.connect_s3()
+# import boto
+# s3_conn = boto.connect_s3()
+
+from airflow.hooks import S3Hook
+s3_conn = S3Hook().get_conn()
+
 import multiprocessing
 cores = multiprocessing.cpu_count()
 
 import pandas as pd
 from skills_utils.time import datetime_to_quarter
 
+from skills_ml.job_postings.common_schema import JobPostingGenerator
+from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
+
 
 def get_time_range(start='2011-01-01', freq='Q', periods=24):
 
     return list(map(lambda x: datetime_to_quarter(x), pd.date_range(start=start, freq=freq, periods=periods)))
 
 if __name__ == '__main__':
-    time_range = get_time_range(start='2011-01-01', freq='Q', periods=24)
-
+    time_range = get_time_range(start='2011-01-01', freq='Q', periods=1)
+    job_postings_generator = JobPostingGenerator(s3_conn=s3_conn, quarters=time_range, s3_path='open-skills-private/job_postings_common', source="all")
+    corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
     trainer = EmbeddingTrainer(s3_conn=s3_conn,
-                               quarters=time_range,
-                               source='nlx',
-                               jp_s3_path='open-skills-private/job_postings_common',
+                               corpus_generator = corpus_generator,
                                model_s3_path='open-skills-private/model_cache/embedding/',
                                batch_size=4000,
                                model_type='word2vec')

@@ -2,6 +2,9 @@ from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 
 from skills_utils.s3 import upload, list_files, download
 
+from skills_ml.job_postings.common_schema import JobPostingGenerator
+from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+
 from moto import mock_s3_deprecated
 import tempfile
 import boto
@@ -62,7 +65,9 @@ def test_embedding_trainer():
 
 
     # Doc2Vec
-    trainer = EmbeddingTrainer(s3_conn=s3_conn, quarters=['2011Q1'], jp_s3_path=s3_prefix_jb, model_s3_path=s3_prefix_model, model_type='doc2vec')
+    job_postings_generator = JobPostingGenerator(s3_conn=s3_conn, quarters=['2011Q1'], s3_path=s3_prefix_jb, source="all")
+    corpus_generator = Doc2VecGensimCorpusCreator(job_postings_generator)
+    trainer = EmbeddingTrainer(corpus_generator=corpus_generator, s3_conn=s3_conn, model_s3_path=s3_prefix_model, model_type='doc2vec')
     trainer.train()
     files = list_files(s3_conn, os.path.join(s3_prefix_model, 'doc2vec_gensim_' + trainer.training_time))
     assert len(files) == 3
@@ -78,13 +83,17 @@ def test_embedding_trainer():
                                            'metadata_doc2vec_gensim_' + trainer.training_time + '.json'])
 
     # Word2Vec
-    trainer = EmbeddingTrainer(s3_conn=s3_conn, quarters=['2011Q1'], jp_s3_path=s3_prefix_jb, model_s3_path=s3_prefix_model, model_type='word2vec')
+    job_postings_generator = JobPostingGenerator(s3_conn=s3_conn, quarters=['2011Q1'], s3_path=s3_prefix_jb, source="all")
+    corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
+    trainer = EmbeddingTrainer(corpus_generator=corpus_generator, s3_conn=s3_conn, model_s3_path=s3_prefix_model, model_type='word2vec')
     trainer.train()
     files = list_files(s3_conn, os.path.join(s3_prefix_model, 'word2vec_gensim_' + trainer.training_time))
     assert len(files) == 2
     assert files == ['metadata_word2vec_gensim_' + trainer.training_time + '.json',
                      'word2vec_gensim_' + trainer.training_time + '.model']
 
-    new_trainer = EmbeddingTrainer(s3_conn=s3_conn, quarters=['2011Q1'], jp_s3_path=s3_prefix_jb, model_s3_path=s3_prefix_model, model_type='word2vec')
+    job_postings_generator = JobPostingGenerator(s3_conn=s3_conn, quarters=['2011Q1'], s3_path=s3_prefix_jb, source="all")
+    corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
+    new_trainer = EmbeddingTrainer(corpus_generator=corpus_generator, s3_conn=s3_conn, model_s3_path=s3_prefix_model, model_type='word2vec')
     new_trainer.load(trainer.modelname, s3_prefix_model)
     assert new_trainer.metadata['metadata']['hyperparameters'] == trainer.metadata['metadata']['hyperparameters']
