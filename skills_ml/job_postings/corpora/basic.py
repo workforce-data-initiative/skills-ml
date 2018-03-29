@@ -40,6 +40,7 @@ class CorpusCreator(object):
                                 Each string is expected to represent a job listing
                                 conforming to the common schema
                                 See sample_job_listing.json for an example of this schema
+        document_schema_fields (list): an list of schema fields to be included
         filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
                                 and output a job posting. Default is to filter documents by major group.
         raw (bool): a flag whether to return the raw documents or transformed documents
@@ -174,9 +175,10 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
 
     Attributes:
         job_posting_generator (generator): a job posting generator
-        major_groups (list): a list of O*NET major group classes you want to include in the corpus being created.
+        document_schema_fields (list): an list of schema fields to be included
         filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
                                 and output a job posting. Default is to filter documents by major group.
+        major_groups (list): a list of O*NET major group classes you want to include in the corpus being created.
         key (string): a key indicates the label which should exist in common schema of job posting.
 
     """
