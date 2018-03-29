@@ -44,13 +44,15 @@ class CorpusCreator(object):
                                 and output a job posting. Default is to filter documents by major group.
         raw (bool): a flag whether to return the raw documents or transformed documents
     """
-    def __init__(self, job_posting_generator=None, filter_func=None, raw=False):
+    def __init__(self, job_posting_generator=None, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
+                 filter_func=None, raw=False):
         self.job_posting_generator = job_posting_generator
         self.nlp = NLPTransforms()
         self.filter_func = filter_func
         self.filter = self.filter_func
         self.raw = raw
         self.quarters = job_posting_generator.quarters if not job_posting_generator is None else None
+        self.document_schema_fields = document_schema_fields
 
     def raw_corpora(self, job_posting_generator):
         """Transforms job listings into corpus format
@@ -95,13 +97,7 @@ class CorpusCreator(object):
             yield str(randint(0,23))
 
     def _clean(self, document):
-        document_schema_fields = [
-            'description',
-            'experienceRequirements',
-            'qualifications',
-            'skills'
-        ]
-        for f in document_schema_fields:
+        for f in self.document_schema_fields:
             try:
                 cleaned = self.nlp.clean_html(document[f]).replace('\n','')
                 cleaned = " ".join(cleaned.split())
@@ -137,13 +133,6 @@ class SimpleCorpusCreator(CorpusCreator):
         An object that transforms job listing documents by picking
         important schema fields and returns them as one large lowercased string
     """
-    document_schema_fields = [
-        'description',
-        'experienceRequirements',
-        'qualifications',
-        'skills'
-    ]
-
     join_spaces = ' '.join
 
     def _clean(self, document):
@@ -191,16 +180,11 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
         key (string): a key indicates the label which should exist in common schema of job posting.
 
     """
-    document_schema_fields = [
-        'description',
-        'experienceRequirements',
-        'qualifications',
-        'skills'
-    ]
     join_spaces = ' '.join
 
-    def __init__(self, job_posting_generator, filter_func=None, major_groups=None, key=['onet_soc_code']):
-        super().__init__(job_posting_generator, filter_func)
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
+                 filter_func=None, major_groups=None, key=['onet_soc_code']):
+        super().__init__(job_posting_generator, document_schema_fields, filter_func)
         self.lookup = {}
         self.k = 0 if not self.lookup else max(self.lookup.keys()) + 1
         self.major_groups = major_groups
@@ -243,16 +227,10 @@ class Word2VecGensimCorpusCreator(CorpusCreator):
         An object that transforms job listing documents by picking
         important schema fields and returns them as one large cleaned array of words
     """
-    document_schema_fields = [
-        'description',
-        'experienceRequirements',
-        'qualifications',
-        'skills'
-    ]
     join_spaces = ' '.join
 
-    def __init__(self, job_posting_generator):
-        super().__init__(job_posting_generator)
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
+        super().__init__(job_posting_generator, document_schema_fields)
 
     def _clean(self, document):
         return self.join_spaces([
