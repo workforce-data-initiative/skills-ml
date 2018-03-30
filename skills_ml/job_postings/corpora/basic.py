@@ -36,26 +36,30 @@ class CorpusCreator(object):
 
 
     Attributes:
-        generator (generator):  an iterable that generates JSON strings.
+        job_posting_generator (generator):  an iterable that generates JSON strings.
                                 Each string is expected to represent a job listing
                                 conforming to the common schema
                                 See sample_job_listing.json for an example of this schema
+        document_schema_fields (list): an list of schema fields to be included
         filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
                                 and output a job posting. Default is to filter documents by major group.
         raw (bool): a flag whether to return the raw documents or transformed documents
     """
-    def __init__(self, generator=None, filter_func=None, raw=False):
-        self.generator = generator
+    def __init__(self, job_posting_generator=None, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
+                 filter_func=None, raw=False):
+        self.job_posting_generator = job_posting_generator
         self.nlp = NLPTransforms()
         self.filter_func = filter_func
         self.filter = self.filter_func
         self.raw = raw
+        self.quarters = job_posting_generator.quarters if not job_posting_generator is None else None
+        self.document_schema_fields = document_schema_fields
 
-    def raw_corpora(self, generator):
+    def raw_corpora(self, job_posting_generator):
         """Transforms job listings into corpus format
 
         Args:
-            generator: an iterable that generates JSON strings.
+            job_posting_generator: an iterable that generates JSON strings.
                 Each string is expected to represent a job listing
                 conforming to the common schema
                 See sample_job_listing.json for an example of this schema
@@ -63,44 +67,38 @@ class CorpusCreator(object):
         Yields:
             (string) The next job listing transformed into corpus format
         """
-        for line in generator:
+        for line in job_posting_generator:
             document = json.loads(line)
             yield self._transform(document)
 
-    def tokenize_corpora(self, generator):
+    def tokenize_corpora(self, job_posting_generator):
         """Transforms job listings into corpus format for gensim's doc2vec
         Args:
-            generator: an iterable that generates an array of words(strings).
+            job_posting_generator: an iterable that generates an array of words(strings).
                 Each array is expected to represent a job listing(a doc)
                 including fields of interests
         Yields:
             (list) The next job listing transformed into gensim's doc2vec
         """
-        for line in generator:
+        for line in job_posting_generator:
             document = json.loads(line)
             yield self._transform(document).split()
 
-    def label_corpora(self, generator):
+    def label_corpora(self, job_posting_generator):
         """Extract job label(category) from job listings and transfrom into corpus format
 
         Args:
-            generator: an iterable that generates a list of job label (strings).
+            job_posting_generator: an iterable that generates a list of job label (strings).
 
         Yields:
             (string) The next job label transform into corpus format
         """
-        for line in generator:
+        for line in job_posting_generator:
             document = json.loads(line)
             yield str(randint(0,23))
 
     def _clean(self, document):
-        document_schema_fields = [
-            'description',
-            'experienceRequirements',
-            'qualifications',
-            'skills'
-        ]
-        for f in document_schema_fields:
+        for f in self.document_schema_fields:
             try:
                 cleaned = self.nlp.clean_html(document[f]).replace('\n','')
                 cleaned = " ".join(cleaned.split())
@@ -121,7 +119,7 @@ class CorpusCreator(object):
        ])
 
     def __iter__(self):
-        for line in self.generator:
+        for line in self.job_posting_generator:
             document = json.loads(line)
             if self.filter:
                 document = self.filter(document)
@@ -136,13 +134,6 @@ class SimpleCorpusCreator(CorpusCreator):
         An object that transforms job listing documents by picking
         important schema fields and returns them as one large lowercased string
     """
-    document_schema_fields = [
-        'description',
-        'experienceRequirements',
-        'qualifications',
-        'skills'
-    ]
-
     join_spaces = ' '.join
 
     def _clean(self, document):
@@ -183,25 +174,20 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     ```
 
     Attributes:
-        generator (generator): a job posting generator
-        major_groups (list): a list of O*NET major group classes you want to include in the corpus being created.
+        job_posting_generator (generator): a job posting generator
+        document_schema_fields (list): an list of schema fields to be included
         filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
                                 and output a job posting. Default is to filter documents by major group.
+        major_groups (list): a list of O*NET major group classes you want to include in the corpus being created.
         key (string): a key indicates the label which should exist in common schema of job posting.
 
     """
-    document_schema_fields = [
-        'description',
-        'experienceRequirements',
-        'qualifications',
-        'skills'
-    ]
     join_spaces = ' '.join
 
-    def __init__(self, generator=None, filter_func=None, major_groups=None, key=['onet_soc_code']):
-        super().__init__()
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
+                 filter_func=None, major_groups=None, key=['onet_soc_code']):
+        super().__init__(job_posting_generator, document_schema_fields, filter_func)
         self.lookup = {}
-        self.generator = generator
         self.k = 0 if not self.lookup else max(self.lookup.keys()) + 1
         self.major_groups = major_groups
         self.key = key
@@ -225,7 +211,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
         return TaggedDocument(words, tag)
 
     def __iter__(self):
-        for line in self.generator:
+        for line in self.job_posting_generator:
             document = json.loads(line)
             if self.filter:
                 document = self.filter(document)
@@ -243,17 +229,10 @@ class Word2VecGensimCorpusCreator(CorpusCreator):
         An object that transforms job listing documents by picking
         important schema fields and returns them as one large cleaned array of words
     """
-    document_schema_fields = [
-        'description',
-        'experienceRequirements',
-        'qualifications',
-        'skills'
-    ]
     join_spaces = ' '.join
 
-    def __init__(self, generator=None):
-        super().__init__()
-        self.generator = generator
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
+        super().__init__(job_posting_generator, document_schema_fields)
 
     def _clean(self, document):
         return self.join_spaces([
