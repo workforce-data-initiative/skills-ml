@@ -249,8 +249,45 @@ class JobCategoryCorpusCreator(CorpusCreator):
     document_schema_fields = [
         'occupationalCategory']
 
+    join_spaces = ' '.join
+
     def _transform(self, document):
         return self.join_spaces([
             self.nlp.lowercase_strip_punc(document[field])
             for field in self.document_schema_fields
         ])
+
+
+class RawCorpusCreator(CorpusCreator):
+    """
+        An object that pass the raw job posting data
+    """
+    join_spaces = ' '.join
+
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
+        super().__init__(job_posting_generator, document_schema_fields)
+
+    def _transform(self, document):
+        return self.join_spaces([document[field] for field in self.document_schema_fields])
+
+
+class RawSentenceCreator(CorpusCreator):
+    join_spaces = ' '.join
+
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
+        super().__init__(job_posting_generator, document_schema_fields)
+
+    def _transform(self, document):
+        return self.nlp.sentence_tokenize(self.join_spaces([document[field] for field in self.document_schema_fields]))
+
+    def __iter__(self):
+        for line in self.job_posting_generator:
+            document = json.loads(line)
+            if self.filter:
+                document = self.filter(document)
+                if document:
+                    for sentence in self._transform(document):
+                        yield sentence
+            else:
+                for sentence in self._transform(document):
+                    yield sentence

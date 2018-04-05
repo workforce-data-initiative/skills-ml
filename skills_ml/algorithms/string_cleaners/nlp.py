@@ -2,6 +2,7 @@
 import unicodedata
 import re
 from bs4 import BeautifulSoup
+import nltk
 
 class NLPTransforms(object):
     # An object that performs common NLP transformations
@@ -73,3 +74,14 @@ class NLPTransforms(object):
         document = re.sub(r"\'ll", " \'ll", document)
         document = re.sub(r"\s{2,}", " ", document)
         return document
+
+    def sentence_tokenize(self, document):
+        if '\n' in document:
+            sentences = re.split('\n', document)
+            sentences = list(filter(None, sentences))
+        else:
+            try:
+                sentences = nltk.sent_tokenizes(document.encode('utf-8'))
+            except:
+                sentences = nltk.sent_tokenize(document)
+        return sentences

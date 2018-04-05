@@ -2,6 +2,7 @@ from functools import reduce
 
 from skills_ml.algorithms.job_vectorizers.doc2vec_vectorizer import Doc2Vectorizer
 from skills_ml.algorithms.skill_feature_creator.structure_features import structFeatGeneration
+from skills_ml.algorithms.skill_feature_creator.contextual_features import local_contextual_features
 
 class FeatureCreator(object):
     """ Feature Creator Factory that help users to instantiate different
@@ -101,7 +102,7 @@ class ContextualFeature(FeatureFactory):
     def output(self, doc):
         """ Output a feature vector.
         """
-        contextfeaures = localcontextualfeatures(doc)
+        contextfeaures = local_contextual_features(doc)
         return contextfeaures
 
 

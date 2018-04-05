@@ -140,6 +140,7 @@ def pre_process(description):
     # Break job description into sentences
     if '\n' in description:
         sentences = re.split('\n', description)
+        sentences = list(filter(None, sentences))
     else:
         try:
             sentences = nltk.sent_tokenizes(description.encode('utf-8'))
@@ -156,16 +157,8 @@ def pre_process(description):
 
     return sentences
 
-def localContextualFeatures(jobPosting):
-
-    data = json.loads(jobPosting, object_pairs_hook=OrderedDict)
-
-    try:
-        description = data["description"]
-    except:
-        description = data[""]
-
-    output = pre_process(description)
+def local_contextual_features(job_posting):
+    output = pre_process(job_posting)
     features = [sent2features(s) for s in output]
 
     return features
