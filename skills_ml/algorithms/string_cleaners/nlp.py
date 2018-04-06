@@ -3,6 +3,7 @@ import unicodedata
 import re
 from bs4 import BeautifulSoup
 import nltk
+from functools import reduce
 
 class NLPTransforms(object):
     # An object that performs common NLP transformations
@@ -79,9 +80,8 @@ class NLPTransforms(object):
         if '\n' in document:
             sentences = re.split('\n', document)
             sentences = list(filter(None, sentences))
-        else:
-            try:
-                sentences = nltk.sent_tokenizes(document.encode('utf-8'))
-            except:
-                sentences = nltk.sent_tokenize(document)
+        try:
+            sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences.encode('utf-8')))
+        except:
+            sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences))
         return sentences
