@@ -100,8 +100,9 @@ class CorpusCreator(object):
 
     @property
     def metadata(self):
-        meta_dict = {'corpus_creator': str(self.__class__)}
-        meta_dict.update(self.job_posting_generator.metadata)
+        meta_dict = {'corpus_creator': ".".join([self.__module__ , self.__class__.__name__])}
+        if self.job_posting_generator:
+            meta_dict.update(self.job_posting_generator.metadata)
         return meta_dict
 
     @property
