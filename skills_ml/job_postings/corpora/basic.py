@@ -44,13 +44,14 @@ class CorpusCreator(object):
         filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
                                 and output a job posting. Default is to filter documents by major group.
         raw (bool): a flag whether to return the raw documents or transformed documents
+        major_groups (list): a list of major gorup. If it's not None, will use the _major_group_filter() as filter_func
     """
     def __init__(self, job_posting_generator=None, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
-                 filter_func=None, raw=False):
+                 filter_func=None, raw=False, major_groups=None):
         self.job_posting_generator = job_posting_generator
         self.nlp = NLPTransforms()
+        self.major_groups = major_groups
         self.filter_func = filter_func
-        self.filter = self.filter_func
         self.raw = raw
         self.quarters = job_posting_generator.quarters if not job_posting_generator is None else None
         self.document_schema_fields = document_schema_fields
@@ -96,6 +97,22 @@ class CorpusCreator(object):
         for line in job_posting_generator:
             document = json.loads(line)
             yield str(randint(0,23))
+
+    @property
+    def metadata(self):
+        meta_dict = {'corpus_creator': str(self.__class__)}
+        meta_dict.update(self.job_posting_generator.metadata)
+        return meta_dict
+
+    @property
+    def filter(self):
+        return self._major_group_filter if isinstance(self.major_groups, list) else self.filter_func
+
+    def _major_group_filter(self, document):
+        key=self.key[0]
+        if document[key]:
+            if document[key][:2] in self.major_groups:
+                return document
 
     def _clean(self, document):
         for f in self.document_schema_fields:
@@ -179,31 +196,22 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
         filter_func (function): a self-defined function to filter job postings, which takes a job posting as input
                                 and output a job posting. Default is to filter documents by major group.
         major_groups (list): a list of O*NET major group classes you want to include in the corpus being created.
-        key (string): a key indicates the label which should exist in common schema of job posting.
 
     """
     join_spaces = ' '.join
 
     def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
-                 filter_func=None, major_groups=None, key=['onet_soc_code']):
-        super().__init__(job_posting_generator, document_schema_fields, filter_func)
+                 filter_func=None, major_groups=None):
+        super().__init__(job_posting_generator, document_schema_fields, filter_func=filter_func, major_groups=major_groups)
         self.lookup = {}
         self.k = 0 if not self.lookup else max(self.lookup.keys()) + 1
-        self.major_groups = major_groups
-        self.key = key
-        self.filter = self._major_group_filter if isinstance(major_groups, list) else filter_func
+        self.key = ['onet_soc_code']
 
     def _clean(self, document):
         return self.join_spaces([
             self.nlp.clean_str(document[field])
             for field in self.document_schema_fields
         ])
-
-    def _major_group_filter(self, document):
-        key=self.key[0]
-        if document[key]:
-            if document[key][:2] in self.major_groups:
-                return document
 
     def _transform(self, document):
         words = self._clean(document).split()
@@ -224,6 +232,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
                 yield self._transform(document)
                 self.k += 1
 
+
 class Word2VecGensimCorpusCreator(CorpusCreator):
     """
         An object that transforms job listing documents by picking
@@ -231,8 +240,9 @@ class Word2VecGensimCorpusCreator(CorpusCreator):
     """
     join_spaces = ' '.join
 
-    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
-        super().__init__(job_posting_generator, document_schema_fields)
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
+                 filter_func=None, major_groups=None):
+        super().__init__(job_posting_generator, document_schema_fields, filter_func=filter_func, major_groups=major_groups)
 
     def _clean(self, document):
         return self.join_spaces([

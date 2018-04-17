@@ -105,5 +105,5 @@ class TestTrainEmbedding(unittest.TestCase):
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         new_trainer = EmbeddingTrainer(corpus_generator=corpus_generator, s3_conn=s3_conn, model_s3_path=s3_prefix_model, model_type='word2vec')
         new_trainer.load(trainer.modelname, s3_prefix_model)
-        assert new_trainer.metadata['metadata']['hyperparameters'] == trainer.metadata['metadata']['hyperparameters']
+        assert new_trainer.metadata['embedding_trainer']['hyperparameters'] == trainer.metadata['embedding_trainer']['hyperparameters']
 

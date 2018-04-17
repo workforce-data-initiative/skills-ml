@@ -163,11 +163,13 @@ class CommonSchemaTestCase(unittest.TestCase):
 
         jp = JobPostingGenerator(s3_conn, quarters, '{}/{}'.format(bucket_name, path), 'all')
         self.assertEqual(len(list(jp)), len(files))
+        self.assertEqual(jp.metadata, {'job_postings_generator': {'quarters': ['2011Q1', '2011Q2', '2011Q3'], 'source': 'all'}})
 
         jp = JobPostingGenerator(s3_conn, quarters, '{}/{}'.format(bucket_name, path), 'nlx')
         self.assertEqual(len(list(jp)), len([j for j in files if 'NLX' in j.split('_')]))
+        self.assertEqual(jp.metadata, {'job_postings_generator': {'quarters': ['2011Q1', '2011Q2', '2011Q3'], 'source': 'nlx'}})
 
         jp = JobPostingGenerator(s3_conn, quarters, '{}/{}'.format(bucket_name, path), ['va', 'nlx'])
         self.assertEqual(len(list(jp)), len([j for j in files if ('VA' in j.split('_') or 'NLX' in j.split('_'))]))
-
+        self.assertEqual(jp.metadata, {'job_postings_generator': {'quarters': ['2011Q1', '2011Q2', '2011Q3'], 'source': ['va', 'nlx']}})
         self.assertEqual(jp.quarters, quarters)

@@ -97,5 +97,5 @@ def test_doc2vec_corpus_creator():
             if document['onet_soc_code'][:2] in ['23', '33']:
                 return document
 
-    corpus = Doc2VecGensimCorpusCreator(it, filter_func=filter_func, key='onet_soc_code')
+    corpus = Doc2VecGensimCorpusCreator(it, filter_func=filter_func)
     assert len(list(corpus)) == 1
