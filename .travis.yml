@@ -25,7 +25,7 @@ deploy:
       SzZWdXFXY3J2QmduRGljd1NhaDc2c1ZucDY4T3Zsd2E3dzlILzU1b0xWQ3ZBRnJMQ1RDU0ExcDd1
       b1gzUGpVOU1EbjZxN24rMjVlc2J2VHgrdm1ib1AvZ3VkWlZtbjZJYzB6dThGTDVIcXlOTWIxVFk9
 env:
-- TOXENV=py34 BOTO_CONFIG=/tmp/nowhere PYTHONPATH='.'
+- TOXENV=py36 BOTO_CONFIG=/tmp/nowhere PYTHONPATH='.'
 install:
 - pip install -r requirements.txt
 - pip install -r requirements_dev.txt
