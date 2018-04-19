@@ -8,6 +8,7 @@ from skills_ml.algorithms.sampling import Sample
 from skills_ml.algorithms.skill_extractors import \
     FuzzyMatchSkillExtractor,\
     ExactMatchSkillExtractor,\
+
 from skills_ml.evaluation.skill_extractors import upload_candidates_from_job_posting_json
 
 

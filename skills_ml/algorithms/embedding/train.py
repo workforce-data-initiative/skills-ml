@@ -4,8 +4,7 @@ from gensim import __name__ as gensim_name
 import gensim.models.doc2vec
 assert gensim.models.doc2vec.FAST_VERSION > -1
 
-from skills_ml.job_postings.common_schema import job_postings_chain, batches_generator
-from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+from skills_ml.job_postings.common_schema import batches_generator
 from skills_ml.algorithms.embedding.base import Word2VecModel
 
 from skills_utils.s3 import upload
@@ -38,23 +37,25 @@ class EmbeddingTrainer(object):
     ```
     from airflow.hooks import S3Hook
     from skills_ml.algorithms.occupation_classifiers.train import EmbeddingTrainer
+    from skills_ml.job_postings.common_schema import JobPostingGenerator
+    from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 
     s3_conn = S3Hook().get_conn()
-    trainer = EmbeddingTrainer(s3_conn, ['2011Q1', '2011Q2'], 'open-skills-private/test_corpus')
+    job_postings_generator = JobPostingGenerator(s3_conn, quarters, s3_path, source="all")
+    corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
+    trainer = EmbeddingTrainer(corpus_generator, s3_conn, 'open-skills-private/test_corpus')
     trainer.train()
     ```
     """
     def __init__(
-        self, s3_conn, quarters, jp_s3_path, source='all',
+        self, corpus_generator, s3_conn,
         model_s3_path=S3_PATH_EMBEDDING_MODEL, batch_size=2000,
         model_type='word2vec'):
         """Initialization
 
         Attributes:
+            corpus_generator (:generator): the iterable corpus
             s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
-            quarters (:obj: `list` of (str)): quarters will be trained on
-            source (:str): job posting source, should be "all", "nlx" or "cb".
-            jp_s3_path (:str): job posting path on S3
             model_s3_path (:str): model path to store on S3
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             metadata (:dict): model metadata
@@ -68,20 +69,11 @@ class EmbeddingTrainer(object):
             logging.warning("Current gensim doc2vec doesn't support online batch learning. Use generic learning instead.")
             logging.warning("Training on too large corpus might cause serious memory leaks!")
 
-        if source not in ['nlx', 'cb', 'all']:
-            raise ValueError('"{}" is an invalid source!'.format(source))
-
-        if not isinstance(quarters, list):
-            raise TypeError('quarters should be a list of string, e.g. ["2011Q1", "2011Q2"]')
-
+        self.corpus_generator = corpus_generator
         self.s3_conn = s3_conn
-        self.quarters = quarters
-        self.jp_s3_path = jp_s3_path
         self.training_time = datetime.today().isoformat()
         self.model_type = model_type
         self.model_s3_path = model_s3_path
-        self.modelname = self.model_type + '_gensim_' + self.training_time
-        self.source = source
         self.update = False
         self.batch_size = batch_size
         self.vocab_size_cumu = []
@@ -126,7 +118,7 @@ class EmbeddingTrainer(object):
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
-        job_postings_generator = job_postings_chain(self.s3_conn, self.quarters, self.jp_s3_path, source=self.source)
+
 
         if self.model_type == 'word2vec':
             if not self._model:
@@ -137,7 +129,7 @@ class EmbeddingTrainer(object):
                 self.update = True
 
             batch_iter = 1
-            batch_gen = batches_generator(Word2VecGensimCorpusCreator(job_postings_generator), self.batch_size)
+            batch_gen = batches_generator(self.corpus_generator, self.batch_size)
             for batch in batch_gen:
                 batch = Reiterable(batch)
                 logging.info("Training batch #{} ".format(batch_iter))
@@ -154,7 +146,7 @@ class EmbeddingTrainer(object):
 
         elif self.model_type == 'doc2vec':
             model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
-            corpus_gen = Doc2VecGensimCorpusCreator(job_postings_generator)
+            corpus_gen = self.corpus_generator
             reiter_corpus_gen = Reiterable(corpus_gen)
             model.build_vocab(reiter_corpus_gen)
             model.train(reiter_corpus_gen, total_examples=model.corpus_count, epochs=model.iter)
@@ -163,14 +155,16 @@ class EmbeddingTrainer(object):
         self._model = model
         self._upload()
 
+    @property
+    def modelname(self):
+        return self.model_type + '_gensim_' + self.training_time
 
     @property
     def metadata(self):
-        meta_dict = {}
+        meta_dict = {'embedding_trainer': {}}
         if self._model:
-            meta_dict['metadata'] = {}
-            meta_dict['model_name'] = self.modelname
-            meta_dict['metadata']['hyperparameters'] = {
+            meta_dict['embedding_trainer']['model_name'] = self.modelname
+            meta_dict['embedding_trainer']['hyperparameters'] = {
                                             'vector_size': self._model.vector_size,
                                             'window': self._model.window,
                                             'min_count': self._model.min_count,
@@ -188,12 +182,12 @@ class EmbeddingTrainer(object):
                                             'dm_concat': self._model.dm_concat if hasattr(self._model, 'dm_concat') else None,
                                             'dm_tag_count': self._model.dm_tag_count if hasattr(self._model, 'dm_tag_count') else None
                                             }
-            meta_dict['metadata']['quarters'] = self.quarters
-            meta_dict['metadata']['gensim_version']  = gensim_name + gensim_version
-            meta_dict['metadata']['training_time'] = self.training_time
-            meta_dict['metadata']['vocab_size_cumu'] = self.vocab_size_cumu
+            meta_dict['embedding_trainer']['gensim_version']  = gensim_name + gensim_version
+            meta_dict['embedding_trainer']['training_time'] = self.training_time
+            meta_dict['embedding_trainer']['vocab_size_cumu'] = self.vocab_size_cumu
 
         else:
-            print("Need to train first")
+            print("Haven't trained the model yet!")
 
+        meta_dict.update(self.corpus_generator.metadata)
         return meta_dict
