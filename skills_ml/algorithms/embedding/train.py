@@ -71,11 +71,9 @@ class EmbeddingTrainer(object):
 
         self.corpus_generator = corpus_generator
         self.s3_conn = s3_conn
-        self.quarters = corpus_generator.quarters
         self.training_time = datetime.today().isoformat()
         self.model_type = model_type
         self.model_s3_path = model_s3_path
-        self.modelname = self.model_type + '_gensim_' + self.training_time
         self.update = False
         self.batch_size = batch_size
         self.vocab_size_cumu = []
@@ -157,14 +155,16 @@ class EmbeddingTrainer(object):
         self._model = model
         self._upload()
 
+    @property
+    def modelname(self):
+        return self.model_type + '_gensim_' + self.training_time
 
     @property
     def metadata(self):
-        meta_dict = {}
+        meta_dict = {'embedding_trainer': {}}
         if self._model:
-            meta_dict['metadata'] = {}
-            meta_dict['model_name'] = self.modelname
-            meta_dict['metadata']['hyperparameters'] = {
+            meta_dict['embedding_trainer']['model_name'] = self.modelname
+            meta_dict['embedding_trainer']['hyperparameters'] = {
                                             'vector_size': self._model.vector_size,
                                             'window': self._model.window,
                                             'min_count': self._model.min_count,
@@ -182,12 +182,12 @@ class EmbeddingTrainer(object):
                                             'dm_concat': self._model.dm_concat if hasattr(self._model, 'dm_concat') else None,
                                             'dm_tag_count': self._model.dm_tag_count if hasattr(self._model, 'dm_tag_count') else None
                                             }
-            meta_dict['metadata']['quarters'] = self.quarters
-            meta_dict['metadata']['gensim_version']  = gensim_name + gensim_version
-            meta_dict['metadata']['training_time'] = self.training_time
-            meta_dict['metadata']['vocab_size_cumu'] = self.vocab_size_cumu
+            meta_dict['embedding_trainer']['gensim_version']  = gensim_name + gensim_version
+            meta_dict['embedding_trainer']['training_time'] = self.training_time
+            meta_dict['embedding_trainer']['vocab_size_cumu'] = self.vocab_size_cumu
 
         else:
-            print("Need to train first")
+            print("Haven't trained the model yet!")
 
+        meta_dict.update(self.corpus_generator.metadata)
         return meta_dict

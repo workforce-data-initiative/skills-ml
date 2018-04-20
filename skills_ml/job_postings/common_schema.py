@@ -35,6 +35,9 @@ class JobPostingGenerator(object):
         for job_post in job_postings_chain(self.s3_conn, self.quarters, self.s3_path, self.source):
             yield job_post
 
+    @property
+    def metadata(self):
+        return {'job_postings_generator':  {'quarters': self.quarters, 'source': self.source}}
 
 def retry_if_io_error(exception):
     return isinstance(exception, IOError)

@@ -20,3 +20,7 @@ def test_array_corpora():
 def test_clean():
     corpus = CorpusCreator()
     assert corpus._clean(json.loads(sample_input[0]))['description'] == 'We are looking for engineer'
+
+def test_metadata():
+	corpus = CorpusCreator()
+	assert corpus.metadata['corpus_creator'] == 'skills_ml.job_postings.corpora.basic.CorpusCreator'
