@@ -64,15 +64,8 @@ def sentTokenize(description):
             sentences = nltk.sent_tokenize(description)
     return sentences
 
-def structFeatGeneration(jobPosting):
-
-    data = json.loads(jobPosting, object_pairs_hook=OrderedDict)
-    try:
-        description = data["description"]
-    except:
-        description = data[""]
-
-    sentences = sentTokenize(description)
+def structFeatGeneration(job_posting):
+    sentences = sentTokenize(job_posting)
     desc_length = len(sentences)
     features = [structFeatures(sentences[i], i, desc_length) for i in range(desc_length)]
 

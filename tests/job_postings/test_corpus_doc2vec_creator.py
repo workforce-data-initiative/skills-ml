@@ -79,9 +79,6 @@ def test_doc2vec_corpus_creator():
 
     it = FakeJobPostingGenerator()
 
-    corpus = Doc2VecGensimCorpusCreator(it)._clean(sample_document[0])
-    assert corpus == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'
-
     # Test for Default
     corpus = Doc2VecGensimCorpusCreator(it)
     assert len(list(corpus)) == 2

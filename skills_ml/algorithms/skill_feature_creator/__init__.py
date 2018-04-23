@@ -49,7 +49,7 @@ class FeatureCreator(object):
         else:
             raise Exception(TypeError)
 
-    def transform(self, docs, combine="concat"):
+    def featurize(self, docs, combine="concat"):
         """ Methods to combine different types of feature and transform to a vector as a generator.
         We might want to have different way to combine vectors in the future (eg. concat, average...).
 
@@ -63,6 +63,8 @@ class FeatureCreator(object):
         """
         features_to_be_combined = self.selected_features
         feature_objects = [FeatureFactory._factory(feature, **self.params) for feature in features_to_be_combined]
+
+
         if combine == "concat":
             for doc in docs:
                 yield reduce(lambda x, y: x+y, map(lambda x: x.output(doc), feature_objects))
@@ -87,7 +89,7 @@ class FeatureFactory(object):
 
 
 class StructuralFeature(FeatureFactory):
-    """ Sturctural features
+    """ Sturctural features in sentence level
     """
     def output(self, doc):
         """ Output a feature vector.
@@ -97,7 +99,7 @@ class StructuralFeature(FeatureFactory):
 
 
 class ContextualFeature(FeatureFactory):
-    """ Contextual features
+    """ Contextual features in sentence level
     """
     def output(self, doc):
         """ Output a feature vector.
@@ -107,7 +109,7 @@ class ContextualFeature(FeatureFactory):
 
 
 class EmbeddingFeature(FeatureFactory):
-    """ Embedding features
+    """ Embedding features in sentence level
     """
     def __init__(self, **kwargs):
         super().__init__()

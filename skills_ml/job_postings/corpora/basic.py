@@ -221,7 +221,7 @@ class RawCorpusCreator(CorpusCreator):
         return self.join_spaces([document[field] for field in self.document_schema_fields])
 
 
-class SentenceCreator(CorpusCreator):
+class SentenceCorpusCreator(CorpusCreator):
     join_spaces = ' '.join
 
     def __init__(self, job_posting_generator, raw=True, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
