@@ -22,10 +22,10 @@ Documentation
 Quick Start
 -----------
 ### 1. Virtualenv
-**skills-ml** depends on python3, so create a virtual environment using a python3 executable.
+**skills-ml** depends on python3.6, so create a virtual environment using a python3.6 executable.
 
 ```bash
-virtualenv venv -p /usr/bin/python3
+virtualenv venv -p /usr/bin/python3.6
 ```
 Activate your virtualenv
 
