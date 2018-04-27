@@ -80,7 +80,7 @@ class CBSAandStateFromGeocode(JobPostingComputedProperty):
                 cache_s3_path=self.cache_s3_path
             ).all_cached_cbsa_results
         )
-        return lambda job_posting: geo_querier.query(json.dumps(job_posting))
+        return lambda job_posting: geo_querier.query(job_posting)
 
 
 class SOCClassifyProperty(JobPostingComputedProperty):

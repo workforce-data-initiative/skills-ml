@@ -1,5 +1,3 @@
-import json
-
 from skills_ml.job_postings.corpora.basic import Word2VecGensimCorpusCreator
 
 sample_document = {
@@ -36,7 +34,7 @@ sample_document = {
 
 class FakeJobPostingGenerator(object):
     def __iter__(self):
-        yield json.dumps(sample_document)
+        yield sample_document
 
     @property
     def metadata(self):
