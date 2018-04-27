@@ -55,7 +55,7 @@ class EmbeddingTrainer(object):
 
         Attributes:
             corpus_generator (:generator): the iterable corpus
-            storage (:obj: `Store`): skills_ml store object
+            storage (:obj: `skills_ml.Store`): skills_ml Store object
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             metadata (:dict): model metadata
             training_time (:str): training time

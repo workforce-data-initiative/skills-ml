@@ -18,17 +18,16 @@ class Word2VecModel(object):
 
     Example:
     ```
-    from airflow.hooks import S3Hook
     from skills_ml.algorithms.embedding.base import Word2VecModel
 
-    s3_conn = S3Hook().get_conn()
-    word2vec_model = Word2VecModel(s3_conn=s3_conn)
+    word2vec_model = Word2VecModel()
+    word2vec_model.load_model(path)
     ```
     """
     def __init__(self, storage=FSStore(), model=None):
         """
         Attributes:
-            storage (:)
+            storage (:obj: `skills_ml.Store`): skills_ml Store object
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
         """
         self.storage = storage
@@ -61,32 +60,31 @@ class Word2VecModel(object):
         """
         self.storage.write(self._model, model_name)
 
+    def inference(self):
+        raise NotImplementedError
+
 
 class Doc2VecModel(object):
     """The Doc2VecModel Object is a base object which specifies which word-embeding model.
 
     Example:
     ```
-    from airflow.hooks import S3Hook
     from skills_ml.algorithms.embedding.base import Doc2VecModel
 
-    s3_conn = S3Hook().get_conn()
-    doc2vec_model = Doc2VecModel(s3_conn=s3_conn)
+    doc2vec_model = Doc2VecModel()
+    doc2vec_model.load_model(path)
     ```
     """
     def __init__(self, storage=FSStore(), model=None, lookup=None):
         """
         Attributes:
-            model_name (str): name of the model to be used.
             lookup_name (str): name of the lookup file
-            s3_path (str): the path of the model on S3.
-            s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
-            model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
+            storage (:obj: `skills_ml.Store`): skills_ml Store object
+            _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
             lookup (dict): lookup table for mapping each jobposting index to soc code.
             training_data (np.ndarray): a document vector array where each row is a document vector.
             target (np.ndarray): a label array.
         """
-        self.model_name = None
         self.storage = storage
         self.lookup_name = 'lookup_' + self.model_name + '.json'
         self._model = model
@@ -144,3 +142,6 @@ class Doc2VecModel(object):
             y.append(self.lookup[str(self.model.docvecs.index_to_doctag(i))])
 
         return np.array(y)
+
+    def inference(self):
+        raise NotImplementedError
