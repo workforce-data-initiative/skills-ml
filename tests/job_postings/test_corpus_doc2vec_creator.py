@@ -1,8 +1,8 @@
-from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator
 import json
+from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator
 
 
-sample_document = [
+sample_documents = [
     {
         "incentiveCompensation": "",
         "experienceRequirements": "Here are some experience and requirements",
@@ -68,23 +68,23 @@ sample_document = [
 ]
 
 class FakeJobPostingGenerator(object):
-    def __init__(self):
-        self.quarters = ['2013Q2']
     def __iter__(self):
-        for d in sample_document:
-            yield json.dumps(d)
+        for document in sample_documents:
+            yield json.dumps(document)
+
+    @property
+    def metadata():
+        return {'job postings': {'purpose': 'unit testing'}}
 
 
 def test_doc2vec_corpus_creator():
 
     it = FakeJobPostingGenerator()
 
-    corpus = Doc2VecGensimCorpusCreator(it)._clean(sample_document[0])
-    assert corpus == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'
-
     # Test for Default
-    corpus = Doc2VecGensimCorpusCreator(it)
-    assert len(list(corpus)) == 2
+    list_corpus = list(Doc2VecGensimCorpusCreator(it))
+    assert len(list_corpus) == 2
+    assert list_corpus[0].words == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'.split()
 
     # Test for using pre-defined major group filter
     corpus = Doc2VecGensimCorpusCreator(it, major_groups=['41'])

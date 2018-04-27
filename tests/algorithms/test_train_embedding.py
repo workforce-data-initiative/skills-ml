@@ -2,7 +2,7 @@ from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 
 from skills_utils.s3 import upload, list_files, download
 
-from skills_ml.job_postings.common_schema import JobPostingGenerator
+from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 
 from moto import mock_s3_deprecated
@@ -54,22 +54,12 @@ class TestTrainEmbedding(unittest.TestCase):
         s3_conn = boto.connect_s3()
         bucket_name = 'fake-jb-bucket'
         bucket = s3_conn.create_bucket(bucket_name)
-
-        job_posting_name = 'FAKE_jobposting'
-        s3_prefix_jb = 'fake-jb-bucket/job_postings'
         s3_prefix_model = 'fake-jb-bucket/model_cache/embedding/'
-        quarters = '2011Q1'
 
         document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
 
-        with tempfile.TemporaryDirectory() as td:
-            with open(os.path.join(td, job_posting_name), 'w') as handle:
-                json.dump(sample_document, handle)
-            upload(s3_conn, os.path.join(td, job_posting_name), os.path.join(s3_prefix_jb, quarters))
-
-
         # Doc2Vec
-        job_postings_generator = JobPostingGenerator(s3_conn=s3_conn, quarters=['2011Q1'], s3_path=s3_prefix_jb, source="all")
+        job_postings_generator = JobPostingCollectionSample(num_records=2)
         corpus_generator = Doc2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         trainer = EmbeddingTrainer(corpus_generator=corpus_generator, s3_conn=s3_conn, model_s3_path=s3_prefix_model, model_type='doc2vec')
         trainer.train()
@@ -86,13 +76,13 @@ class TestTrainEmbedding(unittest.TestCase):
                                                'lookup_doc2vec_gensim_' + trainer.training_time + '.json',
                                                'metadata_doc2vec_gensim_' + trainer.training_time + '.json'])
 
-        job_postings_generator = JobPostingGenerator(s3_conn=s3_conn, quarters=['2011Q1'], s3_path=s3_prefix_jb, source="all")
+        job_postings_generator = JobPostingCollectionSample(num_records=2)
         corpus_generator = Doc2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         new_trainer = EmbeddingTrainer(corpus_generator=corpus_generator, s3_conn=s3_conn, model_s3_path=s3_prefix_model, model_type='doc2vec')
         self.assertRaises(NotImplementedError, lambda: new_trainer.load(trainer.modelname, s3_prefix_model))
 
         # Word2Vec
-        job_postings_generator = JobPostingGenerator(s3_conn=s3_conn, quarters=['2011Q1'], s3_path=s3_prefix_jb, source="all")
+        job_postings_generator = JobPostingCollectionSample(num_records=2)
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         trainer = EmbeddingTrainer(corpus_generator=corpus_generator, s3_conn=s3_conn, model_s3_path=s3_prefix_model, model_type='word2vec')
         trainer.train()
@@ -101,7 +91,7 @@ class TestTrainEmbedding(unittest.TestCase):
         assert files == ['metadata_word2vec_gensim_' + trainer.training_time + '.json',
                          'word2vec_gensim_' + trainer.training_time + '.model']
 
-        job_postings_generator = JobPostingGenerator(s3_conn=s3_conn, quarters=['2011Q1'], s3_path=s3_prefix_jb, source="all")
+        job_postings_generator = JobPostingCollectionSample(num_records=2)
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         new_trainer = EmbeddingTrainer(corpus_generator=corpus_generator, s3_conn=s3_conn, model_s3_path=s3_prefix_model, model_type='word2vec')
         new_trainer.load(trainer.modelname, s3_prefix_model)
