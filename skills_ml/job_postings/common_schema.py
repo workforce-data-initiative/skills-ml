@@ -1,21 +1,38 @@
+"""A variety of common-schema job posting collections.
+
+Each class in this module should implement a generator that yields job postings (in the common schema, as a JSON string), and has a 'metadata' attribute so any users of the job postings can inspect meaningful metadata about the postings.
+"""
 import logging
-import tempfile
 from retrying import Retrying
 from io import BytesIO
-from itertools import chain, islice, groupby, count
+from itertools import chain, islice
 
 from skills_utils.s3 import split_s3_path
 from skills_utils.s3 import log_download_progress
+from skills_ml.job_postings.raw.virginia import VirginiaTransformer
 
-class JobPostingGenerator(object):
+import json
+import gzip
+
+from typing import Dict, Text, Any, Generator, List
+
+JobPostingType = Text
+JobPostingGeneratorType = Generator[JobPostingType, None, None]
+MetadataType = Dict[Text, Dict[Text, Any]]
+
+
+class JobPostingCollectionFromS3(object):
     """
     Stream job posting from s3 for given quarters
     Example:
     ```
+    import json
     from airflow.hooks import S3Hook
     s3_conn = S3Hook().get_conn()
     quarters = ['2011Q1', '2011Q2', '2011Q3']
-    job_postings_generator = JobPostingGenerator(s3_conn, quarters, s3_path='open-skills-private/job_postings_common', source="all")
+    job_postings_generator = JobPostingCollectionFromS3(s3_conn, quarters, s3_path='open-skills-private/job_postings_common', source="all")
+    for job_posting in job_postings_generator:
+        print json.loads(job_posting)['title']
     ```
 
     Attributes:
@@ -30,19 +47,68 @@ class JobPostingGenerator(object):
         self.s3_path = s3_path
         self.source = source
 
-    def __iter__(self):
-        for job_post in job_postings_chain(self.s3_conn, self.quarters, self.s3_path, self.source):
-            yield job_post
+    def __iter__(self) -> JobPostingGeneratorType:
+        yield from generate_job_postings_from_s3_for_quarters(
+            self.s3_conn,
+            self.quarters,
+            self.s3_path,
+            self.source
+        )
 
     @property
-    def metadata(self):
-        return {'job_postings_generator':  {'quarters': self.quarters, 'source': self.source}}
+    def metadata(self) -> MetadataType:
+        return {'job postings':  {'quarters': self.quarters, 'source': self.source}}
+
+
+class JobPostingCollectionSample(object):
+    """Stream a finite number of job postings stored within the library.
+
+    Example:
+    ```
+    import json
+
+    job_postings = JobPostingCollectionSample()
+    for job_posting in job_postings:
+        print(json.loads(job_posting)['title'])
+
+    Meant to provide a dependency-less example of common schema job postings
+    for introduction to the library
+
+    Args:
+        num_records (int): The maximum number of records to return. Defaults to 50 (all postings available)
+    """
+    def __init__(self, num_records:int=50):
+        if num_records > 50:
+            logging.warning('Cannot provide %s records as a maximum of 50 are available', num_records)
+            num_records = 50
+        f = gzip.GzipFile(filename='50_sample.json.gz')
+        self.lines = f.read().decode('utf-8').split('\n')[0:num_records]
+        self.transformer = VirginiaTransformer(partner_id='VA')
+
+    def __iter__(self) -> JobPostingGeneratorType:
+        for line in self.lines:
+            if line:
+                yield json.dumps(self.transformer._transform(json.loads(line)))
+
+    @property
+    def metadata(self) -> MetadataType:
+        return {'job postings': {
+            'downloaded_from': 'http://opendata.cs.vt.edu/dataset/openjobs-jobpostings',
+            'month': '2016-07',
+            'purpose': 'testing'
+        }}
+
 
 def retry_if_io_error(exception):
     return isinstance(exception, IOError)
 
 
-def job_postings(s3_conn, quarter, s3_path, source="all"):
+def generate_job_postings_from_s3_for_quarter(
+        s3_conn,
+        quarter: Text,
+        s3_path: Text,
+        source: Text="all"
+) -> JobPostingGeneratorType:
     """
     Stream all job listings from s3 for a given quarter
     Args:
@@ -70,7 +136,6 @@ def job_postings(s3_conn, quarter, s3_path, source="all"):
     )
     bucket_name, prefix = split_s3_path(s3_path)
     bucket = s3_conn.get_bucket(bucket_name)
-    # keys = bucket.list(prefix='{}/{}'.format(prefix, quarter))
     if isinstance(source, str):
         if source.lower() == "all":
             keys = bucket.list(prefix='{}/{}'.format(prefix, quarter))
@@ -91,7 +156,12 @@ def job_postings(s3_conn, quarter, s3_path, source="all"):
                 yield line.decode('utf-8')
 
 
-def job_postings_chain(s3_conn, quarters, s3_path, source='all'):
+def generate_job_postings_from_s3_for_quarters(
+        s3_conn,
+        quarters: List[Text],
+        s3_path: Text,
+        source: Text='all'
+) -> JobPostingGeneratorType:
     """
     Chain the generators of a list of multiple quarters
     Args:
@@ -106,13 +176,8 @@ def job_postings_chain(s3_conn, quarters, s3_path, source='all'):
     if not isinstance(quarters, list):
         raise TypeError('quarters should be a list of string, e.g. ["2011Q1", "2011Q2"]')
 
-    generators = []
     for quarter in quarters:
-        generators.append(job_postings(s3_conn, quarter, s3_path, source))
-
-    job_postings_generator = chain(*generators)
-
-    return job_postings_generator
+        yield from generate_job_postings_from_s3_for_quarter(s3_conn, quarter, s3_path, source)
 
 
 def batches_generator(iterable, batch_size):

@@ -102,6 +102,7 @@ class VirginiaTransformer(JobPostingImportBase):
             '@type': 'MonetaryAmount',
             'minValue': document['baseSalary']['minSalary'],
             'maxValue': document['baseSalary']['maxSalary'],
+            'medianValue': document['baseSalary']['medianSalary'],
         }
         transformed['industry'] = document['hiringOrganization']['organizationCode']
         transformed['onet_soc_code'] = document['normalizedTitle']['onetCode']

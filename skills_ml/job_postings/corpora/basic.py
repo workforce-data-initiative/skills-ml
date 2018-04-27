@@ -12,12 +12,10 @@ class CorpusCreator(object):
 
     Example:
     ```python
-    from airflow.hooks import S3Hook
-    from skills_ml.job_postings.common_schema import job_postings, job_postings_chain
+    from skills_ml.job_postings.common_schema import JobPostingCollectionSample
     from skills_ml.job_postings.corpora.basic import CorpusCreator
 
-    s3_conn = S3Hook().get_conn()
-    job_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')
+    job_postings_generator = JobPostingCollectionSample()
 
     # Default will include all the cleaned job postings
     corpus = CorpusCreator(job_postings_generator)
@@ -53,7 +51,6 @@ class CorpusCreator(object):
         self.major_groups = major_groups
         self.filter_func = filter_func
         self.raw = raw
-        self.quarters = job_posting_generator.quarters if not job_posting_generator is None else None
         self.document_schema_fields = document_schema_fields
 
     def raw_corpora(self, job_posting_generator):
@@ -169,12 +166,10 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
     Example:
     ```python
 
-    from airflow.hooks import S3Hook
-    from skills_ml.job_postings.common_schema import job_postings, job_postings_chain
+    from skills_ml.job_postings.common_schema import JobPostingCollectionSample
     from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator
 
-    s3_conn = S3Hook().get_conn()
-    job_postings_generator = job_postings_chain(s3_conn, ['2011Q2'], 'open-skills-private/test_corpus')
+    job_postings_generator = JobPostingCollectionSample()
 
     # Default will include all the job postings with O*NET SOC code.
     corpus = Doc2VecGensimCorpusCreator(job_postings_generator)
