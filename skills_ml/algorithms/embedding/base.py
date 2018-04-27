@@ -9,6 +9,7 @@ import boto
 from gensim.models import Doc2Vec, Word2Vec
 
 from skills_utils.s3 import download, split_s3_path, list_files
+from skills_ml.storage import Store, FSStore
 
 S3_PATH_EMBEDDING_MODEL = 'open-skills-private/model_cache/embedding/'
 
@@ -24,38 +25,41 @@ class Word2VecModel(object):
     word2vec_model = Word2VecModel(s3_conn=s3_conn)
     ```
     """
-    def __init__(self, model_name='word2vec_gensim_2017-07-14T11:32:00.997426',
-        model=None, s3_conn=None, s3_path=S3_PATH_EMBEDDING_MODEL):
+    def __init__(self, storage=FSStore(), model=None):
         """
         Attributes:
-            model_name (str): name of the model to be used.
-            s3_path (str): the path of the model on S3.
-            s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
-            files (:obj: `list` of (str)): model files need to be downloaded/loaded.
+            storage (:)
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
-            lookup (dict): lookup table for mapping each jobposting index to soc code.
         """
+        self.storage = storage
+        self._model = model
+        self.model_name = None
+
+    @property
+    def storage(self):
+        return self._storage
+
+    @storage.setter
+    def storage(self, value):
+        if value.__class__.__name__ in [c.__name__ for c in Store.__subclasses__()]:
+            self._storage = value
+        else:
+            raise Exception(f"{value} is not Store Object")
+
+    def load_model(self, model_name):
+        """The method to load the model from where Storage object specified
+
+        model_name (str): name of the model to be used.
+        """
+        self._model = self.storage.load(model_name)
         self.model_name = model_name
-        self.s3_path = s3_path + self.model_name
-        self.s3_conn = s3_conn
-        self.model = self._load_model() if model == None else model
 
-    def _load_model(self):
-        """The method to download the model from S3 and load to the memory.
+    def write_model(self, model_name):
+        """The method to write the model to where the Storage object specified
 
-        Returns:
-            gensim.models.doc2vec.Doc2Vec: The word-embedding model object.
+        model_name (str): name of the model to be used.
         """
-        files  = list_files(self.s3_conn, self.s3_path)
-        with tempfile.TemporaryDirectory() as td:
-            for f in files:
-                filepath = os.path.join(td, f)
-                if not os.path.exists(filepath):
-                    logging.info('calling download from %s to %s', self.s3_path + f, filepath)
-                    download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
-            model = Word2Vec.load(os.path.join(td, self.model_name+".model"))
-
-            return model
+        self.storage.write(self._model, model_name)
 
 
 class Doc2VecModel(object):
@@ -70,8 +74,7 @@ class Doc2VecModel(object):
     doc2vec_model = Doc2VecModel(s3_conn=s3_conn)
     ```
     """
-    def __init__(self, model_name='doc2vec_2017-07-14T11:32:00.997426',
-        lookup=None, model=None, s3_conn=None, s3_path=S3_PATH_EMBEDDING_MODEL):
+    def __init__(self, storage=FSStore(), model=None, lookup=None):
         """
         Attributes:
             model_name (str): name of the model to be used.
@@ -83,49 +86,48 @@ class Doc2VecModel(object):
             training_data (np.ndarray): a document vector array where each row is a document vector.
             target (np.ndarray): a label array.
         """
-        self.model_name = model_name
+        self.model_name = None
+        self.storage = storage
         self.lookup_name = 'lookup_' + self.model_name + '.json'
-        self.s3_path = s3_path + self.model_name
-        self.s3_conn = s3_conn
-        self.model = self._load_model() if model == None else model
-        self.lookup = self._load_lookup() if lookup == None else lookup
-        self.training_data = self.model.docvecs.doctag_syn0 if hasattr(self.model, 'docvecs') else None
+        self._model = model
+        self.lookup = lookup
         self.target = self._create_target_data() if hasattr(self.model, 'docvecs') else None
 
-    def _load_model(self):
+    @property
+    def storage(self):
+        return self._storage
+
+    @storage.setter
+    def storage(self, value):
+        print(value)
+        if value.__class__.__name__ in [c.__name__ for c in Store.__subclasses__()]:
+            self._storage = value
+        else:
+            raise Exception(f"{value} is not Store Object")
+
+    def load_model(self, model_name):
         """The method to download the model from S3 and load to the memory.
 
         Returns:
             gensim.models.doc2vec.Doc2Vec: The word-embedding model object.
         """
-        files  = list_files(self.s3_conn, self.s3_path)
-        with tempfile.TemporaryDirectory() as td:
-            for f in files:
-                filepath = os.path.join(td, f)
-                if not os.path.exists(filepath):
-                    logging.info('calling download from %s to %s', self.s3_path + f, filepath)
-                    download(self.s3_conn, filepath, os.path.join(self.s3_path, f))
-            model = Doc2Vec.load(os.path.join(td, self.model_name+".model"))
+        self._model = self.storage.load(model_name)
+        self.model_name = model_name
 
-            return model
-
-    def _load_lookup(self):
+    def load_lookup(self, lookup_name):
         """The method to download the lookup dictionary from S3 and load to the memory.
 
         Returns:
             dict: a lookup table for mapping gensim index to soc code.
         """
-        with tempfile.TemporaryDirectory() as td:
-            filepath = os.path.join(td, self.lookup_name)
-            logging.info('calling download from %s to %s', self.s3_path + self.lookup_name, filepath)
-            try:
-                download(self.s3_conn, filepath, os.path.join(self.s3_path, self.lookup_name))
-                with open(filepath, 'r') as handle:
-                    lookup = json.load(handle)
-            except boto.exception.S3ResponseError:
-                lookup = None
+        self.lookup = self.storage.load(lookup_name)
 
-            return lookup
+    @property
+    def training_data(self):
+        if hasattr(self._model, 'docvecs'):
+            return self._model.docvecs.doctag_syn0
+        else:
+            return None
 
     @property
     def target_data(self):

@@ -1,4 +1,4 @@
-from skills_ml.utils import S3Store, FSStore
+from skills_ml.storage import S3Store, FSStore
 from skills_utils.s3 import upload, list_files
 
 from moto import mock_s3
