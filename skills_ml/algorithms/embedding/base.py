@@ -24,13 +24,13 @@ class Word2VecModel(object):
     word2vec_model.load_model(path)
     ```
     """
-    def __init__(self, storage=FSStore(), model=None):
+    def __init__(self, storage=None, model=None):
         """
         Attributes:
             storage (:obj: `skills_ml.Store`): skills_ml Store object
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
         """
-        self.storage = storage
+        self.storage = FSStore() if storage is None else storage
         self._model = model
         self.model_name = None
 
@@ -40,10 +40,10 @@ class Word2VecModel(object):
 
     @storage.setter
     def storage(self, value):
-        if value.__class__.__name__ in [c.__name__ for c in Store.__subclasses__()]:
+        if hasattr(value, 'write') and hasattr(value, 'load'):
             self._storage = value
         else:
-            raise Exception(f"{value} is not Store Object")
+            raise Exception(f"{value} should have methods 'write()' and 'load()'")
 
     def load_model(self, model_name):
         """The method to load the model from where Storage object specified

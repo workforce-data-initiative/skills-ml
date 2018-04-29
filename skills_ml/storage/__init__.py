@@ -3,6 +3,8 @@ import s3fs
 from sklearn.externals import joblib
 import os
 import json
+import io
+import tempfile
 
 class Store(object):
     def __init__(self, path):
@@ -34,11 +36,23 @@ class S3Store(Store):
 
     def write(self, obj, fname):
         s3 = s3fs.S3FileSystem()
-        with s3.open(os.path.join(self.path, fname), 'wb') as f:
-            joblib.dump(obj, f, compress=True)
+        if fname.endswith('.json'):
+            with tempfile.TemporaryDirectory() as td:
+                with open(os.path.join(td, fname), 'w') as tmpfile:
+                    json.dump(obj, tmpfile)
+                s3.put(os.path.join(td, fname), os.path.join(self.path, fname))
+        else:
+            with s3.open(os.path.join(self.path, fname), 'wb') as f:
+                joblib.dump(obj, f, compress=True)
 
     def load(self, fname):
         s3 = s3fs.S3FileSystem()
+        if fname.endswith('.json'):
+            with tempfile.TemporaryDirectory() as td:
+                with open(os.path.join(td, fname), 'w') as tmpfile:
+                    s3.get(os.path.join(self.path, fname), os.path.join(td, fname))
+                with open(os.path.join(td, fname), 'r') as tmpfile:
+                    return json.load(tmpfile)
         with s3.open(os.path.join(self.path, fname), 'rb') as f:
             return joblib.load(f)
 
@@ -56,8 +70,8 @@ class FSStore(Store):
 
     def write(self, obj, fname):
         os.makedirs(os.path.dirname(os.path.join(self.path, fname)), exist_ok=True)
-        if isinstance(obj, dict):
-             with open(os.path.join(self.path, fname), 'w') as f:
+        if fname.endswith('.json'):
+            with open(os.path.join(self.path, fname), 'w') as f:
                 json.dump(obj, f, indent=4, separators=(',', ': '))
         else:
             with open(os.path.join(self.path, fname), 'w+b') as f:
