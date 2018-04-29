@@ -7,6 +7,8 @@ assert gensim.models.doc2vec.FAST_VERSION > -1
 from skills_ml.job_postings.common_schema import batches_generator
 from skills_ml.algorithms.embedding.base import Word2VecModel
 
+from skills_ml.storage import FSStore
+
 from skills_utils.s3 import upload
 
 from datetime import datetime
@@ -48,69 +50,52 @@ class EmbeddingTrainer(object):
     ```
     """
     def __init__(
-        self, corpus_generator, s3_conn,
-        model_s3_path=S3_PATH_EMBEDDING_MODEL, batch_size=2000,
-        model_type='word2vec'):
+        self, corpus_generator, batch_size=2000, storage=FSStore()):
         """Initialization
 
         Attributes:
             corpus_generator (:generator): the iterable corpus
-            s3_conn (:obj: `boto.s3.connection.S3Connection`): the boto object to connect to S3.
-            model_s3_path (:str): model path to store on S3
+            storage (:obj: `skills_ml.Store`): skills_ml Store object
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             metadata (:dict): model metadata
             training_time (:str): training time
             batch_size (:int): batch size
             model_type (:str): 'word2vec' or 'doc2vec'
         """
-        if model_type not in ['word2vec', 'doc2vec']:
-            raise ValueError('"{}"" model_type is not supported!'.format(model_type))
-        elif model_type == 'doc2vec':
-            logging.warning("Current gensim doc2vec doesn't support online batch learning. Use generic learning instead.")
-            logging.warning("Training on too large corpus might cause serious memory leaks!")
-
         self.corpus_generator = corpus_generator
-        self.s3_conn = s3_conn
         self.training_time = datetime.today().isoformat()
-        self.model_type = model_type
-        self.model_s3_path = model_s3_path
         self.update = False
         self.batch_size = batch_size
         self.vocab_size_cumu = []
         self._model = None
         self._lookup = None
+        self.storage = storage
 
-    def load(self, model_name, s3_path=S3_PATH_EMBEDDING_MODEL):
+    def load(self, model_name):
         if 'word2vec' in model_name.split('_'):
-            word2vec = Word2VecModel(model_name=model_name, s3_conn=self.s3_conn, s3_path=s3_path)
-            self._model = word2vec.model
-            self.model_type = 'word2vec'
+            word2vec = Word2VecModel(self.storage)
+            word2vec.load_model(model_name)
+            self._model = word2vec._model
         elif 'doc2vec' in model_name.split('_'):
             raise NotImplementedError("Couldn't load doc2vec model. Current gensim doc2vec model doesn't support online learning")
 
-    def _upload(self):
-        with tempfile.TemporaryDirectory() as td:
-            self.save_model(td)
-            for f in glob(os.path.join(td, '*{}*'.format(self.training_time))):
-                upload(self.s3_conn, f, os.path.join(self.model_s3_path, self.modelname))
-
-    def save_model(self, path):
+    def save_model(self):
         """Save model locally
 
         Args:
             path (:str): path to save model files and lookup
         """
         model_name = self.modelname + '.model'
-        self._model.save(os.path.join(path, model_name))
+
+        self.storage.write(self._model, model_name)
+
         meta_dict = self.metadata
         metaname = 'metadata_' + self.modelname + '.json'
-        with open(os.path.join(path, metaname), 'w') as handle:
-            json.dump(meta_dict, handle, indent=4, separators=(',', ': '))
+        self.storage.write(meta_dict, metaname)
 
         if self.model_type == 'doc2vec':
             lookup_name = 'lookup_' + self.modelname + '.json'
-            with open(os.path.join(path, lookup_name), 'w') as handle:
-                json.dump(self._lookup, handle)
+            self.storage.write(self._lookup, lookup_name)
 
     def train(self, size=500, min_count=3, iter=4, window=6, workers=3, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
@@ -118,8 +103,6 @@ class EmbeddingTrainer(object):
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
-
-
         if self.model_type == 'word2vec':
             if not self._model:
                 model = Word2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
@@ -153,7 +136,13 @@ class EmbeddingTrainer(object):
             self._lookup = corpus_gen.lookup
 
         self._model = model
-        self._upload()
+
+    @property
+    def model_type(self):
+        if self.corpus_generator.__class__.__name__ == 'Doc2VecGensimCorpusCreator':
+            return 'doc2vec'
+        elif self.corpus_generator.__class__.__name__ == 'Word2VecGensimCorpusCreator':
+            return 'word2vec'
 
     @property
     def modelname(self):
