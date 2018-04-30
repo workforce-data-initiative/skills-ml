@@ -1,4 +1,3 @@
-import json
 from random import randint
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from gensim.models.doc2vec import TaggedDocument
@@ -53,48 +52,6 @@ class CorpusCreator(object):
         self.raw = raw
         self.document_schema_fields = document_schema_fields
 
-    def raw_corpora(self, job_posting_generator):
-        """Transforms job listings into corpus format
-
-        Args:
-            job_posting_generator: an iterable that generates JSON strings.
-                Each string is expected to represent a job listing
-                conforming to the common schema
-                See sample_job_listing.json for an example of this schema
-
-        Yields:
-            (string) The next job listing transformed into corpus format
-        """
-        for line in job_posting_generator:
-            document = json.loads(line)
-            yield self._transform(document)
-
-    def tokenize_corpora(self, job_posting_generator):
-        """Transforms job listings into corpus format for gensim's doc2vec
-        Args:
-            job_posting_generator: an iterable that generates an array of words(strings).
-                Each array is expected to represent a job listing(a doc)
-                including fields of interests
-        Yields:
-            (list) The next job listing transformed into gensim's doc2vec
-        """
-        for line in job_posting_generator:
-            document = json.loads(line)
-            yield self._transform(document).split()
-
-    def label_corpora(self, job_posting_generator):
-        """Extract job label(category) from job listings and transfrom into corpus format
-
-        Args:
-            job_posting_generator: an iterable that generates a list of job label (strings).
-
-        Yields:
-            (string) The next job label transform into corpus format
-        """
-        for line in job_posting_generator:
-            document = json.loads(line)
-            yield str(randint(0,23))
-
     @property
     def metadata(self):
         meta_dict = {'corpus_creator': ".".join([self.__module__ , self.__class__.__name__])}
@@ -134,8 +91,7 @@ class CorpusCreator(object):
        ])
 
     def __iter__(self):
-        for line in self.job_posting_generator:
-            document = json.loads(line)
+        for document in self.job_posting_generator:
             if self.filter:
                 document = self.filter(document)
                 if document:
@@ -215,8 +171,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
         return TaggedDocument(words, tag)
 
     def __iter__(self):
-        for line in self.job_posting_generator:
-            document = json.loads(line)
+        for document in self.job_posting_generator:
             if self.filter:
                 document = self.filter(document)
                 if document:

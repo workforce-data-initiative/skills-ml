@@ -16,7 +16,7 @@ import gzip
 
 from typing import Dict, Text, Any, Generator, List
 
-JobPostingType = Text
+JobPostingType = Dict[Text, Any]
 JobPostingGeneratorType = Generator[JobPostingType, None, None]
 MetadataType = Dict[Text, Dict[Text, Any]]
 
@@ -88,7 +88,7 @@ class JobPostingCollectionSample(object):
     def __iter__(self) -> JobPostingGeneratorType:
         for line in self.lines:
             if line:
-                yield json.dumps(self.transformer._transform(json.loads(line)))
+                yield self.transformer._transform(json.loads(line))
 
     @property
     def metadata(self) -> MetadataType:
@@ -153,7 +153,7 @@ def generate_job_postings_from_s3_for_quarter(
             retrier.call(key.get_contents_to_file, outfile, cb=log_download_progress)
             outfile.seek(0)
             for line in outfile:
-                yield line.decode('utf-8')
+                yield json.loads(line.decode('utf-8'))
 
 
 def generate_job_postings_from_s3_for_quarters(

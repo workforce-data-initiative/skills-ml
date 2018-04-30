@@ -1,5 +1,4 @@
 """Look up the CBSA for a job posting against a precomputed geocoded CBSA lookup"""
-import json
 import logging
 from . import job_posting_search_strings
 
@@ -31,12 +30,11 @@ class JobCBSAFromGeocodeQuerier(object):
         """
         Look up the CBSA from a job posting
         Arguments:
-            job_posting (string) A job posting in common schema json form
+            job_posting (dict) A job posting in common schema json form
         Returns:
             (tuple) (CBSA FIPS Code, CBSA Name, State)
         """
-        post = json.loads(job_posting)
-        state_code = post\
+        state_code = job_posting\
             .get('jobLocation', {})\
             .get('address', {})\
             .get('addressRegion', None)
@@ -44,7 +42,7 @@ class JobCBSAFromGeocodeQuerier(object):
         if not state_code:
             logging.warning(
                 'Returning blank CBSA for %s, no state found',
-                post['id']
+                job_posting['id']
             )
             return (None, None, None)
 
@@ -52,7 +50,7 @@ class JobCBSAFromGeocodeQuerier(object):
         if not any(search_string in self.cbsa_results for search_string in search_strings):
             logging.warning(
                 'Returning blank CBSA for %s, %s not found in cache',
-                post['id'],
+                job_posting['id'],
                 search_strings
             )
             return (None, None, state_code)
@@ -67,7 +65,7 @@ class JobCBSAFromGeocodeQuerier(object):
         if not first_result_with_cbsa:
             logging.warning(
                 'Returning blank CBSA for %s, %s found in cache as outside CBSA',
-                post['id'],
+                job_posting['id'],
                 search_strings
             )
             return (None, None, state_code)
