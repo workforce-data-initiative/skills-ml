@@ -83,13 +83,6 @@ class JobPostingComputedProperty(metaclass=ABCMeta):
             datestring (string): A string representing the date in the S3 path
         Returns: (skills_utils.s3.S3BackedJsonDict)
         """
-        # return S3BackedJsonDict(
-        #     path='/'.join([
-        #         self.path,
-        #         self.property_name,
-        #         datestring
-        #     ])
-        # )
         fname = '/'.join([self.property_name, datestring]) + '.json'
         return PersistedJSONDict(self.storage, fname)
 

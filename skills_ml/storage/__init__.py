@@ -60,22 +60,10 @@ class FSStore(Store):
 
     def write(self, bytes_obj, fname):
         os.makedirs(os.path.dirname(os.path.join(self.path, fname)), exist_ok=True)
-        # if fname.endswith('.json'):
-        #     with open(os.path.join(self.path, fname), 'w') as f:
-        #         json.dump(obj, f, indent=4, separators=(',', ': '))
-        # else:
-        #     with open(os.path.join(self.path, fname), 'w+b') as f:
-        #         joblib.dump(obj, f, compress=True)
         with open(os.path.join(self.path, fname), 'wb') as f:
             f.write(bytes_obj)
 
     def load(self, fname):
-        # if fname.endswith('.json'):
-        #     with open(os.path.join(self.path, fname), 'r') as f:
-        #         return json.load(f)
-        # else:
-        #     with open(os.path.join(self.path, fname), 'rb') as f:
-        #         return joblib.load(f)
         with open(os.path.join(self.path, fname), 'rb') as f:
             return f.read()
 

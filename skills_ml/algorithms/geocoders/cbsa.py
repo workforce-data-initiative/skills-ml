@@ -9,7 +9,6 @@ import shapely.geometry
 import fiona
 
 from skills_ml.datasets.cbsa_shapefile import download_shapefile
-# from skills_utils.s3 import S3BackedJsonDict
 from skills_ml.storage import PersistedJSONDict
 
 Match = namedtuple('Match', ['index', 'area'])
@@ -58,7 +57,6 @@ class S3CachedCBSAFinder(object):
     ):
         self.cache_storage = cache_storage
         self.cache_fname = cache_fname
-        # self.cache_s3_path = cache_s3_path
         self.shapes = []
         self.properties = []
         self.cache = PersistedJSONDict(self.cache_storage, self.cache_fname)

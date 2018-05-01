@@ -5,8 +5,7 @@ import time
 import geocoder
 import boto
 import traceback
-
-from skills_utils.s3 import split_s3_path, S3BackedJsonDict
+from skills_ml.storage import PersistedJSONDict
 
 
 
@@ -22,14 +21,16 @@ class S3CachedGeocoder(object):
     """
     def __init__(
         self,
-        cache_s3_path,
+        cache_storage,
+        cache_fname,
         geocode_func=geocoder.osm,
         sleep_time=1,
     ):
-        self.cache_s3_path = cache_s3_path
+        self.cache_storage = cache_storage
+        self.cache_fname = cache_fname
         self.geocode_func = geocode_func
         self.sleep_time = sleep_time
-        self.cache = S3BackedJsonDict(path=self.cache_s3_path)
+        self.cache = PersistedJSONDict(self.cache_storage, self.cache_fname)
 
     def retrieve_from_cache(self, search_strings):
         """Retrieve a saved geocode result from the cache if it exists
@@ -75,7 +76,7 @@ class S3CachedGeocoder(object):
         self.cache.save()
         logging.info(
             'Successfully saved geocoding cache to %s',
-            self.cache_s3_path
+            self.cache.fs.path
         )
 
     @property

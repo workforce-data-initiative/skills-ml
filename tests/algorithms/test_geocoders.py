@@ -15,13 +15,15 @@ def test_geocode_cacher():
             sample_geocode_result = json.load(f)
         client = boto3.resource('s3')
         client.create_bucket(Bucket='geobucket')
-
+        cache_storage = S3Store('geobucket')
+        cache_fname = 'cbsas.json'
         geocode_result = namedtuple('GeocodeResult', ['json'])
         geocode_func = MagicMock(
             return_value=geocode_result(json=sample_geocode_result)
         )
         geocoder = S3CachedGeocoder(
-            cache_s3_path='geobucket/geocodes.json',
+            cache_storage=cache_storage,
+            cache_fname=cache_fname,
             geocode_func=geocode_func,
             sleep_time=1
         )
@@ -37,7 +39,8 @@ def test_geocode_cacher():
         assert time_mock.call_count == 2
 
         new_geocoder = S3CachedGeocoder(
-            cache_s3_path='geobucket/geocodes.json',
+            cache_storage=cache_storage,
+            cache_fname=cache_fname,
             geocode_func=geocode_func,
             sleep_time=1
         )
@@ -53,20 +56,23 @@ def test_geocode_search_strings():
         sample_geocode_result = json.load(f)
     client = boto3.resource('s3')
     client.create_bucket(Bucket='geobucket')
-
+    cache_storage = S3Store('geobucket')
+    cache_fname = 'cbsas.json'
     geocode_result = namedtuple('GeocodeResult', ['json'])
     geocode_func = MagicMock(
         return_value=geocode_result(json=sample_geocode_result)
     )
     geocoder = S3CachedGeocoder(
-        cache_s3_path='geobucket/geocodes.json',
+        cache_storage=cache_storage,
+        cache_fname=cache_fname,
         geocode_func=geocode_func,
         sleep_time=0
     )
     geocoder.geocode_search_strings_and_save(['string1', 'string2'])
 
     new_geocoder = S3CachedGeocoder(
-        cache_s3_path='geobucket/geocodes.json',
+        cache_storage=cache_storage,
+        cache_fname=cache_fname,
     )
     assert next(iter(new_geocoder.all_cached_geocodes.values()))\
         == sample_geocode_result
@@ -80,7 +86,6 @@ def test_cbsa_finder_onehit():
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
     finder = S3CachedCBSAFinder(
-        # cache_s3_path='geobucket/cbsas.json',
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name=shapefile_name
@@ -122,7 +127,6 @@ def test_cbsa_finder_nohits():
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
     finder = S3CachedCBSAFinder(
-        # cache_s3_path='geobucket/cbsas.json',
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name=shapefile_name
@@ -144,7 +148,6 @@ def test_cbsa_finder_twohits():
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
     finder = S3CachedCBSAFinder(
-        # cache_s3_path='geobucket/cbsas.json',
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name=shapefile_name
@@ -168,7 +171,6 @@ def test_cbsa_finder_cache():
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
     cbsa_finder = S3CachedCBSAFinder(
-        # cache_s3_path='geobucket/cbsas.json',
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name='tests/sample_cbsa_shapefile.shp'
@@ -191,7 +193,6 @@ def test_cbsa_finder_cache():
     cbsa_finder.find_all_cbsas_and_save(geocode_results)
 
     new_finder = S3CachedCBSAFinder(
-        # cache_s3_path='geobucket/cbsas.json',
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name='tests/sample_cbsa_shapefile.shp'
@@ -211,7 +212,6 @@ def test_cbsa_finder_empty_cache():
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
     cbsa_finder = S3CachedCBSAFinder(
-        # cache_s3_path='geobucket/cbsas.json',
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name='tests/sample_cbsa_shapefile.shp'
@@ -236,7 +236,6 @@ def test_cbsa_finder_empty_cache():
     cbsa_finder.find_all_cbsas_and_save(geocode_results)
 
     new_finder = S3CachedCBSAFinder(
-        # cache_s3_path='geobucket/cbsas.json',
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name='tests/sample_cbsa_shapefile.shp'
