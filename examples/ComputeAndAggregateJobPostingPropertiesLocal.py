@@ -2,12 +2,12 @@
 
 To show job posting property computation and aggregation,
 we calculate job posting counts by cleaned title, and upload
-the resulting CSV to S3.
+the resulting CSV to local file system.
 
 This is essentially a mini version of the Data@Work Research Hub.
 
 To enable this example to be run with as few dependencies as possible, we use:
-- a fake local s3 instance
+- skills_ml.storage.FSStore() object with tempfile
 - a sample of the Virginia Tech open job postings dataset
 - only title cleaning and job counting.
 
@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
     # Regardless of their role in the final dataset, we need to compute
     # all properties from the dataset. Since the computed properties
-    # partition their S3 caches by day, for optimum performance one
+    # partition their caches by day, for optimum performance one
     # could parallelize each property's computation by a day's worth of postings
     # But to keep it simple for this example, we are going to just runin a loop
     for cp in grouping_properties + aggregate_properties:
