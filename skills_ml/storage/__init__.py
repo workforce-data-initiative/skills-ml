@@ -91,8 +91,8 @@ class PersistedJSONDict(MutableMapping):
         self.fname = fname
         self.fs = storage
         if self.fs.exists(self.fname):
-            loaded = self.fs.load(self.fname)
-            self._storage = json.loads(loaded.decode())
+            loaded = self.fs.load(self.fname).decode() or '{}'
+            self._storage = json.loads(loaded)
         else:
             self._storage = dict()
 
@@ -127,8 +127,8 @@ class PersistedJSONDict(MutableMapping):
     def save(self):
         logging.info(f'Attempting to save storage of length {len(self)} to {self.fs.path}')
         if self.fs.exists(self.fname):
-            loaded = self.fs.load(self.fname)
-            saved_data = json.loads(loaded.decode())
+            loaded = self.fs.load(self.fname).decode() or '{}'
+            saved_data = json.loads(loaded)
             logging.info(
                 f'Merging {len(self)} in-memory keys with {len(saved_data)} stored keys. In-memory data takes priority'
             )

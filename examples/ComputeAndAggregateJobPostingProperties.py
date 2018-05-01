@@ -23,12 +23,13 @@ from skills_ml.job_postings.computed_properties.computers import\
     TitleCleanPhaseOne, PostingIdPresent
 from skills_ml.job_postings.computed_properties.aggregators import\
     aggregate_properties_for_quarter
-
+from skills_ml.storage import S3Store
 from moto import mock_s3
 import boto3
 import s3fs
 import unicodecsv as csv
 import numpy
+import os
 
 logging.basicConfig(level=logging.INFO)
 
@@ -46,6 +47,7 @@ with mock_s3():
     client = boto3.resource('s3')
     client.create_bucket(Bucket='test-bucket')
     computed_properties_path = 's3://test-bucket/computed_properties'
+    s3_storage = S3Store(computed_properties_path)
     job_postings = []
 
     for line in lines:
@@ -65,11 +67,11 @@ with mock_s3():
 
     # create properties to be grouped on. In this case, we want to group on cleaned job title
     grouping_properties = [
-        TitleCleanPhaseOne(path=computed_properties_path),
+        TitleCleanPhaseOne(storage=s3_storage),
     ]
     # create properties to aggregate for each group
     aggregate_properties = [
-        PostingIdPresent(path=computed_properties_path),
+        PostingIdPresent(storage=s3_storage),
     ]
 
     # Regardless of their role in the final dataset, we need to compute
@@ -94,13 +96,13 @@ with mock_s3():
         grouping_properties=grouping_properties,
         aggregate_properties=aggregate_properties,
         aggregate_functions={'posting_id_present': [numpy.sum]},
-        aggregations_path='s3://test-bucket/aggregated_properties',
+        storage=s3_storage,
         aggregation_name='title_state_counts'
     )
 
-    s3 = s3fs.S3FileSystem()
     logging.info('Logging all rows in aggregate file')
-    with s3.open(aggregate_path, 'rb') as f:
+    s3 = s3fs.S3FileSystem()
+    with s3.open(os.path.join(s3_storage.path, aggregate_path), 'rb') as f:
         reader = csv.reader(f)
         for row in reader:
             logging.info(row)

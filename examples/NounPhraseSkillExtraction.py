@@ -5,7 +5,7 @@
 # 'skill' or 'skills'.
 from collections import Counter
 import logging
-
+from pprint import pformat
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.algorithms.skill_extractors.noun_phrase_ending import SkillEndingPatternExtractor
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     job_postings = JobPostingCollectionSample()
 
     # 2. A standard transformation into a plaintext corpus, pulling a few text-heavy fields
-    corpus = SimpleCorpusCreator(JobPostingCollectionSample())
+    corpus = SimpleCorpusCreator(job_postings)
 
     # 3. A skill extractor to retrieve noun phrases ending in 'skill' or 'skills'.
     # VT job postings do not include line breaks, so the bulleted-line filter
@@ -30,4 +30,4 @@ if __name__ == '__main__':
     for document in corpus:
         skill_counts += pattern_extractor.document_skill_counts(document)
 
-    logging.info('10 Most Common Skills in job descriptions: %s', skill_counts.most_common(10))
+    logging.info('10 Most Common Skills in job descriptions:\n %s', pformat(skill_counts.most_common(10)))

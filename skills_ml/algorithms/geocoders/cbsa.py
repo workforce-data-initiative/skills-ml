@@ -9,7 +9,8 @@ import shapely.geometry
 import fiona
 
 from skills_ml.datasets.cbsa_shapefile import download_shapefile
-from skills_utils.s3 import split_s3_path, S3BackedJsonDict
+# from skills_utils.s3 import S3BackedJsonDict
+from skills_ml.storage import PersistedJSONDict
 
 Match = namedtuple('Match', ['index', 'area'])
 
@@ -40,7 +41,7 @@ class S3CachedCBSAFinder(object):
     only one copy of `find_all_cbsas_and_save` at a time to avoid overwriting
     the S3 cache file.
 
-    Args: 
+    Args:
         cache_s3_path (string) path (including bucket) to the json cache on s3
         shapefile_name (string) local path to a CBSA shapefile to use
             optional, will download TIGER 2015 shapefile if absent
@@ -50,14 +51,17 @@ class S3CachedCBSAFinder(object):
     """
     def __init__(
         self,
-        cache_s3_path,
+        cache_storage,
+        cache_fname,
         shapefile_name=None,
         cache_dir=None
     ):
-        self.cache_s3_path = cache_s3_path
+        self.cache_storage = cache_storage
+        self.cache_fname = cache_fname
+        # self.cache_s3_path = cache_s3_path
         self.shapes = []
         self.properties = []
-        self.cache = S3BackedJsonDict(path=self.cache_s3_path)
+        self.cache = PersistedJSONDict(self.cache_storage, self.cache_fname)
         self.cache_dir = cache_dir
         self.shapefile_name = shapefile_name
 

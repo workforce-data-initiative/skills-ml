@@ -54,9 +54,10 @@ class CBSAandStateFromGeocode(JobPostingComputedProperty):
     Args:
         cache_s3_path (string) An s3 path to store geocode cache results
     """
-    def __init__(self, cache_s3_path, *args, **kwargs):
+    def __init__(self, cache_storage, cache_fname, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.cache_s3_path = cache_s3_path
+        self.cache_storage = cache_storage
+        self.cache_fname = cache_fname
 
     property_name = 'cbsa_and_state_from_geocode'
     property_columns = [
@@ -77,7 +78,8 @@ class CBSAandStateFromGeocode(JobPostingComputedProperty):
     def _compute_func_on_one(self):
         geo_querier = JobCBSAFromGeocodeQuerier(
             cbsa_results=S3CachedCBSAFinder(
-                cache_s3_path=self.cache_s3_path
+                cache_storage=self.cache_storage,
+                cache_fname=self.cache_fname
             ).all_cached_cbsa_results
         )
         return lambda job_posting: geo_querier.query(job_posting)

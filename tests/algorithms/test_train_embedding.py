@@ -21,7 +21,9 @@ import logging
 logging.getLogger('boto').setLevel(logging.CRITICAL)
 
 import unittest
+import pytest
 
+@pytest.mark.skip('will change it with new storage module')
 class TestTrainEmbedding(unittest.TestCase):
     @mock_s3
     def test_embedding_trainer_doc2vec_s3(self):

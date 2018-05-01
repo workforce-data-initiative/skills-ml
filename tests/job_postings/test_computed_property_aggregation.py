@@ -1,6 +1,7 @@
 from skills_ml.job_postings.computed_properties import JobPostingComputedProperty, ComputedPropertyColumn
 from skills_ml.job_postings.computed_properties.aggregators import aggregation_for_properties_and_dates, aggregate_properties_for_quarter
 from skills_ml.job_postings.aggregate.pandas import listy_n_most_common
+from skills_ml.storage import S3Store
 import datetime
 from functools import partial
 import numpy
@@ -132,12 +133,13 @@ def test_aggregation_for_properties_and_dates():
 def test_aggregate_properties_in_quarter():
     client = boto3.resource('s3')
     client.create_bucket(Bucket='test-bucket')
+    s3_storage = S3Store('s3://test-bucket/aggregations')
     aggregate_properties_for_quarter(
         '2015Q2',
         grouping_properties=[FakeGroupingPropertyOne(), FakeGroupingPropertyTwo()],
         aggregate_properties=[FakeAggregationPropertyOne(), FakeAggregationPropertyTwo()],
         aggregate_functions={'aggregation_property_two': [numpy.sum], 'aggregation_property_one': [partial(listy_n_most_common, 2)]},
-        aggregations_path='s3://test-bucket/aggregations',
+        storage=s3_storage,
         aggregation_name='fake_agg'
     )
     s3 = s3fs.S3FileSystem()
