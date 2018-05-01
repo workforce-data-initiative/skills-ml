@@ -1,11 +1,8 @@
 """Aggregate job posting computed properties into tabular datasets"""
-import s3fs
-
 import logging
 import pandas as pd
 import textwrap
 from skills_utils.time import quarter_to_daterange, dates_in_range
-
 
 def df_for_properties_and_dates(computed_properties, dates):
     """Assemble a dataframe with the raw data from many computed properties and dates
@@ -148,7 +145,7 @@ def aggregate_properties_for_quarter(
     grouping_properties,
     aggregate_properties,
     aggregate_functions,
-    aggregations_path,
+    storage,
     aggregation_name
 ):
     """Aggregate computed properties for a quarter and writes the resulting CSV to S3
@@ -176,11 +173,9 @@ def aggregate_properties_for_quarter(
     )
 
     out_path = '/'.join([
-        aggregations_path,
         aggregation_name,
         quarter + '.csv'
     ])
-    fs = s3fs.S3FileSystem()
-    with fs.open(out_path, 'wb') as f:
-        f.write(aggregation_df.to_csv(None).encode())
+    storage.write(aggregation_df.to_csv(None).encode(), out_path)
+
     return out_path

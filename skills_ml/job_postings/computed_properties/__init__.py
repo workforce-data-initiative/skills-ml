@@ -6,7 +6,7 @@ import logging
 import pandas
 
 from skills_utils.s3 import S3BackedJsonDict
-
+from skills_ml.storage  import PersistedJSONDict
 
 class JobPostingComputedProperty(metaclass=ABCMeta):
     """Base class for computers of job posting properties.
@@ -33,8 +33,8 @@ class JobPostingComputedProperty(metaclass=ABCMeta):
         path (string) An s3 base path to store the properties.
             The caches will be namespaced by the property name and date
     """
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, storage):
+        self.storage = storage
 
     def compute_on_collection(self, job_postings_generator):
         """Compute and save to s3 a property for every job posting in a collection.
@@ -83,13 +83,15 @@ class JobPostingComputedProperty(metaclass=ABCMeta):
             datestring (string): A string representing the date in the S3 path
         Returns: (skills_utils.s3.S3BackedJsonDict)
         """
-        return S3BackedJsonDict(
-            path='/'.join([
-                self.path,
-                self.property_name,
-                datestring
-            ])
-        )
+        # return S3BackedJsonDict(
+        #     path='/'.join([
+        #         self.path,
+        #         self.property_name,
+        #         datestring
+        #     ])
+        # )
+        fname = '/'.join([self.property_name, datestring]) + '.json'
+        return PersistedJSONDict(self.storage, fname)
 
     def df_for_date(self, datestring):
         """Return a dataframe of the cached data for a given date
