@@ -14,17 +14,19 @@ from skills_ml.storage import PersistedJSONDict
 Match = namedtuple('Match', ['index', 'area'])
 
 
-class S3CachedCBSAFinder(object):
-    """Find CBSAs associated with geocode results and save them to S3
+class CachedCBSAFinder(object):
+    """Find CBSAs associated with geocode results and save them to the specified storage
 
     Geocode results are expected in the json format provided by the python
     `geocoder` module, with a 'bbox'
 
     The highest-level interface is the 'find_all_cbsas_and_save' method, which
-    provides S3 caching. A minimal call looks like
+    provides storage caching. A minimal call looks like
 
     ```python
-    cbsa_finder = S3CachedCBSAFinder(cache_s3_path='some-bucket/cbsas.json')
+    cache_storage = S3Store('some-bucket')
+    cache_fname = 'cbsas.json'
+    cbsa_finder = CachedCBSAFinder(cache_storage=cache_storage, cache_fname=cache_fname)
     cbsa_finder.find_all_cbsas_and_save({
         "Flushing, NY": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }
         "Houston, TX": { 'bbox': ['southwest': [..., ...], 'northeast': [...,...] }
@@ -38,10 +40,11 @@ class S3CachedCBSAFinder(object):
 
     Warning: The caching is not parallel-safe! It is recommended you should run
     only one copy of `find_all_cbsas_and_save` at a time to avoid overwriting
-    the S3 cache file.
+    the cache file.
 
     Args:
-        cache_s3_path (string) path (including bucket) to the json cache on s3
+        cache_storage (object) FSStore() or S3Store object to store the cache
+        cache_fname (string) cache file name
         shapefile_name (string) local path to a CBSA shapefile to use
             optional, will download TIGER 2015 shapefile if absent
         cache_dir (string) local path to a cache directory to use if the
@@ -122,7 +125,7 @@ class S3CachedCBSAFinder(object):
         return (properties['CBSAFP'], properties['NAMELSAD'])
 
     def find_all_cbsas_and_save(self, geocode_results):
-        """Find CBSAs from geocode results and save the results to S3
+        """Find CBSAs from geocode results and save the results to storage
 
         Args:
             geocode_results (dict) Search strings mapping to geocode results
@@ -136,7 +139,7 @@ class S3CachedCBSAFinder(object):
 
 
     def save(self):
-        """Save the cbsa finding cache to S3"""
+        """Save the cbsa finding cache to the specified storage"""
         self.cache.save()
 
     @property

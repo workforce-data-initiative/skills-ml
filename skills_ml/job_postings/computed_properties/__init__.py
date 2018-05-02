@@ -5,7 +5,6 @@ import logging
 
 import pandas
 
-from skills_utils.s3 import S3BackedJsonDict
 from skills_ml.storage  import PersistedJSONDict
 
 class JobPostingComputedProperty(metaclass=ABCMeta):

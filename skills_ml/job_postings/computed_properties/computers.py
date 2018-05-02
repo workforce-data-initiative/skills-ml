@@ -12,7 +12,7 @@ from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.job_postings.geography_queriers.cbsa_from_geocode import JobCBSAFromGeocodeQuerier
 from skills_ml.algorithms.skill_extractors import\
     ExactMatchSkillExtractor, SocScopedExactMatchSkillExtractor
-from skills_ml.algorithms.geocoders.cbsa import S3CachedCBSAFinder
+from skills_ml.algorithms.geocoders.cbsa import CachedCBSAFinder
 
 
 class TitleCleanPhaseOne(JobPostingComputedProperty):
@@ -77,7 +77,7 @@ class CBSAandStateFromGeocode(JobPostingComputedProperty):
 
     def _compute_func_on_one(self):
         geo_querier = JobCBSAFromGeocodeQuerier(
-            cbsa_results=S3CachedCBSAFinder(
+            cbsa_results=CachedCBSAFinder(
                 cache_storage=self.cache_storage,
                 cache_fname=self.cache_fname
             ).all_cached_cbsa_results

@@ -1,5 +1,5 @@
-from skills_ml.algorithms.geocoders import S3CachedGeocoder
-from skills_ml.algorithms.geocoders.cbsa import S3CachedCBSAFinder
+from skills_ml.algorithms.geocoders import CachedGeocoder
+from skills_ml.algorithms.geocoders.cbsa import CachedCBSAFinder
 from skills_ml.storage import S3Store
 import json
 from unittest.mock import MagicMock, call, patch
@@ -21,7 +21,7 @@ def test_geocode_cacher():
         geocode_func = MagicMock(
             return_value=geocode_result(json=sample_geocode_result)
         )
-        geocoder = S3CachedGeocoder(
+        geocoder = CachedGeocoder(
             cache_storage=cache_storage,
             cache_fname=cache_fname,
             geocode_func=geocode_func,
@@ -38,7 +38,7 @@ def test_geocode_cacher():
         ]
         assert time_mock.call_count == 2
 
-        new_geocoder = S3CachedGeocoder(
+        new_geocoder = CachedGeocoder(
             cache_storage=cache_storage,
             cache_fname=cache_fname,
             geocode_func=geocode_func,
@@ -62,7 +62,7 @@ def test_geocode_search_strings():
     geocode_func = MagicMock(
         return_value=geocode_result(json=sample_geocode_result)
     )
-    geocoder = S3CachedGeocoder(
+    geocoder = CachedGeocoder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         geocode_func=geocode_func,
@@ -70,7 +70,7 @@ def test_geocode_search_strings():
     )
     geocoder.geocode_search_strings_and_save(['string1', 'string2'])
 
-    new_geocoder = S3CachedGeocoder(
+    new_geocoder = CachedGeocoder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
     )
@@ -85,7 +85,7 @@ def test_cbsa_finder_onehit():
     shapefile_name = 'tests/sample_cbsa_shapefile.shp'
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
-    finder = S3CachedCBSAFinder(
+    finder = CachedCBSAFinder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name=shapefile_name
@@ -126,7 +126,7 @@ def test_cbsa_finder_nohits():
     shapefile_name = 'tests/sample_cbsa_shapefile.shp'
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
-    finder = S3CachedCBSAFinder(
+    finder = CachedCBSAFinder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name=shapefile_name
@@ -147,7 +147,7 @@ def test_cbsa_finder_twohits():
     shapefile_name = 'tests/sample_cbsa_shapefile.shp'
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
-    finder = S3CachedCBSAFinder(
+    finder = CachedCBSAFinder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name=shapefile_name
@@ -170,7 +170,7 @@ def test_cbsa_finder_cache():
     client.create_bucket(Bucket='geobucket')
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
-    cbsa_finder = S3CachedCBSAFinder(
+    cbsa_finder = CachedCBSAFinder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name='tests/sample_cbsa_shapefile.shp'
@@ -192,7 +192,7 @@ def test_cbsa_finder_cache():
 
     cbsa_finder.find_all_cbsas_and_save(geocode_results)
 
-    new_finder = S3CachedCBSAFinder(
+    new_finder = CachedCBSAFinder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name='tests/sample_cbsa_shapefile.shp'
@@ -211,7 +211,7 @@ def test_cbsa_finder_empty_cache():
     geobucket = client.create_bucket(Bucket='geobucket')
     cache_storage = S3Store('geobucket')
     cache_fname = 'cbsas.json'
-    cbsa_finder = S3CachedCBSAFinder(
+    cbsa_finder = CachedCBSAFinder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name='tests/sample_cbsa_shapefile.shp'
@@ -235,7 +235,7 @@ def test_cbsa_finder_empty_cache():
 
     cbsa_finder.find_all_cbsas_and_save(geocode_results)
 
-    new_finder = S3CachedCBSAFinder(
+    new_finder = CachedCBSAFinder(
         cache_storage=cache_storage,
         cache_fname=cache_fname,
         shapefile_name='tests/sample_cbsa_shapefile.shp'
