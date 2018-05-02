@@ -12,7 +12,7 @@ from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.job_postings.geography_queriers.cbsa_from_geocode import JobCBSAFromGeocodeQuerier
 from skills_ml.algorithms.skill_extractors import\
     ExactMatchSkillExtractor, SocScopedExactMatchSkillExtractor
-from skills_ml.algorithms.geocoders.cbsa import S3CachedCBSAFinder
+from skills_ml.algorithms.geocoders.cbsa import CachedCBSAFinder
 
 
 class TitleCleanPhaseOne(JobPostingComputedProperty):
@@ -54,9 +54,10 @@ class CBSAandStateFromGeocode(JobPostingComputedProperty):
     Args:
         cache_s3_path (string) An s3 path to store geocode cache results
     """
-    def __init__(self, cache_s3_path, *args, **kwargs):
+    def __init__(self, cache_storage, cache_fname, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.cache_s3_path = cache_s3_path
+        self.cache_storage = cache_storage
+        self.cache_fname = cache_fname
 
     property_name = 'cbsa_and_state_from_geocode'
     property_columns = [
@@ -76,8 +77,9 @@ class CBSAandStateFromGeocode(JobPostingComputedProperty):
 
     def _compute_func_on_one(self):
         geo_querier = JobCBSAFromGeocodeQuerier(
-            cbsa_results=S3CachedCBSAFinder(
-                cache_s3_path=self.cache_s3_path
+            cbsa_results=CachedCBSAFinder(
+                cache_storage=self.cache_storage,
+                cache_fname=self.cache_fname
             ).all_cached_cbsa_results
         )
         return lambda job_posting: geo_querier.query(job_posting)

@@ -5,31 +5,32 @@ import time
 import geocoder
 import boto
 import traceback
-
-from skills_utils.s3 import split_s3_path, S3BackedJsonDict
-
+from skills_ml.storage import PersistedJSONDict
 
 
-class S3CachedGeocoder(object):
-    """Geocoder that uses S3 as a cache.
+
+class CachedGeocoder(object):
+    """Geocoder that uses specified storage as a cache.
 
     Args:
-        s3_conn (boto.s3.connection) an s3 connection
-        cache_s3_path (string) path (including bucket) to the json cache on s3
+        cache_storage (object) FSStore() or S3Store object to store the cache
+        cache_fname (string) cache file name
         geocode_func (function) a function that geocodes a given search string
             defaults to the OSM geocoder provided by the geocode library
         sleep_time (int) The time, in seconds, between geocode calls
     """
     def __init__(
         self,
-        cache_s3_path,
+        cache_storage,
+        cache_fname,
         geocode_func=geocoder.osm,
         sleep_time=1,
     ):
-        self.cache_s3_path = cache_s3_path
+        self.cache_storage = cache_storage
+        self.cache_fname = cache_fname
         self.geocode_func = geocode_func
         self.sleep_time = sleep_time
-        self.cache = S3BackedJsonDict(path=self.cache_s3_path)
+        self.cache = PersistedJSONDict(self.cache_storage, self.cache_fname)
 
     def retrieve_from_cache(self, search_strings):
         """Retrieve a saved geocode result from the cache if it exists
@@ -58,7 +59,7 @@ class S3CachedGeocoder(object):
         To respect throttling limits, it would be dangerous to try and run more
         then one of these against a geocoder service. As a result, the code
         assumes that when it comes time to save, there have been no
-        external changes to the file on S3 worth keeping.
+        external changes to the file on storage worth keeping.
 
         Args:
             search_string (string) A search query to send to the geocoder
@@ -71,11 +72,11 @@ class S3CachedGeocoder(object):
         return self.cache[search_string]
 
     def save(self):
-        """Save the geocoding cache to S3"""
+        """Save the geocoding cache to the specified storage"""
         self.cache.save()
         logging.info(
             'Successfully saved geocoding cache to %s',
-            self.cache_s3_path
+            self.cache.fs.path
         )
 
     @property
@@ -87,7 +88,7 @@ class S3CachedGeocoder(object):
         return self.cache
 
     def geocode_search_strings_and_save(self, search_strings, save_every=100000):
-        """Geocode job postings and save the results to S3
+        """Geocode job postings and save the results to the specified storage
 
         Args:
             search_strings (iterable) Strings to geocode

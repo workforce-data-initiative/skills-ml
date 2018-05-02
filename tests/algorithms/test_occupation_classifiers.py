@@ -4,8 +4,6 @@ from skills_utils.s3 import upload
 import gensim
 from gensim.similarities.index import AnnoyIndexer
 
-from skills_ml.storage import S3Store
-
 import os
 from moto import mock_s3_deprecated
 from mock import patch
