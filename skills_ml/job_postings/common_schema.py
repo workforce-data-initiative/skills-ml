@@ -12,9 +12,10 @@ from skills_utils.s3 import log_download_progress
 from skills_ml.job_postings.raw.virginia import VirginiaTransformer
 
 import json
+import os
 import gzip
 
-from typing import Dict, Text, Any, Generator, List
+from typing import Dict, Text, Any, Generator, List, Callable
 
 JobPostingType = Dict[Text, Any]
 JobPostingGeneratorType = Generator[JobPostingType, None, None]
@@ -81,7 +82,8 @@ class JobPostingCollectionSample(object):
         if num_records > 50:
             logging.warning('Cannot provide %s records as a maximum of 50 are available', num_records)
             num_records = 50
-        f = gzip.GzipFile(filename='50_sample.json.gz')
+        full_filename = os.path.join(os.path.dirname(__file__), '../../50_sample.json.gz')
+        f = gzip.GzipFile(filename=full_filename)
         self.lines = f.read().decode('utf-8').split('\n')[0:num_records]
         self.transformer = VirginiaTransformer(partner_id='VA')
 
