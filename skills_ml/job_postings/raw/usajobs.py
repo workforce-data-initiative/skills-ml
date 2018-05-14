@@ -124,8 +124,9 @@ class USAJobsTransformer(JobPostingImportBase):
                 '@type': 'Place',
                 'address': {
                     '@type': 'PostalAddress',
-                    'addressLocality': locations[0]['CityName'],
-                    'addressRegion': locations[0]['CountrySubDivisionCode'],
+                    'addressLocality': locations[0].get('CityName', ''),
+                    'addressRegion': locations[0].get('CountrySubDivisionCode', ''),
+                    'addressCountry': locations[0].get('CountryCode', ''),
                 }
             }
 
