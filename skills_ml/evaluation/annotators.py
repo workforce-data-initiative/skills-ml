@@ -415,6 +415,7 @@ class BratExperiment(object):
                 job_posting_id = posting_id_lookup[int(posting_key)]
                 for annotation in posting_annotations:
                     annotation['job_posting_id'] = job_posting_id
+                    annotation['sample_name'] = self.metadata['sample_name']
                     flattened_labels.append(annotation)
         # take labels with agreement by unit
         # flatten, taking unit/posting key and looking up job posting id to include in dict

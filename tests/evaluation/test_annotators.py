@@ -307,12 +307,13 @@ def test_BratExperiment_labels_with_agreement():
             (1, 'ABC_4823943'),
         ]
     }
+    experiment.metadata['sample_name'] = 'test-sample'
     experiment.metadata.save()
     assert experiment.labels_with_agreement == [
-        {'job_posting_id': 'ABC_91238', 'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling', 'percent_tagged': 1.0, 'number_seen': 2},
-        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming', 'percent_tagged': 1.0, 'number_seen': 2},
-        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 39, 'end_index': 65, 'labeled_string': 'substance abuse counseling', 'percent_tagged': 0.5, 'number_seen': 2},
-        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 49, 'end_index': 65, 'labeled_string': 'abuse counseling', 'percent_tagged': 0.5, 'number_seen': 2}
+        {'job_posting_id': 'ABC_91238', 'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling', 'percent_tagged': 1.0, 'number_seen': 2, 'sample_name': 'test-sample'},
+        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming', 'percent_tagged': 1.0, 'number_seen': 2, 'sample_name': 'test-sample'},
+        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 39, 'end_index': 65, 'labeled_string': 'substance abuse counseling', 'percent_tagged': 0.5, 'number_seen': 2, 'sample_name': 'test-sample'},
+        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 49, 'end_index': 65, 'labeled_string': 'abuse counseling', 'percent_tagged': 0.5, 'number_seen': 2, 'sample_name': 'test-sample'}
     ]
 
 
