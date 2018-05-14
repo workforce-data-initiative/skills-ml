@@ -1,21 +1,18 @@
-import json
 from skills_ml.job_postings.corpora.basic import CorpusCreator
 
-sample_input = [json.dumps({
+sample_input = [{
     'description': '<html><h1>We are looking for engineer\n\n</h1></html>',
     'test_field': 'We are looking for a person to fill this job'
-})]
+}]
 
-def test_raw_corpora():
-    assert next(iter(CorpusCreator(sample_input, ['test_field'], raw=True))) == 'We are looking for a person to fill this job'
 
-def test_array_corpora():
-    assert next(iter(CorpusCreator(sample_input, ['test_field'], raw=True, tokenize=True))) == \
-        ['We', 'are', 'looking', 'for', 'a', 'person', 'to', 'fill', 'this', 'job']
+class ExampleCorpusCreator(CorpusCreator):
+    def _transform(self, document):
+        return document['test_field']
 
 def test_clean():
     corpus = CorpusCreator(sample_input, ['description'])
-    assert next(iter(corpus)) == 'we are looking for engineer'
+    assert next(iter(corpus))['description'] == 'We are looking for engineer'
 
 def test_metadata():
     corpus = CorpusCreator()

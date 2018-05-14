@@ -2,12 +2,12 @@
 
 To show job posting property computation and aggregation,
 we calculate job posting counts by cleaned title, and upload
-the resulting CSV to S3.
+the resulting CSV to local file system.
 
 This is essentially a mini version of the Data@Work Research Hub.
 
 To enable this example to be run with as few dependencies as possible, we use:
-- a fake local s3 instance
+- skills_ml.storage.FSStore() object with tempfile
 - a sample of the Virginia Tech open job postings dataset
 - only title cleaning and job counting.
 
@@ -23,12 +23,11 @@ from skills_ml.job_postings.computed_properties.computers import\
     TitleCleanPhaseOne, PostingIdPresent
 from skills_ml.job_postings.computed_properties.aggregators import\
     aggregate_properties_for_quarter
-
-from moto import mock_s3
-import boto3
-import s3fs
+from skills_ml.storage import FSStore
 import unicodecsv as csv
 import numpy
+import os
+import tempfile
 
 logging.basicConfig(level=logging.INFO)
 
@@ -42,10 +41,9 @@ logging.info('Download complete')
 lines = string.split('\n')
 logging.info('Found %s job posting lines', len(lines))
 
-with mock_s3():
-    client = boto3.resource('s3')
-    client.create_bucket(Bucket='test-bucket')
-    computed_properties_path = 's3://test-bucket/computed_properties'
+with tempfile.TemporaryDirectory() as tmpdir:
+    computed_properties_path = os.path.join(tmpdir, 'computed_properties')
+    storage = FSStore(computed_properties_path)
     job_postings = []
 
     for line in lines:
@@ -65,16 +63,16 @@ with mock_s3():
 
     # create properties to be grouped on. In this case, we want to group on cleaned job title
     grouping_properties = [
-        TitleCleanPhaseOne(path=computed_properties_path),
+        TitleCleanPhaseOne(storage=storage),
     ]
     # create properties to aggregate for each group
     aggregate_properties = [
-        PostingIdPresent(path=computed_properties_path),
+        PostingIdPresent(storage=storage),
     ]
 
     # Regardless of their role in the final dataset, we need to compute
     # all properties from the dataset. Since the computed properties
-    # partition their S3 caches by day, for optimum performance one
+    # partition their caches by day, for optimum performance one
     # could parallelize each property's computation by a day's worth of postings
     # But to keep it simple for this example, we are going to just runin a loop
     for cp in grouping_properties + aggregate_properties:
@@ -94,13 +92,12 @@ with mock_s3():
         grouping_properties=grouping_properties,
         aggregate_properties=aggregate_properties,
         aggregate_functions={'posting_id_present': [numpy.sum]},
-        aggregations_path='s3://test-bucket/aggregated_properties',
+        storage=storage,
         aggregation_name='title_state_counts'
     )
 
-    s3 = s3fs.S3FileSystem()
     logging.info('Logging all rows in aggregate file')
-    with s3.open(aggregate_path, 'rb') as f:
+    with open(os.path.join(storage.path, aggregate_path), 'rb') as f:
         reader = csv.reader(f)
         for row in reader:
             logging.info(row)

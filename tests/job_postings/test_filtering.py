@@ -1,5 +1,7 @@
-from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator
+from functools import partial
 
+from skills_ml.job_postings.common_schema import JobPostingCollectionSample
+from skills_ml.job_postings.filtering import JobPostingFilterer, soc_major_group_filter
 
 sample_documents = [
     {
@@ -66,6 +68,7 @@ sample_documents = [
     },
 ]
 
+
 class FakeJobPostingGenerator(object):
     def __iter__(self):
         for document in sample_documents:
@@ -76,11 +79,23 @@ class FakeJobPostingGenerator(object):
         return {'job postings': {'purpose': 'unit testing'}}
 
 
-def test_doc2vec_corpus_creator():
+def test_JobPostingFilterer_soc_major_group():
+    job_postings = FakeJobPostingGenerator()
+    # Test for using pre-defined major group filter
+    filtered_postings = JobPostingFilterer(
+        job_postings,
+        [soc_major_group_filter(major_groups=['41'])]
+    )
+    assert len(list(filtered_postings)) == 1
 
-    it = FakeJobPostingGenerator()
 
-    # Test for Default
-    list_corpus = list(Doc2VecGensimCorpusCreator(it))
-    assert len(list_corpus) == 2
-    assert list_corpus[0].words == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'.split()
+def test_JobPostingFilterer_filterfunc():
+    job_postings = FakeJobPostingGenerator()
+    # Test for using self-defined filter function
+    def filter_func(document):
+        if document['onet_soc_code']:
+            if document['onet_soc_code'][:2] in ['23', '33']:
+                return document
+
+    filtered_postings = JobPostingFilterer(job_postings, filter_funcs=[filter_func])
+    assert len(list(filtered_postings)) == 1

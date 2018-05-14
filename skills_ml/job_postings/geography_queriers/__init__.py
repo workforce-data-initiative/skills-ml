@@ -1,6 +1,4 @@
 """Extracting geographies from job posting datasets"""
-import json
-
 import us
 
 STATE_NAME_LOOKUP = us.states.mapping('abbr', 'name')
@@ -12,11 +10,11 @@ def job_posting_search_strings(job_posting):
     Includes city and state if present, or just city
 
     Args:
-        job_posting (string) A job posting in schema.org/JobPosting json form
+        job_posting (dict) A job posting in schema.org/JobPosting json form
 
     Returns: (string) A geocode-ready search string
     """
-    location = json.loads(job_posting).get('jobLocation', None)
+    location = job_posting.get('jobLocation', None)
     if not location:
         return []
     locality = location.get('address', {}).get('addressLocality', None)

@@ -16,7 +16,7 @@ with open('requirements_dev.txt') as requirements_file:
 
 setup(
     name='Skills ML',
-    version='1.0.0',
+    version='2.0.0',
     description='Algorithms for Jobs/skills taxonomy creation',
     author="Center for Data Science and Public Policy",
     author_email='datascifellows@gmail.com',
@@ -32,7 +32,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     test_suite='tests',
     tests_require=test_requirements

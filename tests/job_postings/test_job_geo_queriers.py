@@ -151,7 +151,7 @@ class CBSAFromGeocodeTest(unittest.TestCase):
         self.querier = JobCBSAFromGeocodeQuerier(cbsa_results=cbsa_results)
 
     def test_querier_one_hit(self):
-        sample_job = json.dumps({
+        sample_job = {
             "description": "We are looking for someone for a job",
             "jobLocation": {
                 "@type": "Place",
@@ -166,13 +166,13 @@ class CBSAFromGeocodeTest(unittest.TestCase):
             "datePosted": "2013-03-07",
             "@type": "JobPosting",
             "id": 5
-        })
+        }
 
         assert self.querier.query(sample_job) == \
             ('456', 'Chicago, IL Metro Area', 'IL')
 
     def test_querier_hit_no_cbsa(self):
-        sample_job = json.dumps({
+        sample_job = {
             "description": "We are looking for someone for a job",
             "jobLocation": {
                 "@type": "Place",
@@ -187,12 +187,12 @@ class CBSAFromGeocodeTest(unittest.TestCase):
             "datePosted": "2013-03-07",
             "@type": "JobPosting",
             "id": 5
-        })
+        }
 
         assert self.querier.query(sample_job) == (None, None, 'TX')
 
     def test_querier_not_present(self):
-        sample_job = json.dumps({
+        sample_job = {
             "description": "We are looking for someone for a job",
             "jobLocation": {
                 "@type": "Place",
@@ -207,7 +207,7 @@ class CBSAFromGeocodeTest(unittest.TestCase):
             "datePosted": "2013-03-07",
             "@type": "JobPosting",
             "id": 5
-        })
+        }
 
         assert self.querier.query(sample_job) == (None, None, 'ND')
 
@@ -215,7 +215,7 @@ class CBSAFromGeocodeTest(unittest.TestCase):
 
 def test_job_posting_search_strings():
     with open('sample_job_listing.json') as f:
-        sample_job_posting = f.read()
+        sample_job_posting = json.load(f)
 
     assert sorted(job_posting_search_strings(sample_job_posting)) == sorted(['Salisbury, Pennsylvania', 'Salisbury, PA'])
 
@@ -226,19 +226,19 @@ def test_job_posting_weird_region():
         'addressRegion': 'Northeastern USA'
     }}}
 
-    assert job_posting_search_strings(json.dumps(fake_job)) ==\
+    assert job_posting_search_strings(fake_job) ==\
         ['Any City, Northeastern USA']
 
 
 def test_job_posting_search_string_only_city():
     fake_job = {'jobLocation': {'address': {'addressLocality': 'City'}}}
-    assert job_posting_search_strings(json.dumps(fake_job)) == ['City']
+    assert job_posting_search_strings(fake_job) == ['City']
 
 
 def test_job_posting_search_string_bad_address():
     fake_job = {'jobLocation': {'address': {}}}
-    assert job_posting_search_strings(json.dumps(fake_job)) == []
+    assert job_posting_search_strings(fake_job) == []
 
 
 def test_job_posting_search_string_no_location():
-    assert job_posting_search_strings('{}') == []
+    assert job_posting_search_strings({}) == []
