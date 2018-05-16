@@ -51,7 +51,7 @@ def structFeatures(sent, i, desc_length):
     else:
        structFeat.append(0)
 
-    return structFeat
+    return [structFeat]*len(nltk.word_tokenize(sent))
 
 # Sentence Tokenization
 def sentTokenize(description):

@@ -13,73 +13,72 @@ class NLPTransforms(object):
         self.punct = set(['P', 'S'])
         self.transforms = ['nlp_a']
 
-    def normalize(self, document):
+    def normalize(self, text):
         """
         Args:
-            document: A unicode string
+            text: A unicode string
         Returns:
-            The document, lowercased and in NFKD normal form
+            The text, lowercased and in NFKD normal form
         """
-        return unicodedata.normalize('NFKD', document.lower())
+        return unicodedata.normalize('NFKD', text.lower())
 
-    def clean_html(self, document):
-        markup = BeautifulSoup(document, "lxml")
+    def clean_html(self, text):
+        markup = BeautifulSoup(text, "lxml")
         return unicodedata.normalize('NFKD', markup.get_text())
 
-    def lowercase_strip_punc(self, document):
+    def lowercase_strip_punc(self, text):
         """
         Args:
-            document: A unicode string
+            text: A unicode string
         Returns:
-            The document, lowercased, sans  punctuation and in NFKD normal form
+            The text, lowercased, sans  punctuation and in NFKD normal form
         """
         return ''.join(
-            char for char in self.normalize(document)
+            char for char in self.normalize(text)
             if not unicodedata.category(char)[0] in self.punct
         )
 
-    def title_phase_one(self, document):
+    def title_phase_one(self, text):
         """
         Args:
-            document: A unicode string
+            text: A unicode string
         Returns:
-            The document, lowercased, sans punctuation, whitespace normalized
+            The text, lowercased, sans punctuation, whitespace normalized
         """
-        no_apos = re.sub(r'\'', '', self.normalize(document))
+        no_apos = re.sub(r'\'', '', self.normalize(text))
         strip_punc = ''.join(
             char if not unicodedata.category(char)[0] in self.punct else ' '
             for char in no_apos
         )
         return re.sub(r'\s+', ' ', strip_punc.strip())
 
-    def clean_str(self, document):
+    def clean_str(self, text):
         """
         Args:
-            document: A unicode string
+            text: A unicode string
         Returns:
-            The array of split words in document, lowercased,
+            The array of split words in text, lowercased,
             sans punctuation, non-English letters
         """
         RE_PREPROCESS = r'\W+|\d+'
-        document = re.sub(
+        text = re.sub(
             RE_PREPROCESS,
             ' ',
-            self.lowercase_strip_punc(document)
+            self.lowercase_strip_punc(text)
         )
-        document = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", document)
-        document = re.sub(r"\'s", " \'s", document)
-        document = re.sub(r"\'ve", " \'ve", document)
-        document = re.sub(r"n\'t", " n\'t", document)
-        document = re.sub(r"\'re", " \'re", document)
-        document = re.sub(r"\'d", " \'d", document)
-        document = re.sub(r"\'ll", " \'ll", document)
-        document = re.sub(r"\s{2,}", " ", document)
-        return document
+        text = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", text)
+        text = re.sub(r"\'s", " \'s", text)
+        text = re.sub(r"\'ve", " \'ve", text)
+        text = re.sub(r"n\'t", " n\'t", text)
+        text = re.sub(r"\'re", " \'re", text)
+        text = re.sub(r"\'d", " \'d", text)
+        text = re.sub(r"\'ll", " \'ll", text)
+        text = re.sub(r"\s{2,}", " ", text)
+        return text
 
-    def sentence_tokenize(self, document):
-        if '\n' in document:
-            sentences = re.split('\n', document)
-            sentences = list(filter(None, sentences))
+    def sentence_tokenize(self, text):
+        sentences = re.split('\n', text)
+        sentences = list(filter(None, sentences))
         try:
             sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences.encode('utf-8')))
         except:
