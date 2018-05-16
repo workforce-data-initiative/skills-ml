@@ -1,3 +1,4 @@
+from skills_utils.hash import md5
 from skills_ml.evaluation.annotators import BratExperiment
 from skills_ml.algorithms.sampling import Sample
 from moto import mock_s3, mock_s3_deprecated
@@ -190,6 +191,112 @@ def test_BratExperiment_add_allocation():
     # once they have seen the whole thing, no more!
     with pytest.raises(ValueError):
         experiment.add_allocation(username)
+
+
+@mock_s3
+@mock_s3_deprecated
+class TestFlattenedAnnotations(unittest.TestCase):
+    def test_flattened_annotations(self):
+        s3 = boto3.resource('s3')
+        s3.create_bucket(Bucket='test-bucket')
+
+        experiment = BratExperiment(
+            experiment_name='initial_skills_tag',
+            brat_s3_path='test-bucket/brat'
+        )
+
+        annotations_by_unit = {}
+        annotations_by_unit['unit_1'] = {
+            '0': {
+                'user_1': [
+                    {'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling'}
+                ],
+                'user_2': [
+                    {'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling'}
+                ]
+            },
+            '1': {
+                'user_1': [
+                    {'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming'},
+                    {'entity': 'Skill', 'start_index': 39, 'end_index': 65, 'labeled_string': 'substance abuse counseling'}
+                ],
+                'user_2': [
+                    {'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming'},
+                    {'entity': 'Skill', 'start_index': 49, 'end_index': 65, 'labeled_string': 'abuse counseling'}
+                ],
+            }
+        }
+        experiment.annotations_by_unit = annotations_by_unit
+        experiment.metadata['units'] = {
+            'unit_1': [
+                (0, 'ABC_91238'),
+                (1, 'ABC_4823943'),
+            ]
+        }
+        experiment.metadata['sample_name'] = 'test-sample'
+        experiment.metadata.save()
+        self.maxDiff = None
+        expected_annotations = [
+            {
+                'entity': 'Skill',
+                'start_index': 44,
+                'end_index': 70,
+                'labeled_string': 'substance abuse counseling',
+                'job_posting_id': 'ABC_91238',
+                'sample_name': 'test-sample',
+                'tagger_id': md5('user_1'),
+            },
+            {
+                'entity': 'Skill',
+                'start_index': 44,
+                'end_index': 70,
+                'labeled_string': 'substance abuse counseling',
+                'job_posting_id': 'ABC_91238',
+                'sample_name': 'test-sample',
+                'tagger_id': md5('user_2'),
+            },
+            {
+                'entity': 'Skill',
+                'start_index': 16,
+                'end_index': 33,
+                'labeled_string': 'python programming',
+                'job_posting_id': 'ABC_4823943',
+                'sample_name': 'test-sample',
+                'tagger_id': md5('user_1'),
+            },
+            {
+                'entity': 'Skill',
+                'start_index': 39,
+                'end_index': 65,
+                'labeled_string': 'substance abuse counseling',
+                'job_posting_id': 'ABC_4823943',
+                'sample_name': 'test-sample',
+                'tagger_id': md5('user_1'),
+            },
+            {
+                'entity': 'Skill',
+                'start_index': 16,
+                'end_index': 33,
+                'labeled_string': 'python programming',
+                'job_posting_id': 'ABC_4823943',
+                'sample_name': 'test-sample',
+                'tagger_id': md5('user_2'),
+            },
+            {
+                'entity': 'Skill',
+                'start_index': 49,
+                'end_index': 65,
+                'labeled_string': 'abuse counseling',
+                'job_posting_id': 'ABC_4823943',
+                'sample_name': 'test-sample',
+                'tagger_id': md5('user_2'),
+            }
+        ]
+        for received, expected in zip(
+            experiment.flattened_annotations,
+            expected_annotations
+        ):
+            self.assertDictEqual(received, expected)
 
 
 @mock_s3

@@ -8,6 +8,7 @@ from descriptors import cachedproperty
 
 from skills_utils.iteration import Batch
 from skills_utils.s3 import S3BackedJsonDict
+from skills_utils.hash import md5
 from skills_ml.job_postings import JobPosting
 
 
@@ -295,12 +296,33 @@ class BratExperiment(object):
                                     'entity': entity,
                                     'start_index': int(start),
                                     'end_index': int(end),
-                                    'labeled_string': string
+                                    'labeled_string': string,
                                 })
                             annotations_by_unit[unit_name][posting_key][user_name] = \
                                 converted_annotations
 
         return annotations_by_unit
+
+    @cachedproperty
+    def flattened_annotations(self):
+        annotations = []
+        for unit_name, unit_annotations in self.annotations_by_unit.items():
+            posting_id_lookup = dict(self.metadata['units'][unit_name])
+            for posting_key, posting_annotations in unit_annotations.items():
+                logging.info(
+                    'Looking up posting key %s in job posting id lookup %s',
+                    posting_key,
+                    posting_id_lookup
+                )
+                job_posting_id = posting_id_lookup[int(posting_key)]
+                for user_name, user_annotations in posting_annotations.items():
+                    for annotation in user_annotations:
+                        new_annotation = deepcopy(annotation)
+                        new_annotation['job_posting_id'] = job_posting_id
+                        new_annotation['sample_name'] = self.metadata['sample_name']
+                        new_annotation['tagger_id'] = md5(user_name)
+                        annotations.append(new_annotation)
+        return annotations
 
     def average_observed_agreement(self):
         """Calculate average observed agreement by unit and posting key
