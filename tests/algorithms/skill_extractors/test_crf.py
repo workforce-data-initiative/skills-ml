@@ -3,13 +3,13 @@ import json
 import boto3
 from moto import mock_s3, mock_s3_deprecated
 
-from skills_ml.algorithms.skill_extractors.crf import store_sequence_from_annotations
+from skills_ml.algorithms.skill_extractors.crf import CrfTransformer
 from skills_ml.storage import S3Store
 
 
 @mock_s3_deprecated
 @mock_s3
-def test_store_sequence_from_annotations():
+def test_CrfTransformerAnnotations():
     # create a bucket that will contain the source sample
 
     s3 = boto3.resource('s3')
@@ -83,70 +83,75 @@ def test_store_sequence_from_annotations():
         }
     ]
 
-    sample_base_path = 'test-bucket/samples'
+    sample_base_path = 's3://test-bucket/samples'
 
     # expect one sequence per tagger and job posting combination
-    expected_text = """
-this O
-is O
-a O
-job O
-description O
-which O
-talks O
-about O
-substance B-SKILL
-abuse I-SKILL
-counseling I-SKILL
-. O
-
-this O
-is O
-another O
-sentence O
-. O
-
-this O
-is O
-a O
-job O
-description O
-which O
-talks O
-about O
-substance B-SKILL
-abuse I-SKILL
-counseling I-SKILL
-. O
-
-this O
-is O
-another O
-sentence O
-. O
-
-job O
-description O
-python B-SKILL
-programming I-SKILL
-and O
-substance B-SKILL
-abuse I-SKILL
-counseling I-SKILL
-
-job O
+    expected_files = {
+        'ABC_4823943-user_2': \
+"""job O
 description O
 python B-SKILL
 programming I-SKILL
 and O
 substance O
 abuse B-SKILL
+counseling I-SKILL""",
+        'ABC_4823943-user_1': \
+"""job O
+description O
+python B-SKILL
+programming I-SKILL
+and O
+substance B-SKILL
+abuse I-SKILL
+counseling I-SKILL""",
+        'ABC_91238-user_2': \
+"""this O
+is O
+a O
+job O
+description O
+which O
+talks O
+about O
+substance B-SKILL
+abuse I-SKILL
 counseling I-SKILL
-"""
-    output_storage = S3Store('test-bucket/sequence_file.txt')
-    store_sequence_from_annotations(
+. O
+
+this O
+is O
+another O
+sentence O
+. O""",
+        'ABC_91238-user_1': \
+"""this O
+is O
+a O
+job O
+description O
+which O
+talks O
+about O
+substance B-SKILL
+abuse I-SKILL
+counseling I-SKILL
+. O
+
+this O
+is O
+another O
+sentence O
+. O"""
+    }
+
+    storage_engine = S3Store('test-bucket')
+    transformer = CrfTransformer(
         sample_base_path=sample_base_path,
-        annotations=input_annotations,
-        storage=output_storage,
+        storage_engine=storage_engine,
     )
-    assert output_storage.read() == expected_text
+    transformer.transform_annotations(
+        annotations=input_annotations
+    )
+    for filename, expected_text in expected_files.items():
+        assert storage_engine.load(filename + '.txt').decode('utf-8') == expected_text

@@ -11,6 +11,10 @@ from skills_utils.s3 import S3BackedJsonDict
 from skills_utils.hash import md5
 from skills_ml.job_postings import JobPosting
 
+from typing import Dict
+
+AnnotationType = Dict
+
 
 class BratExperiment(object):
     """Manage a BRAT experiment. Handles:
