@@ -81,7 +81,7 @@ class Crf(object):
                 for o in range(start, end):
                     if o in offset_label:
                         if o != start:
-                            print('Warning: annotation-token boundary mismatch: {} != {} - context: {}'.format(o, start, l))
+                            print('Warning: annotation-token boundary mismatch: {} != {} - {} != {}'.format(o, start, l, offset_label[o]))
                         label = offset_label[o]['entity'].upper()
                         break
 
