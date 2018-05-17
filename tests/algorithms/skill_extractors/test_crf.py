@@ -150,7 +150,7 @@ sentence O
         sample_base_path=sample_base_path,
         storage_engine=storage_engine,
     )
-    transformer.transform_annotations(
+    transformer.transform_and_save_annotations(
         annotations=input_annotations
     )
     for filename, expected_text in expected_files.items():

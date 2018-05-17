@@ -8,7 +8,7 @@ import nltk
 import re
 
 
-class CrfTransformer(object):
+class Crf(object):
     WORD_TOKENIZATION_REGEX = re.compile(r'([0-9a-zA-Z]+|[^0-9a-zA-Z])')
 
     def __init__(
@@ -25,7 +25,7 @@ class CrfTransformer(object):
     def word_tokenize(self, text):
         return [t for t in self.WORD_TOKENIZATION_REGEX.split(text) if t]
 
-    def transform_annotations(self, annotations: List[AnnotationType]):
+    def transform_and_save_annotations(self, annotations: List[AnnotationType]):
         """
         Transform annotations into sequence tag format and save per job posting and tagger.
 
@@ -81,7 +81,7 @@ class CrfTransformer(object):
                 for o in range(start, end):
                     if o in offset_label:
                         if o != start:
-                            print('Warning: annotation-token boundary mismatch')
+                            print('Warning: annotation-token boundary mismatch: {} != {} - context: {}'.format(o, start, l))
                         label = offset_label[o]['entity'].upper()
                         break
 
