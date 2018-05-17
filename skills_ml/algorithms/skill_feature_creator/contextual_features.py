@@ -1,5 +1,6 @@
 # coding: utf-8
 from skills_ml.algorithms.skill_feature_creator.posTags import tagMatching
+from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
 from functools import reduce
 from operator import add
 import nltk
@@ -135,21 +136,12 @@ def word2features(sent, i):
 def sent2features(sent):
     return [word2features(sent, i) for i in range(len(sent))]
 
-def pre_process(description):
-    """This function takes raw text and chops and then connects the process to break
-       it down into sentences, then words and then complete part-of-speech tagging"""
-    # Break job description into sentences
-    if '\n' in description:
-        sentences = re.split('\n', description)
-        sentences = list(filter(None, sentences))
-    else:
-        try:
-            sentences = nltk.sent_tokenizes(description.encode('utf-8'))
-        except:
-            sentences = nltk.sent_tokenize(description)
+def pre_process(sentences, word_tokenizer):
+    # """This function takes raw text and chops and then connects the process to break
+    #    it down into sentences, then words and then complete part-of-speech tagging"""
 
     # Break sentences into words with punctuations
-    sentences = [nltk.word_tokenize(sent) for sent in sentences]
+    sentences = [word_tokenizer(sent) for sent in sentences]
     # Break sentences into words without punctuations
     #sentences = [nltk.wordpunct_tokenize(sent) for sent in sentences]
 
@@ -159,7 +151,8 @@ def pre_process(description):
     return sentences
 
 def local_contextual_features(job_posting):
-    sentences = pre_process(job_posting)
+    sentences = NLPTransforms().sentence_tokenize(job_posting)
+    sentences = pre_process(sentences)
     features = [sent2features(s) for s in sentences]
     return features
 

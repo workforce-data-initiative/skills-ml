@@ -1,13 +1,10 @@
-from nltk.tokenize import sent_tokenize
-import nltk
-
 import json
 import csv
 from collections import OrderedDict
-
+from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
 import re
 
-def structFeatures(sent, i, desc_length):
+def struct_features(sent, i, desc_length, word_tokenizer):
 
     structFeat =[]
     # structFeat 1. Position
@@ -51,22 +48,12 @@ def structFeatures(sent, i, desc_length):
     else:
        structFeat.append(0)
 
-    return [structFeat]*len(nltk.word_tokenize(sent))
+    return [structFeat]*len(word_tokenizer(sent))
 
-# Sentence Tokenization
-def sentTokenize(description):
-    if '\n' in description:
-        sentences = re.split('\n', description)
-    else:
-        try:
-            sentences = nltk.sent_tokenizes(description.encode('utf-8'))
-        except:
-            sentences = nltk.sent_tokenize(description)
-    return sentences
 
 def structFeatGeneration(job_posting):
-    sentences = sentTokenize(job_posting)
+    sentences = NLPTransforms().sentence_tokenize(job_posting)
     desc_length = len(sentences)
-    features = [structFeatures(sentences[i], i, desc_length) for i in range(desc_length)]
+    features = [struct_features(sentences[i], i, desc_length) for i in range(desc_length)]
 
     return features

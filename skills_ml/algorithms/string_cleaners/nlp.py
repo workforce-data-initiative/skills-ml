@@ -1,9 +1,12 @@
 """String transformations for cleaning"""
 import unicodedata
+import uuid
+FINISH_PROCESSING_SIGNAL = uuid.uuid4()
 import re
 from bs4 import BeautifulSoup
 import nltk
 from functools import reduce
+from collections import defaultdict
 
 class NLPTransforms(object):
     # An object that performs common NLP transformations
@@ -84,3 +87,9 @@ class NLPTransforms(object):
         except:
             sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences))
         return sentences
+
+    def word_tokenize(self, text, punctuation=True):
+        if punctuation:
+            return nltk.word_tokenize(text)
+        else:
+            return nltk.wordpunct_tokenize(text)

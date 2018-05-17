@@ -184,7 +184,7 @@ class SentenceCorpusCreator(CorpusCreator):
             return [self._clean(sentence) for sentence in self.nlp.sentence_tokenize(document)]
 
     def __iter__(self):
-        for document in self.job_posting_generator:
-            for sentence in self._transform(document):
-                yield sentence
+        document = yield from self.job_posting_generator
+        for sentence in self._transform(document):
+            yield sentence
 

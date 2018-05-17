@@ -1,95 +1,125 @@
-from functools import reduce
-from itertools import zip_longest
-from skills_ml.algorithms.skill_feature_creator.structure_features import structFeatGeneration
-from skills_ml.algorithms.skill_feature_creator.contextual_features import local_contextual_features, sent2features
+from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
+from skills_ml.algorithms.skill_feature_creator.structure_features import struct_features
+from skills_ml.algorithms.skill_feature_creator.contextual_features import sent2features, pre_process
+
+from abc import ABC, abstractmethod
 import numpy as np
+import nltk
+
+from functools import reduce
+from itertools import zip_longest, tee
 
 class FeatureCreator(object):
     """ Feature Creator Factory that help users to instantiate different
     types of feature at once and combine them together.
 
     Example:
-        from airflow.hooks import S3Hook
         from skills_ml.algorithms.skill_feature_creator import FeatureCreator
-
-        docs=["something", "something2"]
 
         feature_vector_generator = FeatureCreator(s3_conn, features="all").transform(docs)
         feature_vector_generator = FeatureCreator(s3_conn, features=["StructuralFeature", "EmbeddingFeature"]).transform(docs)
 
     Args:
-        doc (string): job posting data.
+        job_posting_generator (generator): job posting generator.
+        sentence_tokenizer (func): sentence tokenization function
+        word_tokenizer (func): word tokenization function
+        features (list): list of feature types ones want to include. If it's None or by default, it includes all the feature types.
     """
     def __init__(
             self,
             job_posting_generator,
-            features="all"):
+            sentence_tokenizer=NLPTransforms().sentence_tokenize,
+            word_tokenizer=NLPTransforms().word_tokenize,
+            features=None):
         self.all_features = [ f.__name__ for f in FeatureFactory.__subclasses__()]
         self.features = features
         self.job_posting_generator = job_posting_generator
+        self.sentence_tokenizer = sentence_tokenizer
+        self.word_tokenizer = word_tokenizer
 
     @property
     def selected_features(self):
-        if self.features == "all":
+        if self.features is None:
             return self.all_features
         elif isinstance(self.features, list):
             if not (set(self.features) < set(self.all_features)):
                 not_supported = list(set(self.features) - set(self.all_features))
-                raise Exception("\"{}\" not supported!".format(", ".join(not_supported)))
+                raise TypeError("\"{}\" not supported!".format(", ".join(not_supported)))
             else:
                 return self.features
         else:
             raise Exception(TypeError)
 
     def __iter__(self):
-        feature_objects = [FeatureFactory._factory(feature) for feature in self.selected_features]
-
+        feature_objects = [FeatureFactory(self.sentence_tokenizer, self.word_tokenizer)._factory(feature_type) for feature_type in self.selected_features]
         for doc in self.job_posting_generator:
-            feature_generator_map = map(lambda f: f.output(doc), feature_objects)
+
+            feature_generator_map = map(lambda feature: feature.output(doc), feature_objects)
 
             # Aggregated elements from each feature generator
             agg = zip_longest(*[iter(fg) for fg in feature_generator_map])
-            for f in list(map(lambda a: reduce(lambda x, y: np.concatenate((x, y), axis=1), a), agg)):
-                yield f
+
+            # Concat all the features
+            feature_vector = yield from map(lambda a: reduce(lambda x, y: np.concatenate((x, y), axis=1), a), agg)
+
+            yield feature_vector
 
 
 class FeatureFactory(object):
-    @staticmethod
-    def _factory(type, **kwargs):
-        if type == "StructuralFeature":
-            return StructuralFeature()
+    def __init__(self, sentence_tokenizer=None, word_tokenizer=None):
+        self.sentence_tokenizer = sentence_tokenizer
+        self.word_tokenizer = word_tokenizer
 
-        if type == "ContextualFeature":
-            return ContextualFeature()
+    def _factory(self, feature_type, **kwargs):
+        for feature_object in FeatureFactory.__subclasses__():
+            if feature_object.__name__ == feature_type:
+                return feature_object(self.sentence_tokenizer, self.word_tokenizer)
 
-        if type == "EmbeddingFeature":
-            return EmbeddingFeature(**kwargs)
-
-        else:
-            raise ValueError('Bad feature type \"{}\"'.format(type))
+        raise ValueError('Bad feature type \"{}\"'.format(feature_type))
 
 
-class StructuralFeature(FeatureFactory):
-    """ Sturctural features in sentence level
+class BaseFeature(ABC):
+    def __init__(self):
+        super().__init__()
+
+    @abstractmethod
+    def build_feature(self):
+        pass
+
+    @abstractmethod
+    def output(self):
+        pass
+
+
+class StructuralFeature(FeatureFactory, BaseFeature):
+    """ Sturctural features
     """
-    @classmethod
-    def output(self, doc):
+    def build_feature(self, job_posting):
+        sentences = self.sentence_tokenizer(job_posting)
+        desc_length = len(sentences)
+        features = [struct_features(sentences[i], i, desc_length, self.word_tokenizer) for i in range(desc_length)]
+        return features
+
+    def output(self, job_posting):
         """ Output a feature vector.
         """
-        structfeaures = structFeatGeneration(doc)
+        structfeaures = self.build_feature(job_posting)
         for f in structfeaures:
             yield np.array(f).astype(np.float32)
 
 
-class ContextualFeature(FeatureFactory):
-    """ Contextual features in word/sentence level
+class ContextualFeature(FeatureFactory, BaseFeature):
+    """ Contextual features
     """
-    @classmethod
-    def output(self, doc):
+    def build_feature(self, job_posting):
+        sentences = self.sentence_tokenizer(job_posting)
+        tagged_sentences = pre_process(sentences, self.word_tokenizer)
+        features = [sent2features(s) for s in tagged_sentences]
+        return features
+
+    def output(self, job_posting):
         """ Output a feature vector.
         """
-        contextfeaures = local_contextual_features(doc)
-        # contextfeaures = sent2features(sentence)
+        contextfeaures = self.build_feature(job_posting)
         for f in contextfeaures:
             yield np.array(f).astype(np.float32)
-        # return np.array(f).astype(np.float32)
