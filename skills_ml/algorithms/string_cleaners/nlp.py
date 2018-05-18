@@ -1,12 +1,9 @@
 """String transformations for cleaning"""
 import unicodedata
-import uuid
-FINISH_PROCESSING_SIGNAL = uuid.uuid4()
 import re
 from bs4 import BeautifulSoup
 import nltk
 from functools import reduce
-from collections import defaultdict
 
 class NLPTransforms(object):
     # An object that performs common NLP transformations
