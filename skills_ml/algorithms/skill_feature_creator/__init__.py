@@ -7,17 +7,17 @@ import numpy as np
 import nltk
 
 from functools import reduce
-from itertools import zip_longest, tee
+from itertools import zip_longest
 
 class FeatureCreator(object):
     """ Feature Creator Factory that help users to instantiate different
-    types of feature at once and combine them together.
+    types of feature at once and combine them together into a feature vector.
 
     Example:
         from skills_ml.algorithms.skill_feature_creator import FeatureCreator
 
-        feature_vector_generator = FeatureCreator(s3_conn, features="all").transform(docs)
-        feature_vector_generator = FeatureCreator(s3_conn, features=["StructuralFeature", "EmbeddingFeature"]).transform(docs)
+        feature_vector_generator = FeatureCreator(job_posting_generator, features=)
+        feature_vector_generator = FeatureCreator(job_posting_generator, features=["StructuralFeature", "EmbeddingFeature"])
 
     Args:
         job_posting_generator (generator): job posting generator.
@@ -94,16 +94,16 @@ class BaseFeature(ABC):
 class StructuralFeature(FeatureFactory, BaseFeature):
     """ Sturctural features
     """
-    def build_feature(self, job_posting):
-        sentences = self.sentence_tokenizer(job_posting)
+    def build_feature(self, doc):
+        sentences = self.sentence_tokenizer(doc)
         desc_length = len(sentences)
         features = [struct_features(sentences[i], i, desc_length, self.word_tokenizer) for i in range(desc_length)]
         return features
 
-    def output(self, job_posting):
+    def output(self, doc):
         """ Output a feature vector.
         """
-        structfeaures = self.build_feature(job_posting)
+        structfeaures = self.build_feature(doc)
         for f in structfeaures:
             yield np.array(f).astype(np.float32)
 
@@ -111,15 +111,15 @@ class StructuralFeature(FeatureFactory, BaseFeature):
 class ContextualFeature(FeatureFactory, BaseFeature):
     """ Contextual features
     """
-    def build_feature(self, job_posting):
-        sentences = self.sentence_tokenizer(job_posting)
+    def build_feature(self, doc):
+        sentences = self.sentence_tokenizer(doc)
         tagged_sentences = pre_process(sentences, self.word_tokenizer)
         features = [sent2features(s) for s in tagged_sentences]
         return features
 
-    def output(self, job_posting):
+    def output(self, doc):
         """ Output a feature vector.
         """
-        contextfeaures = self.build_feature(job_posting)
+        contextfeaures = self.build_feature(doc)
         for f in contextfeaures:
             yield np.array(f).astype(np.float32)

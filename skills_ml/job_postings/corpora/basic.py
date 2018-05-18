@@ -170,21 +170,3 @@ class RawCorpusCreator(CorpusCreator):
 
     def _transform(self, document):
         return self.join_spaces([document[field] for field in self.document_schema_fields])
-
-
-class SentenceCorpusCreator(CorpusCreator):
-    def __init__(self, job_posting_generator, raw=True, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
-        super().__init__(job_posting_generator=job_posting_generator, raw=raw, document_schema_fields=document_schema_fields)
-
-    def _transform(self, document):
-        document = self.join_spaces([document[field] for field in self.document_schema_fields])
-        if self.raw:
-            return self.nlp.sentence_tokenize(document)
-        else:
-            return [self._clean(sentence) for sentence in self.nlp.sentence_tokenize(document)]
-
-    def __iter__(self):
-        document = yield from self.job_posting_generator
-        for sentence in self._transform(document):
-            yield sentence
-
