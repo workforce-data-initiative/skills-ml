@@ -33,6 +33,9 @@ class CorpusCreator(object):
                                 See sample_job_listing.json for an example of this schema
         document_schema_fields (list): an list of schema fields to be included
         raw (bool): a flag whether to return the raw documents or transformed documents
+
+    Yield:
+        (dict): a dictinary only with selected fields as keys and corresponding raw/cleaned value
     """
     def __init__(self, job_posting_generator=None, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
                  raw=False):
@@ -163,7 +166,7 @@ class JobCategoryCorpusCreator(CorpusCreator):
 
 class RawCorpusCreator(CorpusCreator):
     """
-        An object that pass the raw job posting data
+        An object that return the joined raw string of job posting
     """
     def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
         super().__init__(job_posting_generator, document_schema_fields)
