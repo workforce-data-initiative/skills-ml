@@ -93,7 +93,7 @@ class SimpleCorpusCreator(CorpusCreator):
 class Doc2VecGensimCorpusCreator(CorpusCreator):
     """Corpus for training Gensim Doc2Vec
     An object that transforms job listing documents by picking
-    important schema fields and returns them as one large cleaned array of words
+    important schema fields and yields them as one large cleaned array of words
 
     Example:
     ```python
@@ -135,7 +135,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
 class Word2VecGensimCorpusCreator(CorpusCreator):
     """
         An object that transforms job listing documents by picking
-        important schema fields and returns them as one large cleaned array of words
+        important schema fields and yields them as one large cleaned array of words
     """
     def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
         super().__init__(job_posting_generator, document_schema_fields)
@@ -150,7 +150,7 @@ class Word2VecGensimCorpusCreator(CorpusCreator):
 class JobCategoryCorpusCreator(CorpusCreator):
     """
         An object that extract the label of each job listing document which could be onet soc code or
-        occupationalCategory and returns them as a lowercased string
+        occupationalCategory and yields them as a lowercased string
     """
     document_schema_fields = [
         'occupationalCategory']
@@ -164,7 +164,7 @@ class JobCategoryCorpusCreator(CorpusCreator):
 
 class RawCorpusCreator(CorpusCreator):
     """
-        An object that return the joined raw string of job posting
+        An object that yields the joined raw string of job posting
     """
     def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
         super().__init__(job_posting_generator, document_schema_fields)
