@@ -21,8 +21,6 @@ class CorpusCreator(object):
 
     # For getting a the raw job postings without any cleaning
     corpus = CorpusCreator(job_postings_generator, raw=True)
-
-    corpus = CorpusCreator(job_postings_generator)
     ```
 
 
