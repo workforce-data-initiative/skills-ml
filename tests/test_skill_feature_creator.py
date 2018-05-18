@@ -1,6 +1,6 @@
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import RawCorpusCreator
-from skills_ml.algorithms.skill_feature_creator import FeatureCreator
+from skills_ml.algorithms.skill_feature_creator import SequenceFeatureCreator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
 import numpy as np
@@ -25,7 +25,7 @@ class TestSkillFeatureCreator(unittest.TestCase):
         raw1, raw2 = tee(raw)
 
         # default
-        fc = FeatureCreator(raw1)
+        fc = SequenceFeatureCreator(raw1)
         self.assertEqual(fc.selected_features, ["StructuralFeature", "ContextualFeature"])
         self.assertEqual(fc.all_features, ["StructuralFeature", "ContextualFeature"])
 
@@ -33,10 +33,10 @@ class TestSkillFeatureCreator(unittest.TestCase):
         self.assertEqual(next(fc).shape[0], np.array(next(iter(word_tokenizer_gen(sentence_tokenizer_gen(raw2))))).shape[0])
 
         #
-        fc = FeatureCreator(raw1, features=["StructuralFeature"])
+        fc = SequenceFeatureCreator(raw1, features=["StructuralFeature"])
         fc = iter(fc)
         self.assertEqual(next(fc).shape[0], np.array(next(iter(word_tokenizer_gen(sentence_tokenizer_gen(raw2))))).shape[0])
 
-        fc = FeatureCreator(raw1, features=["FeatureNotSupported"])
+        fc = SequenceFeatureCreator(raw1, features=["FeatureNotSupported"])
         fc = iter(fc)
         self.assertRaises(TypeError, lambda: next(fc))

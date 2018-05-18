@@ -9,9 +9,10 @@ import nltk
 from functools import reduce
 from itertools import zip_longest
 
-class FeatureCreator(object):
-    """ Feature Creator Factory that help users to instantiate different
-    types of feature at once and combine them together into a feature vector.
+class SequenceFeatureCreator(object):
+    """ Sequence Feature Creator helps users to instantiate different
+    types of feature at once and combine them together into a sentence(sequence) feature array for sequence modeling.
+    It's a generator that outputs a sentence array at a time. A sentence array is composed of word vectors.
 
     Example:
         from skills_ml.algorithms.skill_feature_creator import FeatureCreator
@@ -24,6 +25,10 @@ class FeatureCreator(object):
         sentence_tokenizer (func): sentence tokenization function
         word_tokenizer (func): word tokenization function
         features (list): list of feature types ones want to include. If it's None or by default, it includes all the feature types.
+
+    Yield:
+        sentence_array (numpy.array): an array of word vectors represents the words and punctuations in the sentence. The dimension
+                                      is (# of words)*(dimension of the concat word vector)
     """
     def __init__(
             self,
@@ -60,9 +65,9 @@ class FeatureCreator(object):
             agg = zip_longest(*[iter(fg) for fg in feature_generator_map])
 
             # Concat all the features
-            feature_vector = yield from map(lambda a: reduce(lambda x, y: np.concatenate((x, y), axis=1), a), agg)
+            sentence_array = yield from map(lambda a: reduce(lambda x, y: np.concatenate((x, y), axis=1), a), agg)
 
-            yield feature_vector
+            yield sentence_array
 
 
 class FeatureFactory(object):
