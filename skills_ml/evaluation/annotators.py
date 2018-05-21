@@ -308,25 +308,38 @@ class BratExperiment(object):
         return annotations_by_unit
 
     @cachedproperty
-    def flattened_annotations(self):
-        annotations = []
-        for unit_name, unit_annotations in self.annotations_by_unit.items():
-            posting_id_lookup = dict(self.metadata['units'][unit_name])
-            for posting_key, posting_annotations in unit_annotations.items():
-                logging.info(
-                    'Looking up posting key %s in job posting id lookup %s',
-                    posting_key,
-                    posting_id_lookup
-                )
-                job_posting_id = posting_id_lookup[int(posting_key)]
-                for user_name, user_annotations in posting_annotations.items():
-                    for annotation in user_annotations:
-                        new_annotation = deepcopy(annotation)
-                        new_annotation['job_posting_id'] = job_posting_id
-                        new_annotation['sample_name'] = self.metadata['sample_name']
-                        new_annotation['tagger_id'] = md5(user_name)
-                        annotations.append(new_annotation)
-        return annotations
+    def sequence_tagged_annotations(self):
+        """Fetch sequence tagged annotations
+
+        Expects these annotations to be produced by BRAT in CoNLL format.
+        Returns: (dict), keys are tuples of (job posting id, tagger_id)
+            and values are lists of (entity, token) tuples
+        """
+        annotations_by_posting_and_user = {}
+        for user_name, unit_names in self.metadata['allocations'].items():
+            for unit_name in unit_names:
+                posting_id_lookup = dict(self.metadata['units'][unit_name])
+                allocation_path = self.allocation_path(user_name, unit_name)
+                for key in self.s3.ls(allocation_path + '/'):
+                    # this will iterate through posting text (.txt), annotation (.ann),
+                    # and CoNLL (.conll) files. In this case we only care about conll
+                    if key.endswith('.conll'):
+                        posting_key = key.split('/')[-1].replace('.conll', '')
+                        with self.s3.open(key) as f:
+                            logging.info('Reading conll file at %s', key)
+                            job_posting_id = posting_id_lookup[int(posting_key)]
+                            raw_tokens = csv.reader(f, delimiter='\t')
+
+                            tokens = []
+                            for token_line in raw_tokens:
+                                logging.info('Found token line %s', token_line)
+                                tag, _, _, token = token_line
+                                tokens.append((tag, token))
+
+                            key = (job_posting_id, md5(user_name))
+                            annotations_by_posting_and_user[key] = tokens
+
+        return annotations_by_posting_and_user
 
     def average_observed_agreement(self):
         """Calculate average observed agreement by unit and posting key
