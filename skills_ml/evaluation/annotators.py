@@ -333,11 +333,17 @@ class BratExperiment(object):
                             tokens = []
                             for token_line in raw_tokens:
                                 logging.info('Found token line %s', token_line)
-                                tag, _, _, token = token_line
-                                tokens.append((tag, token))
+                                if len(token_line) == 0:
+                                    tokens.append((None, None))
+                                else:
+                                    tag, _, _, token = token_line
+                                    tokens.append((tag, token))
 
                             key = (job_posting_id, md5(user_name))
-                            annotations_by_posting_and_user[key] = tokens
+                            if any(token for token in tokens if token[0] not in {'O', None}):
+                                annotations_by_posting_and_user[key] = tokens
+                            else:
+                                logging.warning('No annotations found in file. Skipping')
 
         return annotations_by_posting_and_user
 
