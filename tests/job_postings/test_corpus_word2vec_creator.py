@@ -1,6 +1,7 @@
 from skills_ml.job_postings.corpora.basic import Word2VecGensimCorpusCreator
+import json
 
-sample_document = {
+sample_documents = [{
         "incentiveCompensation": "",
         "experienceRequirements": "Here are some experience and requirements",
         "baseSalary": {
@@ -30,11 +31,12 @@ sample_document = {
         "alternateName": "Customer Service Representative",
         "datePosted": "2013-05-12",
         "@type": "JobPosting"
-}
+}]
 
 class FakeJobPostingGenerator(object):
     def __iter__(self):
-        yield sample_document
+        for sample in sample_documents:
+            yield sample
 
     @property
     def metadata(self):
@@ -47,3 +49,4 @@ def test_word2vec_corpus_creator():
     corpus = [output for output in Word2VecGensimCorpusCreator(it)]
     assert len(corpus) == 1
     assert corpus[0] == 'we are looking for a person to fill this job here are some experience and requirements here are some qualifications customer service consultant entry level'.split()
+

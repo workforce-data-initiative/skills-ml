@@ -29,6 +29,7 @@ class JobPostingCollectionFromS3(object):
     ```
     import json
     from airflow.hooks import S3Hook
+    from skills_ml.job_postings.common_schema import JobPostingGenerator
     s3_conn = S3Hook().get_conn()
     quarters = ['2011Q1', '2011Q2', '2011Q3']
     job_postings_generator = JobPostingCollectionFromS3(s3_conn, quarters, s3_path='open-skills-private/job_postings_common', source="all")
