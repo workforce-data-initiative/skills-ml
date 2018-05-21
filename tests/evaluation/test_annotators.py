@@ -209,7 +209,7 @@ class TestSequenceTaggedAnnotations(unittest.TestCase):
             'user_1': {
                 'unit_1/0': [
                     'O\t0\t4\tthis',
-                    'O\t5\t7\tis',
+                    'B-SKILL\t5\t7\tis',
                     'O\t8\t14\tpython',
                 ],
                 'unit_1/1': [
@@ -227,7 +227,7 @@ class TestSequenceTaggedAnnotations(unittest.TestCase):
                 'unit_1/1': [
                     'O\t0\t4\tthis',
                     'O\t5\t7\tis',
-                    'O\t8\t14\tpython',
+                    'B-SKILL\t8\t14\tpython',
                 ]
             },
         }
@@ -256,10 +256,10 @@ class TestSequenceTaggedAnnotations(unittest.TestCase):
 
         self.maxDiff = None
         expected_tokens = {
-            ('ABC_91238', md5('user_1')): [('O', 'this'), ('O', 'is'), ('O', 'python')],
+            ('ABC_91238', md5('user_1')): [('O', 'this'), ('B-SKILL', 'is'), ('O', 'python')],
             ('ABC_91238', md5('user_2')): [('O', 'this'), ('O', 'is'), ('B-SKILL', 'python')],
             ('ABC_4823943', md5('user_1')): [('O', 'this'), ('O', 'is'), ('B-SKILL', 'python')],
-            ('ABC_4823943', md5('user_2')): [('O', 'this'), ('O', 'is'), ('O', 'python')],
+            ('ABC_4823943', md5('user_2')): [('O', 'this'), ('O', 'is'), ('B-SKILL', 'python')],
         }
         self.assertDictEqual(experiment.sequence_tagged_annotations, expected_tokens)
 
