@@ -1,82 +1,120 @@
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
-
-from skills_utils.s3 import upload, list_files, download
-
+from skills_ml.algorithms.embedding.base import Word2VecModel, Doc2VecModel
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
-
 from skills_ml.storage import S3Store, FSStore
 
-from moto import mock_s3_deprecated, mock_s3
+from skills_utils.s3 import list_files
+
+from moto import mock_s3
 import mock
 import boto3
 import s3fs
-
 import tempfile
-import boto
 import os
-import json
+import unittest
 
 import logging
 logging.getLogger('boto').setLevel(logging.CRITICAL)
 
-import unittest
-import pytest
 
-@pytest.mark.skip('will change it with new storage module')
 class TestTrainEmbedding(unittest.TestCase):
     @mock_s3
     def test_embedding_trainer_doc2vec_s3(self):
         client = boto3.client('s3')
         client.create_bucket(Bucket='fake-open-skills', ACL='public-read-write')
-        s3_storage = S3Store(path=f"s3://fake-open-skills/model_cache/embedding")
+        s3_path = f"s3://fake-open-skills/model_cache/embedding"
+        s3_storage = S3Store(path=s3_path)
 
         document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
-
-        job_postings_generator = JobPostingCollectionSample(num_records=2)
+        document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
+        job_postings_generator = JobPostingCollectionSample(num_records=30)
         corpus_generator = Doc2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
-        trainer = EmbeddingTrainer(corpus_generator=corpus_generator, storage=s3_storage)
+        d2v = Doc2VecModel(storage=s3_storage, size=10, min_count=3, iter=4, window=6, workers=3)
+
+        trainer = EmbeddingTrainer(corpus_generator, d2v)
         trainer.train()
-        # If ones want to change the path
-        s3_path_to_store = os.path.join("s3://fake-open-skills/model_cache/embedding", trainer.modelname)
+        trainer.write_model()
 
-        trainer.storage.path = s3_path_to_store
-        trainer.save_model()
+        vocab_size = len(d2v.wv.vocab.keys())
         s3 = s3fs.S3FileSystem()
-        files = [f.split('/')[-1] for f in s3.ls(s3_path_to_store)]
-        assert len(files) == 3
+        files = [f.split('/')[-1] for f in s3.ls(s3_path)]
+        assert d2v.model_name == trainer.model_name
+        assert set(files) == set([trainer.model_name])
 
-        assert files == [trainer.modelname + '.model',
-                         'lookup_' + trainer.modelname + '.json',
-                         'metadata_' + trainer.modelname + '.json']
+        # Save as different name
+        d2v.write_model('other_name.model')
 
-        new_trainer = EmbeddingTrainer(corpus_generator=corpus_generator, storage=s3_storage)
-        self.assertRaises(NotImplementedError, lambda: new_trainer.load(trainer.modelname))
+        s3 = s3fs.S3FileSystem()
+        files = [f.split('/')[-1] for f in s3.ls(s3_path)]
+        assert set(files) == set([trainer.model_name, 'other_name.model'])
+
+        # Load
+        d2v_loaded = Doc2VecModel.load_model(s3_storage, trainer.model_name)
+        self.assertDictEqual(d2v_loaded.metadata, trainer.metadata)
+
+        # Change the store directory
+        new_s3_path = "s3://fake-open-skills/model_cache/embedding/other_directory"
+        trainer.write_model(S3Store(new_s3_path))
+        s3 = s3fs.S3FileSystem()
+        files = [f.split('/')[-1] for f in s3.ls(new_s3_path)]
+        assert set(files) == set([trainer.model_name])
 
     @mock_s3
     def test_embedding_trainer_word2vec_s3(self):
         client = boto3.client('s3')
         client.create_bucket(Bucket='fake-open-skills', ACL='public-read-write')
-        s3_storage = S3Store(path=f"s3://fake-open-skills/model_cache/embedding")
+        s3_path = f"s3://fake-open-skills/model_cache/embedding"
+        s3_storage = S3Store(path=s3_path)
 
         document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
-        job_postings_generator = JobPostingCollectionSample(num_records=2)
+        job_postings_generator = JobPostingCollectionSample(num_records=30)
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
-        trainer = EmbeddingTrainer(corpus_generator=corpus_generator, storage=s3_storage)
+        w2v = Word2VecModel(storage=s3_storage, size=10, min_count=3, iter=4, window=6, workers=3)
+
+        trainer = EmbeddingTrainer(corpus_generator, w2v)
         trainer.train()
-        s3_path_to_store = os.path.join("s3://fake-open-skills/model_cache/embedding", trainer.modelname)
-        trainer.storage.path = s3_path_to_store
-        trainer.save_model()
+        trainer.write_model()
+
+        vocab_size = len(w2v.wv.vocab.keys())
+
         s3 = s3fs.S3FileSystem()
-        files = [f.split('/')[-1] for f in s3.ls(s3_path_to_store)]
-        assert len(files) == 2
-        assert files == ['metadata_' + trainer.modelname + '.json',
-                         trainer.modelname + '.model']
+        files = [f.split('/')[-1] for f in s3.ls(s3_path)]
+        assert w2v.model_name == trainer.model_name
+        assert set(files) == set([trainer.model_name])
 
-        new_trainer = EmbeddingTrainer(corpus_generator=corpus_generator, storage=s3_storage)
-        new_trainer.load(trainer.modelname+'.model')
+        # Test online training
+        job_postings_generator = JobPostingCollectionSample(num_records=50)
+        corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
 
+        w2v_loaded = Word2VecModel.load_model(s3_storage, w2v.model_name)
+
+        new_trainer = EmbeddingTrainer(corpus_generator, w2v_loaded)
+        new_trainer.train()
+        new_trainer.write_model()
+
+        new_vocab_size = len(w2v_loaded.wv.vocab.keys())
+
+        s3 = s3fs.S3FileSystem()
+        files = [f.split('/')[-1] for f in s3.ls(s3_path)]
+        assert set(files) == set([new_trainer.model_name, trainer.model_name])
         assert new_trainer.metadata['embedding_trainer']['hyperparameters'] == trainer.metadata['embedding_trainer']['hyperparameters']
+        assert vocab_size <= new_vocab_size
+
+        # Save as different name
+        w2v.write_model('other_name.model')
+
+        s3 = s3fs.S3FileSystem()
+        files = [f.split('/')[-1] for f in s3.ls(s3_path)]
+        assert set(files) == set([trainer.model_name, new_trainer.model_name, 'other_name.model'])
+
+        # Change the store directory
+        new_s3_path = "s3://fake-open-skills/model_cache/embedding/other_directory"
+        new_trainer.write_model(S3Store(new_s3_path))
+        s3 = s3fs.S3FileSystem()
+        files = [f.split('/')[-1] for f in s3.ls(new_s3_path)]
+        assert set(files) == set([new_trainer.model_name])
+
 
     @mock.patch('os.getcwd')
     def test_embedding_trainer_doc2vec_local(self, mock_getcwd):
@@ -84,18 +122,30 @@ class TestTrainEmbedding(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as td:
             mock_getcwd.return_value = td
-            job_postings_generator = JobPostingCollectionSample(num_records=2)
+            job_postings_generator = JobPostingCollectionSample(num_records=30)
             corpus_generator = Doc2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
-            trainer = EmbeddingTrainer(corpus_generator=corpus_generator, storage=FSStore(td))
+            d2v = Doc2VecModel(storage=FSStore(td), size=10, min_count=3, iter=4, window=6, workers=3)
+
+            trainer = EmbeddingTrainer(corpus_generator, d2v)
             trainer.train()
-            trainer.save_model()
+            trainer.write_model()
 
-            assert set(os.listdir(os.getcwd())) == set([trainer.modelname + '.model',
-                                                             'lookup_' + trainer.modelname + '.json',
-                                                             'metadata_' + trainer.modelname + '.json'])
+            vocab_size = len(d2v.wv.vocab.keys())
+            assert d2v.model_name == trainer.model_name
+            assert set(os.listdir(os.getcwd())) == set([trainer.model_name])
 
-        new_trainer = EmbeddingTrainer(corpus_generator=corpus_generator)
-        self.assertRaises(NotImplementedError, lambda: new_trainer.load(trainer.modelname))
+            # Save as different name
+            d2v.write_model('other_name.model')
+            assert set(os.listdir(os.getcwd())) == set([trainer.model_name, 'other_name.model'])
+
+            # Load
+            d2v_loaded = Doc2VecModel.load_model(FSStore(td), trainer.model_name)
+            self.assertDictEqual(d2v_loaded.metadata, trainer.metadata)
+
+            # Change the store directory
+            new_path = os.path.join(td, 'other_directory')
+            trainer.write_model(FSStore(new_path))
+            assert set(os.listdir(new_path)) == set([trainer.model_name])
 
     @mock.patch('os.getcwd')
     def test_embedding_trainer_word2vec_local(self, mock_getcwd):
@@ -103,15 +153,40 @@ class TestTrainEmbedding(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as td:
             mock_getcwd.return_value = td
-            job_postings_generator = JobPostingCollectionSample(num_records=2)
+            job_postings_generator = JobPostingCollectionSample(num_records=30)
             corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
-            trainer = EmbeddingTrainer(corpus_generator=corpus_generator, storage=FSStore(td))
+            w2v = Word2VecModel(storage=FSStore(td), size=10, min_count=3, iter=4, window=6, workers=3)
+
+            trainer = EmbeddingTrainer(corpus_generator, w2v)
             trainer.train()
-            trainer.save_model()
+            trainer.write_model()
 
-            assert set(os.listdir(os.getcwd())) == set([trainer.modelname + '.model',
-                                                             'metadata_' + trainer.modelname + '.json'])
+            vocab_size = len(w2v.wv.vocab.keys())
 
-            new_trainer = EmbeddingTrainer(corpus_generator, storage=FSStore(td))
-            new_trainer.load(trainer.modelname + '.model')
+            assert w2v.model_name == trainer.model_name
+            assert set(os.listdir(os.getcwd())) == set([trainer.model_name])
+
+            # Test Online Training
+            job_postings_generator = JobPostingCollectionSample(num_records=50)
+            corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
+
+            w2v_loaded = Word2VecModel.load_model(FSStore(td), w2v.model_name)
+
+            new_trainer = EmbeddingTrainer(corpus_generator, w2v_loaded)
+            new_trainer.train()
+            new_trainer.write_model()
+
+            new_vocab_size = len(w2v_loaded.wv.vocab.keys())
+
+            assert set(os.listdir(os.getcwd())) == set([trainer.model_name, new_trainer.model_name])
             assert new_trainer.metadata['embedding_trainer']['hyperparameters'] == trainer.metadata['embedding_trainer']['hyperparameters']
+            assert vocab_size <= new_vocab_size
+
+            # Save as different name
+            w2v.write_model('other_name.model')
+            assert set(os.listdir(os.getcwd())) == set([trainer.model_name, new_trainer.model_name, 'other_name.model'])
+
+            # Change the store directory
+            new_path = os.path.join(td, 'other_directory')
+            new_trainer.write_model(FSStore(new_path))
+            assert set(os.listdir(new_path)) == set([new_trainer.model_name])

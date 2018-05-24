@@ -7,7 +7,6 @@ assert gensim.models.doc2vec.FAST_VERSION > -1
 from skills_ml.job_postings.common_schema import batches_generator
 from skills_ml.algorithms.embedding.base import Word2VecModel
 
-from skills_ml.storage import FSStore
 
 from skills_utils.s3 import upload
 
@@ -42,6 +41,8 @@ class EmbeddingTrainer(object):
     from skills_ml.job_postings.common_schema import JobPostingGenerator
     from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 
+    model = Word2VecModel(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
+
     s3_conn = S3Hook().get_conn()
     job_postings_generator = JobPostingGenerator(s3_conn, quarters, s3_path, source="all")
     corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
@@ -50,7 +51,7 @@ class EmbeddingTrainer(object):
     ```
     """
     def __init__(
-        self, corpus_generator, batch_size=2000, storage=FSStore()):
+        self, corpus_generator, model, batch_size=2000):
         """Initialization
 
         Attributes:
@@ -67,48 +68,23 @@ class EmbeddingTrainer(object):
         self.update = False
         self.batch_size = batch_size
         self.vocab_size_cumu = []
-        self._model = None
+        self._model = model
         self._lookup = None
-        self.storage = storage
 
-    def load(self, model_name):
-        if 'word2vec' in model_name.split('_'):
-            word2vec = Word2VecModel(self.storage)
-            word2vec.load_model(model_name)
-            self._model = word2vec._model
-        elif 'doc2vec' in model_name.split('_'):
-            raise NotImplementedError("Couldn't load doc2vec model. Current gensim doc2vec model doesn't support online learning")
-
-    def save_model(self):
-        """Save model locally
-
-        Args:
-            path (:str): path to save model files and lookup
-        """
-        model_name = self.modelname + '.model'
-
-        self.storage.write(self._model, model_name)
-
-        meta_dict = self.metadata
-        metaname = 'metadata_' + self.modelname + '.json'
-        self.storage.write(meta_dict, metaname)
-
-        if self.model_type == 'doc2vec':
-            lookup_name = 'lookup_' + self.modelname + '.json'
-            self.storage.write(self._lookup, lookup_name)
-
-    def train(self, size=500, min_count=3, iter=4, window=6, workers=3, **kwargs):
+    def train(self):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
 
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
         if self.model_type == 'word2vec':
-            if not self._model:
-                model = Word2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
-            else:
-                logging.info("Model existed")
-                model = self._model
+            # if not self._model.wv.vocab:
+                # model = Word2VecModel(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
+                # self.model
+            # else:
+            if self._model.wv.vocab:
+                logging.info("Model has been trained")
+                # model = self._model
                 self.update = True
 
             batch_iter = 1
@@ -117,25 +93,33 @@ class EmbeddingTrainer(object):
                 batch = Reiterable(batch)
                 logging.info("Training batch #{} ".format(batch_iter))
                 if not self.update:
-                    model.build_vocab(batch, update=False)
+                    self._model.build_vocab(batch, update=False)
                     self.update = True
                 else:
-                    model.build_vocab(batch, update=True)
+                    self._model.build_vocab(batch, update=True)
 
-                model.train(batch, total_examples=model.corpus_count, epochs=model.iter)
-                self.vocab_size_cumu.append(len(model.wv.vocab))
+                self._model.train(batch, total_examples=self._model.corpus_count, epochs=self._model.iter)
+                self.vocab_size_cumu.append(len(self._model.wv.vocab))
                 batch_iter += 1
                 logging.info('\n')
 
         elif self.model_type == 'doc2vec':
-            model = Doc2Vec(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
             corpus_gen = self.corpus_generator
             reiter_corpus_gen = Reiterable(corpus_gen)
-            model.build_vocab(reiter_corpus_gen)
-            model.train(reiter_corpus_gen, total_examples=model.corpus_count, epochs=model.iter)
-            self._lookup = corpus_gen.lookup
+            self._model.build_vocab(reiter_corpus_gen)
+            self._model.train(reiter_corpus_gen, total_examples=self._model.corpus_count, epochs=self._model.iter)
+            if self._model.lookup:
+                self._lookup = corpus_gen.lookup
 
-        self._model = model
+        self._model.metadata = self.metadata
+        self._model.model_name = self.model_name
+
+    def write_model(self, storage=None):
+        if storage is None:
+            self._model.write_model(self.model_name)
+        else:
+            self._model.storage = storage
+            self._model.write_model(self.model_name)
 
     @property
     def model_type(self):
@@ -145,14 +129,14 @@ class EmbeddingTrainer(object):
             return 'word2vec'
 
     @property
-    def modelname(self):
-        return self.model_type + '_gensim_' + self.training_time
+    def model_name(self):
+        return self.model_type + '_' + self.training_time + '.model'
 
     @property
     def metadata(self):
         meta_dict = {'embedding_trainer': {}}
         if self._model:
-            meta_dict['embedding_trainer']['model_name'] = self.modelname
+            meta_dict['embedding_trainer']['model_name'] = self.model_name
             meta_dict['embedding_trainer']['hyperparameters'] = {
                                             'vector_size': self._model.vector_size,
                                             'window': self._model.window,
