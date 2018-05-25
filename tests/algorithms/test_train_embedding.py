@@ -1,5 +1,5 @@
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
-from skills_ml.algorithms.embedding.base import Word2VecModel, Doc2VecModel
+from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 from skills_ml.storage import S3Store, FSStore
@@ -33,7 +33,7 @@ class TestTrainEmbedding(unittest.TestCase):
         d2v = Doc2VecModel(storage=s3_storage, size=10, min_count=3, iter=4, window=6, workers=3)
 
         trainer = EmbeddingTrainer(corpus_generator, d2v)
-        trainer.train()
+        trainer.train(lookup=True)
         trainer.write_model()
 
         vocab_size = len(d2v.wv.vocab.keys())
@@ -128,7 +128,7 @@ class TestTrainEmbedding(unittest.TestCase):
             d2v = Doc2VecModel(storage=FSStore(td), size=10, min_count=3, iter=4, window=6, workers=3)
 
             trainer = EmbeddingTrainer(corpus_generator, d2v)
-            trainer.train()
+            trainer.train(lookup=True)
             trainer.write_model()
 
             vocab_size = len(d2v.wv.vocab.keys())

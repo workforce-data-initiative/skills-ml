@@ -4,7 +4,7 @@ import gensim.models.doc2vec
 assert gensim.models.doc2vec.FAST_VERSION > -1
 
 from skills_ml.job_postings.common_schema import batches_generator
-from skills_ml.algorithms.embedding.base import Word2VecModel
+from skills_ml.algorithms.embedding.models import Word2VecModel
 
 from datetime import datetime
 from itertools import tee
@@ -62,10 +62,10 @@ class EmbeddingTrainer(object):
         self.update = False
         self.batch_size = batch_size
         self.vocab_size_cumu = []
-        self._model = model
         self.lookup_dict = None
+        self._model = model
 
-    def train(self, *args, **kwargs):
+    def train(self, lookup=False, *args, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
 
         Args:
@@ -97,7 +97,7 @@ class EmbeddingTrainer(object):
             reiter_corpus_gen = Reiterable(corpus_gen)
             self._model.build_vocab(reiter_corpus_gen)
             self._model.train(reiter_corpus_gen, total_examples=self._model.corpus_count, epochs=self._model.iter, *args, **kwargs)
-            if self._model.lookup:
+            if lookup:
                 self.lookup_dict = corpus_gen.lookup
                 self._model.lookup_dict = self.lookup_dict
 
