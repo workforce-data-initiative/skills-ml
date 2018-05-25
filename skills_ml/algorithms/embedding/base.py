@@ -110,7 +110,7 @@ class Doc2VecModel(Doc2Vec):
     doc2vec_model = Doc2VecModel()
     ```
     """
-    def __init__(self, storage=None, lookup=False, *args, **kwargs):
+    def __init__(self, storage=None, lookup=True, *args, **kwargs):
         """
         Attributes:
             storage (:obj: `skills_ml.Store`): skills_ml Store object

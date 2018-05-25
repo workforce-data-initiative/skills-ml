@@ -41,6 +41,7 @@ class TestTrainEmbedding(unittest.TestCase):
         files = [f.split('/')[-1] for f in s3.ls(s3_path)]
         assert d2v.model_name == trainer.model_name
         assert set(files) == set([trainer.model_name])
+        self.assertDictEqual(trainer.lookup_dict, d2v.lookup_dict)
 
         # Save as different name
         d2v.write_model('other_name.model')
@@ -133,6 +134,7 @@ class TestTrainEmbedding(unittest.TestCase):
             vocab_size = len(d2v.wv.vocab.keys())
             assert d2v.model_name == trainer.model_name
             assert set(os.listdir(os.getcwd())) == set([trainer.model_name])
+            self.assertDictEqual(trainer.lookup_dict, d2v.lookup_dict)
 
             # Save as different name
             d2v.write_model('other_name.model')

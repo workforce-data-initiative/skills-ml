@@ -55,7 +55,7 @@ class EmbeddingTrainer(object):
             model_type (:str): 'word2vec' or 'doc2vec'
             vocab_size_cumu (:list): record the number of vocab every batch for word2vec
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
-            _lookup (:dict): dictionary for storing the training documents and keys for doc2vec
+            lookup (:dict): dictionary for storing the training documents and keys for doc2vec
         """
         self.corpus_generator = corpus_generator
         self.training_time = datetime.today().isoformat()
@@ -63,7 +63,7 @@ class EmbeddingTrainer(object):
         self.batch_size = batch_size
         self.vocab_size_cumu = []
         self._model = model
-        self._lookup = None
+        self.lookup_dict = None
 
     def train(self, *args, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
@@ -98,7 +98,8 @@ class EmbeddingTrainer(object):
             self._model.build_vocab(reiter_corpus_gen)
             self._model.train(reiter_corpus_gen, total_examples=self._model.corpus_count, epochs=self._model.iter, *args, **kwargs)
             if self._model.lookup:
-                self._lookup = corpus_gen.lookup
+                self.lookup_dict = corpus_gen.lookup
+                self._model.lookup_dict = self.lookup_dict
 
         self._model.metadata = self.metadata
         self._model.model_name = self.model_name
