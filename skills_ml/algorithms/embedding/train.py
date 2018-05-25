@@ -1,4 +1,3 @@
-from gensim.models.doc2vec import Doc2Vec, Word2Vec
 from gensim import __version__ as gensim_version
 from gensim import __name__ as gensim_name
 import gensim.models.doc2vec
@@ -7,21 +6,11 @@ assert gensim.models.doc2vec.FAST_VERSION > -1
 from skills_ml.job_postings.common_schema import batches_generator
 from skills_ml.algorithms.embedding.base import Word2VecModel
 
-
-from skills_utils.s3 import upload
-
 from datetime import datetime
-from glob import glob
-
 from itertools import tee
 
-import os
-import json
-import tempfile
 import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-
-S3_PATH_EMBEDDING_MODEL = 'open-skills-private/model_cache/embedding/'
 
 class Reiterable(object):
     def __init__(self, iterable):
@@ -33,21 +22,24 @@ class Reiterable(object):
 
 
 class EmbeddingTrainer(object):
-    """An embedding learning object using gensim word2vec/doc2vec model.
+    """An embedding learning class.
     Example:
-    ```
-    from airflow.hooks import S3Hook
+
+    ```python
     from skills_ml.algorithms.occupation_classifiers.train import EmbeddingTrainer
-    from skills_ml.job_postings.common_schema import JobPostingGenerator
+    from skills_ml.job_postings.common_schema import JobPostingCollectionSample
     from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+    from skills_ml.storage import FSStore
 
     model = Word2VecModel(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
 
     s3_conn = S3Hook().get_conn()
     job_postings_generator = JobPostingGenerator(s3_conn, quarters, s3_path, source="all")
     corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
-    trainer = EmbeddingTrainer(corpus_generator, s3_conn, 'open-skills-private/test_corpus')
+    w2v = Word2VecModel(storage=FSStore(path='/tmp'), size=10, min_count=3, iter=4, window=6, workers=3)
+    trainer = EmbeddingTrainer(corpus_generator, w2v)
     trainer.train()
+    trainer.write_model()
     ```
     """
     def __init__(
@@ -57,11 +49,13 @@ class EmbeddingTrainer(object):
         Attributes:
             corpus_generator (:generator): the iterable corpus
             storage (:obj: `skills_ml.Store`): skills_ml Store object
-            _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             metadata (:dict): model metadata
             training_time (:str): training time
             batch_size (:int): batch size
             model_type (:str): 'word2vec' or 'doc2vec'
+            vocab_size_cumu (:list): record the number of vocab every batch for word2vec
+            _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
+            _lookup (:dict): dictionary for storing the training documents and keys for doc2vec
         """
         self.corpus_generator = corpus_generator
         self.training_time = datetime.today().isoformat()
@@ -71,20 +65,15 @@ class EmbeddingTrainer(object):
         self._model = model
         self._lookup = None
 
-    def train(self):
+    def train(self, *args, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
 
         Args:
             kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
         """
         if self.model_type == 'word2vec':
-            # if not self._model.wv.vocab:
-                # model = Word2VecModel(size=size, min_count=min_count, iter=iter, window=window, workers=workers, **kwargs)
-                # self.model
-            # else:
             if self._model.wv.vocab:
                 logging.info("Model has been trained")
-                # model = self._model
                 self.update = True
 
             batch_iter = 1
@@ -98,7 +87,7 @@ class EmbeddingTrainer(object):
                 else:
                     self._model.build_vocab(batch, update=True)
 
-                self._model.train(batch, total_examples=self._model.corpus_count, epochs=self._model.iter)
+                self._model.train(batch, total_examples=self._model.corpus_count, epochs=self._model.iter, *args, **kwargs)
                 self.vocab_size_cumu.append(len(self._model.wv.vocab))
                 batch_iter += 1
                 logging.info('\n')
@@ -107,7 +96,7 @@ class EmbeddingTrainer(object):
             corpus_gen = self.corpus_generator
             reiter_corpus_gen = Reiterable(corpus_gen)
             self._model.build_vocab(reiter_corpus_gen)
-            self._model.train(reiter_corpus_gen, total_examples=self._model.corpus_count, epochs=self._model.iter)
+            self._model.train(reiter_corpus_gen, total_examples=self._model.corpus_count, epochs=self._model.iter, *args, **kwargs)
             if self._model.lookup:
                 self._lookup = corpus_gen.lookup
 

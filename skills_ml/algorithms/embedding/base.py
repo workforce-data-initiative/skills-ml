@@ -67,7 +67,7 @@ class Word2VecModel(Word2Vec):
         model_name (str): name of the model to be used.
         """
         model_loaded = storage.load(model_name)
-        model = pickle.loads(model_loaded)
+        model = pickle.loads(model_loaded, **kwargs)
         return model
 
     def write_model(self, model_name=None):
@@ -143,7 +143,7 @@ class Doc2VecModel(Doc2Vec):
         model_name (str): name of the model to be used.
         """
         model_loaded = storage.load(model_name)
-        model = pickle.loads(model_loaded)
+        model = pickle.loads(model_loaded, **kwargs)
         return model
 
     def write_model(self, model_name=None):
