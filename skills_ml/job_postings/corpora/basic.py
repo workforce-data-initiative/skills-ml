@@ -6,7 +6,7 @@ from skills_utils.common import safe_get
 class CorpusCreator(object):
     """
         A base class for objects that convert common schema
-        job listings into a corpus suitable for use by
+        job listings into a corpus in documnet level suitable for use by
         machine learning algorithms or specific tasks.
 
     Example:
@@ -21,8 +21,6 @@ class CorpusCreator(object):
 
     # For getting a the raw job postings without any cleaning
     corpus = CorpusCreator(job_postings_generator, raw=True)
-
-    corpus = CorpusCreator(job_postings_generator)
     ```
 
 
@@ -33,13 +31,18 @@ class CorpusCreator(object):
                                 See sample_job_listing.json for an example of this schema
         document_schema_fields (list): an list of schema fields to be included
         raw (bool): a flag whether to return the raw documents or transformed documents
+
+    Yield:
+        (dict): a dictinary only with selected fields as keys and corresponding raw/cleaned value
     """
     def __init__(self, job_posting_generator=None, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
-                 filter_func=None, raw=False, major_groups=None):
+                 raw=False):
         self.job_posting_generator = job_posting_generator
         self.nlp = NLPTransforms()
         self.raw = raw
         self.document_schema_fields = document_schema_fields
+        self.join_spaces = ' '.join
+        self.key = ['onet_soc_code']
 
     @property
     def metadata(self):
@@ -65,12 +68,13 @@ class CorpusCreator(object):
             return self._clean(document)
 
     def _join(self, document):
-       return self.join_spaces([
-           document.get(field, '') for field in self.document_schema_fields
-       ])
+        return self.join_spaces([
+            document.get(field, '') for field in self.document_schema_fields
+        ])
 
     def __iter__(self):
         for document in self.job_posting_generator:
+            document = {key: document[key] for key in self.document_schema_fields}
             yield self._transform(document)
 
 
@@ -79,8 +83,6 @@ class SimpleCorpusCreator(CorpusCreator):
         An object that transforms job listing documents by picking
         important schema fields and returns them as one large lowercased string
     """
-    join_spaces = ' '.join
-
     def _clean(self, document):
         return self.join_spaces([
             self.nlp.lowercase_strip_punc(document.get(field, ''))
@@ -91,7 +93,7 @@ class SimpleCorpusCreator(CorpusCreator):
 class Doc2VecGensimCorpusCreator(CorpusCreator):
     """Corpus for training Gensim Doc2Vec
     An object that transforms job listing documents by picking
-    important schema fields and returns them as one large cleaned array of words
+    important schema fields and yields them as one large cleaned array of words
 
     Example:
     ```python
@@ -107,13 +109,10 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
         job_posting_generator (generator): a job posting generator
         document_schema_fields (list): an list of schema fields to be included
     """
-    join_spaces = ' '.join
-
     def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
         super().__init__(job_posting_generator, document_schema_fields)
         self.lookup = {}
         self.k = 0 if not self.lookup else max(self.lookup.keys()) + 1
-        self.key = ['onet_soc_code']
 
     def _clean(self, document):
         return self.join_spaces([
@@ -136,10 +135,8 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
 class Word2VecGensimCorpusCreator(CorpusCreator):
     """
         An object that transforms job listing documents by picking
-        important schema fields and returns them as one large cleaned array of words
+        important schema fields and yields them as one large cleaned array of words
     """
-    join_spaces = ' '.join
-
     def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
         super().__init__(job_posting_generator, document_schema_fields)
 
@@ -153,7 +150,7 @@ class Word2VecGensimCorpusCreator(CorpusCreator):
 class JobCategoryCorpusCreator(CorpusCreator):
     """
         An object that extract the label of each job listing document which could be onet soc code or
-        occupationalCategory and returns them as a lowercased string
+        occupationalCategory and yields them as a lowercased string
     """
     document_schema_fields = [
         'occupationalCategory']
@@ -163,3 +160,14 @@ class JobCategoryCorpusCreator(CorpusCreator):
             self.nlp.lowercase_strip_punc(document[field])
             for field in self.document_schema_fields
         ])
+
+
+class RawCorpusCreator(CorpusCreator):
+    """
+        An object that yields the joined raw string of job posting
+    """
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
+        super().__init__(job_posting_generator, document_schema_fields)
+
+    def _transform(self, document):
+        return self.join_spaces([document[field] for field in self.document_schema_fields])
