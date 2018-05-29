@@ -195,8 +195,8 @@ def test_BratExperiment_add_allocation():
 
 @mock_s3
 @mock_s3_deprecated
-class TestFlattenedAnnotations(unittest.TestCase):
-    def test_flattened_annotations(self):
+class TestSequenceTaggedAnnotations(unittest.TestCase):
+    def test_sequence_tagged_annotations(self):
         s3 = boto3.resource('s3')
         s3.create_bucket(Bucket='test-bucket')
 
@@ -205,98 +205,63 @@ class TestFlattenedAnnotations(unittest.TestCase):
             brat_s3_path='test-bucket/brat'
         )
 
-        annotations_by_unit = {}
-        annotations_by_unit['unit_1'] = {
-            '0': {
-                'user_1': [
-                    {'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling'}
+        tags = {
+            'user_1': {
+                'unit_1/0': [
+                    'O\t0\t4\tthis',
+                    'B-SKILL\t5\t7\tis',
+                    'O\t8\t14\tpython',
                 ],
-                'user_2': [
-                    {'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling'}
+                'unit_1/1': [
+                    'O\t0\t4\tthis',
+                    'O\t5\t7\tis',
+                    'B-SKILL\t8\t14\tpython',
                 ]
             },
-            '1': {
-                'user_1': [
-                    {'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming'},
-                    {'entity': 'Skill', 'start_index': 39, 'end_index': 65, 'labeled_string': 'substance abuse counseling'}
+            'user_2': {
+                'unit_1/0': [
+                    'O\t0\t4\tthis',
+                    'O\t5\t7\tis',
+                    'B-SKILL\t8\t14\tpython',
                 ],
-                'user_2': [
-                    {'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming'},
-                    {'entity': 'Skill', 'start_index': 49, 'end_index': 65, 'labeled_string': 'abuse counseling'}
-                ],
-            }
+                'unit_1/1': [
+                    'O\t0\t4\tthis',
+                    'O\t5\t7\tis',
+                    'B-SKILL\t8\t14\tpython',
+                ]
+            },
         }
-        experiment.annotations_by_unit = annotations_by_unit
         experiment.metadata['units'] = {
             'unit_1': [
                 (0, 'ABC_91238'),
                 (1, 'ABC_4823943'),
             ]
         }
-        experiment.metadata['sample_name'] = 'test-sample'
+        experiment.metadata['allocations'] = {}
+        for user_name, annotations in tags.items():
+            experiment.metadata['allocations'][user_name] = []
+            for key, token_lines in annotations.items():
+                unit_name, num = key.split('/')
+                if unit_name not in experiment.metadata['allocations'][user_name]:
+                    experiment.metadata['allocations'][user_name].append(unit_name)
+
+                base_path = '{}/{}'.format(experiment.user_allocations_path(user_name), key)
+                with experiment.s3.open('{}.txt'.format(base_path), 'wb') as f:
+                    f.write('does not matter we are not reading'.encode('utf-8'))
+                with experiment.s3.open('{}.ann'.format(base_path), 'wb') as f:
+                    f.write('does not matter we are not reading'.encode('utf-8'))
+                with experiment.s3.open('{}.conll'.format(base_path), 'wb') as f:
+                    f.write('\n'.join(token_lines).encode('utf-8'))
         experiment.metadata.save()
+
         self.maxDiff = None
-        expected_annotations = [
-            {
-                'entity': 'Skill',
-                'start_index': 44,
-                'end_index': 70,
-                'labeled_string': 'substance abuse counseling',
-                'job_posting_id': 'ABC_91238',
-                'sample_name': 'test-sample',
-                'tagger_id': md5('user_1'),
-            },
-            {
-                'entity': 'Skill',
-                'start_index': 44,
-                'end_index': 70,
-                'labeled_string': 'substance abuse counseling',
-                'job_posting_id': 'ABC_91238',
-                'sample_name': 'test-sample',
-                'tagger_id': md5('user_2'),
-            },
-            {
-                'entity': 'Skill',
-                'start_index': 16,
-                'end_index': 33,
-                'labeled_string': 'python programming',
-                'job_posting_id': 'ABC_4823943',
-                'sample_name': 'test-sample',
-                'tagger_id': md5('user_1'),
-            },
-            {
-                'entity': 'Skill',
-                'start_index': 39,
-                'end_index': 65,
-                'labeled_string': 'substance abuse counseling',
-                'job_posting_id': 'ABC_4823943',
-                'sample_name': 'test-sample',
-                'tagger_id': md5('user_1'),
-            },
-            {
-                'entity': 'Skill',
-                'start_index': 16,
-                'end_index': 33,
-                'labeled_string': 'python programming',
-                'job_posting_id': 'ABC_4823943',
-                'sample_name': 'test-sample',
-                'tagger_id': md5('user_2'),
-            },
-            {
-                'entity': 'Skill',
-                'start_index': 49,
-                'end_index': 65,
-                'labeled_string': 'abuse counseling',
-                'job_posting_id': 'ABC_4823943',
-                'sample_name': 'test-sample',
-                'tagger_id': md5('user_2'),
-            }
-        ]
-        for received, expected in zip(
-            experiment.flattened_annotations,
-            expected_annotations
-        ):
-            self.assertDictEqual(received, expected)
+        expected_tokens = {
+            ('ABC_91238', md5('user_1')): [('O', 'this'), ('B-SKILL', 'is'), ('O', 'python')],
+            ('ABC_91238', md5('user_2')): [('O', 'this'), ('O', 'is'), ('B-SKILL', 'python')],
+            ('ABC_4823943', md5('user_1')): [('O', 'this'), ('O', 'is'), ('B-SKILL', 'python')],
+            ('ABC_4823943', md5('user_2')): [('O', 'this'), ('O', 'is'), ('B-SKILL', 'python')],
+        }
+        self.assertDictEqual(experiment.sequence_tagged_annotations, expected_tokens)
 
 
 @mock_s3

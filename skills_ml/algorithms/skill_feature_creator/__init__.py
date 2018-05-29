@@ -56,7 +56,7 @@ class SequenceFeatureCreator(object):
             raise Exception(TypeError)
 
     def __iter__(self):
-        feature_objects = [FeatureFactory(self.sentence_tokenizer, self.word_tokenizer)._factory(feature_type) for feature_type in self.selected_features]
+        feature_objects = [FeatureFactory(self.sentence_tokenizer, self.word_tokenizer).factory(feature_type) for feature_type in self.selected_features]
         for doc in self.job_posting_generator:
 
             feature_generator_map = map(lambda feature: feature.output(doc), feature_objects)
@@ -75,7 +75,7 @@ class FeatureFactory(object):
         self.sentence_tokenizer = sentence_tokenizer
         self.word_tokenizer = word_tokenizer
 
-    def _factory(self, feature_type, **kwargs):
+    def factory(self, feature_type, **kwargs):
         for feature_object in FeatureFactory.__subclasses__():
             if feature_object.__name__ == feature_type:
                 return feature_object(self.sentence_tokenizer, self.word_tokenizer)
