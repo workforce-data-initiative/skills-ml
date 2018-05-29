@@ -1,14 +1,13 @@
 """Embedding model class inherited the interface from gensim"""
-from skills_ml.storage import Store, FSStore
-from skills_ml.algorithms.embedding.base import Base2VecModel
+from skills_ml.storage import FSStore
+from skills_ml.algorithms.embedding.base import ModelStorage
 
 from gensim.models import Doc2Vec, Word2Vec
 
 import numpy as np
-import pickle
 import logging
 
-class Word2VecModel(Word2Vec, Base2VecModel):
+class Word2VecModel(ModelStorage, Word2Vec):
     """The Word2VecModel Object is a base object which specifies which word-embeding model.
 
     Example:
@@ -18,48 +17,16 @@ class Word2VecModel(Word2Vec, Base2VecModel):
     word2vec_model = Word2VecModel()
     ```
     """
-    def __init__(self, storage=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         Attributes:
             storage (:obj: `skills_ml.Store`): skills_ml Store object
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
         """
-        super().__init__(*args, **kwargs)
-        self._storage = FSStore() if storage is None else storage
+        ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
+        Word2Vec.__init__(self, *args, **kwargs)
         self.model_name = None
         self._metadata = None
-
-    @property
-    def storage(self):
-        return self._storage
-
-    @storage.setter
-    def storage(self, value):
-        if hasattr(value, 'write') and hasattr(value, 'load'):
-            self._storage = value
-        else:
-            raise Exception(f"{value} should have methods 'write()' and 'load()'")
-
-    @classmethod
-    def load_model(cls, storage, model_name, **kwargs):
-        """The method to load the model from where Storage object specified
-
-        model_name (str): name of the model to be used.
-        """
-        model_loaded = storage.load(model_name)
-        model = pickle.loads(model_loaded, **kwargs)
-        return model
-
-    def write_model(self, model_name=None):
-        """The method to write the model to where the Storage object specified
-
-        model_name (str): name of the model to be used.
-        """
-        if model_name is None:
-            model_name = self.model_name
-
-        model_pickled = pickle.dumps(self)
-        self.storage.write(model_pickled, model_name)
 
     def infer_vector(self, doc_words):
         """
@@ -80,7 +47,7 @@ class Word2VecModel(Word2Vec, Base2VecModel):
         return sentence_vector
 
 
-class Doc2VecModel(Doc2Vec, Base2VecModel):
+class Doc2VecModel(ModelStorage, Doc2Vec):
     """The Doc2VecModel Object is a base object which specifies which word-embeding model.
 
     Example:
@@ -90,7 +57,7 @@ class Doc2VecModel(Doc2Vec, Base2VecModel):
     doc2vec_model = Doc2VecModel()
     ```
     """
-    def __init__(self, storage=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         Attributes:
             storage (:obj: `skills_ml.Store`): skills_ml Store object
@@ -99,39 +66,7 @@ class Doc2VecModel(Doc2Vec, Base2VecModel):
             training_data (np.ndarray): a document vector array where each row is a document vector.
             target (np.ndarray): a label array.
         """
-        super().__init__(*args, **kwargs)
-        self._storage = FSStore() if storage is None else storage
+        ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
+        Doc2Vec.__init__(self, *args, **kwargs)
         self.model_name = None
         self.lookup_dict = None
-
-    @property
-    def storage(self):
-        return self._storage
-
-    @storage.setter
-    def storage(self, value):
-        if value.__class__.__name__ in [c.__name__ for c in Store.__subclasses__()]:
-            self._storage = value
-        else:
-            raise Exception(f"{value} is not Store Object")
-
-    @classmethod
-    def load_model(cls, storage, model_name, **kwargs):
-        """The method to load the model from where Storage object specified
-
-        model_name (str): name of the model to be used.
-        """
-        model_loaded = storage.load(model_name)
-        model = pickle.loads(model_loaded, **kwargs)
-        return model
-
-    def write_model(self, model_name=None):
-        """The method to write the model to where the Storage object specified
-
-        model_name (str): name of the model to be used.
-        """
-        if model_name is None:
-            model_name = self.model_name
-
-        model_pickled = pickle.dumps(self)
-        self.storage.write(model_pickled, model_name)

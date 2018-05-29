@@ -39,7 +39,7 @@ class EmbeddingTrainer(object):
     w2v = Word2VecModel(storage=FSStore(path='/tmp'), size=10, min_count=3, iter=4, window=6, workers=3)
     trainer = EmbeddingTrainer(corpus_generator, w2v)
     trainer.train()
-    trainer.write_model()
+    trainer.save()
     ```
     """
     def __init__(
@@ -104,12 +104,13 @@ class EmbeddingTrainer(object):
         self._model.metadata = self.metadata
         self._model.model_name = self.model_name
 
-    def write_model(self, storage=None):
+    def save_model(self, storage=None):
         if storage is None:
-            self._model.write_model(self.model_name)
+            self._model.save(self.model_name)
         else:
             self._model.storage = storage
-            self._model.write_model(self.model_name)
+            self._model.save(self.model_name)
+        logging.info(f"{self.model_name} has been saved.")
 
     @property
     def model_type(self):

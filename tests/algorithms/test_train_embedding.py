@@ -34,7 +34,7 @@ class TestTrainEmbedding(unittest.TestCase):
 
         trainer = EmbeddingTrainer(corpus_generator, d2v)
         trainer.train(lookup=True)
-        trainer.write_model()
+        trainer.save_model()
 
         vocab_size = len(d2v.wv.vocab.keys())
         s3 = s3fs.S3FileSystem()
@@ -44,19 +44,19 @@ class TestTrainEmbedding(unittest.TestCase):
         self.assertDictEqual(trainer.lookup_dict, d2v.lookup_dict)
 
         # Save as different name
-        d2v.write_model('other_name.model')
+        d2v.save('other_name.model')
 
         s3 = s3fs.S3FileSystem()
         files = [f.split('/')[-1] for f in s3.ls(s3_path)]
         assert set(files) == set([trainer.model_name, 'other_name.model'])
 
         # Load
-        d2v_loaded = Doc2VecModel.load_model(s3_storage, trainer.model_name)
+        d2v_loaded = Doc2VecModel.load(s3_storage, trainer.model_name)
         self.assertDictEqual(d2v_loaded.metadata, trainer.metadata)
 
         # Change the store directory
         new_s3_path = "s3://fake-open-skills/model_cache/embedding/other_directory"
-        trainer.write_model(S3Store(new_s3_path))
+        trainer.save_model(S3Store(new_s3_path))
         s3 = s3fs.S3FileSystem()
         files = [f.split('/')[-1] for f in s3.ls(new_s3_path)]
         assert set(files) == set([trainer.model_name])
@@ -75,7 +75,7 @@ class TestTrainEmbedding(unittest.TestCase):
 
         trainer = EmbeddingTrainer(corpus_generator, w2v)
         trainer.train()
-        trainer.write_model()
+        trainer.save_model()
 
         vocab_size = len(w2v.wv.vocab.keys())
 
@@ -88,11 +88,11 @@ class TestTrainEmbedding(unittest.TestCase):
         job_postings_generator = JobPostingCollectionSample(num_records=50)
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
 
-        w2v_loaded = Word2VecModel.load_model(s3_storage, w2v.model_name)
+        w2v_loaded = Word2VecModel.load(s3_storage, w2v.model_name)
 
         new_trainer = EmbeddingTrainer(corpus_generator, w2v_loaded)
         new_trainer.train()
-        new_trainer.write_model()
+        new_trainer.save_model()
 
         new_vocab_size = len(w2v_loaded.wv.vocab.keys())
 
@@ -103,7 +103,7 @@ class TestTrainEmbedding(unittest.TestCase):
         assert vocab_size <= new_vocab_size
 
         # Save as different name
-        w2v.write_model('other_name.model')
+        w2v.save('other_name.model')
 
         s3 = s3fs.S3FileSystem()
         files = [f.split('/')[-1] for f in s3.ls(s3_path)]
@@ -111,7 +111,7 @@ class TestTrainEmbedding(unittest.TestCase):
 
         # Change the store directory
         new_s3_path = "s3://fake-open-skills/model_cache/embedding/other_directory"
-        new_trainer.write_model(S3Store(new_s3_path))
+        new_trainer.save_model(S3Store(new_s3_path))
         s3 = s3fs.S3FileSystem()
         files = [f.split('/')[-1] for f in s3.ls(new_s3_path)]
         assert set(files) == set([new_trainer.model_name])
@@ -129,7 +129,7 @@ class TestTrainEmbedding(unittest.TestCase):
 
             trainer = EmbeddingTrainer(corpus_generator, d2v)
             trainer.train(lookup=True)
-            trainer.write_model()
+            trainer.save_model()
 
             vocab_size = len(d2v.wv.vocab.keys())
             assert d2v.model_name == trainer.model_name
@@ -137,16 +137,16 @@ class TestTrainEmbedding(unittest.TestCase):
             self.assertDictEqual(trainer.lookup_dict, d2v.lookup_dict)
 
             # Save as different name
-            d2v.write_model('other_name.model')
+            d2v.save('other_name.model')
             assert set(os.listdir(os.getcwd())) == set([trainer.model_name, 'other_name.model'])
 
             # Load
-            d2v_loaded = Doc2VecModel.load_model(FSStore(td), trainer.model_name)
+            d2v_loaded = Doc2VecModel.load(FSStore(td), trainer.model_name)
             self.assertDictEqual(d2v_loaded.metadata, trainer.metadata)
 
             # Change the store directory
             new_path = os.path.join(td, 'other_directory')
-            trainer.write_model(FSStore(new_path))
+            trainer.save_model(FSStore(new_path))
             assert set(os.listdir(new_path)) == set([trainer.model_name])
 
     @mock.patch('os.getcwd')
@@ -161,7 +161,7 @@ class TestTrainEmbedding(unittest.TestCase):
 
             trainer = EmbeddingTrainer(corpus_generator, w2v)
             trainer.train()
-            trainer.write_model()
+            trainer.save_model()
 
             vocab_size = len(w2v.wv.vocab.keys())
 
@@ -172,11 +172,11 @@ class TestTrainEmbedding(unittest.TestCase):
             job_postings_generator = JobPostingCollectionSample(num_records=50)
             corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
 
-            w2v_loaded = Word2VecModel.load_model(FSStore(td), w2v.model_name)
+            w2v_loaded = Word2VecModel.load(FSStore(td), w2v.model_name)
 
             new_trainer = EmbeddingTrainer(corpus_generator, w2v_loaded)
             new_trainer.train()
-            new_trainer.write_model()
+            new_trainer.save_model()
 
             new_vocab_size = len(w2v_loaded.wv.vocab.keys())
 
@@ -185,10 +185,10 @@ class TestTrainEmbedding(unittest.TestCase):
             assert vocab_size <= new_vocab_size
 
             # Save as different name
-            w2v.write_model('other_name.model')
+            w2v.save('other_name.model')
             assert set(os.listdir(os.getcwd())) == set([trainer.model_name, new_trainer.model_name, 'other_name.model'])
 
             # Change the store directory
             new_path = os.path.join(td, 'other_directory')
-            new_trainer.write_model(FSStore(new_path))
+            new_trainer.save_model(FSStore(new_path))
             assert set(os.listdir(new_path)) == set([new_trainer.model_name])
