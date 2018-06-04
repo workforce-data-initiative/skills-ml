@@ -7,7 +7,7 @@ pytest==3.6.0
 PyYAML==3.12
 Elasticsearch==6.2.0
 gensim==3.2.0 # pyup: ignore
-annoy==1.11.5
+annoy==1.12.0
 unicodecsv==0.14.1
 us==1.0.0
 Sqlalchemy==1.2.7
