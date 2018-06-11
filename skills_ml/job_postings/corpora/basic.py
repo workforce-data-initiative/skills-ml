@@ -63,7 +63,7 @@ class CorpusCreator(object):
 
     def _transform(self, document):
         if self.raw:
-            return document
+            return self._join(document)
         else:
             return self._clean(document)
 
@@ -109,8 +109,8 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
         job_posting_generator (generator): a job posting generator
         document_schema_fields (list): an list of schema fields to be included
     """
-    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
-        super().__init__(job_posting_generator, document_schema_fields)
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'], *args, **kwargs):
+        super().__init__(job_posting_generator, document_schema_fields, *args, **kwargs)
         self.lookup = {}
         self.k = 0 if not self.lookup else max(self.lookup.keys()) + 1
 
@@ -137,15 +137,27 @@ class Word2VecGensimCorpusCreator(CorpusCreator):
         An object that transforms job listing documents by picking
         important schema fields and yields them as one large cleaned array of words
     """
-    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
-        super().__init__(job_posting_generator, document_schema_fields)
+    def __init__(self, job_posting_generator, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'], *args, **kwargs):
+        super().__init__(job_posting_generator, document_schema_fields, *args, **kwargs)
 
     def _clean(self, document):
         return self.join_spaces([
             self.nlp.clean_str(document[field])
             for field in self.document_schema_fields
-        ]).split()
+        ])
 
+    def _transform(self, document):
+        if self.raw:
+            return [self.nlp.word_tokenize(s) for s in self.nlp.sentence_tokenize(self._join(document))]
+        else:
+            return [self.nlp.word_tokenize(s) for s in self.nlp.sentence_tokenize(self._clean(document))]
+
+    def __iter__(self):
+        for document in self.job_posting_generator:
+            document = {key: document[key] for key in self.document_schema_fields}
+            sentences = self._transform(document)
+            for sentence in sentences:
+                yield sentence
 
 class JobCategoryCorpusCreator(CorpusCreator):
     """
