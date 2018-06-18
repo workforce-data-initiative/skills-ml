@@ -5,6 +5,7 @@ from skills_ml.algorithms.skill_feature_creator.contextual_features import sent2
 from abc import ABC, abstractmethod
 import numpy as np
 import nltk
+import logging
 
 from functools import reduce
 from itertools import zip_longest
@@ -17,7 +18,7 @@ class SequenceFeatureCreator(object):
     Example:
         from skills_ml.algorithms.skill_feature_creator import FeatureCreator
 
-        feature_vector_generator = FeatureCreator(job_posting_generator, features=)
+        feature_vector_generator = FeatureCreator(job_posting_generator)
         feature_vector_generator = FeatureCreator(job_posting_generator, features=["StructuralFeature", "EmbeddingFeature"])
 
     Args:
@@ -33,30 +34,38 @@ class SequenceFeatureCreator(object):
     def __init__(
             self,
             job_posting_generator,
-            sentence_tokenizer=NLPTransforms().sentence_tokenize,
-            word_tokenizer=NLPTransforms().word_tokenize,
-            features=None):
+            sentence_tokenizer=None,
+            word_tokenizer=None,
+            features=None,
+            embedding_model=None):
         self.all_features = [ f.__name__ for f in FeatureFactory.__subclasses__()]
         self.features = features
         self.job_posting_generator = job_posting_generator
-        self.sentence_tokenizer = sentence_tokenizer
-        self.word_tokenizer = word_tokenizer
+        self.sentence_tokenizer = NLPTransforms().sentence_tokenize if sentence_tokenizer is None else sentence_tokenizer
+        self.word_tokenizer = NLPTransforms().word_tokenize if word_tokenizer is None else word_tokenizer
+        self.embedding_model = embedding_model
 
     @property
     def selected_features(self):
         if self.features is None:
-            return self.all_features
+            selected_features = self.all_features
         elif isinstance(self.features, list):
             if not (set(self.features) < set(self.all_features)):
                 not_supported = list(set(self.features) - set(self.all_features))
                 raise TypeError("\"{}\" not supported!".format(", ".join(not_supported)))
             else:
-                return self.features
+                selected_features = self.features
         else:
             raise Exception(TypeError)
 
+        if "EmbeddingFeature" in selected_features and self.embedding_model is None:
+            logging.warning("No any embedding model provided!")
+            selected_features.remove("EmbeddingFeature")
+
+        return selected_features
+
     def __iter__(self):
-        feature_objects = [FeatureFactory(self.sentence_tokenizer, self.word_tokenizer).factory(feature_type) for feature_type in self.selected_features]
+        feature_objects = [FeatureFactory(self.sentence_tokenizer, self.word_tokenizer, embedding_model=self.embedding_model).factory(feature_type) for feature_type in self.selected_features]
         for doc in self.job_posting_generator:
 
             feature_generator_map = map(lambda feature: feature.output(doc), feature_objects)
@@ -71,15 +80,18 @@ class SequenceFeatureCreator(object):
 
 
 class FeatureFactory(object):
-    def __init__(self, sentence_tokenizer=None, word_tokenizer=None):
+    def __init__(self, sentence_tokenizer=None, word_tokenizer=None, **kwargs):
         self.sentence_tokenizer = sentence_tokenizer
         self.word_tokenizer = word_tokenizer
+        self.embedding_model = kwargs['embedding_model'] if 'embedding_model' in kwargs else None
 
     def factory(self, feature_type, **kwargs):
         for feature_object in FeatureFactory.__subclasses__():
             if feature_object.__name__ == feature_type:
-                return feature_object(self.sentence_tokenizer, self.word_tokenizer)
-
+                if feature_type == "EmbeddingFeature":
+                    return feature_object(self.sentence_tokenizer, self.word_tokenizer, embedding_model=self.embedding_model)
+                else:
+                    return feature_object(self.sentence_tokenizer, self.word_tokenizer)
         raise ValueError('Bad feature type \"{}\"'.format(feature_type))
 
 
@@ -128,3 +140,23 @@ class ContextualFeature(FeatureFactory, BaseFeature):
         contextfeaures = self.build_feature(doc)
         for f in contextfeaures:
             yield np.array(f).astype(np.float32)
+
+
+class EmbeddingFeature(FeatureFactory, BaseFeature):
+    """ Embedding Feature
+    """
+    # def __init__(self):
+    #     super().__init__()
+
+    def build_feature(self, doc):
+        sentences = self.sentence_tokenizer(doc)
+        features = [[self.embedding_model.wv[w] for w in self.word_tokenizer(s)] for s in sentences]
+        return features
+
+    def output(self, doc):
+        embeddingfeatures = self.build_feature(doc)
+        for f in embeddingfeatures:
+            yield np.array(f).astype(np.float32)
+
+
+

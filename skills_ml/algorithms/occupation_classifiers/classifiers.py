@@ -6,7 +6,7 @@ import filelock
 
 from gensim.similarities.index import AnnoyIndexer
 
-from skills_ml.algorithms.embedding import base
+from skills_ml.algorithms.embedding import models
 from skills_utils.s3 import download, split_s3_path, list_files
 
 
@@ -80,7 +80,7 @@ class Classifier(object):
         return self.classifier.predict_soc(jobposting, **(self.classify_kwargs))
 
 
-class NearestNeighbors(base.Doc2VecModel):
+class NearestNeighbors(models.Doc2VecModel):
     """Nearest neightbors model to classify the jobposting data into soc code.
     If the indexer is passed, then NearestNeighbors will use approximate nearest
     neighbor approach which is much faster than the built-in knn in gensim.
