@@ -77,7 +77,7 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
             # KNNDoc2VecClassifier only supports doc2vec now
             self.assertRaises(NotImplementedError, lambda: KNNDoc2VecClassifier(Word2VecModel()))
 
-            doc = docs.split(',')[0]
+            doc = docs.split(',')[0].split()
 
             knn = KNNDoc2VecClassifier(embedding_model=d2v, k=0)
             self.assertRaises(ValueError, lambda: knn.predict_soc(doc))
@@ -121,7 +121,7 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
         # KNNDoc2VecClassifier only supports doc2vec now
         self.assertRaises(NotImplementedError, lambda: KNNDoc2VecClassifier(Word2VecModel()))
 
-        doc = docs.split(',')[0]
+        doc = docs.split(',')[0].split()
 
         knn = KNNDoc2VecClassifier(embedding_model=d2v, k=0)
         self.assertRaises(ValueError, lambda: knn.predict_soc(doc))

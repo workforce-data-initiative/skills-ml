@@ -11,6 +11,7 @@ import pickle
 class SocClassifier(object):
     """ Interface of SOC Code Classifier.
     """
+
     def __init__(self, classifier):
         self.classifier = classifier
 
@@ -25,6 +26,7 @@ class KNNDoc2VecClassifier(ModelStorage):
 
     Attributes:
         embedding_model (:job: `skills_ml.algorithms.embedding.models.Doc2VecModel`): Doc2Vec embedding model
+        k (int): num of nearest neighbors
         indexer (:obj: `gensim.similarities.index`): any kind of gensim compatible indexer
     """
     def __init__(self, embedding_model, k=1, indexer=None, **kwargs):
@@ -43,17 +45,20 @@ class KNNDoc2VecClassifier(ModelStorage):
         processes may share the same data. For our purpose, it is used to find similarity between words or
         documents in a vector space.
 
+        Args:
+            num_trees (int): A positive integer which effects the build time and the index size.
+                             A larger value will give more accurate results, but larger indexes.
+                             (https://github.com/spotify/annoy)
         Returns:
             Annoy index object
         """
-
         logging.info('indexing the model %s', self.model_name)
         self.model.init_sims()
         annoy_index = AnnoyIndexer(self.model, num_trees)
         self.indexer = annoy_index
         return annoy_index
 
-    def predict_soc(self, documents):
+    def predict_soc(self, tokenized_list):
         """The method to predict the soc code a job posting belongs to.
 
         Args:
@@ -64,7 +69,7 @@ class KNNDoc2VecClassifier(ModelStorage):
         Returns:
             tuple(str, float): The predicted soc code and cosine similarity.
         """
-        inferred_vector = self.model.infer_vector(documents.split())
+        inferred_vector = self.model.infer_vector(tokenized_list)
         if self.k == 1:
             sims = self.model.docvecs.most_similar([inferred_vector], topn=1, indexer=self.indexer)
             resultlist = list(map(lambda l: (self.model.lookup_dict[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
