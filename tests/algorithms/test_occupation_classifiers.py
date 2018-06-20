@@ -1,4 +1,4 @@
-from skills_ml.algorithms.occupation_classifiers.classifiers import KNNDoc2VecClassifier
+from skills_ml.algorithms.occupation_classifiers.classifiers import KNNDoc2VecClassifier, SocClassifier
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel
 from skills_ml.storage import S3Store, FSStore
@@ -49,7 +49,7 @@ def get_corpus(num):
 
 
 class FakeCorpusGenerator(object):
-    def __init__(self , num=15):
+    def __init__(self , num=25):
         self.num = num
         self.lookup = {}
     def __iter__(self):
@@ -76,13 +76,17 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
 
             # KNNDoc2VecClassifier only supports doc2vec now
             self.assertRaises(NotImplementedError, lambda: KNNDoc2VecClassifier(Word2VecModel()))
-            knn = KNNDoc2VecClassifier(d2v)
 
             doc = docs.split(',')[0]
 
-            assert knn.predict_soc(doc)[0] == '29-2061.00'
-            assert knn.predict_soc(doc, 5)[0] == '29-2061.00'
-            self.assertRaises(ValueError, lambda: knn.predict_soc(doc, 0))
+            knn = KNNDoc2VecClassifier(embedding_model=d2v, k=0)
+            self.assertRaises(ValueError, lambda: knn.predict_soc(doc))
+
+            knn = KNNDoc2VecClassifier(embedding_model=d2v, k=1)
+            soc_cls = SocClassifier(knn)
+
+            assert knn.predict_soc(doc)[0] == soc_cls.predict_soc(doc)[0]
+
 
             # Build Annoy index
             knn.build_ann_indexer(num_trees=5)
@@ -97,7 +101,6 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
             new_knn = KNNDoc2VecClassifier.load(FSStore(td), knn.model_name)
             assert new_knn.model_name ==  knn.model_name
             assert new_knn.predict_soc(doc)[0] == '29-2061.00'
-            assert new_knn.predict_soc(doc, 5)[0] == '29-2061.00'
 
             # Have to re-build the index whenever ones load the knn model to the memory
             assert new_knn.indexer == None
@@ -117,13 +120,17 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
 
         # KNNDoc2VecClassifier only supports doc2vec now
         self.assertRaises(NotImplementedError, lambda: KNNDoc2VecClassifier(Word2VecModel()))
-        knn = KNNDoc2VecClassifier(d2v)
 
         doc = docs.split(',')[0]
 
-        assert knn.predict_soc(doc)[0] == '29-2061.00'
-        assert knn.predict_soc(doc, 5)[0] == '29-2061.00'
-        self.assertRaises(ValueError, lambda: knn.predict_soc(doc, 0))
+        knn = KNNDoc2VecClassifier(embedding_model=d2v, k=0)
+        self.assertRaises(ValueError, lambda: knn.predict_soc(doc))
+
+        knn = KNNDoc2VecClassifier(embedding_model=d2v, k=10)
+        soc_cls = SocClassifier(knn)
+
+        assert knn.predict_soc(doc)[0] == soc_cls.predict_soc(doc)[0]
+
 
         # Build Annoy index
         knn.build_ann_indexer(num_trees=5)
@@ -139,7 +146,6 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
         new_knn = KNNDoc2VecClassifier.load(s3_storage, knn.model_name)
         assert new_knn.model_name ==  knn.model_name
         assert new_knn.predict_soc(doc)[0] == '29-2061.00'
-        assert new_knn.predict_soc(doc, 5)[0] == '29-2061.00'
 
         # Have to re-build the index whenever ones load the knn model to the memory
         assert new_knn.indexer == None

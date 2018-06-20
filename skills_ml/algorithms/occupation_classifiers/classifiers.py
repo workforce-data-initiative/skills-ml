@@ -8,6 +8,16 @@ from collections import Counter, defaultdict
 import pickle
 
 
+class SocClassifier(object):
+    """ Interface of SOC Code Classifier.
+    """
+    def __init__(self, classifier):
+        self.classifier = classifier
+
+    def predict_soc(self, tokenized_list):
+        return self.classifier.predict_soc(tokenized_list)
+
+
 class KNNDoc2VecClassifier(ModelStorage):
     """Nearest neightbors model to classify the jobposting data into soc code.
     If the indexer is passed, then NearestNeighbors will use approximate nearest
@@ -17,7 +27,7 @@ class KNNDoc2VecClassifier(ModelStorage):
         embedding_model (:job: `skills_ml.algorithms.embedding.models.Doc2VecModel`): Doc2Vec embedding model
         indexer (:obj: `gensim.similarities.index`): any kind of gensim compatible indexer
     """
-    def __init__(self, embedding_model, indexer=None, **kwargs):
+    def __init__(self, embedding_model, k=1, indexer=None, **kwargs):
         if not isinstance(embedding_model, Doc2VecModel):
             raise NotImplementedError("Only support doc2vec now.")
 
@@ -25,6 +35,7 @@ class KNNDoc2VecClassifier(ModelStorage):
         self.model = embedding_model
         self.model_name = "knn_cls_" + self.model.model_name
         self.indexer = indexer
+        self.k = k
 
     def build_ann_indexer(self, num_trees=100):
         """ Annoy is an open source library to search for points in space that are close to a given query point.
@@ -42,7 +53,7 @@ class KNNDoc2VecClassifier(ModelStorage):
         self.indexer = annoy_index
         return annoy_index
 
-    def predict_soc(self, tokenized_list, k=1):
+    def predict_soc(self, documents):
         """The method to predict the soc code a job posting belongs to.
 
         Args:
@@ -53,13 +64,13 @@ class KNNDoc2VecClassifier(ModelStorage):
         Returns:
             tuple(str, float): The predicted soc code and cosine similarity.
         """
-        inferred_vector = self.model.infer_vector(tokenized_list)
-        if k == 1:
+        inferred_vector = self.model.infer_vector(documents.split())
+        if self.k == 1:
             sims = self.model.docvecs.most_similar([inferred_vector], topn=1, indexer=self.indexer)
             resultlist = list(map(lambda l: (self.model.lookup_dict[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
             predicted_soc = resultlist[0]
-        elif k > 1:
-            sims = self.model.docvecs.most_similar([inferred_vector], topn=k, indexer=self.indexer)
+        elif self.k > 1:
+            sims = self.model.docvecs.most_similar([inferred_vector], topn=self.k, indexer=self.indexer)
             resultlist = list(map(lambda l: (self.model.lookup_dict[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
             most_common = Counter([r[0] for r in resultlist]).most_common()[0]
             resultdict = defaultdict(list)
