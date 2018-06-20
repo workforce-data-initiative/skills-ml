@@ -2,20 +2,19 @@
 import logging
 import pandas as pd
 import textwrap
-from skills_utils.time import quarter_to_daterange, dates_in_range
 
-def df_for_properties_and_dates(computed_properties, dates):
-    """Assemble a dataframe with the raw data from many computed properties and dates
+
+def df_for_properties_and_keys(computed_properties, keys):
+    """Assemble a dataframe with the raw data from many computed properties and keys
 
     Args:
         computed_properties (list of JobPostingComputedProperty)
-        dates (list of datetime.date objects)
+        keys (list of strs)
 
     Returns: pandas.DataFrame
     """
-    datestrings = [date.strftime("%Y-%m-%d") for date in dates]
     dataframes = [
-        computed_property.df_for_dates(datestrings)
+        computed_property.df_for_keys(keys)
         for computed_property in computed_properties
     ]
     return dataframes[0].join(dataframes[1:])
@@ -99,13 +98,13 @@ def validate_aggregate_functions(aggregate_properties, aggregate_functions):
     logging.info('Validation complete')
 
 
-def aggregation_for_properties_and_dates(
+def aggregation_for_properties_and_keys(
     grouping_properties,
     aggregate_properties,
     aggregate_functions,
-    dates
+    keys
 ):
-    """Assemble an aggregation dataframe for given dates
+    """Assemble an aggregation dataframe for given partition keys
 
     Args:
         grouping_properties (list of JobPostingComputedProperty)
@@ -114,13 +113,13 @@ def aggregation_for_properties_and_dates(
             Properties to be aggregated over the primary key
         aggregate_functions (dict) A lookup of aggregate functions
             to be applied for each aggregate column
-        dates (list of datetime.date) The desired dates for the aggregation to cover
+        keys (list of str) The desired partition keys for the aggregation to cover
 
     Returns: pandas.DataFrame indexed on the grouping properties,
-        covering all data from the given dates
+        covering all data from the given keys
     """
     validate_aggregate_functions(aggregate_properties, aggregate_functions)
-    big_df = df_for_properties_and_dates(grouping_properties + aggregate_properties, dates)
+    big_df = df_for_properties_and_keys(grouping_properties + aggregate_properties, keys)
     grouping_column_lists = [p.property_columns for p in grouping_properties]
     grouping_column_names = [col.name for collist in grouping_column_lists for col in collist]
     aggregation = big_df.groupby(grouping_column_names).agg(aggregate_functions)
@@ -140,18 +139,18 @@ def aggregation_for_properties_and_dates(
     return aggregation
 
 
-def aggregate_properties_for_quarter(
-    quarter,
+def aggregate_properties(
+    out_filename,
     grouping_properties,
     aggregate_properties,
     aggregate_functions,
     storage,
     aggregation_name
 ):
-    """Aggregate computed properties for a quarter and writes the resulting CSV to S3
+    """Aggregate computed properties and stores the resulting CSV
 
     Args:
-        quarter (string)
+        out_filename (string) The desired filename (without path) for the .csv
         grouping_properties (list of JobPostingComputedProperty)
             Properties to form the primary key of the aggregation
         aggregate_properties (list of JobPostingComputedProperty)
@@ -163,18 +162,20 @@ def aggregate_properties_for_quarter(
 
     Returns: nothing
     """
-    start_date, end_date = quarter_to_daterange(quarter)
-    included_dates = [date for date in dates_in_range(start_date, end_date)]
-    aggregation_df = aggregation_for_properties_and_dates(
+    all_keys = set()
+    for computed_property in grouping_properties:
+        all_keys = all_keys | set(computed_property.cache_keys())
+
+    aggregation_df = aggregation_for_properties_and_keys(
         grouping_properties,
         aggregate_properties,
         aggregate_functions,
-        included_dates
+        list(all_keys)
     )
 
     out_path = '/'.join([
         aggregation_name,
-        quarter + '.csv'
+        out_filename + '.csv'
     ])
     storage.write(aggregation_df.to_csv(None).encode(), out_path)
 

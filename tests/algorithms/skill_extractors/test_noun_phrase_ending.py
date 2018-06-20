@@ -49,11 +49,12 @@ Primary Location-City Bristol
 Primary Location-State CT
 Primary Location-Country US
 Auto req ID 274081BR"""
+posting_object = {'description': posting_string}
 
 
 def test_counts_skill_pattern_extractor():
     extractor = SkillEndingPatternExtractor()
-    counts = extractor.document_skill_counts(posting_string)
+    counts = extractor.document_skill_counts(posting_object)
     assert counts == {
         'strong analytical skills': 1,
         'strong communication skills': 1
@@ -61,8 +62,7 @@ def test_counts_skill_pattern_extractor():
 
 def test_candidates_skill_pattern_extractor():
     extractor = SkillEndingPatternExtractor()
-    job_posting = namedtuple('JobPosting', ['text'])(text=posting_string)
-    candidate_skills = sorted([cs for cs in extractor.candidate_skills(job_posting)], key=lambda x: x.matched_skill)
+    candidate_skills = sorted([cs for cs in extractor.candidate_skills(posting_object)], key=lambda x: x.matched_skill)
     assert candidate_skills[0].matched_skill == 'strong analytical skills'
     assert candidate_skills[0].context == '* Must have strong analytical skills using Omniture, Google Analytics or related products'
     assert candidate_skills[1].matched_skill == 'strong communication skills'
@@ -70,7 +70,7 @@ def test_candidates_skill_pattern_extractor():
 
 def test_counts_skill_pattern_extractor_not_just_bullets():
     extractor = SkillEndingPatternExtractor(only_bulleted_lines=False)
-    counts = extractor.document_skill_counts(posting_string)
+    counts = extractor.document_skill_counts(posting_object)
     assert counts == {
         'strong analytical skills': 1,
         'strong communication skills': 1,
@@ -79,7 +79,7 @@ def test_counts_skill_pattern_extractor_not_just_bullets():
 
 def test_counts_ability_pattern_extractor_not_just_bullets():
     extractor = AbilityEndingPatternExtractor(only_bulleted_lines=False)
-    counts = extractor.document_skill_counts(posting_string)
+    counts = extractor.document_skill_counts(posting_object)
     assert counts == {
         'deductive reasoning ability': 1,
     }

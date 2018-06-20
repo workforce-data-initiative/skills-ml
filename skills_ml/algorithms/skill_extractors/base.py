@@ -1,19 +1,29 @@
 """Base classes for skill extraction"""
-import json
 import logging
-import re
 from abc import ABCMeta, abstractmethod
 
-import nltk
+from collections import Counter
 
-from descriptors import cachedproperty
 
 from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
+from typing import Dict, Callable, Text, Generator
+
 
 class CandidateSkill(object):
-    def __init__(self, skill_name, matched_skill, context, confidence):
+    def __init__(self, skill_name: Text, matched_skill: Text, context: Text, confidence: float):
+        """An object holding a text snippet that may be a skill/competency.
+
+        Does not hold all needed contextual metadata about the document (like job posting id).
+        This is expected to be managed by the caller.
+
+        Args:
+            skill_name (string) The skill found in the text
+            matched_skill (string) The matching skill in some reference ontology.
+            context (string) The skill_name with surrounding context in the document.
+            confidence (float) How sure the skill extractor is that this is a skill (range 0-1)
+        """
         self.skill_name = skill_name
         self.matched_skill = matched_skill
         if isinstance(self.matched_skill, (bytes, bytearray)):
@@ -22,83 +32,118 @@ class CandidateSkill(object):
         self.confidence = confidence
 
 
+CandidateSkillYielder = Generator[CandidateSkill, None, None]
+
+
 class SkillExtractor(object, metaclass=ABCMeta):
     """Abstract class for all skill extractors.
 
-    All subclasses must implement document_skill_counts
+    All subclasses must implement candidate_skills.
+
+    All subclasses must define properties
+    'method' (a short machine readable property)
+    'description' (a text description of how the extractor does its work)
+
+    Args:
+        transform_func (callable, optional) Function that transforms a structured object into text
+            Defaults to SimpleCorpusCreator's _join, which takes common text fields
+            in common schema job postings and concatenates them together.
+            For non-job postings another transform function may be needed.
     """
-    def __init__(self):
-        self.tracker = {
-            'total_skills': 0,
-            'jobs_with_skills': 0
-        }
+    def __init__(self, transform_func: Callable=None):
+        self.transform_func = transform_func
+        if not self.transform_func:
+            self.transform_func = SimpleCorpusCreator()._join
         self.nlp = NLPTransforms()
 
+    @property
     @abstractmethod
-    def document_skill_counts(self, document):
+    def name(self):
+        """A short, machine-friendly (ideally snake_case) name for the skill extractor"""
+        pass
+
+    @property
+    @abstractmethod
+    def description(self):
+        """A human-readable description for the skill extractor"""
+        pass
+
+    @abstractmethod
+    def candidate_skills(self, source_object: Dict) -> CandidateSkillYielder:
+        """Yield objects which may represent skills/competencies from the given source object
+
+        Args: source_object (dict) A structured document for searching, such as a job posting
+
+        Yields: CandidateSkill objects
+        """
+        pass
+
+    def document_skill_counts(self, source_object: Dict):
         """Count skills in the document
 
         Args:
-            document (string) A document for searching, such as a job posting
+            source_object (dict) A structured document for searching, such as a job posting
 
         Returns: (collections.Counter) skills found in the document, all
             values set to 1 (multiple occurrences of a skill do not count)
         """
-        pass
+        skill_counts = Counter()
+        for candidate_skill in self.candidate_skills(source_object):
+            skill_counts[self.nlp.lowercase_strip_punc(candidate_skill.skill_name)] += 1
+        return skill_counts
 
 
 class ListBasedSkillExtractor(SkillExtractor):
-    """Extract skills by comparing with a known list
+    """Extract skills by comparing with a known lookup/list
 
 
     Subclasses must implement _skills_lookup and _document_skills_in_lookup
 
     Args:
         skill_lookup_path (string) A path to the skill lookup file
-        skill_lookup_type (string, optional) An identifier for the skill lookup type. Defaults to onet_ksat
+        skill_lookup_name (string, optional) An identifier for the skill lookup type.
+            Defaults to onet_ksat
+        skill_lookup_description (string, optional) A human-readable description of the skill lookup.
     """
-    def __init__(self, skill_lookup_path, skill_lookup_type='onet_ksat'):
-        super(ListBasedSkillExtractor, self).__init__()
+    def __init__(
+            self,
+            skill_lookup_path,
+            skill_lookup_name='onet_ksat',
+            skill_lookup_description=None,
+            *args,
+            **kwargs
+    ):
+        super(ListBasedSkillExtractor, self).__init__(*args, **kwargs)
         self.skill_lookup_path = skill_lookup_path
-        self.skill_lookup_type = skill_lookup_type
+        self.skill_lookup_name = skill_lookup_name
+        # TODO: get this from competency object when they are in here
+        # at that point there should also be no default, make them pass in the object
+        if skill_lookup_name == 'onet_ksat':
+            self.skill_lookup_description = 'ONET Knowledge, Skills, Abilities, Tools, and Technology'
+        else:
+            self.skill_lookup_description = skill_lookup_description or ''
         self.lookup = self._skills_lookup()
         logging.info(
             'Done creating skills lookup with %d entries',
             len(self.lookup)
         )
 
-    def document_skill_counts(self, document):
-        """Count skills in the document
+    @property
+    @abstractmethod
+    def method_name(self):
+        """A short, machine-friendly name for the method of skill extraction, independent of the skill lookup"""
+        pass
 
-        Args:
-            document (string) A document for searching, such as a job posting
+    @property
+    @abstractmethod
+    def method_description(self):
+        """A human readable description for the method of skill extraction, independent of the skill lookup"""
+        pass
 
-        Returns: (collections.Counter) skills found in the document, all
-            values set to 1 (multiple occurrences of a skill do not count)
-        """
-        return self._document_skills_in_lookup(document, self.lookup)
+    @property
+    def name(self):
+        return f'{self.skill_lookup_name}_{self.method_name}'
 
-    def ie_preprocess(self, document):
-        """This function takes raw text and chops and then connects the process to break
-           it down into sentences"""
-
-        # Pre-processing
-        # e.g.","exempli gratia"
-        document = document.replace("e.g.", "exempli gratia")
-
-        # Sentence tokenizer out of nltk.sent_tokenize
-        split = re.split('\n|\*', document)
-
-        # Sentence tokenizer
-        sentences = []
-        for sent in split:
-            sents = nltk.sent_tokenize(sent)
-            length = len(sents)
-            if length == 0:
-                next
-            elif length == 1:
-                sentences.append(sents[0])
-            else:
-                for i in range(length):
-                    sentences.append(sents[i])
-        return sentences
+    @property
+    def description(self):
+        return f'{self.skill_lookup_description} found by {self.method_description}'

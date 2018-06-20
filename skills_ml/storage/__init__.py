@@ -27,6 +27,9 @@ class Store(object):
     def write(self, obj):
         raise NotImplementedError
 
+    def list(self, subpath):
+        raise NotImplementedError
+
 
 class S3Store(Store):
     def __init__(self, path):
@@ -50,6 +53,10 @@ class S3Store(Store):
         s3 = s3fs.S3FileSystem()
         s3.rm(os.path.join(self.path, fname))
 
+    def list(self, subpath):
+        s3 = s3fs.S3FileSystem()
+        return s3.ls(os.path.join(self.path, subpath))
+
 
 class FSStore(Store):
     def __init__(self, path=None):
@@ -69,6 +76,9 @@ class FSStore(Store):
 
     def delete(self, fname):
         os.remove(os.path.join(self.path, fname))
+
+    def list(self, subpath):
+        return os.listdir(os.path.join(self.path, subpath))
 
 
 class PersistedJSONDict(MutableMapping):

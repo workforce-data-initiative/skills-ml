@@ -2,7 +2,6 @@
 
 import unicodecsv as csv
 import logging
-from collections import Counter
 from smart_open import smart_open
 import re
 
@@ -12,7 +11,9 @@ try:
 except LookupError:
     nltk.download('punkt')
 
-from .base import CandidateSkill, ListBasedSkillExtractor
+from .base import CandidateSkill, ListBasedSkillExtractor, CandidateSkillYielder
+
+from typing import Dict
 
 
 class ExactMatchSkillExtractor(ListBasedSkillExtractor):
@@ -20,9 +21,10 @@ class ExactMatchSkillExtractor(ListBasedSkillExtractor):
 
     Originally written by Kwame Porter Robinson
     """
-    name = 'exact'
+    method_name = 'exact_match'
+    method_description = 'Exact matching'
 
-    def _skills_lookup(self):
+    def _skills_lookup(self) -> set:
         """Create skills lookup
 
         Reads the object's filename containing skills into a lookup
@@ -37,55 +39,27 @@ class ExactMatchSkillExtractor(ListBasedSkillExtractor):
             generator = (row[index] for row in reader)
             return set(generator)
 
-    def _document_skills_in_lookup(self, document, lookup):
-        """Count skills in the document
+    def candidate_skills(self, source_object:Dict) -> CandidateSkillYielder:
+        """Yield objects which may represent skills/competencies from the given source object.
 
-        Args:
-            lookup (object) A collection that can be queried for an individual skill,
-                implementing 'in' (i.e. 'skill in lookup')
-            document (string) A document for searching, such as a job posting
+        Looks for exact matches between the reference skill lookup and the object's text.
 
-        Returns: (collections.Counter) skills present in the lookup found in the document
-            All values set to 1 (multiple occurrences of a skill do not count)
+        Args: source_object (dict) A structured document for searching, such as a job posting
+
+        Yields: CandidateSkill objects
         """
-        join_spaces = " ".join  # for runtime efficiency
-        N = 5
-        doc = document.split()
-        doc_len = len(doc)
-        skills = Counter()
-
-        start_idx = 0
-
-        while start_idx < doc_len:
-            offset = 1
-
-            lookahead = min(N, doc_len - start_idx)
-            for idx in range(lookahead, 0, -1):
-                ngram = join_spaces(doc[start_idx:start_idx+idx])
-                if ngram in lookup:
-                    skills[ngram] = 1
-                    offset = idx
-                    break
-
-            start_idx += offset
-        return skills
-
-    def candidate_skills(self, job_posting):
-        document = job_posting.text
-        sentences = self.ie_preprocess(document)
+        document = self.transform_func(source_object)
+        sentences = self.nlp.sentence_tokenize(document)
 
         for skill in self.lookup:
-            len_skill = len(skill.split())
             for sent in sentences:
                 sent = sent.encode('utf-8')
 
-                # Exact matching for len(skill) == 1
-                if len_skill == 1:
-                    sent = sent.decode('utf-8')
-                    if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
-                        yield CandidateSkill(
-                            skill_name=skill,
-                            matched_skill=skill,
-                            confidence=100,
-                            context=sent
-                        )
+                sent = sent.decode('utf-8')
+                if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
+                    yield CandidateSkill(
+                        skill_name=skill,
+                        matched_skill=skill,
+                        confidence=100,
+                        context=sent
+                    )

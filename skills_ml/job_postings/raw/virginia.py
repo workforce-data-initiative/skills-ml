@@ -75,6 +75,7 @@ class VirginiaTransformer(JobPostingImportBase):
             'qualifications': 'qualifications',
             'occupationalCategory': 'occupationalCategory',
             'skills': 'skills',
+            'id': 'id'
         }
         for target_key, source_key in basic_mappings.items():
             transformed[target_key] = flatten(document.get(source_key))

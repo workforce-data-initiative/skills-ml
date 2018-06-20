@@ -2,7 +2,6 @@
 """Use noun phrases with specific endings to extract skills from job postings"""
 
 import logging
-from collections import Counter
 
 import nltk
 try:
@@ -16,7 +15,9 @@ except LookupError:
     nltk.download('perluniprops')
     from nltk.tokenize.moses import MosesDetokenizer
 
-from .base import SkillExtractor, CandidateSkill
+from .base import SkillExtractor, CandidateSkill, CandidateSkillYielder
+
+from typing import Dict
 
 
 def sentences_words_pos(document):
@@ -167,34 +168,30 @@ class NPEndPatternExtractor(SkillExtractor):
             that look like they are items in a list
     """
     def __init__(self, endings, stop_phrases, only_bulleted_lines=True, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.endings = endings
         self.stop_phrases = stop_phrases
         self.only_bulleted_lines = only_bulleted_lines
         self.detokenizer = MosesDetokenizer()
 
-    def document_skill_counts(self, document):
-        """Count skills in the document
+    @property
+    def description(self):
+        return f'Noun phrases ending with one of: {self.endings}\n'
+        f'Excluding phrases: {self.stop_phrases}\n'
+        f'Only using bulleted lines: {self.only_bulleted_lines}'
+
+    def candidate_skills(self, source_object: Dict) -> CandidateSkillYielder:
+        """Generate candidate skills from the source object
+
+        Looks for all noun phrases with one of the configured endings.
 
         Args:
-            document (string) A document for searching, such as a job posting
-
-        Returns: (collections.Counter) skill occurrences in the document
-        """
-        skill_counts = Counter()
-        for cleaned_phrase, _ in self.noun_phrases_matching_endings(document):
-            skill_counts[cleaned_phrase] += 1
-        return skill_counts
-
-    def candidate_skills(self, job_posting):
-        """Generate candidate skills from the job posting
-
-        Args:
-            job_posting (job_postings.JobPosting) A single job posting
+            source_object (dict) A single source object to extract skills from.
 
         Yields: all candidate skills (algorithms.skill_extractors.base.CandidateSkill)
             found in the job posting
         """
-        document = job_posting.text
+        document = self.transform_func(source_object)
         for cleaned_phrase, context in self.noun_phrases_matching_endings(document):
             orig_context = self.detokenizer.detokenize([t[0] for t in context], return_str=True)
             logging.info(
@@ -279,6 +276,11 @@ class SkillEndingPatternExtractor(NPEndPatternExtractor):
             **kwargs
         )
 
+    @property
+    def name(self):
+        bulleted_str = '_bulleted' if self.only_bulleted_lines else ''
+        return f'noun_phrase_skill{bulleted_str}'
+
 
 class AbilityEndingPatternExtractor(NPEndPatternExtractor):
     """Identify noun phrases ending in 'ability' or 'abilities' as skills"""
@@ -289,3 +291,8 @@ class AbilityEndingPatternExtractor(NPEndPatternExtractor):
             *args,
             **kwargs
         )
+
+    @property
+    def name(self):
+        bulleted_str = '_bulleted' if self.only_bulleted_lines else ''
+        return f'noun_phrase_ability{bulleted_str}'

@@ -12,13 +12,22 @@ except LookupError:
 
 from fuzzywuzzy import fuzz
 
-from .base import CandidateSkill, ListBasedSkillExtractor
+from .base import CandidateSkill, ListBasedSkillExtractor, CandidateSkillYielder
+from typing import Dict, Text
 
 
 class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
     """Extract skills from unstructured text using fuzzy matching"""
-    name = 'fuzzy'
+
     match_threshold = 88
+
+    @property
+    def method_name(self) -> Text:
+        return f'fuzzy_{self.match_threshold}'
+
+    @property
+    def method_description(self) -> Text:
+        return f'Fuzzy matching using ratio of most similar substring, with a minimum cutoff of {self.match_threshold} percent match'
 
     def reg_ex(self, s):
         s = s.replace(".", "\.")
@@ -29,7 +38,7 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
         s = s.replace("?", "\?")
         return s
 
-    def _skills_lookup(self):
+    def _skills_lookup(self) -> set:
         """Create skills lookup
 
         Reads the object's filename containing skills into a lookup
@@ -66,9 +75,9 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
                     context=sentence.decode('utf-8')
                 )
 
-    def candidate_skills(self, job_posting):
-        document = job_posting.text
-        sentences = self.ie_preprocess(document)
+    def candidate_skills(self, source_object: Dict) -> CandidateSkillYielder:
+        document = self.transform_func(source_object)
+        sentences = self.nlp.sentence_tokenize(document)
 
         for skill in self.lookup:
             len_skill = len(skill.split())

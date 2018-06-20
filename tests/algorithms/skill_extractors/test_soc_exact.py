@@ -16,71 +16,68 @@ def test_occupation_scoped_freetext_skill_extractor():
         extractor = SocScopedExactMatchSkillExtractor(skill_lookup_path=skills_filename)
         documents = [
             {
-                'soc_code': '11-1011.00',
-                'document': 'this is a job that needs active listening', 
+                'onet_soc_code': '11-1011.00',
+                'description': 'this is a job that needs active listening', 
                 'expected_value': Counter({'active listening': 1})
             },
             {
-                'soc_code': '11-1011.00',
-                'document': 'this is a reading comprehension job',
+                'onet_soc_code': '11-1011.00',
+                'description': 'this is a reading comprehension job',
                 'expected_value': Counter({'reading comprehension': 1})
             },
             {
-                'soc_code': '11-1011.00',
-                'document': 'this is an active and reading listening job', 
+                'onet_soc_code': '11-1011.00',
+                'description': 'this is an active and reading listening job', 
                 'expected_value': Counter(),
             },
             {
-                'soc_code': '11-1011.00',
-                'document': 'this is a reading comprehension and active listening job', 
+                'onet_soc_code': '11-1011.00',
+                'description': 'this is a reading comprehension and active listening job', 
                 'expected_value': Counter({'active listening': 1, 'reading comprehension': 1})
             },
             {
-                'soc_code': '11-1021.00',
-                'document': 'this is a job that needs active listening', 
+                'onet_soc_code': '11-1021.00',
+                'description': 'this is a job that needs active listening', 
                 'expected_value': Counter()
             },
             {
-                'soc_code': '11-1021.00',
-                'document': 'this is a reading comprehension job',
+                'onet_soc_code': '11-1021.00',
+                'description': 'this is a reading comprehension job',
                 'expected_value': Counter()
             },
             {
-                'soc_code': '11-1021.00',
-                'document': 'this is an active and reading listening job', 
+                'onet_soc_code': '11-1021.00',
+                'description': 'this is an active and reading listening job', 
                 'expected_value': Counter(),
             },
             {
-                'soc_code': '11-1021.00',
-                'document': 'this is a reading comprehension and active listening job', 
+                'onet_soc_code': '11-1021.00',
+                'description': 'this is a reading comprehension and active listening job', 
                 'expected_value': Counter()
             },
             {
-                'soc_code': None,
-                'document': 'this is a job that needs active listening', 
+                'onet_soc_code': None,
+                'description': 'this is a job that needs active listening', 
                 'expected_value': Counter()
             },
             {
-                'soc_code': None,
-                'document': 'this is a reading comprehension job',
+                'onet_soc_code': None,
+                'description': 'this is a reading comprehension job',
                 'expected_value': Counter()
             },
             {
-                'soc_code': None,
-                'document': 'this is an active and reading listening job', 
+                'onet_soc_code': None,
+                'description': 'this is an active and reading listening job', 
                 'expected_value': Counter(),
             },
             {
-                'soc_code': None,
-                'document': 'this is a reading comprehension and active listening job', 
+                'onet_soc_code': None,
+                'description': 'this is a reading comprehension and active listening job', 
                 'expected_value': Counter()
             },
         ]
         for document in documents:
-            assert extractor.document_skill_counts(
-                soc_code=document['soc_code'],
-                document=document['document']
-            ) == document['expected_value']
+            assert extractor.document_skill_counts(document) == document['expected_value']
 
 
 
