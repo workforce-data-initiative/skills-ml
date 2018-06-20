@@ -114,9 +114,9 @@ class EmbeddingTrainer(object):
 
     @property
     def model_type(self):
-        if self.corpus_generator.__class__.__name__ == 'Doc2VecGensimCorpusCreator':
+        if self._model.__class__.__name__ == 'Doc2VecModel':
             return 'doc2vec'
-        elif self.corpus_generator.__class__.__name__ == 'Word2VecGensimCorpusCreator':
+        elif self._model.__class__.__name__ == 'Word2VecModel':
             return 'word2vec'
 
     @property
@@ -153,5 +153,9 @@ class EmbeddingTrainer(object):
         else:
             print("Haven't trained the model yet!")
 
-        meta_dict.update(self.corpus_generator.metadata)
+        try:
+            meta_dict.update(self.corpus_generator.metadata)
+        except AttributeError:
+            logging.info(self.corpus_generator.__class__.__name__ + " has no metadata!")
+
         return meta_dict

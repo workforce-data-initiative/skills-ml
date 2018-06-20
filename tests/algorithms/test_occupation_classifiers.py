@@ -1,21 +1,22 @@
-from skills_ml.algorithms.occupation_classifiers.classifiers import NearestNeighbors, Classifier
+from skills_ml.algorithms.occupation_classifiers.classifiers import KNNDoc2VecClassifier
+from skills_ml.algorithms.embedding.train import EmbeddingTrainer
+from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel
+from skills_ml.storage import S3Store, FSStore
+
 from skills_utils.s3 import upload
 
 import gensim
 from gensim.similarities.index import AnnoyIndexer
 
-import os
-from moto import mock_s3_deprecated
-from mock import patch
-import boto
-import logging
-logging.getLogger('boto').setLevel(logging.CRITICAL)
-
+from moto import mock_s3
+import mock
+import boto3
+import s3fs
 import tempfile
-
+import os
+import unittest
 import json
 
-import pytest
 
 docs = """licensed practical nurse licensed practical and licensed
 vocational nurses licensed practical nurse department family
@@ -40,13 +41,15 @@ minnesota required current american heart association aha bls healthcare
 provider card required prior to completion of unit orientation eeo aa
 graduate of an approved school of practical nursing required,29,29-2061.00"""
 
+
 def get_corpus(num):
     lines = [docs]*num
     for line in lines:
         yield line
 
+
 class FakeCorpusGenerator(object):
-    def __init__(self , num=5):
+    def __init__(self , num=15):
         self.num = num
         self.lookup = {}
     def __iter__(self):
@@ -60,68 +63,83 @@ class FakeCorpusGenerator(object):
             yield gensim.models.doc2vec.TaggedDocument(words, label)
             k += 1
 
-@mock_s3_deprecated
-@pytest.mark.skip('will change it with new storage module')
-def test_occupation_classifier():
-    s3_conn = boto.connect_s3()
-    bucket_name = 'fake-bucket'
-    bucket = s3_conn.create_bucket(bucket_name)
 
-    model_name = 'doc2vec_gensim_test'
-    s3_prefix_model = 'fake-bucket/cache/embedding/'
+class TestKNNDoc2VecClassifier(unittest.TestCase):
+    @mock.patch('os.getcwd')
+    def test_knn_doc2vec_cls_local(self, mock_getcwd):
+        with tempfile.TemporaryDirectory() as td:
+            mock_getcwd.return_value = td
+            corpus_generator = FakeCorpusGenerator()
+            d2v = Doc2VecModel(storage=FSStore(td), size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
+            trainer = EmbeddingTrainer(corpus_generator, d2v)
+            trainer.train(True)
 
-    classifier_id = 'ann_0614'
-    classifier_name =  classifier_id + '.index'
+            # KNNDoc2VecClassifier only supports doc2vec now
+            self.assertRaises(NotImplementedError, lambda: KNNDoc2VecClassifier(Word2VecModel()))
+            knn = KNNDoc2VecClassifier(d2v)
 
-    fake_corpus_train = FakeCorpusGenerator(num=10)
+            doc = docs.split(',')[0]
 
-    model = gensim.models.Doc2Vec(size=500, min_count=1, iter=5, window=4)
+            assert knn.predict_soc(doc)[0] == '29-2061.00'
+            assert knn.predict_soc(doc, 5)[0] == '29-2061.00'
+            self.assertRaises(ValueError, lambda: knn.predict_soc(doc, 0))
 
-    with tempfile.TemporaryDirectory() as td:
-        model.build_vocab(fake_corpus_train)
-        model.train(fake_corpus_train, total_examples=model.corpus_count, epochs=model.iter)
-        model.save(os.path.join(td, model_name + '.model'))
-        upload(s3_conn, os.path.join(td, model_name + '.model'), os.path.join(s3_prefix_model, model_name))
+            # Build Annoy index
+            knn.build_ann_indexer(num_trees=5)
+            assert isinstance(knn.indexer, AnnoyIndexer)
 
-    with tempfile.TemporaryDirectory() as td:
-        lookup = fake_corpus_train.lookup
-        lookup_name = 'lookup_' + model_name + '.json'
-        with open(os.path.join(td, lookup_name), 'w') as handle:
-            json.dump(lookup, handle)
-        upload(s3_conn, os.path.join(td, lookup_name), os.path.join(s3_prefix_model, model_name))
+            # Save
+            knn.save()
+            assert set(os.listdir(os.getcwd())) == set([knn.model_name])
+            assert isinstance(knn.indexer, AnnoyIndexer)
 
-    nn_classifier = NearestNeighbors(
-        s3_path=s3_prefix_model,
-        s3_conn=s3_conn,
-    )
-    model = nn_classifier.model
-    model.init_sims()
-    ann_index = AnnoyIndexer(model, 10)
-    ann_classifier = NearestNeighbors(
-        s3_path=s3_prefix_model,
-        s3_conn=s3_conn,
-        )
-    ann_classifier.indexer = ann_index
+            # Load
+            new_knn = KNNDoc2VecClassifier.load(FSStore(td), knn.model_name)
+            assert new_knn.model_name ==  knn.model_name
+            assert new_knn.predict_soc(doc)[0] == '29-2061.00'
+            assert new_knn.predict_soc(doc, 5)[0] == '29-2061.00'
 
+            # Have to re-build the index whenever ones load the knn model to the memory
+            assert new_knn.indexer == None
 
-    clf_top = Classifier(
-        classifier_id=classifier_id,
-        s3_conn=s3_conn,
-        s3_path=s3_prefix_model,
-        classifier=ann_classifier,
-        classify_kwargs={'mode': 'top'}
-    )
-    clf_common = Classifier(
-        classifier_id=classifier_id,
-        s3_conn=s3_conn,
-        s3_path=s3_prefix_model,
-        classifier=ann_classifier,
-        classify_kwargs={'mode': 'common'}
-    )
+    @mock_s3
+    def test_knn_doc2vec_cls_s3(self):
+        client = boto3.client('s3')
+        client.create_bucket(Bucket='fake-open-skills', ACL='public-read-write')
+        s3_path = f"s3://fake-open-skills/model_cache/soc_classifiers"
+        s3_storage = S3Store(path=s3_path)
 
 
-    assert nn_classifier.model_name == model_name
-    assert nn_classifier.indexer != clf_top.classifier.indexer
-    assert nn_classifier.predict_soc(docs, 'top')[0] == clf_top.classify(docs)[0]
-    assert nn_classifier.predict_soc(docs, 'common')[0] == clf_common.classify(docs)[0]
+        corpus_generator = FakeCorpusGenerator()
+        d2v = Doc2VecModel(storage=s3_storage, size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
+        trainer = EmbeddingTrainer(corpus_generator, d2v)
+        trainer.train(True)
 
+        # KNNDoc2VecClassifier only supports doc2vec now
+        self.assertRaises(NotImplementedError, lambda: KNNDoc2VecClassifier(Word2VecModel()))
+        knn = KNNDoc2VecClassifier(d2v)
+
+        doc = docs.split(',')[0]
+
+        assert knn.predict_soc(doc)[0] == '29-2061.00'
+        assert knn.predict_soc(doc, 5)[0] == '29-2061.00'
+        self.assertRaises(ValueError, lambda: knn.predict_soc(doc, 0))
+
+        # Build Annoy index
+        knn.build_ann_indexer(num_trees=5)
+        assert isinstance(knn.indexer, AnnoyIndexer)
+
+        # Save
+        s3 = s3fs.S3FileSystem()
+        knn.save()
+        files = [f.split('/')[-1] for f in s3.ls(s3_path)]
+        assert set(files) == set([knn.model_name])
+
+        # Load
+        new_knn = KNNDoc2VecClassifier.load(s3_storage, knn.model_name)
+        assert new_knn.model_name ==  knn.model_name
+        assert new_knn.predict_soc(doc)[0] == '29-2061.00'
+        assert new_knn.predict_soc(doc, 5)[0] == '29-2061.00'
+
+        # Have to re-build the index whenever ones load the knn model to the memory
+        assert new_knn.indexer == None
