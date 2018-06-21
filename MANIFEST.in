@@ -3,4 +3,5 @@ include README.md
 include LICENSE.md
 include tests/*.py
 include sample_job_listing.json
-recursive-include requirements*.txt
+include requirements.txt
+include requirements_dev.txt
