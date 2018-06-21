@@ -1,2 +1,4 @@
 include 50_sample.json.gz
 include README.md
+include LICENSE.md
+include tests/*.py
