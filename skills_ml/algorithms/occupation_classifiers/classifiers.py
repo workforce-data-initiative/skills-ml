@@ -6,7 +6,11 @@ from gensim.similarities.index import AnnoyIndexer
 import logging
 from collections import Counter, defaultdict
 import pickle
+import re
 
+def convert(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 class SocClassifier(object):
     """ Interface of SOC Code Classifier.
@@ -18,6 +22,14 @@ class SocClassifier(object):
     def predict_soc(self, tokenized_list):
         return self.classifier.predict_soc(tokenized_list)
 
+    @property
+    def name(self):
+        return "soc_" + convert(self.classifier.name)
+
+    @property
+    def description(self):
+        return f"SOC code classifier using {self.classifier.description}"
+
 
 class KNNDoc2VecClassifier(ModelStorage):
     """Nearest neightbors model to classify the jobposting data into soc code.
@@ -26,7 +38,8 @@ class KNNDoc2VecClassifier(ModelStorage):
 
     Attributes:
         embedding_model (:job: `skills_ml.algorithms.embedding.models.Doc2VecModel`): Doc2Vec embedding model
-        k (int): num of nearest neighbors
+        k (int): number of nearest neighbor. If k = 1, look for the soc code from single nearest neighbor.
+                 If k > 1, classify the soc code by the majority vote of nearest k neighbors.
         indexer (:obj: `gensim.similarities.index`): any kind of gensim compatible indexer
     """
     def __init__(self, embedding_model, k=1, indexer=None, **kwargs):
@@ -63,8 +76,6 @@ class KNNDoc2VecClassifier(ModelStorage):
 
         Args:
             tokenized_list (list): a list of words of tokenized string
-            k (int): If k = 1, look for the soc code from single nearest neighbor. If k > 1, classify the soc code by
-            a majority vote of nearest k neighbor.
 
         Returns:
             tuple(str, float): The predicted soc code and cosine similarity.
@@ -100,3 +111,14 @@ class KNNDoc2VecClassifier(ModelStorage):
         model_pickled = pickle.dumps(self)
         self.storage.write(model_pickled, model_name)
         self.indexer = tmp_annoy_index
+
+    @property
+    def name(self):
+        return self.__class__.__name__ + 'K' + str(self.k)
+
+    @property
+    def description(self):
+        if self.k == 1:
+            return "single nearest neighbors algorithm"
+        elif self.k > 1:
+            return f"majority vote of {self.k} nearest neighbors"

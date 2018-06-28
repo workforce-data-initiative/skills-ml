@@ -15,7 +15,7 @@ from skills_ml.job_postings.computed_properties.computers import (
     TitleCleanPhaseOne,
     TitleCleanPhaseTwo,
     CBSAandStateFromGeocode,
-    ClassifyTop,
+    SOCClassifyProperty,
     ExactMatchSkillCounts
 )
 
@@ -161,7 +161,15 @@ class SocClassifyWithFakeClassifierTest(ComputedPropertyTestCase):
                 assert document.strip() == description.lower()
                 return '11-1234.00'
 
-        self.computed_property = ClassifyTop(
+            @property
+            def name(self):
+                return "MockClassifier"
+
+            @property
+            def description(self):
+                return "fake algorithm"
+
+        self.computed_property = SOCClassifyProperty(
             storage=storage,
             classifier_obj=MockClassifier(),
         )
@@ -173,6 +181,9 @@ class SocClassifyWithFakeClassifierTest(ComputedPropertyTestCase):
         job_posting_id = self.job_postings[0]['id']
         assert cache[job_posting_id] == '11-1234.00'
 
+    def test_name_description(self):
+        assert self.computed_property.property_name == "soc_mock_classifier"
+        assert self.computed_property.property_description == "SOC code classifier using fake algorithm"
 
 @mock_s3
 @mock_s3_deprecated
