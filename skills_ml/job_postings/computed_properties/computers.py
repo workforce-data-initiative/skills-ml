@@ -7,7 +7,7 @@ from . import JobPostingComputedProperty, ComputedPropertyColumn
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.jobtitle_cleaner.clean import JobTitleStringClean
 from skills_ml.algorithms.occupation_classifiers.classifiers import \
-    Classifier
+    SocClassifier
 from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.job_postings.geography_queriers.cbsa_from_geocode import JobCBSAFromGeocodeQuerier
 from skills_ml.algorithms.skill_extractors import\
@@ -89,60 +89,43 @@ class SOCClassifyProperty(JobPostingComputedProperty):
     """Classify the SOC code from a trained classifier
 
     Args:
-        s3_conn (boto.s3.connection)
         classifier_obj (object, optional) An object to use as a classifier.
             If not sent one will be downloaded from s3
     """
-    def __init__(self, s3_conn, classifier_obj=None, *args, **kwargs):
+    def __init__(self, classifier_obj, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.s3_conn = s3_conn
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.classifier_obj = classifier_obj
+        self.classifier = SocClassifier(classifier_obj)
 
     def _compute_func_on_one(self):
-        common_classifier = Classifier(
-            s3_conn=self.s3_conn,
-            classifier_id='ann_0614',
-            classify_kwargs=self.classify_kwargs,
-            classifier=self.classifier_obj,
-            temporary_directory=self.temp_dir
-        )
+
+        common_classifier = self.classifier
         corpus_creator = SimpleCorpusCreator()
 
         def func(job_posting):
-            return common_classifier.classify(corpus_creator._transform(job_posting))
+            return common_classifier.predict_soc(corpus_creator._transform(job_posting))
 
         return func
 
+    @property
+    def property_name(self):
+        return self.classifier.name
 
-class ClassifyCommon(SOCClassifyProperty):
-    """Classify SOC code using common match method"""
-    classify_kwargs = {'mode': 'common'}
-    property_name = 'soc_common'
-    property_columns = [
-        ComputedPropertyColumn(
-            name='soc_common',
-            description='SOC code inferred by common match method',
-            compatible_aggregate_function_paths={
-                'skills_ml.job_postings.aggregate.pandas.n_most_common': 'Most common'
-            }
-        )
-    ]
+    @property
+    def property_description(self):
+        return self.classifier.description
 
-
-class ClassifyTop(SOCClassifyProperty):
-    """Classify SOC code using top match method"""
-    classify_kwargs = {'mode': 'top'}
-    property_name = 'soc_top'
-    property_columns = [
-        ComputedPropertyColumn(
-            name='soc_top',
-            description='SOC code inferred by top match method',
-            compatible_aggregate_function_paths={
-                'skills_ml.job_postings.aggregate.pandas.n_most_common': 'Most common'
-            }
-        )
-    ]
+    @property
+    def property_columns(self):
+        property_columns = [
+            ComputedPropertyColumn(
+                name=self.property_name,
+                description=self.property_description,
+                compatible_aggregate_function_paths={
+                    'skills_ml.job_postings.aggregate.pandas.n_most_common': 'Most common'
+                }
+            )
+        ]
+        return property_columns
 
 
 class GivenSOC(JobPostingComputedProperty):

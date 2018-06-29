@@ -25,7 +25,7 @@ class Word2VecModel(ModelStorage, Word2Vec):
         """
         ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
         Word2Vec.__init__(self, *args, **kwargs)
-        self.model_name = None
+        self.model_name = ""
         self._metadata = None
 
     def infer_vector(self, doc_words):
@@ -68,5 +68,5 @@ class Doc2VecModel(ModelStorage, Doc2Vec):
         """
         ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
         Doc2Vec.__init__(self, *args, **kwargs)
-        self.model_name = None
+        self.model_name = ""
         self.lookup_dict = None

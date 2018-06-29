@@ -15,9 +15,10 @@ from skills_ml.job_postings.computed_properties.computers import (
     TitleCleanPhaseOne,
     TitleCleanPhaseTwo,
     CBSAandStateFromGeocode,
-    ClassifyTop,
+    SOCClassifyProperty,
     ExactMatchSkillCounts
 )
+
 from skills_ml.storage import S3Store
 import pytest
 
@@ -148,25 +149,29 @@ class CBSAAndStateFromGeocodeTest(ComputedPropertyTestCase):
         assert cache[job_posting_id] == ['22020', 'Fargo, ND-MN Metro Area', 'ND']
 
 
-@mock_s3_deprecated
 @mock_s3
-@pytest.mark.skip('will change it with new storage module')
-class SocClassifyTest(ComputedPropertyTestCase):
+class SocClassifyWithFakeClassifierTest(ComputedPropertyTestCase):
     def setUp(self):
-        s3_conn = boto.connect_s3()
         client = boto3.resource('s3')
         bucket = client.create_bucket(Bucket='test-bucket')
+        storage = S3Store('s3://test-bucket/computed_properties')
         description = 'This is my description'
         class MockClassifier(object):
-            def predict_soc(self, document, mode):
+            def predict_soc(self, document):
                 assert document.strip() == description.lower()
-                assert mode == 'top'
                 return '11-1234.00'
 
-        self.computed_property = ClassifyTop(
-            s3_conn=s3_conn,
+            @property
+            def name(self):
+                return "MockClassifier"
+
+            @property
+            def description(self):
+                return "fake algorithm"
+
+        self.computed_property = SOCClassifyProperty(
+            storage=storage,
             classifier_obj=MockClassifier(),
-            path='test-bucket/computed_properties',
         )
         self.job_postings = [utils.job_posting_factory(datePosted=self.datestring, description=description, skills='', qualifications='', experienceRequirements='')]
         self.computed_property.compute_on_collection(self.job_postings)
@@ -176,6 +181,9 @@ class SocClassifyTest(ComputedPropertyTestCase):
         job_posting_id = self.job_postings[0]['id']
         assert cache[job_posting_id] == '11-1234.00'
 
+    def test_name_description(self):
+        assert self.computed_property.property_name == "soc_mock_classifier"
+        assert self.computed_property.property_description == "SOC code classifier using fake algorithm"
 
 @mock_s3
 @mock_s3_deprecated

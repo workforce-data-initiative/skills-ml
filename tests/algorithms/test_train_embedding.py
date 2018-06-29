@@ -27,7 +27,6 @@ class TestTrainEmbedding(unittest.TestCase):
         s3_storage = S3Store(path=s3_path)
 
         document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
-        document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
         job_postings_generator = JobPostingCollectionSample(num_records=30)
         corpus_generator = Doc2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         d2v = Doc2VecModel(storage=s3_storage, size=10, min_count=3, iter=4, window=6, workers=3)
