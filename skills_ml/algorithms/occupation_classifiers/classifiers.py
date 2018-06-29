@@ -3,17 +3,18 @@ from skills_ml.algorithms.embedding.models import Doc2VecModel
 
 from gensim.similarities.index import AnnoyIndexer
 
-import logging
 from collections import Counter, defaultdict
+from abc import ABCMeta, abstractmethod
 import pickle
 import re
+import logging
 
 def convert(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 class SocClassifier(object):
-    """ Interface of SOC Code Classifier.
+    """ Interface of SOC Code Classifier to be used by computers.
     """
 
     def __init__(self, classifier):
@@ -24,11 +25,43 @@ class SocClassifier(object):
 
     @property
     def name(self):
-        return "soc_" + convert(self.classifier.name)
+        return "soc_" + self.classifier.name
 
     @property
     def description(self):
         return f"SOC code classifier using {self.classifier.description}"
+
+
+class BaseClassifier(ModelStorage, metaclass=ABCMeta):
+    """Abstract class for all classifiers
+
+    """
+    def __init__(self, embedding_model, **kwargs ):
+        self.model = embedding_model
+
+    @property
+    @abstractmethod
+    def name(self):
+        """A short machine-friendly (ideally snake_case) name for the soc classifier"""
+        pass
+
+    @property
+    @abstractmethod
+    def description(self):
+        """A human-readable description for the soc classifier"""
+        pass
+
+    @abstractmethod
+    def train(self):
+        pass
+
+    @abstractmethod
+    def predict_soc(self, tokenized_list):
+        pass
+
+    @abstractmethod
+    def save(self, model_name=None):
+        pass
 
 
 class KNNDoc2VecClassifier(ModelStorage):
@@ -48,7 +81,6 @@ class KNNDoc2VecClassifier(ModelStorage):
 
         super().__init__(storage=kwargs.pop('storage', embedding_model._storage))
         self.model = embedding_model
-        self.model_name = "knn_cls_" + self.model.model_name
         self.indexer = indexer
         self.k = k
 
@@ -98,6 +130,10 @@ class KNNDoc2VecClassifier(ModelStorage):
 
         return predicted_soc
 
+    @property
+    def model_name(self):
+        return "knn_cls_" + self.model.model_name
+
     def save(self, model_name=None):
         """The method to write the model to where the Storage object specified
 
@@ -114,10 +150,12 @@ class KNNDoc2VecClassifier(ModelStorage):
 
     @property
     def name(self):
-        return self.__class__.__name__ + 'K' + str(self.k)
+        """A short machine-friendly (ideally snake_case) name for the soc classifier"""
+        return convert(self.__class__.__name__ + 'K' + str(self.k))
 
     @property
     def description(self):
+        """A human-readable description for the soc classifier"""
         if self.k == 1:
             return "single nearest neighbors algorithm"
         elif self.k > 1:
