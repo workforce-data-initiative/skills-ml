@@ -50,16 +50,5 @@ class ExactMatchSkillExtractor(ListBasedSkillExtractor):
         """
         document = self.transform_func(source_object)
         sentences = self.nlp.sentence_tokenize(document)
-
-        for skill in self.lookup:
-            for sent in sentences:
-                sent = sent.encode('utf-8')
-
-                sent = sent.decode('utf-8')
-                if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
-                    yield CandidateSkill(
-                        skill_name=skill,
-                        matched_skill=skill,
-                        confidence=100,
-                        context=sent
-                    )
+        for sent in sentences:
+            yield from self.candidate_skills_in_context(sent)

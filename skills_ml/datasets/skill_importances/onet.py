@@ -1,7 +1,10 @@
 """Process ONET data to create a dataset with occupations and their skill importances"""
 import csv
 import pandas as pd
+from skills_ml.datasets.onet_source import download_onet
 import logging
+import io
+from skills_utils.hash import md5
 
 
 class OnetSkillImportanceExtractor(object):
@@ -10,16 +13,15 @@ class OnetSkillImportanceExtractor(object):
 
     Originally written by Kwame Porter Robinson
     """
-    def __init__(self, onet_source, output_filename, hash_function):
+    def __init__(self, storage, hash_function=None):
         """
         Args:
             output_filename: A filename to write the final dataset
             onet_source: An object that is able to fetch ONET files by name
             hash_function: A function that can hash a given string
         """
-        self.output_filename = output_filename
-        self.onet_source = onet_source
-        self.hash_function = hash_function
+        self.storage = storage
+        self.hash_function = hash_function or md5
 
     def onet_to_pandas(self, filename, col_name):
         """
@@ -31,9 +33,8 @@ class OnetSkillImportanceExtractor(object):
             A pandas DataFrame
         """
         logging.info('Converting ONET %s to pandas', filename)
-        with self.onet_source.ensure_file(filename) as fullpath:
-            with open(fullpath) as f:
-                onet = [row for row in csv.DictReader(f, delimiter='\t')]
+        filetext = download_onet(filename)
+        onet = [row for row in csv.DictReader(io.StringIO(filetext), delimiter='\t')]
         onet = pd.DataFrame(onet)
         for col in col_name:
             onet[col] = onet[col].astype(str).str.lower()
@@ -48,33 +49,28 @@ class OnetSkillImportanceExtractor(object):
             'O*NET-SOC Code',
             'Element ID',
             'Element Name',
-            'Scale ID',
-            'Data Value',
-            'N',
-            'Standard Error',
-            'Lower CI Bound',
-            'Upper CI Bound',
-            'Recommend Suppress',
-            'Not Relevant',
-            'Date',
-            'Domain Source'
         ]
-        skills = self.onet_to_pandas('Skills.txt', standard_columns)
-        ability = self.onet_to_pandas('Abilities.txt', standard_columns)
-        knowledge = self.onet_to_pandas('Knowledge.txt', standard_columns)
+        skills = self.onet_to_pandas('Skills', standard_columns)
+        ability = self.onet_to_pandas('Abilities', standard_columns)
+        knowledge = self.onet_to_pandas('Knowledge', standard_columns)
+        tools = self.onet_to_pandas('Tools and Technology', ['O*NET-SOC Code', 'Commodity Code', 'T2 Example'])
 
         # Concat KSA dataframes into one table
         standard_columns[2] = 'ONET KSA'
         skills.columns = standard_columns
         ability.columns = standard_columns
         knowledge.columns = standard_columns
+        tools.columns = standard_columns
 
         onet_ksas = pd.concat(
-            (skills, ability, knowledge),
+            (skills, ability, knowledge, tools),
             ignore_index=True
         )
 
-        onet_ksas['skill_uuid'] = onet_ksas['ONET KSA']\
+        onet_ksas['nlp_a'] = onet_ksas['ONET KSA']\
             .apply(self.hash_function)
 
-        onet_ksas.to_csv(self.output_filename, sep='\t')
+        fh = io.StringIO()
+        onet_ksas.to_csv(fh, sep='\t')
+        fh.seek(0)
+        self.storage.write(fh.getvalue().encode('utf-8'), 'soc_skills.tsv')

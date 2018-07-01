@@ -28,7 +28,7 @@ class SocScopedExactMatchSkillExtractor(ExactMatchSkillExtractor):
         with smart_open(self.skill_lookup_path) as infile:
             reader = csv.reader(infile, delimiter='\t')
             header = next(reader)
-            ksa_index = header.index(self.nlp.transforms[0])
+            ksa_index = header.index('ONET KSA')
             soc_index = header.index('O*NET-SOC Code')
             for row in reader:
                 lookup[row[soc_index]].add(row[ksa_index])
@@ -48,7 +48,9 @@ class SocScopedExactMatchSkillExtractor(ExactMatchSkillExtractor):
 
                 # Exact matching
                 sent = sent.decode('utf-8')
-                if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
+                #print(sent)
+                #print(skill)
+                if re.search(r'\b' + re.escape(skill) + r'\b', sent, re.IGNORECASE):
                     yield CandidateSkill(
                         skill_name=skill,
                         matched_skill=skill,

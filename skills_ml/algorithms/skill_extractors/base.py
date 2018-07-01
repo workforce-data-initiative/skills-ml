@@ -9,6 +9,75 @@ from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
 
 from typing import Dict, Callable, Text, Generator
+import re
+
+
+class Trie():
+    """Regex::Trie in Python. Creates a Trie out of a list of words. The trie can be exported to a Regex pattern.
+    The corresponding Regex should match much faster than a simple Regex union."""
+
+    def __init__(self):
+        self.data = {}
+
+    def add(self, word):
+        ref = self.data
+        for char in word:
+            ref[char] = char in ref and ref[char] or {}
+            ref = ref[char]
+        ref[''] = 1
+
+    def dump(self):
+        return self.data
+
+    def quote(self, char):
+        return re.escape(char)
+
+    def _pattern(self, pData):
+        data = pData
+        if "" in data and len(data.keys()) == 1:
+            return None
+
+        alt = []
+        cc = []
+        q = 0
+        for char in sorted(data.keys()):
+            if isinstance(data[char], dict):
+                try:
+                    recurse = self._pattern(data[char])
+                    alt.append(self.quote(char) + recurse)
+                except:
+                    cc.append(self.quote(char))
+            else:
+                q = 1
+        cconly = not len(alt) > 0
+
+        if len(cc) > 0:
+            if len(cc) == 1:
+                alt.append(cc[0])
+            else:
+                alt.append('[' + ''.join(cc) + ']')
+
+        if len(alt) == 1:
+            result = alt[0]
+        else:
+            result = "(?:" + "|".join(alt) + ")"
+
+        if q:
+            if cconly:
+                result += "?"
+            else:
+                result = "(?:%s)?" % result
+        return result
+
+    def pattern(self):
+        return self._pattern(self.dump())
+
+
+def trie_regex_from_words(words):
+    trie = Trie()
+    for word in words:
+        trie.add(word)
+    return re.compile(r"\b" + trie.pattern() + r"\b", re.IGNORECASE)
 
 
 class CandidateSkill(object):
@@ -127,6 +196,7 @@ class ListBasedSkillExtractor(SkillExtractor):
             'Done creating skills lookup with %d entries',
             len(self.lookup)
         )
+        self.trie_regex = trie_regex_from_words(self.lookup)
 
     @property
     @abstractmethod
@@ -147,3 +217,15 @@ class ListBasedSkillExtractor(SkillExtractor):
     @property
     def description(self):
         return f'{self.skill_lookup_description} found by {self.method_description}'
+
+    def candidate_skills_in_context(self, context):
+        matches = self.trie_regex.findall(context)
+        for match in matches: 
+            logging.info('Yielding exact match %s in string %s', match, context)
+            yield CandidateSkill(
+                skill_name=match.lower(),
+                matched_skill=match,
+                confidence=100,
+                context=context
+            )
+
