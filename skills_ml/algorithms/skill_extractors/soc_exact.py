@@ -5,7 +5,7 @@ import unicodecsv as csv
 
 from smart_open import smart_open
 
-from .base import CandidateSkill
+from .base import CandidateSkill, trie_regex_from_words
 from .exact_match import ExactMatchSkillExtractor
 
 
@@ -42,18 +42,15 @@ class SocScopedExactMatchSkillExtractor(ExactMatchSkillExtractor):
         if not soc_code or soc_code not in self.lookup:
             return
 
-        for skill in self.lookup[soc_code]:
-            for sent in sentences:
-                sent = sent.encode('utf-8')
+        soc_trie_regex = trie_regex_from_words(self.lookup[soc_code])
 
-                # Exact matching
-                sent = sent.decode('utf-8')
-                #print(sent)
-                #print(skill)
-                if re.search(r'\b' + re.escape(skill) + r'\b', sent, re.IGNORECASE):
-                    yield CandidateSkill(
-                        skill_name=skill,
-                        matched_skill=skill,
-                        confidence=100,
-                        context=sent
-                    )
+        for sent in sentences:
+            matches = soc_trie_regex.findall(sent)
+            for match in matches: 
+                logging.info('Yielding exact match %s in string %s', match, sent)
+                yield CandidateSkill(
+                    skill_name=match.lower(),
+                    matched_skill=match,
+                    confidence=100,
+                    context=sent
+                )
