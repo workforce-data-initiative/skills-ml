@@ -12,7 +12,7 @@ import nltk
 import re
 import numpy as np
 import logging
-from skills_ml.datasets.onet_source import OnetSourceDownloader
+from skills_ml.datasets.onet_source import OnetToDiskDownloader
 
 ONET_VERSIONS = [
     'db_21_0_text',
@@ -41,7 +41,7 @@ class ESANormalizer(object):
 
     Uses ONET occupation titles and descriptions.
     """
-    def __init__(self, onet_source=OnetSourceDownloader):
+    def __init__(self, onet_source=OnetToDiskDownloader):
         self.onet_downloader = onet_source()
         self.onet_titles = self.retrieve_onet_titles()
         logging.info('Retrieved onet titles')

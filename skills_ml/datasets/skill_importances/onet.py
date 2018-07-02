@@ -1,7 +1,7 @@
 """Process ONET data to create a dataset with occupations and their skill importances"""
 import csv
 import pandas as pd
-from skills_ml.datasets.onet_source import download_onet
+from skills_ml.datasets.onet_source import OnetToMemoryDownloader
 import logging
 import io
 from skills_utils.hash import md5
@@ -13,14 +13,15 @@ class OnetSkillImportanceExtractor(object):
 
     Originally written by Kwame Porter Robinson
     """
-    def __init__(self, storage, hash_function=None):
+    def __init__(self, storage, output_dataset_name, hash_function=None):
         """
         Args:
-            output_filename: A filename to write the final dataset
+            output_dataset_name: A filename to write the final dataset
             onet_source: An object that is able to fetch ONET files by name
             hash_function: A function that can hash a given string
         """
         self.storage = storage
+        self.output_dataset_name = output_dataset_name
         self.hash_function = hash_function or md5
 
     def onet_to_pandas(self, filename, col_name):
@@ -33,7 +34,7 @@ class OnetSkillImportanceExtractor(object):
             A pandas DataFrame
         """
         logging.info('Converting ONET %s to pandas', filename)
-        filetext = download_onet(filename)
+        filetext = OnetToMemoryDownloader().download(filename)
         onet = [row for row in csv.DictReader(io.StringIO(filetext), delimiter='\t')]
         onet = pd.DataFrame(onet)
         for col in col_name:
@@ -73,4 +74,4 @@ class OnetSkillImportanceExtractor(object):
         fh = io.StringIO()
         onet_ksas.to_csv(fh, sep='\t')
         fh.seek(0)
-        self.storage.write(fh.getvalue().encode('utf-8'), 'soc_skills.tsv')
+        self.storage.write(fh.getvalue().encode('utf-8'), f'{self.output_dataset_name}.tsv')
