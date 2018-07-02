@@ -40,6 +40,7 @@ markdown_extensions:
 pages:
 - {Home: index.md << ../README.md}
 - {Examples: examples.md}
+- {Ontology Class: ontologies.md}
 - {Job Posting Common Schema: common_schema.md}
 - {Evaluation Tools: skills_ml.evaluation.md}
 - {Algorithms: skills_ml.algorithms.md}
