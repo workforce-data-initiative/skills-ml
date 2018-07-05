@@ -15,7 +15,7 @@ import json
 import os
 import gzip
 
-from typing import Dict, Text, Any, Generator, List, Callable
+from typing import Dict, Text, Any, Generator
 
 JobPostingType = Dict[Text, Any]
 JobPostingGeneratorType = Generator[JobPostingType, None, None]
@@ -24,42 +24,48 @@ MetadataType = Dict[Text, Dict[Text, Any]]
 
 class JobPostingCollectionFromS3(object):
     """
-    Stream job posting from s3 for given quarters
+    Stream job posting from s3.
+
+    Expects that each will be stored in JSON format, one job posting per line.
+    The s3_path given will be iterated through as a prefix, so job postings may be
+    partitioned under that prefix however you choose.
+    It will look in every file under that prefix.
+
     Example:
     ```
     import json
     from airflow.hooks import S3Hook
     from skills_ml.job_postings.common_schema import JobPostingGenerator
     s3_conn = S3Hook().get_conn()
-    quarters = ['2011Q1', '2011Q2', '2011Q3']
-    job_postings_generator = JobPostingCollectionFromS3(s3_conn, quarters, s3_path='open-skills-private/job_postings_common', source="all")
+    job_postings_generator = JobPostingCollectionFromS3(s3_conn, s3_path='my-bucket/job_postings_common_schema')
     for job_posting in job_postings_generator:
-        print json.loads(job_posting)['title']
+        print(job_posting['title'])
     ```
 
     Attributes:
         s3_conn: a boto s3 connection
-        quarters: a list of quarters
-        s3_path: path to the job listings
-        source: should be a string or a subset of "nlx", "va", "cb" or "all"
+        s3_path: path to the job listings. there may be multiple
     """
-    def __init__(self, s3_conn, quarters, s3_path, source='all'):
+    def __init__(self, s3_conn, s3_paths, extra_metadata=None):
         self.s3_conn = s3_conn
-        self.quarters = quarters
-        self.s3_path = s3_path
-        self.source = source
+        self.s3_paths = s3_paths
+        if not isinstance(self.s3_paths, list):
+            self.s3_paths = [self.s3_paths]
+        if not extra_metadata:
+            self.extra_metadata = {}
 
     def __iter__(self) -> JobPostingGeneratorType:
-        yield from generate_job_postings_from_s3_for_quarters(
-            self.s3_conn,
-            self.quarters,
-            self.s3_path,
-            self.source
-        )
+        yield from generate_job_postings_from_s3_multiple_prefixes(self.s3_conn, self.s3_paths)
 
     @property
     def metadata(self) -> MetadataType:
-        return {'job postings':  {'quarters': self.quarters, 'source': self.source}}
+        """Metadata describing the source/s of the job postings"""
+        metadata = {
+            's3_paths': self.s3_paths,
+        }
+        metadata.update(self.extra_metadata)
+        
+        return {'job postings': metadata }
 
 
 class JobPostingCollectionSample(object):
@@ -106,49 +112,28 @@ def retry_if_io_error(exception):
     return isinstance(exception, IOError)
 
 
-def generate_job_postings_from_s3_for_quarter(
+def generate_job_postings_from_s3(
         s3_conn,
-        quarter: Text,
-        s3_path: Text,
-        source: Text="all"
+        s3_prefix: Text,
 ) -> JobPostingGeneratorType:
     """
-    Stream all job listings from s3 for a given quarter
+    Stream all job listings from s3
     Args:
         s3_conn: a boto s3 connection
-        quarter: a string representing a quarter (2015Q1)
-        s3_path: path to the job listings.
-        source: should be a string or a subset of "nlx", "va", "cb" or "all"
+        s3_prefix: path to the job listings.
 
     Yields:
         string in json format representing the next job listing
             Refer to sample_job_listing.json for example structure
     """
-    if isinstance(source, str):
-        s = [source]
-    else:
-        s = source
-
-    if not set(s) <= set(['nlx', 'cb', 'va', 'all']):
-        raise ValueError('"{}" is an invalid source!'.format(s))
-
     retrier = Retrying(
         retry_on_exception=retry_if_io_error,
         wait_exponential_multiplier=100,
         wait_exponential_max=100000
     )
-    bucket_name, prefix = split_s3_path(s3_path)
+    bucket_name, prefix = split_s3_path(s3_prefix)
     bucket = s3_conn.get_bucket(bucket_name)
-    if isinstance(source, str):
-        if source.lower() == "all":
-            keys = bucket.list(prefix='{}/{}'.format(prefix, quarter))
-        else:
-            keys = bucket.list(prefix='{}/{}/{}_'.format(prefix, quarter, source.upper()))
-    elif isinstance(source, list):
-        keys = []
-        for s in source:
-            keys.append(bucket.list(prefix='{}/{}/{}_'.format(prefix, quarter, s.upper())))
-        keys = chain(*keys)
+    keys = bucket.list(prefix=prefix)
 
     for key in keys:
         logging.info('Extracting job postings from key {}'.format(key.name))
@@ -159,28 +144,24 @@ def generate_job_postings_from_s3_for_quarter(
                 yield json.loads(line.decode('utf-8'))
 
 
-def generate_job_postings_from_s3_for_quarters(
+def generate_job_postings_from_s3_multiple_prefixes(
         s3_conn,
-        quarters: List[Text],
-        s3_path: Text,
-        source: Text='all'
+        s3_prefixes: Text,
 ) -> JobPostingGeneratorType:
     """
     Chain the generators of a list of multiple quarters
     Args:
         s3_conn: a boto s3 connection
-        quarters: a list of quarters
-        s3_path: path to the job listings
-        source: should be a string or a subset of "nlx", "va", "cb" or "all"
+        s3_prefixes: paths to job listings
 
     Return:
         a generator that all generators are chained together into
     """
-    if not isinstance(quarters, list):
-        raise TypeError('quarters should be a list of string, e.g. ["2011Q1", "2011Q2"]')
+    if not isinstance(s3_prefixes, list):
+        raise TypeError('s3_prefixes should be a list of string, e.g. ["2011Q1", "2011Q2"]')
 
-    for quarter in quarters:
-        yield from generate_job_postings_from_s3_for_quarter(s3_conn, quarter, s3_path, source)
+    for s3_prefix in s3_prefixes:
+        yield from generate_job_postings_from_s3(s3_conn, s3_prefix)
 
 
 def batches_generator(iterable, batch_size):

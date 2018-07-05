@@ -4,6 +4,7 @@ import os
 import boto
 
 from skills_utils.s3 import split_s3_path
+from skills_ml.datasets.onet_source import OnetSourceDownloader
 
 
 class OnetCache(object):
@@ -47,3 +48,31 @@ class OnetCache(object):
             )
             key.get_contents_to_filename(full_path)
             yield full_path
+
+
+
+class OnetSiteCache(object):
+    """
+    An object that downloads and caches ONET files from the ONET site
+    """
+    def __init__(self, cache_dir):
+        """
+        Args:
+            s3_conn: a boto s3 connection
+            s3_path: path to the onet directory
+            cache_dir: directory to cache files
+        """
+        self.downloader = OnetSourceDownloader()
+
+    def ensure_file(self, filename):
+        """
+        Ensures that the given ONET data file is present, either by
+        using a cached copy or downloading from S3
+
+        Args:
+            filename: unpathed filename of an ONET file (Skills.txt)
+
+        Yields:
+            Full path to file on local filesystem
+        """
+        return self.downloader.download(filename)

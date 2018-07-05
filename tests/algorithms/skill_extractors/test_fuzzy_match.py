@@ -12,6 +12,8 @@ def test_fuzzymatch_skill_extractor_candidate_skills():
             key=lambda cs: cs.skill_name
         )
 
+        for cs in candidate_skills:
+            print(cs.skill_name)
         assert candidate_skills[0].skill_name == 'communication skills'
         assert candidate_skills[0].context == 'Organization, Cleanliness, Trainability, team player, good communication skillz, Motivation, a Sense of Responsibility and Pride in your Performance'
         assert candidate_skills[0].confidence == 95

@@ -6,7 +6,7 @@ import re
 from collections import OrderedDict
 import logging
 
-from skills_ml.datasets import negative_positive_dict
+from skills_ml.datasets.negative_positive_dict import negative_positive_dict
 
 def clean_by_rules(jobtitle):
     """Remove numbers and normalize spaces

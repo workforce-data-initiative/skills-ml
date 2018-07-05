@@ -10,8 +10,13 @@ from skills_ml.algorithms.occupation_classifiers.classifiers import \
     SocClassifier
 from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
 from skills_ml.job_postings.geography_queriers.cbsa_from_geocode import JobCBSAFromGeocodeQuerier
-from skills_ml.algorithms.skill_extractors import\
-    ExactMatchSkillExtractor, SocScopedExactMatchSkillExtractor
+from skills_ml.algorithms.skill_extractors import (
+    ExactMatchSkillExtractor,
+    SocScopedExactMatchSkillExtractor,
+    FuzzyMatchSkillExtractor,
+    SkillEndingPatternExtractor,
+    AbilityEndingPatternExtractor
+)
 from skills_ml.algorithms.geocoders.cbsa import CachedCBSAFinder
 
 
@@ -147,77 +152,33 @@ class GivenSOC(JobPostingComputedProperty):
         return func
 
 
-class SocScopedExactMatchSkillCounts(JobPostingComputedProperty):
-    """Find skills by exact matching, and filter out ones that aren't associated
-    with the job's given SOC code
 
-    Args:
-        skill_lookup_path (string) A path to a skills lookup file, containing both
-            skill names and their association with SOC codes. See
-            SocScopedExactMatchSkillExtractor for more details
+class SkillCounts(JobPostingComputedProperty):
+    """Adding top skill counts from a skill extractor
+    
+    Args: (skills_ml.algorithms.skill_extractors.base.SkillExtractorBase) A skill extractor object
     """
-    def __init__(self, skill_lookup_path, *args, **kwargs):
+    def __init__(self, skill_extractor, *args, **kwargs):
+        self.skill_extractor = skill_extractor
         super().__init__(*args, **kwargs)
-        self.skill_lookup_path = skill_lookup_path
 
-    property_name = 'skill_counts_soc_scoped'
-    property_columns = [
-        ComputedPropertyColumn(
-            name='skill_counts_soc_scoped',
-            description='ONET skills found by exact matching that are present in the skillset indicated by the given SOC code',
+    @property
+    def property_name(self):
+        return f'skill_counts_{self.skill_extractor.name}'
+
+    @property
+    def property_columns(self):
+        return [ComputedPropertyColumn(
+            name=self.property_name,
+            description=self.skill_extractor.description,
             compatible_aggregate_function_paths={
                 'skills_ml.job_postings.aggregate.pandas.listy_n_most_common': 'Most common'
             }
-        )
-    ]
+        )]
 
     def _compute_func_on_one(self):
-        corpus_creator = SimpleCorpusCreator()
-        skill_extractor = SocScopedExactMatchSkillExtractor(
-            skill_lookup_path=self.skill_lookup_path
-        )
-
         def func(job_posting):
-            count_dict = skill_extractor.document_skill_counts(
-              soc_code=job_posting.get('onet_soc_code', '99-9999.00'),
-              document=corpus_creator._transform(job_posting)
-            )
-            count_lists = [[k] * v for k, v in count_dict.items()]
-            flattened = [count for countlist in count_lists for count in countlist]
-            return {self.property_name: flattened}
-        return func
-
-
-class ExactMatchSkillCounts(JobPostingComputedProperty):
-    """Find skills by exact matching
-
-    Args:
-        skill_lookup_path (string) A path to a skills lookup file, containing skill names.
-            See ExactMatchSkillExtractor for more details
-    """
-    def __init__(self, skill_lookup_path, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.skill_lookup_path = skill_lookup_path
-
-    property_name = 'skill_counts_exact_match'
-    property_columns = [
-        ComputedPropertyColumn(
-            name='skill_counts_exact_match',
-            description='ONET skills found by exact matching',
-            compatible_aggregate_function_paths={
-                'skills_ml.job_postings.aggregate.pandas.listy_n_most_common': 'Most common'
-            }
-        )
-    ]
-
-    def _compute_func_on_one(self):
-        corpus_creator = SimpleCorpusCreator()
-        skill_extractor = ExactMatchSkillExtractor(skill_lookup_path=self.skill_lookup_path)
-
-        def func(job_posting):
-            count_dict = skill_extractor.document_skill_counts(
-              document=corpus_creator._transform(job_posting)
-            )
+            count_dict = self.skill_extractor.document_skill_counts(job_posting)
             count_lists = [[k] * v for k, v in count_dict.items()]
             flattened = [count for countlist in count_lists for count in countlist]
             return {self.property_name: flattened}

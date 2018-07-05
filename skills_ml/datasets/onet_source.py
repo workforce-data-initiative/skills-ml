@@ -1,12 +1,22 @@
 """Download ONET files from their site"""
-import io
-import logging
-import os
 import requests
+import os
+import logging
+import io
 import zipfile
 
 
-class OnetSourceDownloader(object):
+class OnetToMemoryDownloader(object):
+    """Downloads newest version of ONET as of time of writing and returns it as text"""
+    url_prefix = 'http://www.onetcenter.org/dl_files/database/db_22_3_text'
+
+    def download(self, source_file):
+        url = f'{self.url_prefix}/{source_file}.txt'
+        response = requests.get(url)
+        return response.text
+
+
+class OnetToDiskDownloader(object):
     url_prefix = 'http://www.onetcenter.org/dl_files'
     directory = 'tmp/'
 

@@ -16,11 +16,12 @@ from skills_ml.job_postings.computed_properties.computers import (
     TitleCleanPhaseTwo,
     CBSAandStateFromGeocode,
     SOCClassifyProperty,
-    ExactMatchSkillCounts
+    SkillCounts
 )
 
+from skills_ml.algorithms.skill_extractors import ExactMatchSkillExtractor
+
 from skills_ml.storage import S3Store
-import pytest
 
 
 class ComputedPropertyTestCase(unittest.TestCase):
@@ -38,7 +39,7 @@ class ComputedPropertyTestCase(unittest.TestCase):
                 raise ValueError('All subclasses of ComputedPropertyTestCase ' +
                                  'should create self.computed_property in self.setUp')
 
-        df = self.computed_property.df_for_date(self.datestring)
+        df = self.computed_property.df_for_key(self.datestring)
 
         def pandas_ready_functions(paths):
             """Generate aggregate functions from the configured aggregate function paths
@@ -81,7 +82,7 @@ class PostingIdPresentTest(ComputedPropertyTestCase):
         self.computed_property.compute_on_collection(self.job_postings)
 
     def test_compute_func(self):
-        cache = self.computed_property.cache_for_date(self.datestring)
+        cache = self.computed_property.cache_for_key(self.datestring)
         job_posting_id = self.job_postings[0]['id']
         assert cache[str(job_posting_id)] == 1
 
@@ -100,7 +101,7 @@ class TitleCleanPhaseOneTest(ComputedPropertyTestCase):
         self.computed_property.compute_on_collection(self.job_postings)
 
     def test_compute_func(self):
-        cache = self.computed_property.cache_for_date(self.datestring)
+        cache = self.computed_property.cache_for_key(self.datestring)
         job_posting_id = self.job_postings[0]['id']
         assert cache[str(job_posting_id)] == 'software engineer tulsa'
 
@@ -117,7 +118,7 @@ class TitleCleanPhaseTwoTest(ComputedPropertyTestCase):
             self.computed_property.compute_on_collection(self.job_postings)
 
     def test_compute_func(self):
-        cache = self.computed_property.cache_for_date(self.datestring)
+        cache = self.computed_property.cache_for_key(self.datestring)
         job_posting_id = self.job_postings[0]['id']
         assert cache[str(job_posting_id)] == 'software engineer'
 
@@ -144,7 +145,7 @@ class CBSAAndStateFromGeocodeTest(ComputedPropertyTestCase):
 
     @patch('skills_ml.datasets.cbsa_shapefile.download_shapefile')
     def test_compute_func(self, download_mock):
-        cache = self.computed_property.cache_for_date(self.datestring)
+        cache = self.computed_property.cache_for_key(self.datestring)
         job_posting_id = self.job_postings[0]['id']
         assert cache[job_posting_id] == ['22020', 'Fargo, ND-MN Metro Area', 'ND']
 
@@ -177,7 +178,7 @@ class SocClassifyWithFakeClassifierTest(ComputedPropertyTestCase):
         self.computed_property.compute_on_collection(self.job_postings)
 
     def test_compute_func(self):
-        cache = self.computed_property.cache_for_date(self.datestring)
+        cache = self.computed_property.cache_for_key(self.datestring)
         job_posting_id = self.job_postings[0]['id']
         assert cache[job_posting_id] == '11-1234.00'
 
@@ -195,8 +196,11 @@ class SkillExtractTest(ComputedPropertyTestCase):
         skills_path = 's3://test-bucket/skills_master_table.tsv'
         utils.create_skills_file(skills_path)
         storage = S3Store('s3://test-bucket/computed_properties')
-        self.computed_property = ExactMatchSkillCounts(
+        skill_extractor = ExactMatchSkillExtractor(
             skill_lookup_path=skills_path,
+        )
+        self.computed_property = SkillCounts(
+            skill_extractor=skill_extractor,
             storage=storage,
         )
         self.job_postings = [utils.job_posting_factory(
@@ -206,6 +210,7 @@ class SkillExtractTest(ComputedPropertyTestCase):
         self.computed_property.compute_on_collection(self.job_postings)
 
     def test_compute_func(self):
-        cache = self.computed_property.cache_for_date(self.datestring)
+        cache = self.computed_property.cache_for_key(self.datestring)
         job_posting_id = self.job_postings[0]['id']
-        assert cache[job_posting_id] == {'skill_counts_exact_match': ['reading comprehension']}
+        assert cache[job_posting_id] == {'skill_counts_onet_ksat_exact_match': ['reading comprehension']}
+

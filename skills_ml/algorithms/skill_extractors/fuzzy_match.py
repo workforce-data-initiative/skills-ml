@@ -12,13 +12,22 @@ except LookupError:
 
 from fuzzywuzzy import fuzz
 
-from .base import CandidateSkill, ListBasedSkillExtractor
+from .base import CandidateSkill, ListBasedSkillExtractor, CandidateSkillYielder, trie_regex_from_words
+from typing import Dict, Text
 
 
 class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
     """Extract skills from unstructured text using fuzzy matching"""
-    name = 'fuzzy'
+
     match_threshold = 88
+
+    @property
+    def method_name(self) -> Text:
+        return f'fuzzy_{self.match_threshold}'
+
+    @property
+    def method_description(self) -> Text:
+        return f'Fuzzy matching using ratio of most similar substring, with a minimum cutoff of {self.match_threshold} percent match'
 
     def reg_ex(self, s):
         s = s.replace(".", "\.")
@@ -29,7 +38,7 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
         s = s.replace("?", "\?")
         return s
 
-    def _skills_lookup(self):
+    def _skills_lookup(self) -> set:
         """Create skills lookup
 
         Reads the object's filename containing skills into a lookup
@@ -66,33 +75,25 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
                     context=sentence.decode('utf-8')
                 )
 
-    def candidate_skills(self, job_posting):
-        document = job_posting.text
-        sentences = self.ie_preprocess(document)
+    def candidate_skills(self, source_object: Dict) -> CandidateSkillYielder:
+        document = self.transform_func(source_object)
+        sentences = self.nlp.sentence_tokenize(document)
 
-        for skill in self.lookup:
-            len_skill = len(skill.split())
-            for sent in sentences:
-                sent = sent.encode('utf-8')
+        for sent in sentences:
+            exact_matches = set()
+            for cs in self.candidate_skills_in_context(sent): 
+                yield cs
+                if cs.skill_name not in exact_matches:
+                    exact_matches.add(cs.skill_name)
 
-                # Exact matching
-                if len_skill == 1:
-                    sent = sent.decode('utf-8')
-                    if re.search(r'\b' + skill + r'\b', sent, re.IGNORECASE):
-                        logging.info('Returning exact match %s in sent %s', skill, sent)
-                        yield CandidateSkill(
-                            skill_name=skill,
-                            matched_skill=skill,
-                            confidence=100,
-                            context=sent
-                        )
-                # Fuzzy matching
-                else:
-                    ratio = fuzz.partial_ratio(skill, sent)
-                    # You can adjust the partial of matching here:
-                    # 100 => exact matching 0 => no matching
-                    if ratio > self.match_threshold:
-                        logging.info('Found fuzzy matches passing threshold in %s', sent)
-                        for match in self.fuzzy_matches_in_sentence(skill, sent):
-                            logging.info('Returning fuzzy match %s in sent: %s', match, sent)
-                            yield match
+            for skill in self.lookup:
+                if skill in exact_matches:
+                    continue
+                ratio = fuzz.partial_ratio(skill, sent)
+                # You can adjust the partial of matching here:
+                # 100 => exact matching 0 => no matching
+                if ratio > self.match_threshold:
+                    logging.info('Found fuzzy matches passing threshold in %s', sent)
+                    for match in self.fuzzy_matches_in_sentence(skill, sent.encode('utf-8')):
+                        logging.info('Returning fuzzy match %s in sent: %s', match, sent)
+                        yield match

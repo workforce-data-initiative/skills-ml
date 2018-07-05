@@ -14,7 +14,7 @@ def test_exactmatch_skill_extractor():
     ]
     with utils.makeNamedTemporaryCSV(content, '\t') as skills_filename:
         extractor = ExactMatchSkillExtractor(skill_lookup_path=skills_filename)
-        result = [extractor.document_skill_counts(doc) for doc in [
+        result = [extractor.document_skill_counts({'description': doc}) for doc in [
             'this is a job that needs active listening',
             'this is a reading comprehension job',
             'this is an active and reading listening job',
