@@ -68,6 +68,7 @@ class CachedGeocoder(object):
         if search_string not in self.cache:
             logging.info('%s not found in cache, geocoding', search_string)
             self.cache[search_string] = self.geocode_func(search_string).json
+            self.save()
             time.sleep(self.sleep_time)
         return self.cache[search_string]
 

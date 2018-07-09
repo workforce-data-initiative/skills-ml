@@ -14,12 +14,13 @@ from skills_ml.job_postings.computed_properties.computers import (
     PostingIdPresent,
     TitleCleanPhaseOne,
     TitleCleanPhaseTwo,
-    CBSAandStateFromGeocode,
+    Geography,
     SOCClassifyProperty,
     SkillCounts
 )
 
 from skills_ml.algorithms.skill_extractors import ExactMatchSkillExtractor
+from skills_ml.job_postings.geography_queriers.base import JobGeographyQuerier
 
 from skills_ml.storage import S3Store
 
@@ -125,29 +126,30 @@ class TitleCleanPhaseTwoTest(ComputedPropertyTestCase):
 
 
 @mock_s3
-class CBSAAndStateFromGeocodeTest(ComputedPropertyTestCase):
+class GeographyTest(ComputedPropertyTestCase):
     def setUp(self):
         client = boto3.resource('s3')
         bucket = client.create_bucket(Bucket='test-bucket')
         storage = S3Store('s3://test-bucket/computed_properties')
         cache_storage = S3Store('s3://test-bucket')
-        sample_cbsa_cache = {
-            'AMENIA, North Dakota': ['22020', 'Fargo, ND-MN Metro Area']
-        }
-        bucket.put_object(Key='cbsas.json', Body=json.dumps(sample_cbsa_cache))
-        self.computed_property = CBSAandStateFromGeocode(
+        class SampleJobGeoQuerier(JobGeographyQuerier):
+            name = 'blah'
+            output_columns = (
+                ('city', 'the city'),
+            )
+            def _query(self, job_posting):
+                return ['Fargo']
+        self.computed_property = Geography(
+            geo_querier=SampleJobGeoQuerier(),
             storage=storage,
-            cache_storage=cache_storage,
-            cache_fname='cbsas.json'
         )
-        self.job_postings = [utils.job_posting_factory(datePosted=self.datestring, jobLocation={"@type": "Place", "address": {"addressLocality": "AMENIA", "addressRegion": "ND", "@type": "PostalAddress"}} )]
+        self.job_postings = [utils.job_posting_factory(datePosted=self.datestring)]
         self.computed_property.compute_on_collection(self.job_postings)
 
-    @patch('skills_ml.datasets.cbsa_shapefile.download_shapefile')
-    def test_compute_func(self, download_mock):
+    def test_compute_func(self):
         cache = self.computed_property.cache_for_key(self.datestring)
         job_posting_id = self.job_postings[0]['id']
-        assert cache[job_posting_id] == ['22020', 'Fargo, ND-MN Metro Area', 'ND']
+        assert cache[job_posting_id] == ['Fargo']
 
 
 @mock_s3

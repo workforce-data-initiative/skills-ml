@@ -19,7 +19,8 @@ import logging
 
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.computed_properties.computers import\
-    TitleCleanPhaseOne, PostingIdPresent
+    TitleCleanPhaseOne, PostingIdPresent, Geography
+from skills_ml.job_postings.geography_queriers.state import JobStateQuerier
 from skills_ml.job_postings.computed_properties.aggregators import\
     aggregate_properties
 from skills_ml.storage import FSStore
@@ -47,6 +48,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     # create properties to be grouped on. In this case, we want to group on cleaned job title
     grouping_properties = [
         TitleCleanPhaseOne(storage=storage),
+        Geography(geo_querier=JobStateQuerier(), storage=storage)
     ]
     # create properties to aggregate for each group
     aggregated_properties = [

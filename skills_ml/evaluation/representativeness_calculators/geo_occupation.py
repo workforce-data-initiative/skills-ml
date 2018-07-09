@@ -2,7 +2,7 @@
 Computes geographic representativeness of job postings based on ONET SOC Code
 """
 from collections import Counter
-from skills_ml.job_postings.geography_queriers.cbsa import JobCBSAQuerier
+from skills_ml.job_postings.geography_queriers.cbsa import JobCBSAFromCrosswalkQuerier
 
 
 class GeoOccupationRepresentativenessCalculator(object):
@@ -18,7 +18,7 @@ class GeoOccupationRepresentativenessCalculator(object):
     """
     def __init__(self, geo_querier=None, normalizer=None):
         self.normalizer = normalizer
-        self.cbsa_querier = geo_querier or JobCBSAQuerier()
+        self.cbsa_querier = geo_querier or JobCBSAFromCrosswalkQuerier()
 
     def dataset_distribution(self, job_postings):
         """
