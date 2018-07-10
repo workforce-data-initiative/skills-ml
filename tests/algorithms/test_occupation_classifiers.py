@@ -86,7 +86,7 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
             soc_cls = SocClassifier(knn)
 
             assert knn.predict_soc(doc)[0] == soc_cls.predict_soc(doc)[0]
-
+            assert knn.predict_soc(doc) == ['11']
 
             # Build Annoy index
             knn.build_ann_indexer(num_trees=5)

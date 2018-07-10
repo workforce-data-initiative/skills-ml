@@ -1,6 +1,8 @@
-from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import KFold, StratifiedKFold
+
+from skills_ml.storage import FSStore
 from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
 import importlib
 
@@ -38,33 +40,54 @@ class ClassifierTrainer(object):
         k_folds (int)
         n_jobs (int)
     """
-    def __init__(self, k_folds, n_jobs, grid_config):
-        # self.storage = storage
-        # self.target_variable = target_variable
+    def __init__(self, k_folds, grid_config=None, target_variable='major_group', storage=None,
+                 random_state_for_split=None, scores=['accuracy'], n_jobs=3):
+        self.storage = FSStore() if storage is None else storage
+        self.target_variable = target_variable
         self.k_folds = k_folds
         self.n_jobs = n_jobs
-        self.grid_config = grid_config
+        self.grid_config = self.default_grid_config if grid_config is None else grid_config
         self.cls_cv_result = {}
+        self.scores = scores
+        self.random_state_for_split = random_state_for_split
 
-    def _train(self, matrix_store):
+    @property
+    def default_grid_config(self):
+        return {
+                'sklearn.ensemble.ExtraTreesClassifier': {
+                    'n_estimators': [100, 500],
+                    'criterion': ['gini', 'entropy'],
+                    'max_depth': [1, 5, 10, 20, 50],
+                    'max_features': ['sqrt', 'log2'],
+                    'min_samples_split': [2, 5, 10]
+                    },
+                'sklearn.ensemble.RandomForestClassifier': {
+                    'n_estimators': [100, 500],
+                    'criterion': ['gini', 'entropy'],
+                    'max_depth': [1, 5, 10, 20, 50],
+                    'max_features': ['sqrt', 'log2'],
+                    'min_samples_split': [2, 5, 10]
+                    }
+                }
+
+    def fit(self, X, y):
         """Fit a model to a training set. Works on any modeling class that
         is vailable in this package's environment and implements .fit
 
         Args:
-
-        Returns:
+            X (list or np.array) training vectors
+            y (list or np.array) Target relative to X for classification
 
         """
-        scores = ['accuracy']
-        y =  matrix_store.labels
         for class_path, parameter_config in self.grid_config.items():
             module_name, class_name = class_path.rsplit(".", 1)
             module = importlib.import_module(module_name)
             cls = getattr(module, class_name)
-            for score in scores:
-                cls_cv = GridSearchCV(cls(), parameter_config, cv=self.k_folds, scoring=f'{score}', n_jobs=self.n_jobs)
+            kf = StratifiedKFold(n_splits=self.k_folds, random_state=self.random_state_for_split)
+            for score in self.scores:
+                cls_cv = GridSearchCV(cls(), parameter_config, cv=kf, scoring=score, n_jobs=self.n_jobs)
 
-                self.cls_cv_result[class_name] = {score: cls_cv.fit(matrix_store.matrix, y)}
+                self.cls_cv_result[class_name] = {score: cls_cv.fit(X, y)}
 
     def save_result(self):
         return NotImplementedError

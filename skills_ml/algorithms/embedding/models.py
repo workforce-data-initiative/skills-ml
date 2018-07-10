@@ -3,7 +3,7 @@ from skills_ml.storage import FSStore
 from skills_ml.algorithms.embedding.base import ModelStorage
 
 from gensim.models import Doc2Vec, Word2Vec
-
+from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 import logging
 
@@ -70,3 +70,14 @@ class Doc2VecModel(ModelStorage, Doc2Vec):
         Doc2Vec.__init__(self, *args, **kwargs)
         self.model_name = ""
         self.lookup_dict = None
+
+
+class EmbeddingTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, embedding_model):
+        self.embedding_model = embedding_model
+
+    def fit(self, X, y):
+        return self
+
+    def transform(self, X):
+        return [self.embedding_model.infer_vector(x) for x in X]
