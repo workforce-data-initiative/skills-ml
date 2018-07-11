@@ -6,43 +6,43 @@ import json
 class CompetencyTest(TestCase):
     def test_create(self):
         # Should be able to create a competency with the necessary inputs
-        competency = Competency(identifier='123', name='communication', category='social skills')
+        competency = Competency(identifier='123', name='communication', categories=['social skills'])
         assert competency.identifier == '123'
         assert competency.name == 'communication'
-        assert competency.category == 'social skills'
+        assert competency.categories[0] == 'social skills'
 
     def test_equivalence(self):
         # Two competencies with the same id should be equivalent
-        competency = Competency(identifier='123', name='communication', category='social skills')
-        competency_two = Competency(identifier='123', name='communication', category='social skills')
+        competency = Competency(identifier='123', name='communication', categories=['social skills'])
+        competency_two = Competency(identifier='123', name='communication', categories=['social skills'])
         assert competency == competency_two
 
     def test_add_parent(self):
         # Adding a parent should mutate the parents on self and the children on the parent
-        communication = Competency(identifier='123', name='communication', category='social skills')
-        listening = Competency(identifier='456', name='listening', category='social skills')
+        communication = Competency(identifier='123', name='communication', categories=['social skills'])
+        listening = Competency(identifier='456', name='listening', categories=['social skills'])
         communication.add_parent(listening)
         assert listening in communication.parents
         assert communication in listening.children
 
     def test_add_child(self):
         # Adding a child should mutate the children on self and the parents on the child
-        communication = Competency(identifier='123', name='communication', category='social skills')
-        listening = Competency(identifier='456', name='listening', category='social skills')
+        communication = Competency(identifier='123', name='communication', categories=['social skills'])
+        listening = Competency(identifier='456', name='listening', categories=['social skills'])
         listening.add_child(communication)
         assert listening in communication.parents
         assert communication in listening.children
 
     def test_jsonld(self):
         # The jsonld version of a competency should include all parent/child links, using the jsonld id
-        communication = Competency(identifier='123', name='communication', category='social skills')
-        listening = Competency(identifier='456', name='listening', category='social skills')
+        communication = Competency(identifier='123', name='communication', categories=['social skills'])
+        listening = Competency(identifier='456', name='listening', categories=['social skills'])
         listening.add_child(communication)
         assert listening.jsonld_full == {
             '@type': 'Competency',
             '@id': '456',
             'name': 'listening',
-            'competencyCategory': 'social skills',
+            'competencyCategory': ['social skills'],
             'hasChild': [{'@type': 'Competency', '@id': '123'}],
             'isChildOf': [],
         }
@@ -52,13 +52,13 @@ class CompetencyTest(TestCase):
             '@type': 'Competency',
             '@id': '456',
             'name': 'listening',
-            'competencyCategory': 'social skills',
+            'competencyCategory': ['social skills'],
             'hasChild': [{'@type': 'Competency', '@id': '123'}],
             'isChildOf': [],
             'extra_kwarg': 'extra_value'
         }
 
-        target_competency = Competency(identifier='456', name='listening', category='social skills', extra_kwarg='extra_value')
+        target_competency = Competency(identifier='456', name='listening', categories=['social skills'], extra_kwarg='extra_value')
         target_competency.add_child(Competency(identifier='123'))
         competency = Competency.from_jsonld(jsonld_input)
         assert competency == target_competency
@@ -124,7 +124,7 @@ class OccupationTest(TestCase):
 class CompetencyOccupationEdgeTest(TestCase):
     def test_create(self):
         # Should be able to create an edge with a competency and occupation
-        competency = Competency(identifier='123', name='communication', category='social skills')
+        competency = Competency(identifier='123', name='communication', categories=['social skills'])
         occupation = Occupation(identifier='456', name='Civil Engineer')
         edge = CompetencyOccupationEdge(competency=competency, occupation=occupation)
         assert edge.competency == competency
@@ -132,7 +132,7 @@ class CompetencyOccupationEdgeTest(TestCase):
 
 
     def test_jsonld(self):
-        competency = Competency(identifier='111', name='communication', category='social skills')
+        competency = Competency(identifier='111', name='communication', categories=['social skills'])
         occupation = Occupation(identifier='123', name='Civil Engineer')
         edge = CompetencyOccupationEdge(competency=competency, occupation=occupation)
         assert edge.jsonld_full == {
@@ -173,7 +173,7 @@ class CompetencyOccupationEdgeTest(TestCase):
 class OntologyTest(TestCase):
     def test_add_competency(self):
         # Should be able to add a competency to an ontology
-        competency = Competency(identifier='123', name='communication', category='social skills')
+        competency = Competency(identifier='123', name='communication', categories=['social skills'])
         ontology = CompetencyOntology()
         ontology.add_competency(competency)
         assert len(ontology.competencies) == 1
@@ -190,7 +190,7 @@ class OntologyTest(TestCase):
     def test_add_edge(self):
         # Should be able to add an edge between an occupation and a competency to an ontology
         occupation = Occupation(identifier='456', name='Civil Engineer')
-        competency = Competency(identifier='123', name='communication', category='social skills')
+        competency = Competency(identifier='123', name='communication', categories=['social skills'])
         ontology = CompetencyOntology()
         ontology.add_edge(competency=competency, occupation=occupation)
         assert competency in ontology.competencies
@@ -200,10 +200,10 @@ class OntologyTest(TestCase):
     def test_filter_by(self):
         # Should be able to take an ontology and filter it by the edges, returning a new sub-ontology
         ontology = CompetencyOntology()
-        comm = Competency(identifier='123', name='communication', category='social skills')
-        python = Competency(identifier='999', name='python', category='Technologies')
-        math = Competency(identifier='111', name='mathematics', category='Knowledge')
-        science = Competency(identifier='222', name='science', category='Knowledge')
+        comm = Competency(identifier='123', name='communication', categories=['social skills'])
+        python = Competency(identifier='999', name='python', categories=['Technologies'])
+        math = Competency(identifier='111', name='mathematics', categories=['Knowledge'])
+        science = Competency(identifier='222', name='science', categories=['Knowledge'])
 
         civil_engineer = Occupation(identifier='123', name='Civil Engineer')
         ontology.add_competency(comm)
@@ -214,7 +214,7 @@ class OntologyTest(TestCase):
         ontology.add_edge(occupation=civil_engineer, competency=math)
         ontology.add_edge(occupation=civil_engineer, competency=science)
 
-        tech_ontology = ontology.filter_by(lambda edge: edge.competency.category == 'Technologies')
+        tech_ontology = ontology.filter_by(lambda edge: 'Technologies' in edge.competency.categories)
         assert tech_ontology.competencies == {python}
         assert len(tech_ontology.occupations) == 0
 
@@ -224,10 +224,10 @@ class OntologyTest(TestCase):
 
     def ontology(self):
         ontology = CompetencyOntology()
-        comm = Competency(identifier='123', name='communication', category='social skills')
-        python = Competency(identifier='999', name='python', category='Technologies')
-        math = Competency(identifier='111', name='mathematics', category='Knowledge')
-        science = Competency(identifier='222', name='science', category='Knowledge')
+        comm = Competency(identifier='123', name='communication', categories=['social skills'])
+        python = Competency(identifier='999', name='python', categories=['Technologies'])
+        math = Competency(identifier='111', name='mathematics', categories=['Knowledge'])
+        science = Competency(identifier='222', name='science', categories=['Knowledge'])
 
         civil_engineer = Occupation(identifier='123', name='Civil Engineer')
         ontology.add_competency(comm)
@@ -253,7 +253,7 @@ class OntologyTest(TestCase):
                     '@type': 'Competency',
                     '@id': '111',
                     'name': 'mathematics',
-                    'competencyCategory': 'Knowledge',
+                    'competencyCategory': ['Knowledge'],
                     'hasChild': [],
                     'isChildOf': [],
                 },
@@ -261,7 +261,7 @@ class OntologyTest(TestCase):
                     '@type': 'Competency',
                     '@id': '123',
                     'name': 'communication',
-                    'competencyCategory': 'social skills',
+                    'competencyCategory': ['social skills'],
                     'hasChild': [],
                     'isChildOf': [],
                 },
@@ -269,7 +269,7 @@ class OntologyTest(TestCase):
                     '@type': 'Competency',
                     '@id': '222',
                     'name': 'science',
-                    'competencyCategory': 'Knowledge',
+                    'competencyCategory': ['Knowledge'],
                     'hasChild': [],
                     'isChildOf': [],
                 },
@@ -277,7 +277,7 @@ class OntologyTest(TestCase):
                     '@type': 'Competency',
                     '@id': '999',
                     'name': 'python',
-                    'competencyCategory': 'Technologies',
+                    'competencyCategory': ['Technologies'],
                     'hasChild': [],
                     'isChildOf': [],
                 },

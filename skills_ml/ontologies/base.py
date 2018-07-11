@@ -1,4 +1,4 @@
-from typing import Callable, Text
+from typing import Callable, Text, List
 import json
 
 
@@ -8,13 +8,13 @@ class Competency(object):
     Args:
         identifier: A unique identifier for this competency. Choose the identifier wisely as it will be used for equivalence with other competency objects
         name: A name for the competency (e.g. Microsoft Office)
-        category: An optional text category for the competency that is not a higher-level competency itself
+        categories: Optional text categories for the competency that is not a higher-level competency itself
     """
 
-    def __init__(self, identifier: Text, name: Text=None, category: Text=None, **kwargs):
+    def __init__(self, identifier: Text, name: Text=None, categories: List[Text]=None, **kwargs):
         self.identifier = identifier
         self.name = name or ''
-        self.category = category
+        self.categories = categories or []
         self.other_attributes = kwargs
         self.children = set()
         self.parents = set()
@@ -25,7 +25,7 @@ class Competency(object):
         obj = cls(
             identifier=jsonld_input['@id'],
             name=jsonld_input.get('name', ''),
-            category=jsonld_input.get('competencyCategory', None),
+            categories=jsonld_input.get('competencyCategory', None),
             **extra_kwargs
         )
         for jsonld_child_obj in jsonld_input.get('hasChild', []):
@@ -42,7 +42,7 @@ class Competency(object):
         return hash(self.identifier)
 
     def __repr__(self):
-        return f'Competency(identifier={self.identifier}, name={self.name}, category={self.category}, {self.other_attributes})'
+        return f'Competency(identifier={self.identifier}, name={self.name}, categories={self.categories}, {self.other_attributes})'
 
     @property
     def jsonld_id(self):
@@ -57,7 +57,7 @@ class Competency(object):
             '@type': 'Competency',
             '@id': self.identifier,
             'name': self.name,
-            'competencyCategory': self.category,
+            'competencyCategory': self.categories,
             'hasChild': [child.jsonld_id for child in self.children],
             'isChildOf': [parent.jsonld_id for parent in self.parents],
         }
