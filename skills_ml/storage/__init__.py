@@ -55,7 +55,10 @@ class S3Store(Store):
 
     def list(self, subpath):
         s3 = s3fs.S3FileSystem()
-        return s3.ls(os.path.join(self.path, subpath))
+        return [
+            k.split('/')[-1] for k in
+            s3.ls(os.path.join(self.path, subpath))   
+        ]
 
 
 class FSStore(Store):
