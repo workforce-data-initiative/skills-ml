@@ -4,7 +4,7 @@
     
     <url>
      <loc>/</loc>
-     <lastmod>2018-05-04</lastmod>
+     <lastmod>2018-07-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,7 +12,15 @@
     
     <url>
      <loc>/examples/</loc>
-     <lastmod>2018-05-04</lastmod>
+     <lastmod>2018-07-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/ontologies/</loc>
+     <lastmod>2018-07-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -20,7 +28,7 @@
     
     <url>
      <loc>/common_schema/</loc>
-     <lastmod>2018-05-04</lastmod>
+     <lastmod>2018-07-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -28,7 +36,7 @@
     
     <url>
      <loc>/skills_ml.evaluation/</loc>
-     <lastmod>2018-05-04</lastmod>
+     <lastmod>2018-07-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -36,7 +44,7 @@
     
     <url>
      <loc>/skills_ml.algorithms/</loc>
-     <lastmod>2018-05-04</lastmod>
+     <lastmod>2018-07-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -44,7 +52,7 @@
     
     <url>
      <loc>/skills_ml.job_postings/</loc>
-     <lastmod>2018-05-04</lastmod>
+     <lastmod>2018-07-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -52,7 +60,7 @@
     
     <url>
      <loc>/skills_ml.datasets/</loc>
-     <lastmod>2018-05-04</lastmod>
+     <lastmod>2018-07-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     

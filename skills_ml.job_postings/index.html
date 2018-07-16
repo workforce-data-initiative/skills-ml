@@ -70,10 +70,6 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
-      <a href="#skills_mljob_postingsaggregate" tabindex="1" class="md-skip">
-        Skip to content
-      </a>
-    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
@@ -191,6 +187,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../ontologies/" title="Ontology Class" class="md-nav__link">
+      Ontology Class
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="../common_schema/" title="Job Posting Common Schema" class="md-nav__link">
       Job Posting Common Schema
     </a>
@@ -233,573 +241,9 @@
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
     
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        Job Posting Dataset Processors
-      </label>
-    
     <a href="./" title="Job Posting Dataset Processors" class="md-nav__link md-nav__link--active">
       Job Posting Dataset Processors
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregate" title="skills_ml.job_postings.aggregate" class="md-nav__link">
-    skills_ml.job_postings.aggregate
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobaggregator" title="JobAggregator" class="md-nav__link">
-    JobAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#countaggregator" title="CountAggregator" class="md-nav__link">
-    CountAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#skillaggregator" title="SkillAggregator" class="md-nav__link">
-    SkillAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#occupationscopedskillaggregator" title="OccupationScopedSkillAggregator" class="md-nav__link">
-    OccupationScopedSkillAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#soccodeaggregator" title="SocCodeAggregator" class="md-nav__link">
-    SocCodeAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#givensoccodeaggregator" title="GivenSocCodeAggregator" class="md-nav__link">
-    GivenSocCodeAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatedataset_transform" title="skills_ml.job_postings.aggregate.dataset_transform" class="md-nav__link">
-    skills_ml.job_postings.aggregate.dataset_transform
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#datasetstatscounter" title="DatasetStatsCounter" class="md-nav__link">
-    DatasetStatsCounter
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#datasetstatsaggregator" title="DatasetStatsAggregator" class="md-nav__link">
-    DatasetStatsAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#globalstatsaggregator" title="GlobalStatsAggregator" class="md-nav__link">
-    GlobalStatsAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatefield_values" title="skills_ml.job_postings.aggregate.field_values" class="md-nav__link">
-    skills_ml.job_postings.aggregate.field_values
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#fieldvaluecounter" title="FieldValueCounter" class="md-nav__link">
-    FieldValueCounter
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregategeo" title="skills_ml.job_postings.aggregate.geo" class="md-nav__link">
-    skills_ml.job_postings.aggregate.geo
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#geoaggregator" title="GeoAggregator" class="md-nav__link">
-    GeoAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatepandas" title="skills_ml.job_postings.aggregate.pandas" class="md-nav__link">
-    skills_ml.job_postings.aggregate.pandas
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#aggregatefunction" title="AggregateFunction" class="md-nav__link">
-    AggregateFunction
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#listy_n_most_common" title="listy_n_most_common" class="md-nav__link">
-    listy_n_most_common
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatesoc_code" title="skills_ml.job_postings.aggregate.soc_code" class="md-nav__link">
-    skills_ml.job_postings.aggregate.soc_code
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#geosocaggregator" title="GeoSocAggregator" class="md-nav__link">
-    GeoSocAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatetitle" title="skills_ml.job_postings.aggregate.title" class="md-nav__link">
-    skills_ml.job_postings.aggregate.title
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#geotitleaggregator" title="GeoTitleAggregator" class="md-nav__link">
-    GeoTitleAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscommon_schema" title="skills_ml.job_postings.common_schema" class="md-nav__link">
-    skills_ml.job_postings.common_schema
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobpostingcollectionfroms3" title="JobPostingCollectionFromS3" class="md-nav__link">
-    JobPostingCollectionFromS3
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#jobpostingcollectionsample" title="JobPostingCollectionSample" class="md-nav__link">
-    JobPostingCollectionSample
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#generate_job_postings_from_s3_for_quarters" title="generate_job_postings_from_s3_for_quarters" class="md-nav__link">
-    generate_job_postings_from_s3_for_quarters
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#batches_generator" title="batches_generator" class="md-nav__link">
-    batches_generator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscomputed_properties" title="skills_ml.job_postings.computed_properties" class="md-nav__link">
-    skills_ml.job_postings.computed_properties
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobpostingcomputedproperty" title="JobPostingComputedProperty" class="md-nav__link">
-    JobPostingComputedProperty
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#computedpropertycolumn" title="ComputedPropertyColumn" class="md-nav__link">
-    ComputedPropertyColumn
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscomputed_propertiesaggregators" title="skills_ml.job_postings.computed_properties.aggregators" class="md-nav__link">
-    skills_ml.job_postings.computed_properties.aggregators
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#df_for_properties_and_dates" title="df_for_properties_and_dates" class="md-nav__link">
-    df_for_properties_and_dates
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expand_array_col_to_many_cols" title="expand_array_col_to_many_cols" class="md-nav__link">
-    expand_array_col_to_many_cols
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#base_func" title="base_func" class="md-nav__link">
-    base_func
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#aggregation_for_properties_and_dates" title="aggregation_for_properties_and_dates" class="md-nav__link">
-    aggregation_for_properties_and_dates
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#aggregate_properties_for_quarter" title="aggregate_properties_for_quarter" class="md-nav__link">
-    aggregate_properties_for_quarter
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscomputed_propertiescomputers" title="skills_ml.job_postings.computed_properties.computers" class="md-nav__link">
-    skills_ml.job_postings.computed_properties.computers
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#titlecleanphaseone" title="TitleCleanPhaseOne" class="md-nav__link">
-    TitleCleanPhaseOne
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#titlecleanphasetwo" title="TitleCleanPhaseTwo" class="md-nav__link">
-    TitleCleanPhaseTwo
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cbsaandstatefromgeocode" title="CBSAandStateFromGeocode" class="md-nav__link">
-    CBSAandStateFromGeocode
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#socclassifyproperty" title="SOCClassifyProperty" class="md-nav__link">
-    SOCClassifyProperty
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#classifycommon" title="ClassifyCommon" class="md-nav__link">
-    ClassifyCommon
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#classifytop" title="ClassifyTop" class="md-nav__link">
-    ClassifyTop
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#givensoc" title="GivenSOC" class="md-nav__link">
-    GivenSOC
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#socscopedexactmatchskillcounts" title="SocScopedExactMatchSkillCounts" class="md-nav__link">
-    SocScopedExactMatchSkillCounts
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#exactmatchskillcounts" title="ExactMatchSkillCounts" class="md-nav__link">
-    ExactMatchSkillCounts
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#postingidpresent" title="PostingIdPresent" class="md-nav__link">
-    PostingIdPresent
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscorpora" title="skills_ml.job_postings.corpora" class="md-nav__link">
-    skills_ml.job_postings.corpora
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscorporabasic" title="skills_ml.job_postings.corpora.basic" class="md-nav__link">
-    skills_ml.job_postings.corpora.basic
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#corpuscreator" title="CorpusCreator" class="md-nav__link">
-    CorpusCreator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#simplecorpuscreator" title="SimpleCorpusCreator" class="md-nav__link">
-    SimpleCorpusCreator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#doc2vecgensimcorpuscreator" title="Doc2VecGensimCorpusCreator" class="md-nav__link">
-    Doc2VecGensimCorpusCreator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#jobcategorycorpuscreator" title="JobCategoryCorpusCreator" class="md-nav__link">
-    JobCategoryCorpusCreator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsgeography_queriers" title="skills_ml.job_postings.geography_queriers" class="md-nav__link">
-    skills_ml.job_postings.geography_queriers
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#job_posting_search_strings" title="job_posting_search_strings" class="md-nav__link">
-    job_posting_search_strings
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsgeography_querierscbsa" title="skills_ml.job_postings.geography_queriers.cbsa" class="md-nav__link">
-    skills_ml.job_postings.geography_queriers.cbsa
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobcbsaquerier" title="JobCBSAQuerier" class="md-nav__link">
-    JobCBSAQuerier
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsgeography_querierscbsa_from_geocode" title="skills_ml.job_postings.geography_queriers.cbsa_from_geocode" class="md-nav__link">
-    skills_ml.job_postings.geography_queriers.cbsa_from_geocode
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobcbsafromgeocodequerier" title="JobCBSAFromGeocodeQuerier" class="md-nav__link">
-    JobCBSAFromGeocodeQuerier
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsraw" title="skills_ml.job_postings.raw" class="md-nav__link">
-    skills_ml.job_postings.raw
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsrawusajobs" title="skills_ml.job_postings.raw.usajobs" class="md-nav__link">
-    skills_ml.job_postings.raw.usajobs
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsrawvirginia" title="skills_ml.job_postings.raw.virginia" class="md-nav__link">
-    skills_ml.job_postings.raw.virginia
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingssample" title="skills_ml.job_postings.sample" class="md-nav__link">
-    skills_ml.job_postings.sample
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobsampler" title="JobSampler" class="md-nav__link">
-    JobSampler
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
     
   </li>
 
@@ -823,859 +267,105 @@
               </div>
             
             
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregate" title="skills_ml.job_postings.aggregate" class="md-nav__link">
-    skills_ml.job_postings.aggregate
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobaggregator" title="JobAggregator" class="md-nav__link">
-    JobAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#countaggregator" title="CountAggregator" class="md-nav__link">
-    CountAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#skillaggregator" title="SkillAggregator" class="md-nav__link">
-    SkillAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#occupationscopedskillaggregator" title="OccupationScopedSkillAggregator" class="md-nav__link">
-    OccupationScopedSkillAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#soccodeaggregator" title="SocCodeAggregator" class="md-nav__link">
-    SocCodeAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#givensoccodeaggregator" title="GivenSocCodeAggregator" class="md-nav__link">
-    GivenSocCodeAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatedataset_transform" title="skills_ml.job_postings.aggregate.dataset_transform" class="md-nav__link">
-    skills_ml.job_postings.aggregate.dataset_transform
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#datasetstatscounter" title="DatasetStatsCounter" class="md-nav__link">
-    DatasetStatsCounter
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#datasetstatsaggregator" title="DatasetStatsAggregator" class="md-nav__link">
-    DatasetStatsAggregator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#globalstatsaggregator" title="GlobalStatsAggregator" class="md-nav__link">
-    GlobalStatsAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatefield_values" title="skills_ml.job_postings.aggregate.field_values" class="md-nav__link">
-    skills_ml.job_postings.aggregate.field_values
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#fieldvaluecounter" title="FieldValueCounter" class="md-nav__link">
-    FieldValueCounter
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregategeo" title="skills_ml.job_postings.aggregate.geo" class="md-nav__link">
-    skills_ml.job_postings.aggregate.geo
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#geoaggregator" title="GeoAggregator" class="md-nav__link">
-    GeoAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatepandas" title="skills_ml.job_postings.aggregate.pandas" class="md-nav__link">
-    skills_ml.job_postings.aggregate.pandas
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#aggregatefunction" title="AggregateFunction" class="md-nav__link">
-    AggregateFunction
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#listy_n_most_common" title="listy_n_most_common" class="md-nav__link">
-    listy_n_most_common
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatesoc_code" title="skills_ml.job_postings.aggregate.soc_code" class="md-nav__link">
-    skills_ml.job_postings.aggregate.soc_code
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#geosocaggregator" title="GeoSocAggregator" class="md-nav__link">
-    GeoSocAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsaggregatetitle" title="skills_ml.job_postings.aggregate.title" class="md-nav__link">
-    skills_ml.job_postings.aggregate.title
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#geotitleaggregator" title="GeoTitleAggregator" class="md-nav__link">
-    GeoTitleAggregator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscommon_schema" title="skills_ml.job_postings.common_schema" class="md-nav__link">
-    skills_ml.job_postings.common_schema
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobpostingcollectionfroms3" title="JobPostingCollectionFromS3" class="md-nav__link">
-    JobPostingCollectionFromS3
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#jobpostingcollectionsample" title="JobPostingCollectionSample" class="md-nav__link">
-    JobPostingCollectionSample
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#generate_job_postings_from_s3_for_quarters" title="generate_job_postings_from_s3_for_quarters" class="md-nav__link">
-    generate_job_postings_from_s3_for_quarters
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#batches_generator" title="batches_generator" class="md-nav__link">
-    batches_generator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscomputed_properties" title="skills_ml.job_postings.computed_properties" class="md-nav__link">
-    skills_ml.job_postings.computed_properties
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobpostingcomputedproperty" title="JobPostingComputedProperty" class="md-nav__link">
-    JobPostingComputedProperty
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#computedpropertycolumn" title="ComputedPropertyColumn" class="md-nav__link">
-    ComputedPropertyColumn
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscomputed_propertiesaggregators" title="skills_ml.job_postings.computed_properties.aggregators" class="md-nav__link">
-    skills_ml.job_postings.computed_properties.aggregators
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#df_for_properties_and_dates" title="df_for_properties_and_dates" class="md-nav__link">
-    df_for_properties_and_dates
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expand_array_col_to_many_cols" title="expand_array_col_to_many_cols" class="md-nav__link">
-    expand_array_col_to_many_cols
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#base_func" title="base_func" class="md-nav__link">
-    base_func
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#aggregation_for_properties_and_dates" title="aggregation_for_properties_and_dates" class="md-nav__link">
-    aggregation_for_properties_and_dates
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#aggregate_properties_for_quarter" title="aggregate_properties_for_quarter" class="md-nav__link">
-    aggregate_properties_for_quarter
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscomputed_propertiescomputers" title="skills_ml.job_postings.computed_properties.computers" class="md-nav__link">
-    skills_ml.job_postings.computed_properties.computers
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#titlecleanphaseone" title="TitleCleanPhaseOne" class="md-nav__link">
-    TitleCleanPhaseOne
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#titlecleanphasetwo" title="TitleCleanPhaseTwo" class="md-nav__link">
-    TitleCleanPhaseTwo
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cbsaandstatefromgeocode" title="CBSAandStateFromGeocode" class="md-nav__link">
-    CBSAandStateFromGeocode
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#socclassifyproperty" title="SOCClassifyProperty" class="md-nav__link">
-    SOCClassifyProperty
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#classifycommon" title="ClassifyCommon" class="md-nav__link">
-    ClassifyCommon
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#classifytop" title="ClassifyTop" class="md-nav__link">
-    ClassifyTop
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#givensoc" title="GivenSOC" class="md-nav__link">
-    GivenSOC
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#socscopedexactmatchskillcounts" title="SocScopedExactMatchSkillCounts" class="md-nav__link">
-    SocScopedExactMatchSkillCounts
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#exactmatchskillcounts" title="ExactMatchSkillCounts" class="md-nav__link">
-    ExactMatchSkillCounts
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#postingidpresent" title="PostingIdPresent" class="md-nav__link">
-    PostingIdPresent
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscorpora" title="skills_ml.job_postings.corpora" class="md-nav__link">
-    skills_ml.job_postings.corpora
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingscorporabasic" title="skills_ml.job_postings.corpora.basic" class="md-nav__link">
-    skills_ml.job_postings.corpora.basic
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#corpuscreator" title="CorpusCreator" class="md-nav__link">
-    CorpusCreator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#simplecorpuscreator" title="SimpleCorpusCreator" class="md-nav__link">
-    SimpleCorpusCreator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#doc2vecgensimcorpuscreator" title="Doc2VecGensimCorpusCreator" class="md-nav__link">
-    Doc2VecGensimCorpusCreator
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#jobcategorycorpuscreator" title="JobCategoryCorpusCreator" class="md-nav__link">
-    JobCategoryCorpusCreator
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsgeography_queriers" title="skills_ml.job_postings.geography_queriers" class="md-nav__link">
-    skills_ml.job_postings.geography_queriers
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#job_posting_search_strings" title="job_posting_search_strings" class="md-nav__link">
-    job_posting_search_strings
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsgeography_querierscbsa" title="skills_ml.job_postings.geography_queriers.cbsa" class="md-nav__link">
-    skills_ml.job_postings.geography_queriers.cbsa
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobcbsaquerier" title="JobCBSAQuerier" class="md-nav__link">
-    JobCBSAQuerier
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsgeography_querierscbsa_from_geocode" title="skills_ml.job_postings.geography_queriers.cbsa_from_geocode" class="md-nav__link">
-    skills_ml.job_postings.geography_queriers.cbsa_from_geocode
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobcbsafromgeocodequerier" title="JobCBSAFromGeocodeQuerier" class="md-nav__link">
-    JobCBSAFromGeocodeQuerier
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsraw" title="skills_ml.job_postings.raw" class="md-nav__link">
-    skills_ml.job_postings.raw
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsrawusajobs" title="skills_ml.job_postings.raw.usajobs" class="md-nav__link">
-    skills_ml.job_postings.raw.usajobs
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingsrawvirginia" title="skills_ml.job_postings.raw.virginia" class="md-nav__link">
-    skills_ml.job_postings.raw.virginia
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#skills_mljob_postingssample" title="skills_ml.job_postings.sample" class="md-nav__link">
-    skills_ml.job_postings.sample
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jobsampler" title="JobSampler" class="md-nav__link">
-    JobSampler
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                  <h1>Job Posting Dataset Processors</h1>
-                
-                <div class="toc">
-<ul>
-<li><a href="#skills_mljob_postingsaggregate">skills_ml.job_postings.aggregate</a><ul>
-<li><a href="#jobaggregator">JobAggregator</a></li>
-<li><a href="#countaggregator">CountAggregator</a></li>
-<li><a href="#skillaggregator">SkillAggregator</a></li>
-<li><a href="#occupationscopedskillaggregator">OccupationScopedSkillAggregator</a></li>
-<li><a href="#soccodeaggregator">SocCodeAggregator</a></li>
-<li><a href="#givensoccodeaggregator">GivenSocCodeAggregator</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsaggregatedataset_transform">skills_ml.job_postings.aggregate.dataset_transform</a><ul>
-<li><a href="#datasetstatscounter">DatasetStatsCounter</a></li>
-<li><a href="#datasetstatsaggregator">DatasetStatsAggregator</a></li>
-<li><a href="#globalstatsaggregator">GlobalStatsAggregator</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsaggregatefield_values">skills_ml.job_postings.aggregate.field_values</a><ul>
-<li><a href="#fieldvaluecounter">FieldValueCounter</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsaggregategeo">skills_ml.job_postings.aggregate.geo</a><ul>
-<li><a href="#geoaggregator">GeoAggregator</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsaggregatepandas">skills_ml.job_postings.aggregate.pandas</a><ul>
-<li><a href="#aggregatefunction">AggregateFunction</a></li>
-<li><a href="#listy_n_most_common">listy_n_most_common</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsaggregatesoc_code">skills_ml.job_postings.aggregate.soc_code</a><ul>
-<li><a href="#geosocaggregator">GeoSocAggregator</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsaggregatetitle">skills_ml.job_postings.aggregate.title</a><ul>
-<li><a href="#geotitleaggregator">GeoTitleAggregator</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingscommon_schema">skills_ml.job_postings.common_schema</a><ul>
-<li><a href="#jobpostingcollectionfroms3">JobPostingCollectionFromS3</a></li>
-<li><a href="#jobpostingcollectionsample">JobPostingCollectionSample</a></li>
-<li><a href="#generate_job_postings_from_s3_for_quarters">generate_job_postings_from_s3_for_quarters</a></li>
-<li><a href="#batches_generator">batches_generator</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingscomputed_properties">skills_ml.job_postings.computed_properties</a><ul>
-<li><a href="#jobpostingcomputedproperty">JobPostingComputedProperty</a></li>
-<li><a href="#computedpropertycolumn">ComputedPropertyColumn</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingscomputed_propertiesaggregators">skills_ml.job_postings.computed_properties.aggregators</a><ul>
-<li><a href="#df_for_properties_and_dates">df_for_properties_and_dates</a></li>
-<li><a href="#expand_array_col_to_many_cols">expand_array_col_to_many_cols</a></li>
-<li><a href="#base_func">base_func</a></li>
-<li><a href="#aggregation_for_properties_and_dates">aggregation_for_properties_and_dates</a></li>
-<li><a href="#aggregate_properties_for_quarter">aggregate_properties_for_quarter</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingscomputed_propertiescomputers">skills_ml.job_postings.computed_properties.computers</a><ul>
-<li><a href="#titlecleanphaseone">TitleCleanPhaseOne</a></li>
-<li><a href="#titlecleanphasetwo">TitleCleanPhaseTwo</a></li>
-<li><a href="#cbsaandstatefromgeocode">CBSAandStateFromGeocode</a></li>
-<li><a href="#socclassifyproperty">SOCClassifyProperty</a></li>
-<li><a href="#classifycommon">ClassifyCommon</a></li>
-<li><a href="#classifytop">ClassifyTop</a></li>
-<li><a href="#givensoc">GivenSOC</a></li>
-<li><a href="#socscopedexactmatchskillcounts">SocScopedExactMatchSkillCounts</a></li>
-<li><a href="#exactmatchskillcounts">ExactMatchSkillCounts</a></li>
-<li><a href="#postingidpresent">PostingIdPresent</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingscorpora">skills_ml.job_postings.corpora</a></li>
-<li><a href="#skills_mljob_postingscorporabasic">skills_ml.job_postings.corpora.basic</a><ul>
-<li><a href="#corpuscreator">CorpusCreator</a></li>
-<li><a href="#simplecorpuscreator">SimpleCorpusCreator</a></li>
-<li><a href="#doc2vecgensimcorpuscreator">Doc2VecGensimCorpusCreator</a></li>
-<li><a href="#jobcategorycorpuscreator">JobCategoryCorpusCreator</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsgeography_queriers">skills_ml.job_postings.geography_queriers</a><ul>
-<li><a href="#job_posting_search_strings">job_posting_search_strings</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsgeography_querierscbsa">skills_ml.job_postings.geography_queriers.cbsa</a><ul>
-<li><a href="#jobcbsaquerier">JobCBSAQuerier</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsgeography_querierscbsa_from_geocode">skills_ml.job_postings.geography_queriers.cbsa_from_geocode</a><ul>
-<li><a href="#jobcbsafromgeocodequerier">JobCBSAFromGeocodeQuerier</a></li>
-</ul>
-</li>
-<li><a href="#skills_mljob_postingsraw">skills_ml.job_postings.raw</a></li>
-<li><a href="#skills_mljob_postingsrawusajobs">skills_ml.job_postings.raw.usajobs</a></li>
-<li><a href="#skills_mljob_postingsrawvirginia">skills_ml.job_postings.raw.virginia</a></li>
-<li><a href="#skills_mljob_postingssample">skills_ml.job_postings.sample</a><ul>
-<li><a href="#jobsampler">JobSampler</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<h2 id="skills_mljob_postingsaggregate"><a class="toclink" href="#skills_mljob_postingsaggregate">skills_ml.job_postings.aggregate <a href="../skills_ml.job_postings.aggregate"></a></a><a class="headerlink" href="#skills_mljob_postingsaggregate" title="Permanent link">&para;</a></h2>
-<p>Aggregate properties of job postings.</p>
-<p>Classes in this module generally wrap calls to some code in <code>skills_ml.algorithms</code> for some arbitrary set of job postings (in schema.org JobPosting format as a Python dict), accumulating the output in a Counter.</p>
-<h3 id="jobaggregator"><a class="toclink" href="#jobaggregator">JobAggregator <a href="../skills_ml.job_postings.aggregate.JobAggregator"></a></a><a class="headerlink" href="#jobaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">JobAggregator(self, output_count=1, output_total=False)
-</code></pre>
+                <h1 id="skills_ml.job_postings.aggregate">skills_ml.job_postings.aggregate</h1>
 
-<p>Base class for different aggregators. Provides a useful interface for subclasses to benefit from.</p>
-<h3 id="countaggregator"><a class="toclink" href="#countaggregator">CountAggregator <a href="../skills_ml.job_postings.aggregate.CountAggregator"></a></a><a class="headerlink" href="#countaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">CountAggregator(self, output_count=1, output_total=False)
-</code></pre>
+<h1 id="skills_ml.job_postings.aggregate.dataset_transform">skills_ml.job_postings.aggregate.dataset_transform</h1>
 
-<p>Counts job postings</p>
-<h3 id="skillaggregator"><a class="toclink" href="#skillaggregator">SkillAggregator <a href="../skills_ml.job_postings.aggregate.SkillAggregator"></a></a><a class="headerlink" href="#skillaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">SkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)
-</code></pre>
-
-<p>Aggregates skills found in job postings</p>
-<p><strong>Args</strong></p>
-<pre><code>skill_extractor (.skill_extractors.FreetextSkillExtractor)
-    an object that returns skill counts from unstructured text
-corpus creator (object) an object that returns a text corpus
-    from a job posting
-</code></pre>
-<h3 id="occupationscopedskillaggregator"><a class="toclink" href="#occupationscopedskillaggregator">OccupationScopedSkillAggregator <a href="../skills_ml.job_postings.aggregate.OccupationScopedSkillAggregator"></a></a><a class="headerlink" href="#occupationscopedskillaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">OccupationScopedSkillAggregator(self, skill_extractor, corpus_creator, *args, **kwargs)
-</code></pre>
-
-<p>Aggregates skills found in job postings using the job's occupation</p>
-<p><strong>Args</strong></p>
-<pre><code>skill_extractor (.skill_extractors.FreetextSkillExtractor)
-    an object that returns skill counts from unstructured text
-corpus creator (object) an object that returns a text corpus
-    from a job posting
-</code></pre>
-<h3 id="soccodeaggregator"><a class="toclink" href="#soccodeaggregator">SocCodeAggregator <a href="../skills_ml.job_postings.aggregate.SocCodeAggregator"></a></a><a class="headerlink" href="#soccodeaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">SocCodeAggregator(self, occupation_classifier, corpus_creator, *args, **kwargs)
-</code></pre>
-
-<p>Aggregates SOC codes inferred from job posting text</p>
-<p><strong>Args</strong></p>
-<pre><code>occupation_classifier (.occupation_classifiers.SocClassifier)
-    An object that returns a classified SOC code and similarity score
-    from unstructured text
-corpus creator (object) an object that returns unstructured text
-    from a job posting
-</code></pre>
-<h3 id="givensoccodeaggregator"><a class="toclink" href="#givensoccodeaggregator">GivenSocCodeAggregator <a href="../skills_ml.job_postings.aggregate.GivenSocCodeAggregator"></a></a><a class="headerlink" href="#givensoccodeaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">GivenSocCodeAggregator(self, output_count=1, output_total=False)
-</code></pre>
-
-<p>Aggregates SOC codes given as an input field</p>
-<p>Caution! We may or may not know where these came from, and the method
-for creating them may differ from record to record</p>
-<h2 id="skills_mljob_postingsaggregatedataset_transform"><a class="toclink" href="#skills_mljob_postingsaggregatedataset_transform">skills_ml.job_postings.aggregate.dataset_transform <a href="../skills_ml.job_postings.aggregate.dataset_transform"></a></a><a class="headerlink" href="#skills_mljob_postingsaggregatedataset_transform" title="Permanent link">&para;</a></h2>
 <p>Track stats of job listing datasets, before and after transformation
 into the common schema.</p>
-<h3 id="datasetstatscounter"><a class="toclink" href="#datasetstatscounter">DatasetStatsCounter <a href="../skills_ml.job_postings.aggregate.dataset_transform.DatasetStatsCounter"></a></a><a class="headerlink" href="#datasetstatscounter" title="Permanent link">&para;</a></h3>
+<h2 id="skills_ml.job_postings.aggregate.dataset_transform.DatasetStatsCounter">DatasetStatsCounter</h2>
+
 <pre><code class="python">DatasetStatsCounter(self, dataset_id, quarter)
 </code></pre>
 
 <p>Accumulate data Dataset ETL statistics for a quarter
 to show presence and absence of different fields,
 and the total count of rows</p>
-<p><strong>Args</strong></p>
-<pre><code>dataset_id (string) A dataset id
-quarter (string) The quarter being analyzed
-</code></pre>
-<h3 id="datasetstatsaggregator"><a class="toclink" href="#datasetstatsaggregator">DatasetStatsAggregator <a href="../skills_ml.job_postings.aggregate.dataset_transform.DatasetStatsAggregator"></a></a><a class="headerlink" href="#datasetstatsaggregator" title="Permanent link">&para;</a></h3>
+<p>Args:
+    dataset_id (string) A dataset id
+    quarter (string) The quarter being analyzed</p>
+<h2 id="skills_ml.job_postings.aggregate.dataset_transform.DatasetStatsAggregator">DatasetStatsAggregator</h2>
+
 <pre><code class="python">DatasetStatsAggregator(self, dataset_id, s3_conn)
 </code></pre>
 
 <p>Aggregate data Dataset ETL statistics up to the dataset level</p>
-<p><strong>Args</strong></p>
-<pre><code>dataset_id (string) A dataset id
-s3_conn (boto.Connection) an s3 connection
-</code></pre>
-<h3 id="globalstatsaggregator"><a class="toclink" href="#globalstatsaggregator">GlobalStatsAggregator <a href="../skills_ml.job_postings.aggregate.dataset_transform.GlobalStatsAggregator"></a></a><a class="headerlink" href="#globalstatsaggregator" title="Permanent link">&para;</a></h3>
+<p>Args:
+    dataset_id (string) A dataset id
+    s3_conn (boto.Connection) an s3 connection</p>
+<h2 id="skills_ml.job_postings.aggregate.dataset_transform.GlobalStatsAggregator">GlobalStatsAggregator</h2>
+
 <pre><code class="python">GlobalStatsAggregator(self, s3_conn)
 </code></pre>
 
 <p>Aggregate Dataset ETL statistics up to the global level</p>
-<p><strong>Args</strong></p>
-<pre><code>s3_conn (boto.Connection) an s3 connection
-</code></pre>
-<h2 id="skills_mljob_postingsaggregatefield_values"><a class="toclink" href="#skills_mljob_postingsaggregatefield_values">skills_ml.job_postings.aggregate.field_values <a href="../skills_ml.job_postings.aggregate.field_values"></a></a><a class="headerlink" href="#skills_mljob_postingsaggregatefield_values" title="Permanent link">&para;</a></h2>
-<p>Track field value distribution of common schema job postings</p>
-<h3 id="fieldvaluecounter"><a class="toclink" href="#fieldvaluecounter">FieldValueCounter <a href="../skills_ml.job_postings.aggregate.field_values.FieldValueCounter"></a></a><a class="headerlink" href="#fieldvaluecounter" title="Permanent link">&para;</a></h3>
+<p>Args:
+    s3_conn (boto.Connection) an s3 connection</p>
+<h1 id="skills_ml.job_postings.aggregate.field_values">skills_ml.job_postings.aggregate.field_values</h1>
+
+<p>Track field value distribution of common schema job postings
+<h2 id="skills_ml.job_postings.aggregate.field_values.FieldValueCounter">FieldValueCounter</h2></p>
 <pre><code class="python">FieldValueCounter(self, quarter, field_values)
 </code></pre>
 
 <p>Accumulate field distribution statistics for common schema job postings</p>
-<p><strong>Args</strong></p>
-<pre><code>quarter (string) The quarter being analyzed
-</code></pre>
-<p><strong>    field_values (list) each entry should be either</strong></p>
-<pre><code>    1. a field key
-    2. a tuple, first value field key, second value function to fetch value or values from document
-</code></pre>
-<h2 id="skills_mljob_postingsaggregategeo"><a class="toclink" href="#skills_mljob_postingsaggregategeo">skills_ml.job_postings.aggregate.geo <a href="../skills_ml.job_postings.aggregate.geo"></a></a><a class="headerlink" href="#skills_mljob_postingsaggregategeo" title="Permanent link">&para;</a></h2>
-<p>Aggregates job geographies</p>
-<h3 id="geoaggregator"><a class="toclink" href="#geoaggregator">GeoAggregator <a href="../skills_ml.job_postings.aggregate.geo.GeoAggregator"></a></a><a class="headerlink" href="#geoaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">GeoAggregator(self, job_aggregators, geo_querier)
-</code></pre>
+<p>Args:
+    quarter (string) The quarter being analyzed
+    field_values (list) each entry should be either:
+        1. a field key
+        2. a tuple, first value field key, second value function to fetch value or values from document</p>
+<h1 id="skills_ml.job_postings.aggregate.pandas">skills_ml.job_postings.aggregate.pandas</h1>
 
-<p>Aggregates jobs by geography</p>
-<p>job_aggregators (dict of .JobAggregator objects) - The aggregators
-    that should accumulate data based on geography and title for each
-    job posting
-geo_querier (object) an object that returns a geography of a given job.</p>
-<h2 id="skills_mljob_postingsaggregatepandas"><a class="toclink" href="#skills_mljob_postingsaggregatepandas">skills_ml.job_postings.aggregate.pandas <a href="../skills_ml.job_postings.aggregate.pandas"></a></a><a class="headerlink" href="#skills_mljob_postingsaggregatepandas" title="Permanent link">&para;</a></h2>
-<p>Aggregation functions that can be used with pandas dataframes</p>
-<h3 id="aggregatefunction"><a class="toclink" href="#aggregatefunction">AggregateFunction <a href="../skills_ml.job_postings.aggregate.pandas.AggregateFunction"></a></a><a class="headerlink" href="#aggregatefunction" title="Permanent link">&para;</a></h3>
-<pre><code class="python">AggregateFunction(self, returns)
-</code></pre>
-
-<p>Wrap a function with an attribute that indicates the return type name</p>
-<h3 id="listy_n_most_common"><a class="toclink" href="#listy_n_most_common">listy_n_most_common <a href="../skills_ml.job_postings.aggregate.pandas.listy_n_most_common"></a></a><a class="headerlink" href="#listy_n_most_common" title="Permanent link">&para;</a></h3>
+<p>Aggregation functions that can be used with pandas dataframes
+<h2 id="skills_ml.job_postings.aggregate.pandas.listy_n_most_common">listy_n_most_common</h2></p>
 <pre><code class="python">listy_n_most_common(*params, **kwparams)
 </code></pre>
 
-<p>Expects each item to be iterable, each sub-item to be addable</p>
-<h2 id="skills_mljob_postingsaggregatesoc_code"><a class="toclink" href="#skills_mljob_postingsaggregatesoc_code">skills_ml.job_postings.aggregate.soc_code <a href="../skills_ml.job_postings.aggregate.soc_code"></a></a><a class="headerlink" href="#skills_mljob_postingsaggregatesoc_code" title="Permanent link">&para;</a></h2>
-<p>Aggregates job occupations</p>
-<h3 id="geosocaggregator"><a class="toclink" href="#geosocaggregator">GeoSocAggregator <a href="../skills_ml.job_postings.aggregate.soc_code.GeoSocAggregator"></a></a><a class="headerlink" href="#geosocaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">GeoSocAggregator(self, occupation_classifier=None, corpus_creator=None, *args, **kwargs)
+<p>Expects each item to be iterable, each sub-item to be addable
+<h2 id="skills_ml.job_postings.aggregate.pandas.AggregateFunction">AggregateFunction</h2></p>
+<pre><code class="python">AggregateFunction(self, returns)
 </code></pre>
 
-<p>Aggregates job titles by geography</p>
-<p><strong>Args</strong></p>
-<pre><code>occupation_classifier (..occupation_classifiers.classifiers.Classifier,
-    optional)
-    a SOC code classifier,
-    if absent will aggregate using the given SOC code
-corpus_creator (CorpusCreator, optional) an object that will transform
-    a given common schema job posting into unstructured text for the
-    occupation classifier. Defaults to SimpleCorpusCreator
-</code></pre>
-<h2 id="skills_mljob_postingsaggregatetitle"><a class="toclink" href="#skills_mljob_postingsaggregatetitle">skills_ml.job_postings.aggregate.title <a href="../skills_ml.job_postings.aggregate.title"></a></a><a class="headerlink" href="#skills_mljob_postingsaggregatetitle" title="Permanent link">&para;</a></h2>
-<p>Aggregates job titles</p>
-<h3 id="geotitleaggregator"><a class="toclink" href="#geotitleaggregator">GeoTitleAggregator <a href="../skills_ml.job_postings.aggregate.title.GeoTitleAggregator"></a></a><a class="headerlink" href="#geotitleaggregator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">GeoTitleAggregator(self, title_cleaner=None, *args, **kwargs)
-</code></pre>
-
-<p>Aggregates job titles by geography</p>
-<p><strong>Args</strong></p>
-<pre><code>title_cleaner (function) a function that cleans a given job title
-</code></pre>
-<h2 id="skills_mljob_postingscommon_schema"><a class="toclink" href="#skills_mljob_postingscommon_schema">skills_ml.job_postings.common_schema <a href="../skills_ml.job_postings.common_schema"></a></a><a class="headerlink" href="#skills_mljob_postingscommon_schema" title="Permanent link">&para;</a></h2>
+<p>Wrap a function with an attribute that indicates the return type name
+<h1 id="skills_ml.job_postings.common_schema">skills_ml.job_postings.common_schema</h1></p>
 <p>A variety of common-schema job posting collections.</p>
 <p>Each class in this module should implement a generator that yields job postings (in the common schema, as a JSON string), and has a 'metadata' attribute so any users of the job postings can inspect meaningful metadata about the postings.</p>
-<h3 id="jobpostingcollectionfroms3"><a class="toclink" href="#jobpostingcollectionfroms3">JobPostingCollectionFromS3 <a href="../skills_ml.job_postings.common_schema.JobPostingCollectionFromS3"></a></a><a class="headerlink" href="#jobpostingcollectionfroms3" title="Permanent link">&para;</a></h3>
-<pre><code class="python">JobPostingCollectionFromS3(self, s3_conn, quarters, s3_path, source='all')
+<h2 id="skills_ml.job_postings.common_schema.JobPostingCollectionFromS3">JobPostingCollectionFromS3</h2>
+
+<pre><code class="python">JobPostingCollectionFromS3(self, s3_conn, s3_paths, extra_metadata=None)
 </code></pre>
 
-<p>Stream job posting from s3 for given quarters
-<strong>Example</strong></p>
+<p>Stream job posting from s3.</p>
+<p>Expects that each will be stored in JSON format, one job posting per line.
+The s3_path given will be iterated through as a prefix, so job postings may be
+partitioned under that prefix however you choose.
+It will look in every file under that prefix.</p>
+<p>Example:</p>
 <pre><code>import json
 from airflow.hooks import S3Hook
+from skills_ml.job_postings.common_schema import JobPostingGenerator
 s3_conn = S3Hook().get_conn()
-quarters = ['2011Q1', '2011Q2', '2011Q3']
-job_postings_generator = JobPostingCollectionFromS3(s3_conn, quarters, s3_path='open-skills-private/job_postings_common', source=&quot;all&quot;)
+job_postings_generator = JobPostingCollectionFromS3(s3_conn, s3_path='my-bucket/job_postings_common_schema')
 for job_posting in job_postings_generator:
-    print json.loads(job_posting)['title']
+    print(job_posting['title'])
 </code></pre>
 
-<p><strong>Attributes</strong></p>
-<ul>
-<li><code>s3_conn</code>: a boto s3 connection</li>
-<li><code>quarters</code>: a list of quarters</li>
-<li><code>s3_path</code>: path to the job listings</li>
-<li><code>source</code>: should be a string or a subset of "nlx", "va", "cb" or "all"</li>
-</ul>
-<h3 id="jobpostingcollectionsample"><a class="toclink" href="#jobpostingcollectionsample">JobPostingCollectionSample <a href="../skills_ml.job_postings.common_schema.JobPostingCollectionSample"></a></a><a class="headerlink" href="#jobpostingcollectionsample" title="Permanent link">&para;</a></h3>
+<p>Attributes:
+    s3_conn: a boto s3 connection
+    s3_path: path to the job listings. there may be multiple</p>
+<h2 id="skills_ml.job_postings.common_schema.JobPostingCollectionSample">JobPostingCollectionSample</h2>
+
 <pre><code class="python">JobPostingCollectionSample(self, num_records:int=50)
 </code></pre>
 
 <p>Stream a finite number of job postings stored within the library.</p>
-<p><strong>Example</strong></p>
+<p>Example:</p>
 <pre><code>import json
 
 job_postings = JobPostingCollectionSample()
@@ -1688,255 +378,216 @@ for introduction to the library
 Args:
     num_records (int): The maximum number of records to return. Defaults to 50 (all postings available)
 
-## generate_job_postings_from_s3_for_quarter [](skills_ml.job_postings.common_schema.generate_job_postings_from_s3_for_quarter)
+&lt;h2 id=&quot;skills_ml.job_postings.common_schema.generate_job_postings_from_s3&quot;&gt;generate_job_postings_from_s3&lt;/h2&gt;
 
 ```python
-generate_job_postings_from_s3_for_quarter(s3_conn, quarter:str, s3_path:str, source:str='all') -&gt; Generator[Dict[str, Any], NoneType, NoneType]
+generate_job_postings_from_s3(s3_conn, s3_prefix:str) -&gt; Generator[Dict[str, Any], NoneType, NoneType]
 </code></pre>
 
-<p>Stream all job listings from s3 for a given quarter
-<strong>Args</strong></p>
-<ul>
-<li><strong>s3_conn</strong>: a boto s3 connection</li>
-<li><strong>quarter</strong>: a string representing a quarter (2015Q1)</li>
-<li><strong>s3_path</strong>: path to the job listings.</li>
-<li><strong>source</strong>: should be a string or a subset of "nlx", "va", "cb" or "all"</li>
-</ul>
-<p><strong>Yields</strong></p>
-<pre><code>string in json format representing the next job listing
-    Refer to sample_job_listing.json for example structure
-</code></pre>
-<h3 id="generate_job_postings_from_s3_for_quarters"><a class="toclink" href="#generate_job_postings_from_s3_for_quarters">generate_job_postings_from_s3_for_quarters <a href="../skills_ml.job_postings.common_schema.generate_job_postings_from_s3_for_quarters"></a></a><a class="headerlink" href="#generate_job_postings_from_s3_for_quarters" title="Permanent link">&para;</a></h3>
-<pre><code class="python">generate_job_postings_from_s3_for_quarters(s3_conn, quarters:List[str], s3_path:str, source:str='all') -&gt; Generator[Dict[str, Any], NoneType, NoneType]
+<p>Stream all job listings from s3
+Args:
+    s3_conn: a boto s3 connection
+    s3_prefix: path to the job listings.</p>
+<p>Yields:
+    string in json format representing the next job listing
+        Refer to sample_job_listing.json for example structure</p>
+<h2 id="skills_ml.job_postings.common_schema.generate_job_postings_from_s3_multiple_prefixes">generate_job_postings_from_s3_multiple_prefixes</h2>
+
+<pre><code class="python">generate_job_postings_from_s3_multiple_prefixes(s3_conn, s3_prefixes:str) -&gt; Generator[Dict[str, Any], NoneType, NoneType]
 </code></pre>
 
 <p>Chain the generators of a list of multiple quarters
-<strong>Args</strong></p>
-<ul>
-<li><strong>s3_conn</strong>: a boto s3 connection</li>
-<li><strong>quarters</strong>: a list of quarters</li>
-<li><strong>s3_path</strong>: path to the job listings</li>
-<li><strong>source</strong>: should be a string or a subset of "nlx", "va", "cb" or "all"</li>
-</ul>
-<p><strong>Return</strong></p>
-<pre><code>a generator that all generators are chained together into
-</code></pre>
-<h3 id="batches_generator"><a class="toclink" href="#batches_generator">batches_generator <a href="../skills_ml.job_postings.common_schema.batches_generator"></a></a><a class="headerlink" href="#batches_generator" title="Permanent link">&para;</a></h3>
+Args:
+    s3_conn: a boto s3 connection
+    s3_prefixes: paths to job listings</p>
+<p>Return:
+    a generator that all generators are chained together into</p>
+<h2 id="skills_ml.job_postings.common_schema.batches_generator">batches_generator</h2>
+
 <pre><code class="python">batches_generator(iterable, batch_size)
 </code></pre>
 
 <p>Batch generator
-<strong>Args</strong></p>
-<ul>
-<li><strong>iterable</strong>: an iterable</li>
-<li><strong>batch_size</strong>: batch size</li>
-</ul>
-<h2 id="skills_mljob_postingscomputed_properties"><a class="toclink" href="#skills_mljob_postingscomputed_properties">skills_ml.job_postings.computed_properties <a href="../skills_ml.job_postings.computed_properties"></a></a><a class="headerlink" href="#skills_mljob_postingscomputed_properties" title="Permanent link">&para;</a></h2>
+Args:
+    iterable: an iterable
+    batch_size: batch size</p>
+<h1 id="skills_ml.job_postings.computed_properties">skills_ml.job_postings.computed_properties</h1>
+
 <p>Encapsulates the computation of some piece of data for job postings, to make aggregation
-and tabular datasets easy to produce</p>
-<h3 id="jobpostingcomputedproperty"><a class="toclink" href="#jobpostingcomputedproperty">JobPostingComputedProperty <a href="../skills_ml.job_postings.computed_properties.JobPostingComputedProperty"></a></a><a class="headerlink" href="#jobpostingcomputedproperty" title="Permanent link">&para;</a></h3>
-<pre><code class="python">JobPostingComputedProperty(self, storage)
+and tabular datasets easy to produce
+<h2 id="skills_ml.job_postings.computed_properties.JobPostingComputedProperty">JobPostingComputedProperty</h2></p>
+<pre><code class="python">JobPostingComputedProperty(self, storage, partition_func=None)
 </code></pre>
 
 <p>Base class for computers of job posting properties.</p>
 <p>Using this class, expensive computations can be performed once, stored on S3 per job posting
-in daily partitions, and reused in different aggregations.</p>
+in partitions, and reused in different aggregations.</p>
 <p>The base class takes care of all of the serialization and partitioning,
 leaving subclasses to implement a function for computing the property of a single posting
 and metadata describing the output of this function.</p>
-<p><strong>Subclasses must implement</strong></p>
-<pre><code>- _compute_func_on_one to produce a callable that takes in a single
-    job posting and returns JSON-serializable output representing the computation target.
-    This function can produce objects that are kept in scope and reused,
-    so properties that require a large object (e.g. a trained classifier) to do their
-    computation work can be downloaded from S3 here without requiring the I/O work
-    to be done over and over. (See .computers.SOCClassifyProperty for illustration)
-- property_name attribute (string) that is used when saving the computed properties
-- property_columns attribute (list) of ComputedPropertyColumns that
-    map to the column names output by `_compute_func_on_one`
+<p>Subclasses must implement:
+    - _compute_func_on_one to produce a callable that takes in a single
+        job posting and returns JSON-serializable output representing the computation target.
+        This function can produce objects that are kept in scope and reused,
+        so properties that require a large object (e.g. a trained classifier) to do their
+        computation work can be downloaded from S3 here without requiring the I/O work
+        to be done over and over. (See .computers.SOCClassifyProperty for illustration)
+    - property_name attribute (string) that is used when saving the computed properties
+    - property_columns attribute (list) of ComputedPropertyColumns that
+        map to the column names output by <code>_compute_func_on_one</code></p>
+<p>Args:
+    storage (skills_ml.storage.Store) A storage object in which to store the cached properties.
+    partition_func (callable, optional) A function that takes a job posting and
+        outputs a string that should be used as a partition key. Must be deterministic.
+        Defaults to the 'datePosted' value</p>
+<pre><code>    The caches will be namespaced by the property name and partition function
 </code></pre>
-<p><strong>Args</strong></p>
-<pre><code>path (string) An s3 base path to store the properties.
-    The caches will be namespaced by the property name and date
-</code></pre>
-<h3 id="computedpropertycolumn"><a class="toclink" href="#computedpropertycolumn">ComputedPropertyColumn <a href="../skills_ml.job_postings.computed_properties.ComputedPropertyColumn"></a></a><a class="headerlink" href="#computedpropertycolumn" title="Permanent link">&para;</a></h3>
+<h2 id="skills_ml.job_postings.computed_properties.ComputedPropertyColumn">ComputedPropertyColumn</h2>
+
 <pre><code class="python">ComputedPropertyColumn(self, name, description, compatible_aggregate_function_paths=None)
 </code></pre>
 
 <p>Metadata about a specific output column of a computed property</p>
-<p><strong>Args</strong></p>
-<pre><code>name (string) The name of the column
-description (string) A description of the column and how it was populated.
-</code></pre>
-<ul>
-<li><strong>compatible_aggregate_function_paths (dict, optional)</strong>: If this property is meant to be
+<p>Args:
+    name (string) The name of the column
+    description (string) A description of the column and how it was populated.
+    compatible_aggregate_function_paths (dict, optional): If this property is meant to be
         used in aggregations, map string function paths to descriptions of what the
         function is computing for this column.
         All function paths should be compatible with pandas.agg (one argument, an iterable),
-        though multi-argument functions can be used in conjunction with functools.partial</li>
-</ul>
-<h2 id="skills_mljob_postingscomputed_propertiesaggregators"><a class="toclink" href="#skills_mljob_postingscomputed_propertiesaggregators">skills_ml.job_postings.computed_properties.aggregators <a href="../skills_ml.job_postings.computed_properties.aggregators"></a></a><a class="headerlink" href="#skills_mljob_postingscomputed_propertiesaggregators" title="Permanent link">&para;</a></h2>
-<p>Aggregate job posting computed properties into tabular datasets</p>
-<h3 id="df_for_properties_and_dates"><a class="toclink" href="#df_for_properties_and_dates">df_for_properties_and_dates <a href="../skills_ml.job_postings.computed_properties.aggregators.df_for_properties_and_dates"></a></a><a class="headerlink" href="#df_for_properties_and_dates" title="Permanent link">&para;</a></h3>
-<pre><code class="python">df_for_properties_and_dates(computed_properties, dates)
+        though multi-argument functions can be used in conjunction with functools.partial</p>
+<h1 id="skills_ml.job_postings.computed_properties.aggregators">skills_ml.job_postings.computed_properties.aggregators</h1>
+
+<p>Aggregate job posting computed properties into tabular datasets
+<h2 id="skills_ml.job_postings.computed_properties.aggregators.df_for_properties_and_keys">df_for_properties_and_keys</h2></p>
+<pre><code class="python">df_for_properties_and_keys(computed_properties, keys)
 </code></pre>
 
-<p>Assemble a dataframe with the raw data from many computed properties and dates</p>
-<p><strong>Args</strong></p>
-<pre><code>computed_properties (list of JobPostingComputedProperty)
-dates (list of datetime.date objects)
-</code></pre>
-<ul>
-<li><strong>Returns</strong>: pandas.DataFrame</li>
-</ul>
-<h3 id="expand_array_col_to_many_cols"><a class="toclink" href="#expand_array_col_to_many_cols">expand_array_col_to_many_cols <a href="../skills_ml.job_postings.computed_properties.aggregators.expand_array_col_to_many_cols"></a></a><a class="headerlink" href="#expand_array_col_to_many_cols" title="Permanent link">&para;</a></h3>
+<p>Assemble a dataframe with the raw data from many computed properties and keys</p>
+<p>Args:
+    computed_properties (list of JobPostingComputedProperty)
+    keys (list of strs)</p>
+<p>Returns: pandas.DataFrame</p>
+<h2 id="skills_ml.job_postings.computed_properties.aggregators.expand_array_col_to_many_cols">expand_array_col_to_many_cols</h2>
+
 <pre><code class="python">expand_array_col_to_many_cols(base_col, func, aggregation)
 </code></pre>
 
 <p>Expand an array column created as the result of an .aggregate call into many columns</p>
-<p><strong>Args</strong></p>
-<pre><code>base_col (string) The name of the base column (before .aggregate)
-func (function) The base function that was aggregated on
-aggregation (pandas.DataFrame) The post-aggregation dataframe
-</code></pre>
-<ul>
-<li><strong>Returns</strong>: pandas.DataFrame, minus the array column and plus columns for each array value</li>
-</ul>
-<h3 id="base_func"><a class="toclink" href="#base_func">base_func <a href="../skills_ml.job_postings.computed_properties.aggregators.base_func"></a></a><a class="headerlink" href="#base_func" title="Permanent link">&para;</a></h3>
+<p>Args:
+    base_col (string) The name of the base column (before .aggregate)
+    func (function) The base function that was aggregated on
+    aggregation (pandas.DataFrame) The post-aggregation dataframe</p>
+<p>Returns: pandas.DataFrame, minus the array column and plus columns for each array value</p>
+<h2 id="skills_ml.job_postings.computed_properties.aggregators.base_func">base_func</h2>
+
 <pre><code class="python">base_func(aggregate_function)
 </code></pre>
 
 <p>Deals with the possibility of functools.partial being applied to a given
 function. Allows access to the decorated 'return' attribute whether or not
 it is also a partial function</p>
-<p><strong>Args</strong></p>
-<pre><code>aggregate_function (callable) Either a raw function or a functools.partial object
-</code></pre>
-<ul>
-<li><strong>Returns</strong>: callable</li>
-</ul>
-<h3 id="aggregation_for_properties_and_dates"><a class="toclink" href="#aggregation_for_properties_and_dates">aggregation_for_properties_and_dates <a href="../skills_ml.job_postings.computed_properties.aggregators.aggregation_for_properties_and_dates"></a></a><a class="headerlink" href="#aggregation_for_properties_and_dates" title="Permanent link">&para;</a></h3>
-<pre><code class="python">aggregation_for_properties_and_dates(grouping_properties, aggregate_properties, aggregate_functions, dates)
+<p>Args:
+    aggregate_function (callable) Either a raw function or a functools.partial object</p>
+<p>Returns: callable</p>
+<h2 id="skills_ml.job_postings.computed_properties.aggregators.aggregation_for_properties_and_keys">aggregation_for_properties_and_keys</h2>
+
+<pre><code class="python">aggregation_for_properties_and_keys(grouping_properties, aggregate_properties, aggregate_functions, keys)
 </code></pre>
 
-<p>Assemble an aggregation dataframe for given dates</p>
-<p><strong>Args</strong></p>
-<pre><code>grouping_properties (list of JobPostingComputedProperty)
-    Properties to form the primary key of the aggregation
-aggregate_properties (list of JobPostingComputedProperty)
-    Properties to be aggregated over the primary key
-aggregate_functions (dict) A lookup of aggregate functions
-    to be applied for each aggregate column
-dates (list of datetime.date) The desired dates for the aggregation to cover
-</code></pre>
-<ul>
-<li><strong>Returns</strong>: pandas.DataFrame indexed on the grouping properties,
-    covering all data from the given dates</li>
-</ul>
-<h3 id="aggregate_properties_for_quarter"><a class="toclink" href="#aggregate_properties_for_quarter">aggregate_properties_for_quarter <a href="../skills_ml.job_postings.computed_properties.aggregators.aggregate_properties_for_quarter"></a></a><a class="headerlink" href="#aggregate_properties_for_quarter" title="Permanent link">&para;</a></h3>
-<pre><code class="python">aggregate_properties_for_quarter(quarter, grouping_properties, aggregate_properties, aggregate_functions, storage, aggregation_name)
+<p>Assemble an aggregation dataframe for given partition keys</p>
+<p>Args:
+    grouping_properties (list of JobPostingComputedProperty)
+        Properties to form the primary key of the aggregation
+    aggregate_properties (list of JobPostingComputedProperty)
+        Properties to be aggregated over the primary key
+    aggregate_functions (dict) A lookup of aggregate functions
+        to be applied for each aggregate column
+    keys (list of str) The desired partition keys for the aggregation to cover</p>
+<p>Returns: pandas.DataFrame indexed on the grouping properties,
+    covering all data from the given keys</p>
+<h2 id="skills_ml.job_postings.computed_properties.aggregators.aggregate_properties">aggregate_properties</h2>
+
+<pre><code class="python">aggregate_properties(out_filename, grouping_properties, aggregate_properties, aggregate_functions, storage, aggregation_name)
 </code></pre>
 
-<p>Aggregate computed properties for a quarter and writes the resulting CSV to S3</p>
-<p><strong>Args</strong></p>
-<pre><code>quarter (string)
-grouping_properties (list of JobPostingComputedProperty)
-    Properties to form the primary key of the aggregation
-aggregate_properties (list of JobPostingComputedProperty)
-    Properties to be aggregated over the primary key
-aggregate_functions (dict) A lookup of aggregate functions
-    to be applied for each aggregate column
-aggregations_path (string) The base s3 path to store aggregations
-aggregation_name (string) The name of this particular aggregation
-</code></pre>
-<ul>
-<li><strong>Returns</strong>: nothing</li>
-</ul>
-<h2 id="skills_mljob_postingscomputed_propertiescomputers"><a class="toclink" href="#skills_mljob_postingscomputed_propertiescomputers">skills_ml.job_postings.computed_properties.computers <a href="../skills_ml.job_postings.computed_properties.computers"></a></a><a class="headerlink" href="#skills_mljob_postingscomputed_propertiescomputers" title="Permanent link">&para;</a></h2>
-<p>Various computers of job posting properties. Each class is generally a generic algorithm (such as skill extraction or occupation classification) paired with enough configuration to run on its own</p>
-<h3 id="titlecleanphaseone"><a class="toclink" href="#titlecleanphaseone">TitleCleanPhaseOne <a href="../skills_ml.job_postings.computed_properties.computers.TitleCleanPhaseOne"></a></a><a class="headerlink" href="#titlecleanphaseone" title="Permanent link">&para;</a></h3>
-<pre><code class="python">TitleCleanPhaseOne(self, storage)
+<p>Aggregate computed properties and stores the resulting CSV</p>
+<p>Args:
+    out_filename (string) The desired filename (without path) for the .csv
+    grouping_properties (list of JobPostingComputedProperty)
+        Properties to form the primary key of the aggregation
+    aggregate_properties (list of JobPostingComputedProperty)
+        Properties to be aggregated over the primary key
+    aggregate_functions (dict) A lookup of aggregate functions
+        to be applied for each aggregate column
+    aggregations_path (string) The base s3 path to store aggregations
+    aggregation_name (string) The name of this particular aggregation</p>
+<p>Returns: nothing</p>
+<h1 id="skills_ml.job_postings.computed_properties.computers">skills_ml.job_postings.computed_properties.computers</h1>
+
+<p>Various computers of job posting properties. Each class is generally a generic algorithm (such as skill extraction or occupation classification) paired with enough configuration to run on its own
+<h2 id="skills_ml.job_postings.computed_properties.computers.TitleCleanPhaseOne">TitleCleanPhaseOne</h2></p>
+<pre><code class="python">TitleCleanPhaseOne(self, storage, partition_func=None)
 </code></pre>
 
-<p>Perform one phase of job title cleaning: lowercase/remove punctuation</p>
-<h3 id="titlecleanphasetwo"><a class="toclink" href="#titlecleanphasetwo">TitleCleanPhaseTwo <a href="../skills_ml.job_postings.computed_properties.computers.TitleCleanPhaseTwo"></a></a><a class="headerlink" href="#titlecleanphasetwo" title="Permanent link">&para;</a></h3>
-<pre><code class="python">TitleCleanPhaseTwo(self, storage)
+<p>Perform one phase of job title cleaning: lowercase/remove punctuation
+<h2 id="skills_ml.job_postings.computed_properties.computers.TitleCleanPhaseTwo">TitleCleanPhaseTwo</h2></p>
+<pre><code class="python">TitleCleanPhaseTwo(self, storage, partition_func=None)
 </code></pre>
 
-<p><strong>Perform two phases of job title cleaning</strong></p>
+<p>Perform two phases of job title cleaning:</p>
 <ol>
 <li>lowercase/remove punctuation</li>
 <li>Remove geography information</li>
 </ol>
-<h3 id="cbsaandstatefromgeocode"><a class="toclink" href="#cbsaandstatefromgeocode">CBSAandStateFromGeocode <a href="../skills_ml.job_postings.computed_properties.computers.CBSAandStateFromGeocode"></a></a><a class="headerlink" href="#cbsaandstatefromgeocode" title="Permanent link">&para;</a></h3>
+<h2 id="skills_ml.job_postings.computed_properties.computers.CBSAandStateFromGeocode">CBSAandStateFromGeocode</h2>
+
 <pre><code class="python">CBSAandStateFromGeocode(self, cache_storage, cache_fname, *args, **kwargs)
 </code></pre>
 
 <p>Produce a CBSA by geocoding the job's location and matching with a CBSA shapefile</p>
-<p><strong>Args</strong></p>
-<pre><code>cache_s3_path (string) An s3 path to store geocode cache results
-</code></pre>
-<h3 id="socclassifyproperty"><a class="toclink" href="#socclassifyproperty">SOCClassifyProperty <a href="../skills_ml.job_postings.computed_properties.computers.SOCClassifyProperty"></a></a><a class="headerlink" href="#socclassifyproperty" title="Permanent link">&para;</a></h3>
-<pre><code class="python">SOCClassifyProperty(self, s3_conn, classifier_obj=None, *args, **kwargs)
+<p>Args:
+    cache_s3_path (string) An s3 path to store geocode cache results</p>
+<h2 id="skills_ml.job_postings.computed_properties.computers.SOCClassifyProperty">SOCClassifyProperty</h2>
+
+<pre><code class="python">SOCClassifyProperty(self, classifier_obj, *args, **kwargs)
 </code></pre>
 
 <p>Classify the SOC code from a trained classifier</p>
-<p><strong>Args</strong></p>
-<pre><code>s3_conn (boto.s3.connection)
-classifier_obj (object, optional) An object to use as a classifier.
-    If not sent one will be downloaded from s3
-</code></pre>
-<h3 id="classifycommon"><a class="toclink" href="#classifycommon">ClassifyCommon <a href="../skills_ml.job_postings.computed_properties.computers.ClassifyCommon"></a></a><a class="headerlink" href="#classifycommon" title="Permanent link">&para;</a></h3>
-<pre><code class="python">ClassifyCommon(self, s3_conn, classifier_obj=None, *args, **kwargs)
+<p>Args:
+    classifier_obj (object, optional) An object to use as a classifier.
+        If not sent one will be downloaded from s3</p>
+<h2 id="skills_ml.job_postings.computed_properties.computers.GivenSOC">GivenSOC</h2>
+
+<pre><code class="python">GivenSOC(self, storage, partition_func=None)
 </code></pre>
 
-<p>Classify SOC code using common match method</p>
-<h3 id="classifytop"><a class="toclink" href="#classifytop">ClassifyTop <a href="../skills_ml.job_postings.computed_properties.computers.ClassifyTop"></a></a><a class="headerlink" href="#classifytop" title="Permanent link">&para;</a></h3>
-<pre><code class="python">ClassifyTop(self, s3_conn, classifier_obj=None, *args, **kwargs)
+<p>Assign the SOC code given by the partner
+<h2 id="skills_ml.job_postings.computed_properties.computers.SkillCounts">SkillCounts</h2></p>
+<pre><code class="python">SkillCounts(self, skill_extractor, *args, **kwargs)
 </code></pre>
 
-<p>Classify SOC code using top match method</p>
-<h3 id="givensoc"><a class="toclink" href="#givensoc">GivenSOC <a href="../skills_ml.job_postings.computed_properties.computers.GivenSOC"></a></a><a class="headerlink" href="#givensoc" title="Permanent link">&para;</a></h3>
-<pre><code class="python">GivenSOC(self, storage)
+<p>Adding top skill counts from a skill extractor</p>
+<p>Args: (skills_ml.algorithms.skill_extractors.base.SkillExtractorBase) A skill extractor object</p>
+<h2 id="skills_ml.job_postings.computed_properties.computers.PostingIdPresent">PostingIdPresent</h2>
+
+<pre><code class="python">PostingIdPresent(self, storage, partition_func=None)
 </code></pre>
 
-<p>Assign the SOC code given by the partner</p>
-<h3 id="socscopedexactmatchskillcounts"><a class="toclink" href="#socscopedexactmatchskillcounts">SocScopedExactMatchSkillCounts <a href="../skills_ml.job_postings.computed_properties.computers.SocScopedExactMatchSkillCounts"></a></a><a class="headerlink" href="#socscopedexactmatchskillcounts" title="Permanent link">&para;</a></h3>
-<pre><code class="python">SocScopedExactMatchSkillCounts(self, skill_lookup_path, *args, **kwargs)
-</code></pre>
-
-<p>Find skills by exact matching, and filter out ones that aren't associated
-with the job's given SOC code</p>
-<p><strong>Args</strong></p>
-<pre><code>skill_lookup_path (string) A path to a skills lookup file, containing both
-    skill names and their association with SOC codes. See
-    SocScopedExactMatchSkillExtractor for more details
-</code></pre>
-<h3 id="exactmatchskillcounts"><a class="toclink" href="#exactmatchskillcounts">ExactMatchSkillCounts <a href="../skills_ml.job_postings.computed_properties.computers.ExactMatchSkillCounts"></a></a><a class="headerlink" href="#exactmatchskillcounts" title="Permanent link">&para;</a></h3>
-<pre><code class="python">ExactMatchSkillCounts(self, skill_lookup_path, *args, **kwargs)
-</code></pre>
-
-<p>Find skills by exact matching</p>
-<p><strong>Args</strong></p>
-<pre><code>skill_lookup_path (string) A path to a skills lookup file, containing skill names.
-    See ExactMatchSkillExtractor for more details
-</code></pre>
-<h3 id="postingidpresent"><a class="toclink" href="#postingidpresent">PostingIdPresent <a href="../skills_ml.job_postings.computed_properties.computers.PostingIdPresent"></a></a><a class="headerlink" href="#postingidpresent" title="Permanent link">&para;</a></h3>
-<pre><code class="python">PostingIdPresent(self, storage)
-</code></pre>
-
-<p>Records job posting ids. Used for counting job postings</p>
-<h2 id="skills_mljob_postingscorpora"><a class="toclink" href="#skills_mljob_postingscorpora">skills_ml.job_postings.corpora <a href="../skills_ml.job_postings.corpora"></a></a><a class="headerlink" href="#skills_mljob_postingscorpora" title="Permanent link">&para;</a></h2>
+<p>Records job posting ids. Used for counting job postings
+<h1 id="skills_ml.job_postings.corpora">skills_ml.job_postings.corpora</h1></p>
 <p>Classes for converting collections of objects (for instance, common schema job postings) into text corpora suitable for use by natural language processing algorithms.</p>
-<h2 id="skills_mljob_postingscorporabasic"><a class="toclink" href="#skills_mljob_postingscorporabasic">skills_ml.job_postings.corpora.basic <a href="../skills_ml.job_postings.corpora.basic"></a></a><a class="headerlink" href="#skills_mljob_postingscorporabasic" title="Permanent link">&para;</a></h2>
-<h3 id="corpuscreator"><a class="toclink" href="#corpuscreator">CorpusCreator <a href="../skills_ml.job_postings.corpora.basic.CorpusCreator"></a></a><a class="headerlink" href="#corpuscreator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">CorpusCreator(self, job_posting_generator=None, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'], filter_func=None, raw=False, major_groups=None)
+<h1 id="skills_ml.job_postings.corpora.basic">skills_ml.job_postings.corpora.basic</h1>
+
+<h2 id="skills_ml.job_postings.corpora.basic.CorpusCreator">CorpusCreator</h2>
+
+<pre><code class="python">CorpusCreator(self, job_posting_generator=None, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'], raw=False)
 </code></pre>
 
 <p>A base class for objects that convert common schema
-job listings into a corpus suitable for use by
+job listings into a corpus in documnet level suitable for use by
 machine learning algorithms or specific tasks.</p>
-<p><strong>Example</strong></p>
+<p>Example:</p>
 <pre><code class="python">from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import CorpusCreator
 
@@ -1947,33 +598,33 @@ corpus = CorpusCreator(job_postings_generator)
 
 # For getting a the raw job postings without any cleaning
 corpus = CorpusCreator(job_postings_generator, raw=True)
-
-corpus = CorpusCreator(job_postings_generator)
 </code></pre>
 
-<p><strong>Attributes</strong></p>
-<ul>
-<li><code>job_posting_generator (generator)</code>:  an iterable that generates JSON strings.
+<p>Attributes:
+job_posting_generator (generator):  an iterable that generates JSON strings.
                         Each string is expected to represent a job listing
                         conforming to the common schema
-                        See sample_job_listing.json for an example of this schema</li>
-<li><code>document_schema_fields (list)</code>: an list of schema fields to be included</li>
-<li><code>raw (bool)</code>: a flag whether to return the raw documents or transformed documents</li>
-</ul>
-<h3 id="simplecorpuscreator"><a class="toclink" href="#simplecorpuscreator">SimpleCorpusCreator <a href="../skills_ml.job_postings.corpora.basic.SimpleCorpusCreator"></a></a><a class="headerlink" href="#simplecorpuscreator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">SimpleCorpusCreator(self, job_posting_generator=None, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'], filter_func=None, raw=False, major_groups=None)
+                        See sample_job_listing.json for an example of this schema
+document_schema_fields (list): an list of schema fields to be included
+raw (bool): a flag whether to return the raw documents or transformed documents</p>
+<p>Yield:
+(dict): a dictinary only with selected fields as keys and corresponding raw/cleaned value</p>
+<h2 id="skills_ml.job_postings.corpora.basic.SimpleCorpusCreator">SimpleCorpusCreator</h2>
+
+<pre><code class="python">SimpleCorpusCreator(self, job_posting_generator=None, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'], raw=False)
 </code></pre>
 
 <p>An object that transforms job listing documents by picking
 important schema fields and returns them as one large lowercased string</p>
-<h3 id="doc2vecgensimcorpuscreator"><a class="toclink" href="#doc2vecgensimcorpuscreator">Doc2VecGensimCorpusCreator <a href="../skills_ml.job_postings.corpora.basic.Doc2VecGensimCorpusCreator"></a></a><a class="headerlink" href="#doc2vecgensimcorpuscreator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">Doc2VecGensimCorpusCreator(self, job_posting_generator, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'])
+<h2 id="skills_ml.job_postings.corpora.basic.Doc2VecGensimCorpusCreator">Doc2VecGensimCorpusCreator</h2>
+
+<pre><code class="python">Doc2VecGensimCorpusCreator(self, job_posting_generator, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'], *args, **kwargs)
 </code></pre>
 
 <p>Corpus for training Gensim Doc2Vec
 An object that transforms job listing documents by picking
-important schema fields and returns them as one large cleaned array of words</p>
-<p><strong>Example</strong></p>
+important schema fields and yields them as one large cleaned array of words</p>
+<p>Example:</p>
 <pre><code class="python">
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator
@@ -1986,37 +637,61 @@ Attributes:
     job_posting_generator (generator): a job posting generator
     document_schema_fields (list): an list of schema fields to be included
 
-## Word2VecGensimCorpusCreator [](skills_ml.job_postings.corpora.basic.Word2VecGensimCorpusCreator)
+&lt;h2 id=&quot;skills_ml.job_postings.corpora.basic.Word2VecGensimCorpusCreator&quot;&gt;Word2VecGensimCorpusCreator&lt;/h2&gt;
 
 ```python
-Word2VecGensimCorpusCreator(self, job_posting_generator, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'])
+Word2VecGensimCorpusCreator(self, job_posting_generator, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'], *args, **kwargs)
 </code></pre>
 
 <p>An object that transforms job listing documents by picking
-important schema fields and returns them as one large cleaned array of words</p>
-<h3 id="jobcategorycorpuscreator"><a class="toclink" href="#jobcategorycorpuscreator">JobCategoryCorpusCreator <a href="../skills_ml.job_postings.corpora.basic.JobCategoryCorpusCreator"></a></a><a class="headerlink" href="#jobcategorycorpuscreator" title="Permanent link">&para;</a></h3>
-<pre><code class="python">JobCategoryCorpusCreator(self, job_posting_generator=None, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'], filter_func=None, raw=False, major_groups=None)
+important schema fields and yields them as one large cleaned array of words</p>
+<h2 id="skills_ml.job_postings.corpora.basic.JobCategoryCorpusCreator">JobCategoryCorpusCreator</h2>
+
+<pre><code class="python">JobCategoryCorpusCreator(self, job_posting_generator=None, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'], raw=False)
 </code></pre>
 
 <p>An object that extract the label of each job listing document which could be onet soc code or
-occupationalCategory and returns them as a lowercased string</p>
-<h2 id="skills_mljob_postingsgeography_queriers"><a class="toclink" href="#skills_mljob_postingsgeography_queriers">skills_ml.job_postings.geography_queriers <a href="../skills_ml.job_postings.geography_queriers"></a></a><a class="headerlink" href="#skills_mljob_postingsgeography_queriers" title="Permanent link">&para;</a></h2>
-<p>Extracting geographies from job posting datasets</p>
-<h3 id="job_posting_search_strings"><a class="toclink" href="#job_posting_search_strings">job_posting_search_strings <a href="../skills_ml.job_postings.geography_queriers.job_posting_search_strings"></a></a><a class="headerlink" href="#job_posting_search_strings" title="Permanent link">&para;</a></h3>
+occupationalCategory and yields them as a lowercased string</p>
+<h2 id="skills_ml.job_postings.corpora.basic.RawCorpusCreator">RawCorpusCreator</h2>
+
+<pre><code class="python">RawCorpusCreator(self, job_posting_generator, document_schema_fields=['description', 'experienceRequirements', 'qualifications', 'skills'])
+</code></pre>
+
+<p>An object that yields the joined raw string of job posting</p>
+<h1 id="skills_ml.job_postings.filtering">skills_ml.job_postings.filtering</h1>
+
+<p>Filtering streamed job postings
+<h2 id="skills_ml.job_postings.filtering.soc_major_group_filter">soc_major_group_filter</h2></p>
+<pre><code class="python">soc_major_group_filter(major_groups:List) -&gt; Callable
+</code></pre>
+
+<p>Return a function that checks the ONET Soc Code of a job posting (if it is present) against the configured major groups.</p>
+<h2 id="skills_ml.job_postings.filtering.JobPostingFilterer">JobPostingFilterer</h2>
+
+<pre><code class="python">JobPostingFilterer(self, job_posting_generator:Generator[Dict[str, Any], NoneType, NoneType], filter_funcs:List[Callable])
+</code></pre>
+
+<p>Filter common schema job postings through a number of filtering functions</p>
+<p>Args:
+    job_posting_generator: An iterable of job postings (each in dict form)
+    filter_funcs: A list of filtering functions, each taking in a job posting document (as dict) and returning a boolean instructing whether or not the posting passes the filter</p>
+<h1 id="skills_ml.job_postings.geography_queriers">skills_ml.job_postings.geography_queriers</h1>
+
+<p>Extracting geographies from job posting datasets
+<h2 id="skills_ml.job_postings.geography_queriers.job_posting_search_strings">job_posting_search_strings</h2></p>
 <pre><code class="python">job_posting_search_strings(job_posting)
 </code></pre>
 
 <p>Convert a job posting to a geocode-ready search string</p>
 <p>Includes city and state if present, or just city</p>
-<p><strong>Args</strong></p>
-<pre><code>job_posting (dict) A job posting in schema.org/JobPosting json form
-</code></pre>
-<ul>
-<li><strong>Returns</strong>: (string) A geocode-ready search string</li>
-</ul>
-<h2 id="skills_mljob_postingsgeography_querierscbsa"><a class="toclink" href="#skills_mljob_postingsgeography_querierscbsa">skills_ml.job_postings.geography_queriers.cbsa <a href="../skills_ml.job_postings.geography_queriers.cbsa"></a></a><a class="headerlink" href="#skills_mljob_postingsgeography_querierscbsa" title="Permanent link">&para;</a></h2>
+<p>Args:
+    job_posting (dict) A job posting in schema.org/JobPosting json form</p>
+<p>Returns: (string) A geocode-ready search string</p>
+<h1 id="skills_ml.job_postings.geography_queriers.cbsa">skills_ml.job_postings.geography_queriers.cbsa</h1>
+
 <p>Look up the CBSA for a job posting from a census crosswalk (job location -&gt; Census Place -&gt; Census UA -&gt; Census CBSA)</p>
-<h3 id="jobcbsaquerier"><a class="toclink" href="#jobcbsaquerier">JobCBSAQuerier <a href="../skills_ml.job_postings.geography_queriers.cbsa.JobCBSAQuerier"></a></a><a class="headerlink" href="#jobcbsaquerier" title="Permanent link">&para;</a></h3>
+<h2 id="skills_ml.job_postings.geography_queriers.cbsa.JobCBSAQuerier">JobCBSAQuerier</h2>
+
 <pre><code class="python">JobCBSAQuerier(self)
 </code></pre>
 
@@ -2024,9 +699,10 @@ occupationalCategory and returns them as a lowercased string</p>
 <p>First looks up a Place or County Subdivision by the job posting's state and city.
 If it finds a result, it will then take the Urbanized Area for that Place or County Subdivison and find CBSAs associated with it.</p>
 <p>Queries return all hits, so there may be multiple CBSAs for a given query.</p>
-<h2 id="skills_mljob_postingsgeography_querierscbsa_from_geocode"><a class="toclink" href="#skills_mljob_postingsgeography_querierscbsa_from_geocode">skills_ml.job_postings.geography_queriers.cbsa_from_geocode <a href="../skills_ml.job_postings.geography_queriers.cbsa_from_geocode"></a></a><a class="headerlink" href="#skills_mljob_postingsgeography_querierscbsa_from_geocode" title="Permanent link">&para;</a></h2>
-<p>Look up the CBSA for a job posting against a precomputed geocoded CBSA lookup</p>
-<h3 id="jobcbsafromgeocodequerier"><a class="toclink" href="#jobcbsafromgeocodequerier">JobCBSAFromGeocodeQuerier <a href="../skills_ml.job_postings.geography_queriers.cbsa_from_geocode.JobCBSAFromGeocodeQuerier"></a></a><a class="headerlink" href="#jobcbsafromgeocodequerier" title="Permanent link">&para;</a></h3>
+<h1 id="skills_ml.job_postings.geography_queriers.cbsa_from_geocode">skills_ml.job_postings.geography_queriers.cbsa_from_geocode</h1>
+
+<p>Look up the CBSA for a job posting against a precomputed geocoded CBSA lookup
+<h2 id="skills_ml.job_postings.geography_queriers.cbsa_from_geocode.JobCBSAFromGeocodeQuerier">JobCBSAFromGeocodeQuerier</h2></p>
 <pre><code class="python">JobCBSAFromGeocodeQuerier(self, cbsa_results)
 </code></pre>
 
@@ -2037,34 +713,34 @@ module for an example of how this can be generated.</p>
 <p>Instead, this object focuses on the job posting-centric logic necessary,
 such as converting the job posting to the form needed to use the cache
 and dealing with differents kinds of cache misses.</p>
-<p><strong>Args</strong></p>
-<pre><code>cbsa_results (dict) A mapping of geocoding search strings to
-    (CBSA FIPS, CBSA Name) tuples
-</code></pre>
-<h2 id="skills_mljob_postingsraw"><a class="toclink" href="#skills_mljob_postingsraw">skills_ml.job_postings.raw <a href="../skills_ml.job_postings.raw"></a></a><a class="headerlink" href="#skills_mljob_postingsraw" title="Permanent link">&para;</a></h2>
-<h2 id="skills_mljob_postingsrawusajobs"><a class="toclink" href="#skills_mljob_postingsrawusajobs">skills_ml.job_postings.raw.usajobs <a href="../skills_ml.job_postings.raw.usajobs"></a></a><a class="headerlink" href="#skills_mljob_postingsrawusajobs" title="Permanent link">&para;</a></h2>
-<p>Import USAJobs postings into the Open Skills common schema</p>
-<h2 id="skills_mljob_postingsrawvirginia"><a class="toclink" href="#skills_mljob_postingsrawvirginia">skills_ml.job_postings.raw.virginia <a href="../skills_ml.job_postings.raw.virginia"></a></a><a class="headerlink" href="#skills_mljob_postingsrawvirginia" title="Permanent link">&para;</a></h2>
-<h2 id="skills_mljob_postingssample"><a class="toclink" href="#skills_mljob_postingssample">skills_ml.job_postings.sample <a href="../skills_ml.job_postings.sample"></a></a><a class="headerlink" href="#skills_mljob_postingssample" title="Permanent link">&para;</a></h2>
-<p>Sample job postings</p>
-<h3 id="jobsampler"><a class="toclink" href="#jobsampler">JobSampler <a href="../skills_ml.job_postings.sample.JobSampler"></a></a><a class="headerlink" href="#jobsampler" title="Permanent link">&para;</a></h3>
+<p>Args:
+    cbsa_results (dict) A mapping of geocoding search strings to
+        (CBSA FIPS, CBSA Name) tuples</p>
+<h1 id="skills_ml.job_postings.raw">skills_ml.job_postings.raw</h1>
+
+<h1 id="skills_ml.job_postings.raw.usajobs">skills_ml.job_postings.raw.usajobs</h1>
+
+<p>Import USAJobs postings into the Open Skills common schema
+<h1 id="skills_ml.job_postings.raw.virginia">skills_ml.job_postings.raw.virginia</h1></p>
+<h1 id="skills_ml.job_postings.sample">skills_ml.job_postings.sample</h1>
+
+<p>Sample job postings
+<h2 id="skills_ml.job_postings.sample.JobSampler">JobSampler</h2></p>
 <pre><code class="python">JobSampler(self, job_posting_generator, major_group=False, keys=None, weights=None, random_state=None)
 </code></pre>
 
 <p>Job posting sampler using reservoir sampling methods</p>
 <p>It takes a job_posting generator as an input. To sample based on weights, one should sepecify a weight dictionary.</p>
-<p><strong>Attributes</strong></p>
-<ul>
-<li><code>job_posting_generator (iterator)</code>: Job posting iterator to sample from.</li>
-<li><code>major_group (bool)</code>: A flag for using major_group as a label or not</li>
-<li><code>keys (list|str)</code>: a key or keys(for nested dictionary) indicates the label which should exist in common schema
-                     of job posting.</li>
-<li><code>weights (dict)</code>: a dictionary that has key-value pairs as label-weighting pairs. It expects every
-                    label in the iterator to be present as a key in the weights dictionary For example,</li>
-<li><code>weights = {'11'</code>: 2, '13', 1}. In this case, the label/key is the occupation major
-                    group and the value is the weight you want to sample with.</li>
-<li><code>random_state (int)</code>: the seed used by the random number generator</li>
-</ul>
+<p>Attributes:
+    job_posting_generator (iterator): Job posting iterator to sample from.
+    major_group (bool): A flag for using major_group as a label or not
+    keys (list|str): a key or keys(for nested dictionary) indicates the label which should exist in common schema
+                     of job posting.
+    weights (dict): a dictionary that has key-value pairs as label-weighting pairs. It expects every
+                    label in the iterator to be present as a key in the weights dictionary For example,
+                    weights = {'11': 2, '13', 1}. In this case, the label/key is the occupation major
+                    group and the value is the weight you want to sample with.
+    random_state (int): the seed used by the random number generator</p>
                 
                   
                 
