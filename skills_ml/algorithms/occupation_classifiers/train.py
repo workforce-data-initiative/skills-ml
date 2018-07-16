@@ -4,6 +4,8 @@ from sklearn.model_selection import KFold, StratifiedKFold
 
 from skills_ml.storage import FSStore
 from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
+
+import numpy as np
 import importlib
 
 onetdict ={'11': 'Management Occupations',
@@ -31,7 +33,7 @@ onetdict ={'11': 'Management Occupations',
            '55': 'Military Specific Occupations'}
 
 
-class ClassifierTrainer(object):
+class OccupationClassifierTrainer(object):
     """Trains a series of classifiers using the same training set
     Args:
         storage (skills_ml.storage)
@@ -93,20 +95,26 @@ class ClassifierTrainer(object):
         return NotImplementedError
 
 
-def major_group_label_encode(soc):
-    onet_soc = list(onetdict.keys())
-    label_encoder = LabelEncoder()
-    label_encoder.fit(onet_soc)
-
-    return label_encoder.transform([soc[:2]])
+class SocEncoder(LabelEncoder):
+    def __init__(self):
+        onet_soc = list(onetdict.keys())
+        self.fit(onet_soc)
 
 
-def create_training_set(job_postings_generator, embedding_model, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
+def create_training_set(job_postings_generator, embedding_model=None, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
+    X = []
+    y =[]
     for job in job_postings_generator:
         if job['onet_soc_code'][:2] != '99' and job['onet_soc_code'][:2] != '' :
-            label = major_group_label_encode(job['onet_soc_code'])
+            se = SocEncoder()
+            label = se.transform([job['onet_soc_code'][:2]])
             text = ' '.join([job[d] for d in document_schema_fields])
             tokens = NLPTransforms().word_tokenize(text)
-            yield (embedding_model.infer_vector(tokens), label)
+            if embedding_model:
+                X.append(embedding_model.infer_vector(tokens))
+            else:
+                X.append(tokens)
+            y.append(label)
+    return np.array(X), np.reshape(np.array(y), len(y), 1)
 
 

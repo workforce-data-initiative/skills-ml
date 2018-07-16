@@ -1,5 +1,10 @@
 from skills_ml.algorithms.embedding.base import ModelStorage
-from skills_ml.algorithms.embedding.models import Doc2VecModel
+from skills_ml.algorithms.embedding.models import Doc2VecModel, EmbeddingTransformer
+from skills_ml.algorithms.occupation_classifiers.train import SocEncoder
+from sklearn.base import BaseEstimator, ClassifierMixin
+
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.pipeline import make_pipeline, Pipeline
 
 from gensim.similarities.index import AnnoyIndexer
 
@@ -8,27 +13,54 @@ from collections import Counter, defaultdict
 import pickle
 import re
 
-def convert(name):
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+first_cap_re = re.compile('(.)([A-Z][a-z]+)')
+all_cap_re = re.compile('([a-z0-9])([A-Z])')
+
+def convert_camel_to_lower(name):
+    s1 = first_cap_re.sub(r'\1_\2', name)
+    return all_cap_re.sub( r'\1_\2', s1).lower()
+
 
 class SocClassifier(object):
-    """ Interface of SOC Code Classifier.
+    """ Interface of SOC Code Classifier for computer class to use.
     """
 
     def __init__(self, classifier):
         self.classifier = classifier
 
-    def predict_soc(self, tokenized_list):
-        return self.classifier.predict_soc(tokenized_list)
+    def predict_soc(self, tokenized_words):
+        return self.classifier.predict_soc(tokenized_words)
 
     @property
     def name(self):
-        return "soc_" + convert(self.classifier.name)
+        return "soc_" + convert_camel_to_lower(self.classifier.name)
 
     @property
     def description(self):
         return f"SOC code classifier using {self.classifier.description}"
+
+
+class CombinedClassifier(object):
+    def __init__(self, embedding, classifier, **kwargs):
+        self.embedding = embedding
+        self.classifier = classifier
+        self.combined = Pipeline([
+            ('tokens_to_vector', EmbeddingTransformer(self.embedding)),
+            ('classify', self.classifier)
+        ])
+        self.soc_encoder = SocEncoder()
+
+    def predict_soc(self, tokenized_words):
+        result = self.soc_encoder.inverse_transform(self.combined.predict(tokenized_words)), self.combined.predict_proba(tokenized_words)
+        return [(predicted_class, prob) for predicted_class, prob in zip(result[0], result[1])]
+
+    @property
+    def name(self):
+        return self.__class__.__name__
+
+    @property
+    def description(self):
+        return f"combined model of {self.embedding.__class__.__name__} and {self.classifier.__class__.__name__}"
 
 
 class KNNDoc2VecClassifier(ModelStorage):
@@ -80,19 +112,25 @@ class KNNDoc2VecClassifier(ModelStorage):
         Returns:
             tuple(str, float): The predicted soc code and cosine similarity.
         """
-        inferred_vector = self.model.infer_vector(tokenized_list)
+        inferred_vectors = EmbeddingTransformer(self.model).transform(tokenized_list)
+        predicted_soc = []
+        predicted_prob = []
         if self.k == 1:
-            sims = self.model.docvecs.most_similar([inferred_vector], topn=1, indexer=self.indexer)
-            resultlist = list(map(lambda l: (self.model.lookup_dict[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
-            predicted_soc = resultlist[0]
+            for inferred_vector in inferred_vectors:
+                sims = self.model.docvecs.most_similar([inferred_vector], topn=1, indexer=self.indexer)
+                resultlist = list(map(lambda l: (self.model.lookup_dict[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
+                predicted_soc.append(resultlist[0])
+
         elif self.k > 1:
-            sims = self.model.docvecs.most_similar([inferred_vector], topn=self.k, indexer=self.indexer)
-            resultlist = list(map(lambda l: (self.model.lookup_dict[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
-            most_common = Counter([r[0] for r in resultlist]).most_common()[0]
-            resultdict = defaultdict(list)
-            for u, v in resultlist:
-                resultdict[u].append(v)
-            predicted_soc = (most_common[0], sum(resultdict[most_common[0]])/most_common[1])
+            for inferred_vector in inferred_vectors:
+                sims = self.model.docvecs.most_similar([inferred_vector], topn=self.k, indexer=self.indexer)
+                resultlist = list(map(lambda l: (self.model.lookup_dict[l[0]], l[1]), [(x[0], x[1]) for x in sims]))
+                most_common = Counter([r[0] for r in resultlist]).most_common()[0]
+                resultdict = defaultdict(list)
+                for u, v in resultlist:
+                    resultdict[u].append(v)
+
+                predicted_soc.append((most_common[0], sum(resultdict[most_common[0]])/most_common[1]))
         else:
             raise ValueError("k should not be smaller than 1!")
 
@@ -100,6 +138,7 @@ class KNNDoc2VecClassifier(ModelStorage):
 
     def save(self, model_name=None):
         """The method to write the model to where the Storage object specified
+        The index wouldn't be stored, so one needs to call `build_ann_indexer` once the model is loaded
 
         model_name (str): name of the model to be used.
         """
@@ -122,3 +161,5 @@ class KNNDoc2VecClassifier(ModelStorage):
             return "single nearest neighbors algorithm"
         elif self.k > 1:
             return f"majority vote of {self.k} nearest neighbors"
+
+

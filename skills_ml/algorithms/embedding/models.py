@@ -80,4 +80,11 @@ class EmbeddingTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        return [self.embedding_model.infer_vector(x) for x in X]
+        trans_X = []
+        for x in X:
+            trans_X.append(self.embedding_model.infer_vector(x))
+        return trans_X
+
+    def fit_transform(self, X, y=None):
+        self.fit(X, y)
+        return self.transform(X)
