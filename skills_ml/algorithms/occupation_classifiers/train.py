@@ -4,11 +4,21 @@ from sklearn.model_selection import KFold, StratifiedKFold
 
 from skills_ml.storage import FSStore
 from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
-from skills_ml.ontologies.onet import majorgroupname
+from skills_ml.ontologies.onet import build_onet, majorgroupname
 
 import numpy as np
 import importlib
 
+
+def get_all_soc():
+    onet = build_onet()
+    occupations = onet.occupations
+    soc = []
+    for occ in occupations:
+        if 'O*NET-SOC Occupation' in occ.other_attributes['categories']:
+            soc.append(occ.identifier)
+
+    return soc
 
 class OccupationClassifierTrainer(object):
     """Trains a series of classifiers using the same training set
@@ -89,7 +99,7 @@ def create_training_set(job_postings_generator, embedding_model=None, target_var
         document_schema_fields (list): fields to be included in the training data
 
     Returns:
-        A dictionary of training data(X), label(y) and the embedding_model
+        (dict) a dictionary of training data(X), label(y), the embedding_model, target_variable and soc_encoder
     """
     X = []
     y = []
@@ -98,7 +108,8 @@ def create_training_set(job_postings_generator, embedding_model=None, target_var
         se = SocEncoder(list(majorgroupname.keys()))
         label_transformer = lambda soc_code: se.transform([soc_code[:2]])
     elif target_variable == "full_soc":
-        raise NotImplementedError
+        se = SocEncoder(get_all_soc())
+        label_transformer = lambda soc_code: se.transform([soc_code])
 
     for job in job_postings_generator:
         if job['onet_soc_code'][:2] != '99' and job['onet_soc_code'] != '' :

@@ -1,4 +1,4 @@
-from skills_ml.algorithms.occupation_classifiers.train import OccupationClassifierTrainer, create_training_set
+from skills_ml.algorithms.occupation_classifiers.train import OccupationClassifierTrainer, create_training_set, get_all_soc
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.filtering import JobPostingFilterer
 from skills_ml.job_postings.corpora.basic import Word2VecGensimCorpusCreator
@@ -40,6 +40,10 @@ class TestClassifierTrainer(unittest.TestCase):
         self.embedding_model = w2v
         self.jobpostings = jobpostings
 
+    def test_get_all_soc(self):
+        all_soc = get_all_soc()
+        assert len(all_soc) == 1110
+
     def test_create_training_set(self):
         jp_f = list(JobPostingFilterer(self.jobpostings, [self.has_soc_filter]))
         matrix = create_training_set(jp_f, self.embedding_model, target_variable="major_group")
@@ -48,6 +52,10 @@ class TestClassifierTrainer(unittest.TestCase):
         assert matrix['y'].shape[0] == len(jp_f)
         assert matrix['embedding_model'] == self.embedding_model
         assert matrix['soc_encoder'].inverse_transform([0]) == '11'
+
+        matrix = create_training_set(jp_f, self.embedding_model, target_variable="full_soc")
+        assert matrix['target_variable'] == "full_soc"
+        assert matrix['soc_encoder'].inverse_transform([0]) == '11-1011.00'
 
     def test_training(self):
         jp_f = JobPostingFilterer(self.jobpostings, [self.has_soc_filter])
