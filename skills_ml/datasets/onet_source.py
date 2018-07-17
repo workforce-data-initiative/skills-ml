@@ -4,6 +4,7 @@ import os
 import logging
 import io
 import zipfile
+import csv
 
 
 class OnetToMemoryDownloader(object):
