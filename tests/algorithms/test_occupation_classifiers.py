@@ -79,13 +79,13 @@ class TestCombinedClassifier(unittest.TestCase):
             trainer = EmbeddingTrainer(corpus_generator, w2v)
             trainer.train(True)
 
-            train, target = create_training_set(jobpostings)
-            X = EmbeddingTransformer(w2v).transform(train)
+            matrix = create_training_set(jobpostings)
+            X = EmbeddingTransformer(w2v).transform(matrix['X'])
 
             rf = RandomForestClassifier()
-            rf.fit(X, target)
+            rf.fit(X, matrix['y'])
             ccls = CombinedClassifier(w2v, rf)
-            assert len(ccls.predict_soc([train[0]])[0]) == 2
+            assert len(ccls.predict_soc([matrix['X'][0]])[0]) == 2
 
 class TestKNNDoc2VecClassifier(unittest.TestCase):
     @mock.patch('os.getcwd')

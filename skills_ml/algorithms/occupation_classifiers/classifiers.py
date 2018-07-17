@@ -1,8 +1,9 @@
 from skills_ml.algorithms.embedding.base import ModelStorage
 from skills_ml.algorithms.embedding.models import Doc2VecModel, EmbeddingTransformer
 from skills_ml.algorithms.occupation_classifiers.train import SocEncoder
-from sklearn.base import BaseEstimator, ClassifierMixin
+from skills_ml.datasets.onet_source import onet_major_group
 
+from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.pipeline import make_pipeline, Pipeline
 
@@ -48,7 +49,7 @@ class CombinedClassifier(object):
             ('tokens_to_vector', EmbeddingTransformer(self.embedding)),
             ('classify', self.classifier)
         ])
-        self.soc_encoder = SocEncoder()
+        self.soc_encoder = SocEncoder(list(onet_major_group.keys()))
 
     def predict_soc(self, tokenized_words):
         result = self.soc_encoder.inverse_transform(self.combined.predict(tokenized_words)), self.combined.predict_proba(tokenized_words)

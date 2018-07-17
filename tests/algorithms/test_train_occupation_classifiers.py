@@ -18,26 +18,46 @@ grid = {
         }
 
 class TestClassifierTrainer(unittest.TestCase):
+    def setUp(self):
+        self.embedding_model = None
+        self.jobpostings = None
+
+        self.train_embedding()
 
     def has_soc_filter(self, document):
-        if document['onet_soc_code'] != None and document['onet_soc_code'] != '':
+        if document['onet_soc_code'][:2] != '99' and document['onet_soc_code'] != '':
             return True
         else:
              return False
 
-    def test_training(self):
+    def train_embedding(self):
         jobpostings = list(JobPostingCollectionSample())
         corpus_generator = Word2VecGensimCorpusCreator(jobpostings, raw=True)
         w2v = Word2VecModel(size=10, min_count=0, alpha=0.025, min_alpha=0.025)
         trainer = EmbeddingTrainer(corpus_generator, w2v)
         trainer.train(True)
 
-        jp_f = JobPostingFilterer(jobpostings, [self.has_soc_filter])
-        X, y = create_training_set(jp_f, w2v)
+        self.embedding_model = w2v
+        self.jobpostings = jobpostings
 
-        occ_trainer = OccupationClassifierTrainer(k_folds=2, target_variable='soc', grid_config=grid, scores=['accuracy'])
-        occ_trainer.fit(X, y)
-        assert list(occ_trainer.cls_cv_result['ExtraTreesClassifier'].keys()) == ['accuracy']
+    def test_create_training_set(self):
+        jp_f = list(JobPostingFilterer(self.jobpostings, [self.has_soc_filter]))
+        matrix = create_training_set(jp_f, self.embedding_model, target_variable="major_group")
+        assert matrix['target_variable'] == "major_group"
+        assert matrix['X'].shape[0] ==  len(jp_f)
+        assert matrix['y'].shape[0] == len(jp_f)
+        assert matrix['embedding_model'] == self.embedding_model
+        assert matrix['soc_encoder'].inverse_transform([0]) == '11'
+
+    def test_training(self):
+        jp_f = JobPostingFilterer(self.jobpostings, [self.has_soc_filter])
+        matrix = create_training_set(jp_f, self.embedding_model, target_variable="major_group")
+        assert matrix['target_variable'] == "major_group"
+
+        occ_trainer = OccupationClassifierTrainer(matrix, k_folds=2, grid_config=grid, scores=['accuracy'])
+        occ_trainer.train()
+        assert list(occ_trainer.cls_cv_result['accuracy'].keys()) == ['ExtraTreesClassifier']
+        assert occ_trainer.matrix["embedding_model"].model_name == self.embedding_model.model_name
 
 
 
