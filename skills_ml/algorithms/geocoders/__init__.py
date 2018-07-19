@@ -25,11 +25,13 @@ class CachedGeocoder(object):
         cache_fname,
         geocode_func=geocoder.osm,
         sleep_time=1,
+        autosave=True
     ):
         self.cache_storage = cache_storage
         self.cache_fname = cache_fname
         self.geocode_func = geocode_func
         self.sleep_time = sleep_time
+        self.autosave = autosave
         self.cache = PersistedJSONDict(self.cache_storage, self.cache_fname)
 
     def retrieve_from_cache(self, search_strings):
@@ -68,7 +70,8 @@ class CachedGeocoder(object):
         if search_string not in self.cache:
             logging.info('%s not found in cache, geocoding', search_string)
             self.cache[search_string] = self.geocode_func(search_string).json
-            self.save()
+            if self.autosave:
+                self.save()
             time.sleep(self.sleep_time)
         return self.cache[search_string]
 
