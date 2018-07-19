@@ -47,25 +47,25 @@ class TestClassifierTrainer(unittest.TestCase):
     def test_create_training_set(self):
         jp_f = list(JobPostingFilterer(self.jobpostings, [self.has_soc_filter]))
         matrix = create_training_set(jp_f, self.embedding_model, target_variable="major_group")
-        assert matrix['target_variable'] == "major_group"
-        assert matrix['X'].shape[0] ==  len(jp_f)
-        assert matrix['y'].shape[0] == len(jp_f)
-        assert matrix['embedding_model'] == self.embedding_model
-        assert matrix['soc_encoder'].inverse_transform([0]) == '11'
+        assert matrix.target_variable == "major_group"
+        assert matrix.X.shape[0] ==  len(jp_f)
+        assert matrix.y.shape[0] == len(jp_f)
+        assert matrix.embedding_model == self.embedding_model
+        assert matrix.soc_encoder.inverse_transform([0]) == '11'
 
         matrix = create_training_set(jp_f, self.embedding_model, target_variable="full_soc")
-        assert matrix['target_variable'] == "full_soc"
-        assert matrix['soc_encoder'].inverse_transform([0]) == '11-1011.00'
+        assert matrix.target_variable == "full_soc"
+        assert matrix.soc_encoder.inverse_transform([0]) == '11-1011.00'
 
     def test_training(self):
         jp_f = JobPostingFilterer(self.jobpostings, [self.has_soc_filter])
         matrix = create_training_set(jp_f, self.embedding_model, target_variable="major_group")
-        assert matrix['target_variable'] == "major_group"
+        assert matrix.target_variable == "major_group"
 
-        occ_trainer = OccupationClassifierTrainer(matrix, k_folds=2, grid_config=grid, scores=['accuracy'])
+        occ_trainer = OccupationClassifierTrainer(matrix, k_folds=2, grid_config=grid, scoring=['accuracy'])
         occ_trainer.train()
         assert list(occ_trainer.cls_cv_result['accuracy'].keys()) == ['ExtraTreesClassifier']
-        assert occ_trainer.matrix["embedding_model"].model_name == self.embedding_model.model_name
+        assert occ_trainer.matrix.embedding_model.model_name == self.embedding_model.model_name
 
 
 

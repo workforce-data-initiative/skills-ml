@@ -64,7 +64,7 @@ class NLPTransforms(object):
         text = re.sub(
             RE_PREPROCESS,
             ' ',
-            self.lowercase_strip_punc(text)
+            text.lower()
         )
         text = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", text)
         text = re.sub(r"\'s", " \'s", text)

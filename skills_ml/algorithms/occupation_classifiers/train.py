@@ -10,8 +10,9 @@ import numpy as np
 import importlib
 
 
-def get_all_soc():
-    onet = build_onet()
+def get_all_soc(onet=None):
+    if not onet:
+        onet = build_onet()
     occupations = onet.occupations
     soc = []
     for occ in occupations:
@@ -23,23 +24,23 @@ def get_all_soc():
 class OccupationClassifierTrainer(object):
     """Trains a series of classifiers using the same training set
     Args:
-        matrix ()
-        storage (skills_ml.storage)
-        target_variable (str)
-        embedding_model (gensim.model)
-        k_folds (int)
-        n_jobs (int)
+        matrix (skills_ml.algorithms.train.matrix): a matrix object holds X, y and other training data information
+        storage (skills_ml.storage): a skills_ml storage object specified the store method
+        k_folds (int): number of folds for cross validation
+        random_state_for_split(int): random state
+        n_jobs (int): umber of jobs to run in parallel
+        scores:
     """
     def __init__(self, matrix, k_folds, grid_config=None, storage=None,
-                 random_state_for_split=None, scores=['accuracy'], n_jobs=3):
+                 random_state_for_split=None, scoring=['accuracy'], n_jobs=3):
         self.matrix = matrix
         self.storage = FSStore() if storage is None else storage
-        self.target_variable = self.matrix['target_variable']
+        self.target_variable = self.matrix.target_variable
         self.k_folds = k_folds
         self.n_jobs = n_jobs
         self.grid_config = self.default_grid_config if grid_config is None else grid_config
         self.cls_cv_result = {}
-        self.scores = scores
+        self.scoring = scoring
         self.best_classifiers = {}
         self.random_state_for_split = random_state_for_split
 
@@ -66,9 +67,9 @@ class OccupationClassifierTrainer(object):
         """Fit a model to a training set. Works on any modeling class that
         is vailable in this package's environment and implements .fit
         """
-        X = self.matrix['X']
-        y = self.matrix['y']
-        for score in self.scores:
+        X = self.matrix.X
+        y = self.matrix.y
+        for score in self.scoring:
             for class_path, parameter_config in self.grid_config.items():
                 module_name, class_name = class_path.rsplit(".", 1)
                 module = importlib.import_module(module_name)
@@ -114,7 +115,8 @@ def create_training_set(job_postings_generator, embedding_model=None, target_var
     for job in job_postings_generator:
         if job['onet_soc_code'][:2] != '99' and job['onet_soc_code'] != '' :
             label = label_transformer(job['onet_soc_code'])
-            text = ' '.join([job[d] for d in document_schema_fields])
+
+            text = ' '.join([NLPTransforms().clean_str(job[field]) for field in document_schema_fields])
             tokens = NLPTransforms().word_tokenize(text)
             if embedding_model:
                 X.append(embedding_model.infer_vector(tokens))
@@ -122,10 +124,21 @@ def create_training_set(job_postings_generator, embedding_model=None, target_var
                 X.append(tokens)
             y.append(label)
 
-    return {'X': np.array(X),
-            'y': np.reshape(np.array(y), len(y), 1),
-            'embedding_model': embedding_model,
-            'target_variable': target_variable,
-            'soc_encoder': se
-            }
+    return Matrix(X, y, embedding_model, target_variable, se)
 
+
+class Matrix(object):
+    def __init__(self, X, y, embedding_model, target_variable, soc_encoder):
+        self._X = X
+        self._y = y
+        self.embedding_model = embedding_model
+        self.target_variable = target_variable
+        self.soc_encoder = soc_encoder
+
+    @property
+    def X(self):
+        return np.array(self._X)
+
+    @property
+    def y(self):
+        return np.reshape(np.array(self._y), len(self._y), 1)

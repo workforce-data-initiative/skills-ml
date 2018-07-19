@@ -39,7 +39,8 @@ class Word2VecModel(ModelStorage, Word2Vec):
                 sum_vector += self[token]
                 words_in_vocab.append(token)
             except KeyError as e:
-                print("".join([str(e), ". Ignore the word."]))
+                # logging.warning("".join([str(e), ". Ignore the word."]))
+                pass
 
         if len(words_in_vocab) == 0:
             raise KeyError("None of the words is in vocabulary.")
