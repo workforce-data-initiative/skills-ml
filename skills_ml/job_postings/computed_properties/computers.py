@@ -6,6 +6,17 @@ from skills_ml.algorithms.jobtitle_cleaner.clean import JobTitleStringClean
 from skills_ml.algorithms.occupation_classifiers.classifiers import \
     SocClassifier
 from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
+import logging
+import statistics
+
+
+NUMERIC_AGGREGATION_FUNCTION_PATHS = {
+    'statistics.mean': 'Arithemetic mean',
+    'statistics.median': 'Median (middle value)',
+    'statistics.mode': 'Mode (most common value)',
+    'statistics.stdev': 'Sample standard deviation',
+    'statistics.variance': 'Sample variance',
+}
 
 
 class TitleCleanPhaseOne(JobPostingComputedProperty):
@@ -128,6 +139,71 @@ class GivenSOC(JobPostingComputedProperty):
             return job_posting.get('onet_soc_code', '99-9999.00')
         return func
 
+
+
+class PayMixin(object):
+    def salary_from_job_posting(job_posting):
+        minSalary = None
+        maxSalary = None
+        try:
+            minSalary = float(job_posting['baseSalary']['minSalary'])
+        except ValueError:
+            logging.warning('Could not cast minValue string %s to float', job_posting['baseSalary']['minSalary'])
+
+        try:
+            maxSalary = float(job_posting['baseSalary']['maxSalary'])
+        except ValueError:
+            logging.warning('Could not cast maxValue string %s to float', job_posting['baseSalary']['maxSalary'])
+
+        if not maxSalary and not minSalary:
+            logging.warning('Neither minSalary nor maxSalary could be converted to float, no extraction possible')
+            return None
+
+        if not maxSalary:
+            return minSalary
+
+        if not minSalary:
+            return maxSalary
+
+        return statistics.mean([minSalary, maxSalary])
+
+
+class HourlyPay(JobPostingComputedProperty, PayMixin):
+    """The pay given in the baseSalary field if salaryFrequency is hourly"""
+    property_name = 'hourly_pay'
+    property_columns = [
+        ComputedPropertyColumn(
+            name='pay_hourly',
+            description='Pay given in baseSalary field if salaryFrequency is hourly',
+            compatible_aggregate_function_paths=NUMERIC_AGGREGATION_FUNCTION_PATHS,
+        )
+    ]
+
+    def _compute_func_on_one(self):
+        def func(job_posting):
+            if job_posting.get('baseSalary', {}).get('salaryFrequency', None) is not 'hourly':
+                return None
+            return self.salary_from_job_posting(job_posting)
+        return func
+
+
+class YearlyPay(JobPostingComputedProperty, PayMixin):
+    """The pay given in the baseSalary field if salaryFrequency is yearly"""
+    property_name = 'yearly_pay'
+    property_columns = [
+        ComputedPropertyColumn(
+            name='pay_yearly',
+            description='Pay given in baseSalary field if salaryFrequency is yearly',
+            compatible_aggregate_function_paths=NUMERIC_AGGREGATION_FUNCTION_PATHS,
+        )
+    ]
+
+    def _compute_func_on_one(self):
+        def func(job_posting):
+            if job_posting.get('baseSalary', {}).get('salaryFrequency', None) is not 'yearly':
+                return None
+            return self.salary_from_job_posting(job_posting)
+        return func
 
 
 class SkillCounts(JobPostingComputedProperty):
