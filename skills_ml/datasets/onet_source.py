@@ -6,7 +6,6 @@ import io
 import zipfile
 import csv
 
-
 class OnetToMemoryDownloader(object):
     """Downloads newest version of ONET as of time of writing and returns it as text"""
     url_prefix = 'http://www.onetcenter.org/dl_files/database/db_22_3_text'
