@@ -89,6 +89,8 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
             for skill in self.lookup:
                 if skill in exact_matches:
                     continue
+                if len(skill.split()) == 1:
+                    continue
                 ratio = fuzz.partial_ratio(skill, sent)
                 # You can adjust the partial of matching here:
                 # 100 => exact matching 0 => no matching
