@@ -1,6 +1,6 @@
 from skills_ml.algorithms.embedding.base import ModelStorage
 from skills_ml.algorithms.embedding.models import Doc2VecModel, EmbeddingTransformer
-from skills_ml.algorithms.occupation_classifiers.train import SocEncoder
+from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
 from skills_ml.ontologies.onet import majorgroupname
 
 from sklearn.pipeline import  Pipeline
@@ -40,17 +40,17 @@ class SocClassifier(object):
 
 
 class CombinedClassifier(object):
-    def __init__(self, embedding, classifier, **kwargs):
+    def __init__(self, embedding, classifier, target_variable,  **kwargs):
         self.embedding = embedding
         self.classifier = classifier
+        self.target_variable = target_variable
         self.combined = Pipeline([
             ('tokens_to_vector', EmbeddingTransformer(self.embedding)),
             ('classify', self.classifier)
         ])
-        self.soc_encoder = SocEncoder(list(majorgroupname.keys()))
 
     def predict_soc(self, tokenized_words):
-        result = self.soc_encoder.inverse_transform(self.combined.predict(tokenized_words)), self.combined.predict_proba(tokenized_words)
+        result = self.target_variable.encoder.inverse_transform(self.combined.predict(tokenized_words)), self.combined.predict_proba(tokenized_words)
         return [(predicted_class, prob) for predicted_class, prob in zip(result[0], result[1])]
 
     @property

@@ -85,7 +85,7 @@ class TestCombinedClassifier(unittest.TestCase):
 
             rf = RandomForestClassifier()
             rf.fit(X, matrix.y)
-            ccls = CombinedClassifier(w2v, rf)
+            ccls = CombinedClassifier(w2v, rf, matrix.target_variable)
             assert len(ccls.predict_soc([matrix.X[0]])[0]) == 2
 
 class TestKNNDoc2VecClassifier(unittest.TestCase):
