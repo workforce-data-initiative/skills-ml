@@ -3,9 +3,7 @@ from skills_ml.algorithms.embedding.models import Doc2VecModel, EmbeddingTransfo
 from skills_ml.algorithms.occupation_classifiers.train import SocEncoder
 from skills_ml.ontologies.onet import majorgroupname
 
-from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.pipeline import  Pipeline
 
 from gensim.similarities.index import AnnoyIndexer
 

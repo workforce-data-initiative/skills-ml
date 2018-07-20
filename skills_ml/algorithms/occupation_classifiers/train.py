@@ -1,14 +1,15 @@
 from sklearn.model_selection import GridSearchCV
-from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import KFold, StratifiedKFold
 
 from skills_ml.storage import FSStore
-from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
 from skills_ml.ontologies.onet import build_onet, majorgroupname
+from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
+from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
+from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, TrainingMatrix
+from skills_ml.job_postings.common_schema import JobPostingGeneratorType
 
-import numpy as np
 import importlib
-
+from typing import Type, Union
 
 def get_all_soc(onet=None):
     if not onet:
@@ -85,13 +86,10 @@ class OccupationClassifierTrainer(object):
         return NotImplementedError
 
 
-class SocEncoder(LabelEncoder):
-    def __init__(self, label_list):
-        self.fit(label_list)
-
-
-def create_training_set(job_postings_generator, embedding_model=None, target_variable="major_group",
-                        document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']):
+def create_training_set(job_postings_generator: JobPostingGeneratorType,
+                        embedding_model: Union[Word2VecModel, Doc2VecModel],
+                        target_variable: TargetVariable,
+                        document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']) -> TrainingMatrix:
     """Create training set for occupation classifier from job postings generator and embedding model
 
     Args:
@@ -100,45 +98,21 @@ def create_training_set(job_postings_generator, embedding_model=None, target_var
         document_schema_fields (list): fields to be included in the training data
 
     Returns:
-        (dict) a dictionary of training data(X), label(y), the embedding_model, target_variable and soc_encoder
+        (skills_ml.algorithm.occupation_classifiers.TrainingMatrix) a matrix class with properties of training data(X),
+        label(y), the embedding_model, target_variable and soc_encoder
     """
     X = []
     y = []
 
-    if target_variable == "major_group":
-        se = SocEncoder(list(majorgroupname.keys()))
-        label_transformer = lambda soc_code: se.transform([soc_code[:2]])
-    elif target_variable == "full_soc":
-        se = SocEncoder(get_all_soc())
-        label_transformer = lambda soc_code: se.transform([soc_code])
+    for job in filter(target_variable.filter_func, job_postings_generator):
+        label = target_variable.transformer(job)
 
-    for job in job_postings_generator:
-        if job['onet_soc_code'][:2] != '99' and job['onet_soc_code'] != '' :
-            label = label_transformer(job['onet_soc_code'])
+        text = ' '.join([NLPTransforms().clean_str(job[field]) for field in document_schema_fields])
+        tokens = NLPTransforms().word_tokenize(text)
+        if embedding_model:
+            X.append(embedding_model.infer_vector(tokens))
+        else:
+            X.append(tokens)
+        y.append(label)
 
-            text = ' '.join([NLPTransforms().clean_str(job[field]) for field in document_schema_fields])
-            tokens = NLPTransforms().word_tokenize(text)
-            if embedding_model:
-                X.append(embedding_model.infer_vector(tokens))
-            else:
-                X.append(tokens)
-            y.append(label)
-
-    return Matrix(X, y, embedding_model, target_variable, se)
-
-
-class Matrix(object):
-    def __init__(self, X, y, embedding_model, target_variable, soc_encoder):
-        self._X = X
-        self._y = y
-        self.embedding_model = embedding_model
-        self.target_variable = target_variable
-        self.soc_encoder = soc_encoder
-
-    @property
-    def X(self):
-        return np.array(self._X)
-
-    @property
-    def y(self):
-        return np.reshape(np.array(self._y), len(self._y), 1)
+    return TrainingMatrix(X, y, embedding_model, target_variable)

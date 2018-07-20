@@ -1,4 +1,5 @@
 from skills_ml.algorithms.occupation_classifiers.train import OccupationClassifierTrainer, create_training_set, get_all_soc
+from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.filtering import JobPostingFilterer
 from skills_ml.job_postings.corpora.basic import Word2VecGensimCorpusCreator
@@ -46,27 +47,41 @@ class TestClassifierTrainer(unittest.TestCase):
 
     def test_create_training_set(self):
         jp_f = list(JobPostingFilterer(self.jobpostings, [self.has_soc_filter]))
-        matrix = create_training_set(jp_f, self.embedding_model, target_variable="major_group")
-        assert matrix.target_variable == "major_group"
+        matrix = create_training_set(jp_f, self.embedding_model, target_variable=SOCMajorGroup())
+        assert matrix.target_variable.name == "major_group"
         assert matrix.X.shape[0] ==  len(jp_f)
         assert matrix.y.shape[0] == len(jp_f)
         assert matrix.embedding_model == self.embedding_model
-        assert matrix.soc_encoder.inverse_transform([0]) == '11'
+        assert matrix.target_variable.encoder.inverse_transform([0]) == '11'
 
-        matrix = create_training_set(jp_f, self.embedding_model, target_variable="full_soc")
-        assert matrix.target_variable == "full_soc"
-        assert matrix.soc_encoder.inverse_transform([0]) == '11-1011.00'
+        # matrix = create_training_set(jp_f, self.embedding_model, target_variable=)
+        # assert matrix.target_variable == "full_soc"
+        # assert matrix.soc_encoder.inverse_transform([0]) == '11-1011.00'
 
     def test_training(self):
         jp_f = JobPostingFilterer(self.jobpostings, [self.has_soc_filter])
-        matrix = create_training_set(jp_f, self.embedding_model, target_variable="major_group")
-        assert matrix.target_variable == "major_group"
+        matrix = create_training_set(jp_f, self.embedding_model, target_variable=SOCMajorGroup())
+        assert matrix.target_variable.name == "major_group"
 
         occ_trainer = OccupationClassifierTrainer(matrix, k_folds=2, grid_config=grid, scoring=['accuracy'])
         occ_trainer.train()
         assert list(occ_trainer.cls_cv_result['accuracy'].keys()) == ['ExtraTreesClassifier']
         assert occ_trainer.matrix.embedding_model.model_name == self.embedding_model.model_name
 
+    def test_filtering(self):
+        major_group_27_filter = lambda job: job['onet_soc_code'][:2] != '27'
+        major_group_49_filter = lambda job: job['onet_soc_code'][:2] != '49'
 
+        soc_target = SOCMajorGroup()
+        matrix = create_training_set(self.jobpostings, self.embedding_model, soc_target)
+        assert '27' in matrix.target_variable.encoder.inverse_transform(matrix.y)
 
+        soc_target = SOCMajorGroup(major_group_27_filter)
+        matrix = create_training_set(self.jobpostings, self.embedding_model, soc_target)
+        assert '27' not in matrix.target_variable.encoder.inverse_transform(matrix.y)
+
+        soc_target = SOCMajorGroup([major_group_27_filter, major_group_49_filter])
+        matrix = create_training_set(self.jobpostings, self.embedding_model, soc_target)
+        assert '27' not in matrix.target_variable.encoder.inverse_transform(matrix.y)
+        assert '49' not in matrix.target_variable.encoder.inverse_transform(matrix.y)
 
