@@ -9,6 +9,7 @@ from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGrou
 from skills_ml.job_postings.common_schema import JobPostingGeneratorType
 
 import importlib
+import logging
 from typing import Type, Union
 
 def get_all_soc(onet=None):
@@ -21,6 +22,7 @@ def get_all_soc(onet=None):
             soc.append(occ.identifier)
 
     return soc
+
 
 class OccupationClassifierTrainer(object):
     """Trains a series of classifiers using the same training set
@@ -87,8 +89,8 @@ class OccupationClassifierTrainer(object):
 
 
 def create_training_set(job_postings_generator: JobPostingGeneratorType,
-                        embedding_model: Union[Word2VecModel, Doc2VecModel],
                         target_variable: TargetVariable,
+                        embedding_model: Union[Word2VecModel, Doc2VecModel]=None,
                         document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']) -> TrainingMatrix:
     """Create training set for occupation classifier from job postings generator and embedding model
 
@@ -103,16 +105,23 @@ def create_training_set(job_postings_generator: JobPostingGeneratorType,
     """
     X = []
     y = []
+    for i, job in enumerate(job_postings_generator):
+        if target_variable.filter_func(job):
+            label = target_variable.transformer(job)
 
-    for job in filter(target_variable.filter_func, job_postings_generator):
-        label = target_variable.transformer(job)
+            text = ' '.join([NLPTransforms().clean_str(job[field]) for field in document_schema_fields])
+            tokens = NLPTransforms().word_tokenize(text)
+            if embedding_model:
+                X.append(embedding_model.infer_vector(tokens))
+            else:
+                X.append(tokens)
+            y.append(label)
 
-        text = ' '.join([NLPTransforms().clean_str(job[field]) for field in document_schema_fields])
-        tokens = NLPTransforms().word_tokenize(text)
-        if embedding_model:
-            X.append(embedding_model.infer_vector(tokens))
-        else:
-            X.append(tokens)
-        y.append(label)
+    total = i + 1
+    filtered = len(y)
+    dropped = 1 - float(len(y) / (i+1))
+    logging.info(f"total jobpostings: {total}")
+    logging.info(f"filtered jobpostings: {filtered}")
+    logging.info(f"dropped jobposting: {dropped}")
 
     return TrainingMatrix(X, y, embedding_model, target_variable)

@@ -1,9 +1,10 @@
 from skills_ml.algorithms.occupation_classifiers.classifiers import CombinedClassifier, KNNDoc2VecClassifier, SocClassifier
 from skills_ml.algorithms.occupation_classifiers.train import create_training_set
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
+from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
+from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel, EmbeddingTransformer
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import Word2VecGensimCorpusCreator
-from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel, EmbeddingTransformer
 from skills_ml.storage import S3Store, FSStore
 
 from skills_utils.s3 import upload
@@ -79,13 +80,13 @@ class TestCombinedClassifier(unittest.TestCase):
             trainer = EmbeddingTrainer(corpus_generator, w2v)
             trainer.train(True)
 
-            matrix = create_training_set(jobpostings)
-            X = EmbeddingTransformer(w2v).transform(matrix['X'])
+            matrix = create_training_set(jobpostings, SOCMajorGroup())
+            X = EmbeddingTransformer(w2v).transform(matrix.X)
 
             rf = RandomForestClassifier()
-            rf.fit(X, matrix['y'])
+            rf.fit(X, matrix.y)
             ccls = CombinedClassifier(w2v, rf)
-            assert len(ccls.predict_soc([matrix['X'][0]])[0]) == 2
+            assert len(ccls.predict_soc([matrix.X[0]])[0]) == 2
 
 class TestKNNDoc2VecClassifier(unittest.TestCase):
     @mock.patch('os.getcwd')
