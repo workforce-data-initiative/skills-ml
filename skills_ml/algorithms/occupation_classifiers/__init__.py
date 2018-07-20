@@ -28,7 +28,7 @@ empty_soc_filter = lambda job: job['onet_soc_code'] != ''
 
 class TargetVariable(ABC):
     def __init__(self, filters=None):
-        self.default_filters = [unknown_soc_filter, empty_soc_filter]
+        self.default_filters = []
         self.filters = filters
         self.filter_func =  lambda x: all(f(x) for f in self.all_filters)
 
@@ -47,15 +47,24 @@ class TargetVariable(ABC):
     def name(self):
         pass
 
+    @property
+    @abstractmethod
+    def transformer(self):
+        pass
+
 
 class SOCMajorGroup(TargetVariable):
     name = 'major_group'
 
     def __init__(self, filters=None):
         super().__init__(filters)
+        self.default_filters = [unknown_soc_filter, empty_soc_filter]
         self.choices = list(majorgroupname.keys())
         self.encoder = SocEncoder(self.choices)
-        self.transformer = lambda job_posting: self.encoder.transform([job_posting['onet_soc_code'][:2]])
+
+    @property
+    def transformer(self):
+        return lambda job_posting: self.encoder.transform([job_posting['onet_soc_code'][:2]])
 
 
 class TrainingMatrix(object):
