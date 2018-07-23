@@ -30,6 +30,86 @@ majorgroupname = {
 }
 
 
+class Onet(CompetencyOntology):
+    def __init__(self):
+        super().__init__()
+        self.build_onet()
+
+    def build_onet(self, onet_cache=None):
+        if not onet_cache:
+            onet_cache = OnetSiteCache()
+
+        description_lookup = {}
+        logging.info('Processing Content Model Reference')
+        for row in onet_cache.reader('Content Model Reference'):
+            description_lookup[row['Element ID']] = row['Description']
+
+        logging.info('Processing occupation data')
+        for row in onet_cache.reader('Occupation Data'):
+            occupation = Occupation(
+                    identifier=row['O*NET-SOC Code'],
+                    name=row['Title'],
+                    description=row['Description'],
+                    categories=['O*NET-SOC Occupation'],
+            )
+            major_group_num = row['O*NET-SOC Code'][0:2]
+            major_group = Occupation(
+                identifier=major_group_num,
+                name=majorgroupname[major_group_num],
+                categories=['O*NET-SOC Major Group']
+            )
+            occupation.add_parent(major_group)
+            self.add_occupation(occupation)
+            self.add_occupation(major_group)
+
+        logging.info('Processing Knowledge, Skills, Abilities')
+        for content_model_file in {'Knowledge', 'Abilities', 'Skills'}:
+            for row in onet_cache.reader(content_model_file):
+                competency = Competency(
+                    identifier=row['Element ID'],
+                    name=row['Element Name'],
+                    categories=[content_model_file],
+                    competencyText=description_lookup[row['Element ID']]
+                )
+                self.add_competency(competency)
+                occupation = Occupation(identifier=row['O*NET-SOC Code'])
+                self.add_edge(competency=competency, occupation=occupation)
+
+        logging.info('Processing tools and technology')
+        for row in onet_cache.reader('Tools and Technology'):
+            key = row['Commodity Code'] + '-' + row['T2 Example']
+            commodity_competency = Competency(
+                identifier=row['Commodity Code'],
+                name=row['Commodity Title'],
+                categories=[row['T2 Type'], 'UNSPSC Commodity'],
+            )
+            competency = Competency(
+                identifier=key,
+                name=row['T2 Example'],
+                categories=[row['T2 Type'], 'O*NET T2'],
+            )
+            competency.add_parent(commodity_competency)
+            self.add_competency(commodity_competency)
+            self.add_competency(competency)
+            occupation = Occupation(identifier=row['O*NET-SOC Code'])
+            self.add_edge(competency=competency, occupation=occupation)
+
+    def get_all_soc(self):
+        occupations = self.occupations
+        soc = []
+        for occ in occupations:
+            if 'O*NET-SOC Occupation' in occ.other_attributes['categories']:
+                soc.append(occ.identifier)
+        return soc
+
+    def get_all_major_groups(self):
+        occupations = self.occupations
+        major_groups = []
+        for occ in occupations:
+            if 'O*NET-SOC Major Group' in occ.other_attributes['categories']:
+                major_groups.append(occ.identifier)
+        return sorted(major_groups)
+
 def build_onet(onet_cache=None):
     if not onet_cache:
         onet_cache = OnetSiteCache()
