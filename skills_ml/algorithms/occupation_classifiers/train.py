@@ -12,17 +12,6 @@ import importlib
 import logging
 from typing import Type, Union
 
-def get_all_soc(onet=None):
-    if not onet:
-        onet = build_onet()
-    occupations = onet.occupations
-    soc = []
-    for occ in occupations:
-        if 'O*NET-SOC Occupation' in occ.other_attributes['categories']:
-            soc.append(occ.identifier)
-
-    return soc
-
 
 class OccupationClassifierTrainer(object):
     """Trains a series of classifiers using the same training set

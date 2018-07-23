@@ -1,4 +1,4 @@
-from skills_ml.algorithms.occupation_classifiers.train import OccupationClassifierTrainer, create_training_set, get_all_soc
+from skills_ml.algorithms.occupation_classifiers.train import OccupationClassifierTrainer, create_training_set
 from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.filtering import JobPostingFilterer
@@ -39,10 +39,6 @@ class TestClassifierTrainer(unittest.TestCase):
 
         self.embedding_model = w2v
         self.jobpostings = jobpostings
-
-    def test_get_all_soc(self):
-        all_soc = get_all_soc()
-        assert len(all_soc) == 1110
 
     def test_create_training_set(self):
         jp_f = list(JobPostingFilterer(self.jobpostings, [self.has_soc_filter]))
