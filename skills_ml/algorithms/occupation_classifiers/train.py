@@ -2,7 +2,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import KFold, StratifiedKFold
 
 from skills_ml.storage import FSStore
-from skills_ml.ontologies.onet import build_onet, majorgroupname
+from skills_ml.ontologies.onet import majorgroupname
 from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
 from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
 from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, TrainingMatrix
