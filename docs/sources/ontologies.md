@@ -208,7 +208,7 @@ ontology = CompetencyOntology.from_jsonld({
 
 ### ONET
 
-The `skills_ml.ontologies.onet` module contains a builder function to create a CompetencyOntology object from a variety of files on the ONET site, using at the time of writing the latest version of onet (db_v22_3):
+The `skills_ml.ontologies.onet` module contains a Onet class inherited from CompetencyOntology which will build the ontology during the instantiation from a variety of files on the ONET site, using at the time of writing the latest version of onet (db_v22_3):
 
 - Content Model Reference.txt
 - Knowledge.txt
@@ -219,9 +219,9 @@ The `skills_ml.ontologies.onet` module contains a builder function to create a C
 
 ```python
 
-from skills.ml.ontologies.onet import build_onet
+from skills.ml.ontologies.onet import Onet
 
-ONET = build_onet()
+ONET = Onet()
 # this will take a while as it downloads the relatively large files and processes them
 ONET.filter_by(lambda edge: 'forklift' in edge.competency.name)
 ```
@@ -233,7 +233,7 @@ from skills_ml.storage import FSStore
 from skills_ml.datasets.onet_cache import OnetSiteCache
 from skills_ml.ontologies.onet import build_onet
 
-ONET = build_onet(OnetSiteCache(FSStore('onet_cache')))
+ONET = Onet(OnetSiteCache(FSStore('onet_cache')))
 ```
 
 
