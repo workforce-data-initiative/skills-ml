@@ -86,6 +86,9 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
                     min_distance = 4
                 matches = self.real_lookup.lookup(phrase, 2, min_distance)
                 for match in matches:
+                    if match.term in exact_matches:
+                        continue
+                    logging.info('Fuzzy match found: %s corrected to %s in %s', phrase, match.term, sent)
                     yield CandidateSkill(
                         skill_name=phrase,
                         matched_skill=match.term,
