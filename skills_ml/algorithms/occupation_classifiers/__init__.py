@@ -5,17 +5,6 @@ from skills_ml.ontologies.onet import majorgroupname
 from abc import ABC, abstractmethod
 import numpy as np
 
-def get_all_soc(onet=None):
-    if not onet:
-        onet = build_onet()
-    occupations = onet.occupations
-    soc = []
-    for occ in occupations:
-        if 'O*NET-SOC Occupation' in occ.other_attributes['categories']:
-            soc.append(occ.identifier)
-
-    return soc
-
 
 class SocEncoder(LabelEncoder):
     def __init__(self, label_list):

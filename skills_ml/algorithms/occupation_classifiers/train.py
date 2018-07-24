@@ -2,7 +2,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import KFold, StratifiedKFold
 
 from skills_ml.storage import FSStore
-from skills_ml.ontologies.onet import build_onet, majorgroupname
+from skills_ml.ontologies.onet import majorgroupname
 from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
 from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
 from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, TrainingMatrix
@@ -11,17 +11,6 @@ from skills_ml.job_postings.common_schema import JobPostingGeneratorType
 import importlib
 import logging
 from typing import Type, Union
-
-def get_all_soc(onet=None):
-    if not onet:
-        onet = build_onet()
-    occupations = onet.occupations
-    soc = []
-    for occ in occupations:
-        if 'O*NET-SOC Occupation' in occ.other_attributes['categories']:
-            soc.append(occ.identifier)
-
-    return soc
 
 
 class OccupationClassifierTrainer(object):
