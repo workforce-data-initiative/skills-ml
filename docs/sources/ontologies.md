@@ -231,7 +231,7 @@ If you pass in an ONET cache object, the raw ONET files can be cached on your fi
 ```python
 from skills_ml.storage import FSStore
 from skills_ml.datasets.onet_cache import OnetSiteCache
-from skills_ml.ontologies.onet import build_onet
+from skills_ml.ontologies.onet import Onet
 
 ONET = Onet(OnetSiteCache(FSStore('onet_cache')))
 ```
