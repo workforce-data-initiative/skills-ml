@@ -75,8 +75,8 @@ class JobPostingComputedProperty(metaclass=ABCMeta):
                 misses += 1
             else:
                 hits += 1
-            if number % 100000 == 0:
-                logging.info('Proactively saving caches at job posting %s', number)
+            if misses % 100000 == 0:
+                logging.info('Proactively saving caches at cache miss %s (job posting %s)', misses, number)
                 for cache in caches.values():
                     cache.save()
         for cache in caches.values():
