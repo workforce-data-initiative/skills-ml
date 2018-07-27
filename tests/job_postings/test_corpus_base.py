@@ -1,4 +1,4 @@
-from skills_ml.job_postings.corpora.basic import CorpusCreator
+from skills_ml.job_postings.corpora import CorpusCreator
 
 sample_input = [{
     'description': '<html><h1>We are looking for engineer\n\n</h1></html>',
@@ -16,4 +16,4 @@ def test_clean():
 
 def test_metadata():
     corpus = CorpusCreator()
-    assert corpus.metadata['corpus_creator'] == 'skills_ml.job_postings.corpora.basic.CorpusCreator'
+    assert corpus.metadata['corpus_creator'] == 'skills_ml.job_postings.corpora.CorpusCreator'
