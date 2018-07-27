@@ -25,10 +25,12 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
     """Extract skills from unstructured text using fuzzy matching"""
 
     match_threshold = 88
+    max_distance = 4
+    max_ngrams = 5
 
     @property
     def method_name(self) -> Text:
-        return f'fuzzy_{self.match_threshold}'
+        return f'fuzzy_thresh{self.match_threshold}_maxdist{self.max_distance}_maxngram{self.max_ngrams}'
 
     @property
     def method_description(self) -> Text:
@@ -84,12 +86,12 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
         sentences = self.nlp.sentence_tokenize(document)
 
         for sent in sentences:
-            for phrase in self.ngrams(sent, 5):
+            for phrase in self.ngrams(sent, self.max_ngrams):
                 length_of_phrase = len(phrase)
                 max_distance = length_of_phrase - \
                     ceil(length_of_phrase * self.match_threshold/100)
-                if max_distance > 4:
-                    max_distance = 4
+                if max_distance > self.max_distance:
+                    max_distance = self.max_distance
                 matches = self.symspell.lookup(phrase, 2, max_distance)
                 for match in matches:
                     logging.info(
