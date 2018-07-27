@@ -1,4 +1,4 @@
-from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator
+from skills_ml.job_postings.corpora import Doc2VecGensimCorpusCreator
 
 
 sample_documents = [

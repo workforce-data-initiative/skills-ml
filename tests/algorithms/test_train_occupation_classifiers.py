@@ -2,7 +2,7 @@ from skills_ml.algorithms.occupation_classifiers.train import OccupationClassifi
 from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.filtering import JobPostingFilterer
-from skills_ml.job_postings.corpora.basic import Word2VecGensimCorpusCreator
+from skills_ml.job_postings.corpora import Word2VecGensimCorpusCreator
 from skills_ml.algorithms.embedding.models import Word2VecModel
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 import unittest

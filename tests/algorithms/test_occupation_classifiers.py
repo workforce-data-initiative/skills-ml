@@ -4,7 +4,7 @@ from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
 from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel, EmbeddingTransformer
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
-from skills_ml.job_postings.corpora.basic import Word2VecGensimCorpusCreator
+from skills_ml.job_postings.corpora import Word2VecGensimCorpusCreator
 from skills_ml.storage import S3Store, FSStore
 
 from skills_utils.s3 import upload

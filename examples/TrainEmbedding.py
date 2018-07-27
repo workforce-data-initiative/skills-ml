@@ -11,7 +11,7 @@ import pandas as pd
 from skills_utils.time import datetime_to_quarter
 
 from skills_ml.job_postings.common_schema import JobPostingGenerator
-from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+from skills_ml.job_postings.corpora import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 
