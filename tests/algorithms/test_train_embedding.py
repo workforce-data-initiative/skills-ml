@@ -1,7 +1,7 @@
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
-from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+from skills_ml.job_postings.corpora import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 from skills_ml.storage import S3Store, FSStore
 
 from skills_utils.s3 import list_files

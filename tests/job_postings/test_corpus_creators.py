@@ -1,4 +1,4 @@
-from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
+from skills_ml.job_postings.corpora import SimpleCorpusCreator
 
 
 def test_simple_corpus_creator():

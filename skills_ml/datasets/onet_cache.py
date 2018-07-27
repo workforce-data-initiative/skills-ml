@@ -1,10 +1,13 @@
 import contextlib
 import os
+import csv
+import io
 
 import boto
 
 from skills_utils.s3 import split_s3_path
-from skills_ml.datasets.onet_source import OnetSourceDownloader
+from skills_ml.datasets.onet_source import OnetToMemoryDownloader
+from skills_ml.storage import InMemoryStore
 
 
 class OnetCache(object):
@@ -50,29 +53,30 @@ class OnetCache(object):
             yield full_path
 
 
-
 class OnetSiteCache(object):
     """
-    An object that downloads and caches ONET files from the ONET site
+    An object that downloads files from the ONET site
     """
-    def __init__(self, cache_dir):
+    def __init__(self, storage=None):
         """
         Args:
-            s3_conn: a boto s3 connection
-            s3_path: path to the onet directory
-            cache_dir: directory to cache files
+            storage: Storage object to cache files
         """
-        self.downloader = OnetSourceDownloader()
+        self.storage = storage or InMemoryStore('')
+        self.downloader = OnetToMemoryDownloader()
 
-    def ensure_file(self, filename):
+    def reader(self, filename):
         """
         Ensures that the given ONET data file is present, either by
         using a cached copy or downloading from S3
 
         Args:
-            filename: unpathed filename of an ONET file (Skills.txt)
+            filename: unpathed filename of an ONET file (Skills)
 
-        Yields:
-            Full path to file on local filesystem
+        Returns:
+            csv.DictReader
         """
-        return self.downloader.download(filename)
+        if not self.storage.exists(filename):
+            self.storage.write(self.downloader.download(filename).encode('utf-8'), filename)
+        contents = self.storage.load(filename)
+        return csv.DictReader(io.StringIO(contents.decode('utf-8')), delimiter='\t')

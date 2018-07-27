@@ -1,7 +1,7 @@
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
-from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+from skills_ml.job_postings.corpora import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 
 from numpy.testing import assert_array_equal, assert_almost_equal
 
@@ -26,7 +26,7 @@ class TestEmbeddingModels(unittest.TestCase):
         assert_array_equal(v1, v2)
 
         # test unseen vocab
-        self.assertRaises(KeyError, lambda: w2v.infer_vector(["sports"]))
+        assert w2v.infer_vector(["sports"]).shape[0] == 10
 
         # test a list that has some words not in vocab
         sentence_with_unseen_word = ["sports", "news", "and", "media"]

@@ -4,7 +4,7 @@ import os
 import logging
 import io
 import zipfile
-
+import csv
 
 class OnetToMemoryDownloader(object):
     """Downloads newest version of ONET as of time of writing and returns it as text"""

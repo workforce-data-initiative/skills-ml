@@ -1,12 +1,9 @@
-from skills_utils.s3 import split_s3_path
 import s3fs
-from sklearn.externals import joblib
 import os
 import json
-import io
 import logging
-import tempfile
 from collections.abc import MutableMapping
+
 
 class Store(object):
     def __init__(self, path):
@@ -82,6 +79,27 @@ class FSStore(Store):
 
     def list(self, subpath):
         return os.listdir(os.path.join(self.path, subpath))
+
+
+class InMemoryStore(Store):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.store = {}
+
+    def exists(self, fname):
+        return fname in self.store
+
+    def write(self, bytes_obj, fname):
+        self.store[fname] = bytes_obj
+
+    def load(self, fname):
+        return self.store[fname]
+
+    def delete(self, fname):
+        del self.store[fname]
+
+    def list(self, subpath):
+        return [key for key in self.store if key.startswith(subpath)]
 
 
 class PersistedJSONDict(MutableMapping):

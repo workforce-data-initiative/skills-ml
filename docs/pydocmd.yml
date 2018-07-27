@@ -29,7 +29,7 @@ generate:
     skills_ml.job_postings.aggregate.field_values+, skills_ml.job_postings.aggregate.pandas+,
     skills_ml.job_postings.common_schema+, skills_ml.job_postings.computed_properties+,
     skills_ml.job_postings.computed_properties.aggregators+, skills_ml.job_postings.computed_properties.computers+,
-    skills_ml.job_postings.corpora+, skills_ml.job_postings.corpora.basic+, skills_ml.job_postings.filtering+,
+    skills_ml.job_postings.corpora+, skills_ml.job_postings.filtering+,
     skills_ml.job_postings.geography_queriers+, skills_ml.job_postings.geography_queriers.cbsa+,
     skills_ml.job_postings.geography_queriers.cbsa_from_geocode+, skills_ml.job_postings.raw+,
     skills_ml.job_postings.raw.usajobs+, skills_ml.job_postings.raw.virginia+, skills_ml.job_postings.sample+]
@@ -40,6 +40,7 @@ markdown_extensions:
 pages:
 - {Home: index.md << ../README.md}
 - {Examples: examples.md}
+- {Ontology Class: ontologies.md}
 - {Job Posting Common Schema: common_schema.md}
 - {Evaluation Tools: skills_ml.evaluation.md}
 - {Algorithms: skills_ml.algorithms.md}

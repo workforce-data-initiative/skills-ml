@@ -1,12 +1,18 @@
-from skills_ml.algorithms.occupation_classifiers.classifiers import KNNDoc2VecClassifier, SocClassifier
+from skills_ml.algorithms.occupation_classifiers.classifiers import CombinedClassifier, KNNDoc2VecClassifier, SocClassifier
+from skills_ml.algorithms.occupation_classifiers.train import create_training_set
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
-from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel
+from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
+from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel, EmbeddingTransformer
+from skills_ml.job_postings.common_schema import JobPostingCollectionSample
+from skills_ml.job_postings.corpora import Word2VecGensimCorpusCreator
 from skills_ml.storage import S3Store, FSStore
 
 from skills_utils.s3 import upload
 
 import gensim
 from gensim.similarities.index import AnnoyIndexer
+
+from sklearn.ensemble import RandomForestClassifier
 
 from moto import mock_s3
 import mock
@@ -63,6 +69,24 @@ class FakeCorpusGenerator(object):
             yield gensim.models.doc2vec.TaggedDocument(words, label)
             k += 1
 
+class TestCombinedClassifier(unittest.TestCase):
+    @mock.patch('os.getcwd')
+    def test_combined_cls_local(self, mock_getcwd):
+        with tempfile.TemporaryDirectory() as td:
+            mock_getcwd.return_value = td
+            jobpostings = list(JobPostingCollectionSample())
+            corpus_generator = Word2VecGensimCorpusCreator(jobpostings, raw=True)
+            w2v = Word2VecModel(storage=FSStore(td), size=10, min_count=0, alpha=0.025, min_alpha=0.025)
+            trainer = EmbeddingTrainer(corpus_generator, w2v)
+            trainer.train(True)
+
+            matrix = create_training_set(jobpostings, SOCMajorGroup())
+            X = EmbeddingTransformer(w2v).transform(matrix.X)
+
+            rf = RandomForestClassifier()
+            rf.fit(X, matrix.y)
+            ccls = CombinedClassifier(w2v, rf, matrix.target_variable)
+            assert len(ccls.predict_soc([matrix.X[0]])[0]) == 2
 
 class TestKNNDoc2VecClassifier(unittest.TestCase):
     @mock.patch('os.getcwd')
@@ -80,13 +104,12 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
             doc = docs.split(',')[0].split()
 
             knn = KNNDoc2VecClassifier(embedding_model=d2v, k=0)
-            self.assertRaises(ValueError, lambda: knn.predict_soc(doc))
+            self.assertRaises(ValueError, lambda: knn.predict_soc([doc]))
 
             knn = KNNDoc2VecClassifier(embedding_model=d2v, k=1)
             soc_cls = SocClassifier(knn)
 
-            assert knn.predict_soc(doc)[0] == soc_cls.predict_soc(doc)[0]
-
+            assert knn.predict_soc([doc])[0][0] == soc_cls.predict_soc([doc])[0][0]
 
             # Build Annoy index
             knn.build_ann_indexer(num_trees=5)
@@ -100,7 +123,7 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
             # Load
             new_knn = KNNDoc2VecClassifier.load(FSStore(td), knn.model_name)
             assert new_knn.model_name ==  knn.model_name
-            assert new_knn.predict_soc(doc)[0] == '29-2061.00'
+            assert new_knn.predict_soc([doc])[0][0] == '29-2061.00'
 
             # Have to re-build the index whenever ones load the knn model to the memory
             assert new_knn.indexer == None
@@ -124,12 +147,12 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
         doc = docs.split(',')[0].split()
 
         knn = KNNDoc2VecClassifier(embedding_model=d2v, k=0)
-        self.assertRaises(ValueError, lambda: knn.predict_soc(doc))
+        self.assertRaises(ValueError, lambda: knn.predict_soc([doc]))
 
         knn = KNNDoc2VecClassifier(embedding_model=d2v, k=10)
         soc_cls = SocClassifier(knn)
 
-        assert knn.predict_soc(doc)[0] == soc_cls.predict_soc(doc)[0]
+        assert knn.predict_soc([doc])[0][0] == soc_cls.predict_soc([doc])[0][0]
 
 
         # Build Annoy index
@@ -145,7 +168,7 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
         # Load
         new_knn = KNNDoc2VecClassifier.load(s3_storage, knn.model_name)
         assert new_knn.model_name ==  knn.model_name
-        assert new_knn.predict_soc(doc)[0] == '29-2061.00'
+        assert new_knn.predict_soc([doc])[0][0] == '29-2061.00'
 
         # Have to re-build the index whenever ones load the knn model to the memory
         assert new_knn.indexer == None

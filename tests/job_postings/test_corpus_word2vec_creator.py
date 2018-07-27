@@ -1,4 +1,4 @@
-from skills_ml.job_postings.corpora.basic import Word2VecGensimCorpusCreator
+from skills_ml.job_postings.corpora import Word2VecGensimCorpusCreator
 import json
 
 sample_documents = [{

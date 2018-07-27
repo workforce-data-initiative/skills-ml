@@ -5,7 +5,7 @@ from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.jobtitle_cleaner.clean import JobTitleStringClean
 from skills_ml.algorithms.occupation_classifiers.classifiers import \
     SocClassifier
-from skills_ml.job_postings.corpora.basic import SimpleCorpusCreator
+from skills_ml.job_postings.corpora import SimpleCorpusCreator
 import logging
 import statistics
 
