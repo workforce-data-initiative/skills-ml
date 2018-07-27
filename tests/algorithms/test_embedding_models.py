@@ -26,7 +26,7 @@ class TestEmbeddingModels(unittest.TestCase):
         assert_array_equal(v1, v2)
 
         # test unseen vocab
-        self.assertRaises(KeyError, lambda: w2v.infer_vector(["sports"]))
+        assert w2v.infer_vector(["sports"]).shape[0] == 10
 
         # test a list that has some words not in vocab
         sentence_with_unseen_word = ["sports", "news", "and", "media"]

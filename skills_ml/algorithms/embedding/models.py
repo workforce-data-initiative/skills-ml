@@ -43,7 +43,8 @@ class Word2VecModel(ModelStorage, Word2Vec):
                 pass
 
         if len(words_in_vocab) == 0:
-            raise KeyError("None of the words is in vocabulary.")
+            logging.warning("None of the words is in vocabulary.")
+            return np.random.rand(self.vector_size)
         sentence_vector = sum_vector / len(words_in_vocab)
         return sentence_vector
 
