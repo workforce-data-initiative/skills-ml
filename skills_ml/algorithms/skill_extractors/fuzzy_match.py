@@ -1,8 +1,10 @@
-"""Use fuzzy matching with a source list to extract skills from a job posting"""
+"""Use fuzzy matching with a source list to extract skills
+from unstructured text"""
 import unicodecsv as csv
 import logging
 from smart_open import smart_open
-import re
+from descriptors import cachedproperty
+from math import ceil
 
 import nltk
 try:
@@ -10,24 +12,30 @@ try:
 except LookupError:
     nltk.download('punkt')
 
-from fuzzywuzzy import fuzz
-
-from .base import CandidateSkill, ListBasedSkillExtractor, CandidateSkillYielder, trie_regex_from_words
-from typing import Dict, Text
+from .base import (
+    CandidateSkill,
+    ListBasedSkillExtractor,
+    CandidateSkillYielder
+)
+from typing import Dict, Text, Generator
+from .symspell import SymSpell
 
 
 class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
     """Extract skills from unstructured text using fuzzy matching"""
 
     match_threshold = 88
+    max_distance = 4
+    max_ngrams = 5
 
     @property
     def method_name(self) -> Text:
-        return f'fuzzy_{self.match_threshold}'
+        return f'fuzzy_thresh{self.match_threshold}_maxdist{self.max_distance}_maxngram{self.max_ngrams}'
 
     @property
     def method_description(self) -> Text:
-        return f'Fuzzy matching using ratio of most similar substring, with a minimum cutoff of {self.match_threshold} percent match'
+        return f'Fuzzy matching using ratio of most similar substring, ' + \
+            f'with a minimum cutoff of {self.match_threshold} percent match'
 
     def reg_ex(self, s):
         s = s.replace(".", "\.")
@@ -50,50 +58,51 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
             next(reader)
             index = 3
             generator = (self.reg_ex(row[index]) for row in reader)
-
             return set(generator)
 
-    def ngrams(self, sent, n):
-        sent_input = sent.split()
-        output = []
-        for i in range(len(sent_input)-n+1):
-            output.append(sent_input[i:i+n])
-        return output
+    def ngrams(self, sent: Text, N: int) -> Generator[Text, None, None]:
+        """Yield ngrams from sentence
 
-    def fuzzy_matches_in_sentence(self, skill, sentence):
-        N = len(skill.split())
-        doc = self.ngrams(sentence, N)
-        doc_join = [b" ".join(d) for d in doc]
+        Args:
+            sent (string) A sentence
+            N (int) The maximum N-gram length to create. 
 
-        for dj in doc_join:
-            ratio = fuzz.partial_ratio(skill, dj)
-            if ratio > self.match_threshold:
-                yield CandidateSkill(
-                    skill_name=skill,
-                    matched_skill=dj,
-                    confidence=ratio,
-                    context=sentence.decode('utf-8')
-                )
+        Yields: (string) n-grams in sentence from n=1 up to the given N
+        """
+        sent_input = self.nlp.word_tokenize(sent)
+        for n in range(1, N):
+            for i in range(len(sent_input)-n+1):
+                yield " ".join(sent_input[i:i+n]).lower()
+
+    @cachedproperty
+    def symspell(self):
+        """A SymSpell lookup based on the object's list of skills"""
+        ss = SymSpell(max_dictionary_edit_distance=4)
+        ss.create_dictionary(list(self.lookup))
+        return ss
 
     def candidate_skills(self, source_object: Dict) -> CandidateSkillYielder:
         document = self.transform_func(source_object)
         sentences = self.nlp.sentence_tokenize(document)
 
         for sent in sentences:
-            exact_matches = set()
-            for cs in self.candidate_skills_in_context(sent): 
-                yield cs
-                if cs.skill_name not in exact_matches:
-                    exact_matches.add(cs.skill_name)
-
-            for skill in self.lookup:
-                if skill in exact_matches:
-                    continue
-                ratio = fuzz.partial_ratio(skill, sent)
-                # You can adjust the partial of matching here:
-                # 100 => exact matching 0 => no matching
-                if ratio > self.match_threshold:
-                    logging.info('Found fuzzy matches passing threshold in %s', sent)
-                    for match in self.fuzzy_matches_in_sentence(skill, sent.encode('utf-8')):
-                        logging.info('Returning fuzzy match %s in sent: %s', match, sent)
-                        yield match
+            for phrase in self.ngrams(sent, self.max_ngrams):
+                length_of_phrase = len(phrase)
+                max_distance = length_of_phrase - \
+                    ceil(length_of_phrase * self.match_threshold/100)
+                if max_distance > self.max_distance:
+                    max_distance = self.max_distance
+                matches = self.symspell.lookup(phrase, 2, max_distance)
+                for match in matches:
+                    logging.info(
+                        'Fuzzy match found: %s corrected to %s in %s',
+                        phrase,
+                        match.term,
+                        sent
+                    )
+                    yield CandidateSkill(
+                        skill_name=phrase,
+                        matched_skill=match.term,
+                        confidence=100*(length_of_phrase-match.distance)/length_of_phrase,
+                        context=sent
+                    )

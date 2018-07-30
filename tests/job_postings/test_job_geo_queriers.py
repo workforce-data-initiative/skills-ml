@@ -1,7 +1,6 @@
 from mock import patch
 from skills_ml.job_postings.geography_queriers import job_posting_search_strings
-from skills_ml.job_postings.geography_queriers.cbsa import JobCBSAQuerier
-from skills_ml.job_postings.geography_queriers.cbsa_from_geocode import JobCBSAFromGeocodeQuerier
+from skills_ml.job_postings.geography_queriers.cbsa import JobCBSAFromCrosswalkQuerier, JobCBSAFromGeocodeQuerier
 import json
 import unittest
 
@@ -23,7 +22,7 @@ ua_cbsa_lookup = {
 }
 
 
-class CBSATest(unittest.TestCase):
+class CrosswalkTest(unittest.TestCase):
     def setUp(self):
         place_patch = patch(
             'skills_ml.job_postings.geography_queriers.cbsa.place_ua',
@@ -43,7 +42,7 @@ class CBSATest(unittest.TestCase):
         cousub_patch.start()
         place_patch.start()
         cbsa_patch.start()
-        self.querier = JobCBSAQuerier()
+        self.querier = JobCBSAFromCrosswalkQuerier()
 
     def test_querier_one_hit(self):
         sample_job = {
@@ -63,9 +62,7 @@ class CBSATest(unittest.TestCase):
             "id": 5
         }
 
-        assert self.querier.query(sample_job) == (
-            ('456', 'Chicago, IL Metro Area', 'IL'),
-        )
+        assert self.querier.query(sample_job) == ('456', 'Chicago, IL Metro Area')
 
     def test_querier_multiple_hits(self):
         sample_job = {
@@ -85,10 +82,7 @@ class CBSATest(unittest.TestCase):
             "id": 5
         }
 
-        assert self.querier.query(sample_job) == (
-            ('987', 'Springfield, MA Metro Area', 'MA'),
-            ('876', 'Worcester, MA Metro Area', 'MA'),
-        )
+        assert self.querier.query(sample_job) == ('987', 'Springfield, MA Metro Area')
 
     def test_querier_no_hits(self):
         sample_job = {
@@ -108,7 +102,7 @@ class CBSATest(unittest.TestCase):
             "id": 5
         }
 
-        assert self.querier.query(sample_job) == []
+        assert self.querier.query(sample_job) == (None, None)
 
     def test_querier_hit_in_alternate(self):
         sample_job = {
@@ -128,27 +122,35 @@ class CBSATest(unittest.TestCase):
             "id": 5
         }
 
-        assert self.querier.query(sample_job) == (
-            ('345', 'Fargo, ND Metro Area', 'ND'),
-        )
+        assert self.querier.query(sample_job) == ('345', 'Fargo, ND Metro Area')
 
     def test_querier_blank(self):
-        assert self.querier.query({'id': 5}) == []
+        assert self.querier.query({'id': 5}) == (None, None)
 
 
-cbsa_results = {
-    # have the IL results differ to make sure that we catch the one with a CBSA
-    'Elgin, Illinois': ['456', 'Chicago, IL Metro Area'],
-    'Elgin, IL': None,
-    # TX results should consistently be None so we can test searches that are outside any CBSA
-    'Elgin, Texas': None,
-    'Elgin, TX': None,
-}
+# note: this is not actually what the output of the
+# geocoder looks like.
+# what's important is that the geocoder outputs
+# in a form that the cbsa finder understands.
+# That is what this geography querier cares about
+class MockGeocoder(object):
+    def geocode(self, search_string):
+        if search_string == 'Elgin, Illinois':
+            return '456'
+        else:
+            return None
+
+class MockCBSAFinder(object):
+    def query(self, geocode_result):
+        if geocode_result:
+            return ['456', 'Chicago, IL Metro Area']
+        else:
+            return None
 
 
-class CBSAFromGeocodeTest(unittest.TestCase):
+class GeocodeTest(unittest.TestCase):
     def setUp(self):
-        self.querier = JobCBSAFromGeocodeQuerier(cbsa_results=cbsa_results)
+        self.querier = JobCBSAFromGeocodeQuerier(geocoder=MockGeocoder(), cbsa_finder=MockCBSAFinder())
 
     def test_querier_one_hit(self):
         sample_job = {
@@ -169,7 +171,7 @@ class CBSAFromGeocodeTest(unittest.TestCase):
         }
 
         assert self.querier.query(sample_job) == \
-            ('456', 'Chicago, IL Metro Area', 'IL')
+            ('456', 'Chicago, IL Metro Area')
 
     def test_querier_hit_no_cbsa(self):
         sample_job = {
@@ -189,7 +191,7 @@ class CBSAFromGeocodeTest(unittest.TestCase):
             "id": 5
         }
 
-        assert self.querier.query(sample_job) == (None, None, 'TX')
+        assert self.querier.query(sample_job) == (None, None)
 
     def test_querier_not_present(self):
         sample_job = {
@@ -209,7 +211,7 @@ class CBSAFromGeocodeTest(unittest.TestCase):
             "id": 5
         }
 
-        assert self.querier.query(sample_job) == (None, None, 'ND')
+        assert self.querier.query(sample_job) == (None, None)
 
 
 

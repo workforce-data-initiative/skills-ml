@@ -73,6 +73,10 @@ class JobPostingComputedProperty(metaclass=ABCMeta):
             if job_posting['id'] not in caches[partition_key]:
                 caches[partition_key][job_posting['id']] = property_computer(job_posting)
                 misses += 1
+                if misses > 0 and misses % 100000 == 0:
+                    logging.info('Proactively saving caches at cache miss %s (job posting %s)', misses, number)
+                    for cache in caches.values():
+                        cache.save()
             else:
                 hits += 1
         for cache in caches.values():

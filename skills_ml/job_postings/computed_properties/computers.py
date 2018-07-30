@@ -1,7 +1,4 @@
 """Various computers of job posting properties. Each class is generally a generic algorithm (such as skill extraction or occupation classification) paired with enough configuration to run on its own"""
-import json
-import tempfile
-
 from . import JobPostingComputedProperty, ComputedPropertyColumn
 
 from skills_ml.algorithms.string_cleaners import NLPTransforms
@@ -9,15 +6,17 @@ from skills_ml.algorithms.jobtitle_cleaner.clean import JobTitleStringClean
 from skills_ml.algorithms.occupation_classifiers.classifiers import \
     SocClassifier
 from skills_ml.job_postings.corpora import SimpleCorpusCreator
-from skills_ml.job_postings.geography_queriers.cbsa_from_geocode import JobCBSAFromGeocodeQuerier
-from skills_ml.algorithms.skill_extractors import (
-    ExactMatchSkillExtractor,
-    SocScopedExactMatchSkillExtractor,
-    FuzzyMatchSkillExtractor,
-    SkillEndingPatternExtractor,
-    AbilityEndingPatternExtractor
-)
-from skills_ml.algorithms.geocoders.cbsa import CachedCBSAFinder
+import logging
+import statistics
+
+
+NUMERIC_AGGREGATION_FUNCTION_PATHS = {
+    'statistics.mean': 'Arithemetic mean',
+    'statistics.median': 'Median (middle value)',
+    'statistics.mode': 'Mode (most common value)',
+    'statistics.stdev': 'Sample standard deviation',
+    'statistics.variance': 'Sample variance',
+}
 
 
 class TitleCleanPhaseOne(JobPostingComputedProperty):
@@ -53,41 +52,30 @@ class TitleCleanPhaseTwo(JobPostingComputedProperty):
         return lambda job_posting: JobTitleStringClean().clean_title(NLPTransforms().title_phase_one(job_posting['title']))
 
 
-class CBSAandStateFromGeocode(JobPostingComputedProperty):
-    """Produce a CBSA by geocoding the job's location and matching with a CBSA shapefile
+class Geography(JobPostingComputedProperty):
+    """Produce a geography by querying a given JobGeographyQuerier
 
     Args:
-        cache_s3_path (string) An s3 path to store geocode cache results
+        geo_querier
     """
-    def __init__(self, cache_storage, cache_fname, *args, **kwargs):
+    def __init__(self, geo_querier, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.cache_storage = cache_storage
-        self.cache_fname = cache_fname
+        self.geo_querier = geo_querier
 
-    property_name = 'cbsa_and_state_from_geocode'
-    property_columns = [
-        ComputedPropertyColumn(
-            name='cbsa_fips',
-            description='FIPS code of Core-Based Statistical Area, found by geocoding job location'
-        ),
-        ComputedPropertyColumn(
-            name='cbsa_name',
-            description='Name of Core-Based Statistical Area, found by geocoding job location'
-        ),
-        ComputedPropertyColumn(
-            name='state_code',
-            description='State code of job posting'
-        )
-    ]
+    @property
+    def property_name(self):
+        return self.geo_querier.name
+
+    @property
+    def property_columns(self):
+        return [
+            ComputedPropertyColumn(name=name, description=description)
+            for name, description
+            in self.geo_querier.output_columns
+        ]
 
     def _compute_func_on_one(self):
-        geo_querier = JobCBSAFromGeocodeQuerier(
-            cbsa_results=CachedCBSAFinder(
-                cache_storage=self.cache_storage,
-                cache_fname=self.cache_fname
-            ).all_cached_cbsa_results
-        )
-        return lambda job_posting: geo_querier.query(job_posting)
+        return lambda job_posting: self.geo_querier.query(job_posting)
 
 
 class SOCClassifyProperty(JobPostingComputedProperty):
@@ -151,6 +139,71 @@ class GivenSOC(JobPostingComputedProperty):
             return job_posting.get('onet_soc_code', '99-9999.00')
         return func
 
+
+
+class PayMixin(object):
+    def salary_from_job_posting(job_posting):
+        minSalary = None
+        maxSalary = None
+        try:
+            minSalary = float(job_posting['baseSalary']['minSalary'])
+        except ValueError:
+            logging.warning('Could not cast minValue string %s to float', job_posting['baseSalary']['minSalary'])
+
+        try:
+            maxSalary = float(job_posting['baseSalary']['maxSalary'])
+        except ValueError:
+            logging.warning('Could not cast maxValue string %s to float', job_posting['baseSalary']['maxSalary'])
+
+        if not maxSalary and not minSalary:
+            logging.warning('Neither minSalary nor maxSalary could be converted to float, no extraction possible')
+            return None
+
+        if not maxSalary:
+            return minSalary
+
+        if not minSalary:
+            return maxSalary
+
+        return statistics.mean([minSalary, maxSalary])
+
+
+class HourlyPay(JobPostingComputedProperty, PayMixin):
+    """The pay given in the baseSalary field if salaryFrequency is hourly"""
+    property_name = 'hourly_pay'
+    property_columns = [
+        ComputedPropertyColumn(
+            name='pay_hourly',
+            description='Pay given in baseSalary field if salaryFrequency is hourly',
+            compatible_aggregate_function_paths=NUMERIC_AGGREGATION_FUNCTION_PATHS,
+        )
+    ]
+
+    def _compute_func_on_one(self):
+        def func(job_posting):
+            if job_posting.get('baseSalary', {}).get('salaryFrequency', None) is not 'hourly':
+                return None
+            return self.salary_from_job_posting(job_posting)
+        return func
+
+
+class YearlyPay(JobPostingComputedProperty, PayMixin):
+    """The pay given in the baseSalary field if salaryFrequency is yearly"""
+    property_name = 'yearly_pay'
+    property_columns = [
+        ComputedPropertyColumn(
+            name='pay_yearly',
+            description='Pay given in baseSalary field if salaryFrequency is yearly',
+            compatible_aggregate_function_paths=NUMERIC_AGGREGATION_FUNCTION_PATHS,
+        )
+    ]
+
+    def _compute_func_on_one(self):
+        def func(job_posting):
+            if job_posting.get('baseSalary', {}).get('salaryFrequency', None) is not 'yearly':
+                return None
+            return self.salary_from_job_posting(job_posting)
+        return func
 
 
 class SkillCounts(JobPostingComputedProperty):

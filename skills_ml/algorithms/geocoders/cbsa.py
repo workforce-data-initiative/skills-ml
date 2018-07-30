@@ -69,7 +69,7 @@ class CachedCBSAFinder(object):
     def _load_shapefile(self):
         """Load the CBSA Shapefile into memory"""
         if not self.shapefile_name:
-            download_shapefile(self.cache_dir or 'tmp')
+            self.shapefile_name = download_shapefile(self.cache_dir or 'tmp')
         with fiona.collection(self.shapefile_name) as input:
             for row in input:
                 self.shapes.append(shapely.geometry.shape(row['geometry']))
@@ -88,7 +88,7 @@ class CachedCBSAFinder(object):
         """
         if not self.shapes or not self.properties:
             self._load_shapefile()
-        if 'bbox' not in geocode_result:
+        if not geocode_result or 'bbox' not in geocode_result:
             logging.warning('Geocode result failed: %s', geocode_result)
             return None
         box = shapely.geometry.box(
