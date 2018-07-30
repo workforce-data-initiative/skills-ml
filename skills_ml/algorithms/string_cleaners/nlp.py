@@ -90,3 +90,14 @@ class NLPTransforms(object):
             return nltk.word_tokenize(text)
         else:
             return nltk.wordpunct_tokenize(text)
+
+
+def deep(function):
+    def wrapper(*args, **kwargs):
+        if isinstance(args[0], list):
+            if len(args[0]) == 1:
+                return wrapper(args[0][0])
+            return [wrapper(i) for i in args[0]]
+        return function(args[0])
+    return wrapper
+
