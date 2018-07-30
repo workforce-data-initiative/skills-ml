@@ -7,6 +7,7 @@ from collections import Counter
 
 from skills_ml.job_postings.corpora import SimpleCorpusCreator
 from skills_ml.algorithms.string_cleaners import NLPTransforms
+from skills_ml.ontologies.base import CompetencyFramework
 
 from typing import Dict, Callable, Text, Generator
 import re
@@ -163,40 +164,22 @@ class SkillExtractor(object, metaclass=ABCMeta):
 
 
 class ListBasedSkillExtractor(SkillExtractor):
-    """Extract skills by comparing with a known lookup/list
-
-
+    """Extract skills by comparing with a known lookup/list.
+    
     Subclasses must implement _skills_lookup and _document_skills_in_lookup
 
     Args:
-        skill_lookup_path (string) A path to the skill lookup file
         skill_lookup_name (string, optional) An identifier for the skill lookup type.
             Defaults to onet_ksat
         skill_lookup_description (string, optional) A human-readable description of the skill lookup.
     """
-    def __init__(
-            self,
-            skill_lookup_path,
-            skill_lookup_name='onet_ksat',
-            skill_lookup_description=None,
-            *args,
-            **kwargs
-    ):
+    def __init__(self, competency_framework, *args, **kwargs):
         super(ListBasedSkillExtractor, self).__init__(*args, **kwargs)
-        self.skill_lookup_path = skill_lookup_path
-        self.skill_lookup_name = skill_lookup_name
-        # TODO: get this from competency object when they are in here
-        # at that point there should also be no default, make them pass in the object
-        if skill_lookup_name == 'onet_ksat':
-            self.skill_lookup_description = 'ONET Knowledge, Skills, Abilities, Tools, and Technology'
-        else:
-            self.skill_lookup_description = skill_lookup_description or ''
-        self.lookup = self._skills_lookup()
-        logging.info(
-            'Done creating skills lookup with %d entries',
-            len(self.lookup)
-        )
-        self.trie_regex = trie_regex_from_words(self.lookup)
+        if not isinstance(competency_framework, CompetencyFramework):
+            raise ValueError('Must pass in a CompetencyFramework object')
+        if not competency_framework.name or not competency_framework.description:
+            raise ValueError('CompetencyFramework object must be documented with a name and description')
+        self.competency_framework = competency_framework
 
     @property
     @abstractmethod
@@ -212,20 +195,8 @@ class ListBasedSkillExtractor(SkillExtractor):
 
     @property
     def name(self):
-        return f'{self.skill_lookup_name}_{self.method_name}'
+        return f'{self.competency_framework.name}_{self.method_name}'
 
     @property
     def description(self):
-        return f'{self.skill_lookup_description} found by {self.method_description}'
-
-    def candidate_skills_in_context(self, context):
-        matches = self.trie_regex.findall(context)
-        for match in matches: 
-            logging.info('Yielding exact match %s in string %s', match, context)
-            yield CandidateSkill(
-                skill_name=match.lower(),
-                matched_skill=match,
-                confidence=100,
-                context=context
-            )
-
+        return f'{self.competency_framework.description} found by {self.method_description}'

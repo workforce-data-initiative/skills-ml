@@ -1,8 +1,6 @@
 """Use fuzzy matching with a source list to extract skills
 from unstructured text"""
-import unicodecsv as csv
 import logging
-from smart_open import smart_open
 from descriptors import cachedproperty
 from math import ceil
 
@@ -28,6 +26,20 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
     max_distance = 4
     max_ngrams = 5
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        list_entries = set(
+            competency.name.lower()
+            for competency in self.competency_framework.values()
+        )
+        logging.info(
+            'Found %s entries for lookup',
+            len(list_entries)
+        )
+        self.symspell = SymSpell(max_dictionary_edit_distance=4)
+        self.symspell.create_dictionary(list(list_entries))
+
     @property
     def method_name(self) -> Text:
         return f'fuzzy_thresh{self.match_threshold}_maxdist{self.max_distance}_maxngram{self.max_ngrams}'
@@ -46,20 +58,6 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
         s = s.replace("?", "\?")
         return s
 
-    def _skills_lookup(self) -> set:
-        """Create skills lookup
-
-        Reads the object's filename containing skills into a lookup
-
-        Returns: (set) skill names
-        """
-        with smart_open(self.skill_lookup_path) as infile:
-            reader = csv.reader(infile, delimiter='\t')
-            next(reader)
-            index = 3
-            generator = (self.reg_ex(row[index]) for row in reader)
-            return set(generator)
-
     def ngrams(self, sent: Text, N: int) -> Generator[Text, None, None]:
         """Yield ngrams from sentence
 
@@ -73,13 +71,6 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
         for n in range(1, N):
             for i in range(len(sent_input)-n+1):
                 yield " ".join(sent_input[i:i+n]).lower()
-
-    @cachedproperty
-    def symspell(self):
-        """A SymSpell lookup based on the object's list of skills"""
-        ss = SymSpell(max_dictionary_edit_distance=4)
-        ss.create_dictionary(list(self.lookup))
-        return ss
 
     def candidate_skills(self, source_object: Dict) -> CandidateSkillYielder:
         document = self.transform_func(source_object)

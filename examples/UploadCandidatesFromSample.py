@@ -9,6 +9,7 @@ from skills_ml.algorithms.skill_extractors import \
     FuzzyMatchSkillExtractor,\
     ExactMatchSkillExtractor,\
 
+from skills_ml.ontologies.onet import Onet
 from skills_ml.evaluation.skill_extractors import upload_candidates_from_job_posting_json
 
 
@@ -37,15 +38,13 @@ if __name__ == '__main__':
     ]
     sample_path = 's3://{}/sampled_jobpostings'.format(PRIVATE_BUCKET)
     candidates_path = '{}/skill_candidates'.format(PRIVATE_BUCKET)
-    skill_tables = [
-        ('s3://{}/skill_lists/onet_knowledge.tsv'.format(PUBLIC_BUCKET), 'onet_knowledge'),
-        ('s3://{}/skill_lists/onet_skill.tsv'.format(PUBLIC_BUCKET), 'onet_skill'),
-        ('s3://{}/skill_lists/onet_ability.tsv'.format(PUBLIC_BUCKET), 'onet_ability'),
+    full_onet = Onet()
+    ontologies = [
+        full_onet.filter_by(lambda edge: 'Knowledge' in edge.competency.categories, competency_name='onet_knowledge', competency_description='ONET Knowledge')
+        full_onet.filter_by(lambda edge: 'Ability' in edge.competency.categories, competency_name='onet_ability', competency_description='ONET Ability')
+        full_onet.filter_by(lambda edge: 'Skill' in edge.competency.categories, competency_name='onet_skill', competency_description='ONET Skill')
     ]
-    for sample_name, skill_extractor_class, skill_table in product(sample_names, skill_extractor_classes, skill_tables):
+    for sample_name, skill_extractor_class, ontologies in product(sample_names, skill_extractor_classes, ontologies):
         sample = Sample(sample_path, sample_name)
-        skill_extractor = skill_extractor_class(
-            skill_lookup_path=skill_table[0],
-            skill_lookup_type=skill_table[1]
-        )
+        skill_extractor = skill_extractor_class(ontology.competency_framework)
         generate_skill_candidates_oneprocess(candidates_path, sample, skill_extractor)

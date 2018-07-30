@@ -141,6 +141,32 @@ CompetencyOccupationEdge.from_jsonld({
 })
 ```
 
+## CompetencyFramework
+
+A `CompetencyFramework` represent a collection of competencies and some metadata about them. The identifiers for given Competencies are used to disambiguate between them. The metadata exists so any code that uses the `CompetencyFramework` object can pass on useful knowledge about the framework to its output.
+
+The metadata has only two pieces of data:
+- name: A machine-readable name. Should be in snake case (e.g. `onet_ksat`)
+- description: A human-readable description.
+
+### Basic Example
+
+*Using Python Constructor*
+
+```python
+from skills_ml.ontologies import Competency, CompetencyFramework
+
+framework = CompetencyFramework(
+    name='Sample Framework',
+    description='A few basic competencies',
+    competencies=[
+        Competency(identifier='a', name='Organization'),
+        Competency(identifier='b', name='Communication Skills'),
+        Competency(identifier='c', name='Cooking')
+    ]
+)
+```
+
 ## CompetencyOntology
 
 An ontology represents a collection of competencies, a collection of occupations, and a collection of all relationships between competencies and occupations. The CompetencyOntology class represents each of these three collections using a `set` object. The identifiers for all of those objects are used to disambiguate between items in each of these sets. The JSON-LD representation of the ontology mirrors this internal structure.
@@ -156,7 +182,10 @@ Note in the Python example that importing the CompetencyOccupationEdge class is 
 ```python
 from skills_ml.ontologies import Competency, Occupation, CompetencyOntology
 
-ontology = CompetencyOntology()
+ontology = CompetencyOntology(
+    competency_name='caveman_games',
+    competency_description='Competencies Useful to Characters in NES title Caveman Games'
+)
 
 dinosaur_riding = Competency(identifier='12345', name='Dinosaur Riding')
 extreme_transportation = Competency(identifier='123', name='Extreme Transportation')
@@ -239,11 +268,11 @@ ONET = Onet(OnetSiteCache(FSStore('onet_cache')))
 
 ## Uses of Ontologies
 
-There isn't much functionality built up around ontologies just yet, but the class is under heavy development. 
-
 ### Filtering
 
 You can filter the graph to produce subsets based on the list of edges. This will return another CompetencyOntology object, so any code that takes an ontology as input will work on the subsetted graph.
+
+You can optionally supply `competency_name` and `competency_description` keyword arguments to apply to the `CompetencyFramework` in the returned ontology object. This is necessary if you wish to send the `CompetencyFramework` object in the resulting ontology to algorithms in skills-ml.
 
 
 ```python
@@ -259,18 +288,65 @@ ontology.filter_by(lambda edge: 'software' in edge.occupation.name.lower() and '
 
 # Return only competencies who have a parent competency containing 'software'
 ontology.filter_by(lambda edge: any('software' in parent.name.lower() for parent in edge.parents)
+
+# Return an ontology with only 'python' competencies, and set a name/description for the resulting CompetencyFramework
+ontology.filter_by(lambda edge: 'python' in edge.competency.name.lower(), competency_name='python', competency_description='Python-related competencies')
 ```
 
-### Retrieving Leaf Strings
+### Skill Extraction: competencies-only
 
-Retrieving all the detailed competencies as a list of strings can be helpful for using as a reference list for skill extraction.
+Many list-based skill extraction require a CompetencyFramework as input. This can be retrieved directory from the `CompetencyOntology` object. 
+
+```python
+from skills_ml.algorithms.skill_extractors import ExactMatchSkillExtractor
+from skills_ml.job_postings.common_schema import JobPostingCollectionSample
+skill_extractor = ExactMatchSkillExtractor(ontology.competency_framework)
+for candidate_skill in skill_extractor.candidate_skills(JobPostingCollectionSample()):
+    print(candidate_skill)
+```
+
+### Skill Extraction: filtered competencies
+
+If you wish to filter a `CompetencyOntology` and then use it for skill extraction, you must make sure it has a name and description, either through the optional `filter_by` keyword argument or through modifying the `CompetencyFramework` instance directly.
 
 ```python
 
-leaf_skill_strings = [
-	competency.name for competency in 
-	ontology.filter_by(lambda edge: len(edge.competency.children) == 0).competencies
-]
+from skills_ml.algorithms.skill_extractors import ExactMatchSkillExtractor
+from skills_ml.job_postings.common_schema import JobPostingCollectionSample
+
+
+# Option 1: Using filter_by keyword arguments (recommended)
+
+competency_framework = ontology.filter_by(
+    lambda edge: 'python' in edge.competency.name.lower(),
+    competency_name='python',
+    competency_description='Python-related competencies'
+).competency_framework
+
+
+# Option 2: Modifying competency_framework afterwards
+competency_framework = ontology.filter_by(lambda edge: 'python' in edge.competency.name.lower()).competency_framework
+competency_framework.name = 'python'
+competency_framework.description = 'Python-related competencies'
+
+
+skill_extractor = ExactMatchSkillExtractor(competency_framework)
+
+for candidate_skill in skill_extractor.candidate_skills(JobPostingCollectionSample()):
+    print(candidate_skill)
+
+```
+
+### Skill Extraction: full ontology
+
+The SocScopedExactMatchSkillExtractor requires both occupation and competency data, so it takes in the entire `CompetencyOntology` as input.
+
+```python
+from skills_ml.algorithms.skill_extractors import ExactMatchSkillExtractor
+from skills_ml.job_postings.common_schema import JobPostingCollectionSample
+skill_extractor = SocScopedExactMatchSkillExtractor(ontology)
+for candidate_skill in skill_extractor.candidate_skills(JobPostingCollectionSample()):
+    print(candidate_skill)
 ```
 
 ### Exporting as JSON-LD

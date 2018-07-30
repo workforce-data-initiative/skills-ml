@@ -19,13 +19,16 @@ import logging
 
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.computed_properties.computers import\
-    TitleCleanPhaseOne, PostingIdPresent, Geography
+    TitleCleanPhaseOne, PostingIdPresent, Geography, SkillCounts
 from skills_ml.job_postings.geography_queriers.state import JobStateQuerier
+from skills_ml.algorithms.skill_extractors.noun_phrase_ending import SkillEndingPatternExtractor
 from skills_ml.job_postings.computed_properties.aggregators import\
     aggregate_properties
 from skills_ml.storage import FSStore
+from functools import partial
 import unicodecsv as csv
 import numpy
+from skills_ml.job_postings.aggregate.pandas import listy_n_most_common
 import os
 import tempfile
 
@@ -51,10 +54,9 @@ with tempfile.TemporaryDirectory() as tmpdir:
         Geography(geo_querier=JobStateQuerier(), storage=storage)
     ]
     # create properties to aggregate for each group
-    aggregated_properties = [
-        PostingIdPresent(storage=storage),
-    ]
-
+    posting_present_prop= PostingIdPresent(storage=storage)
+    skill_count_prop = SkillCounts(skill_extractor=SkillEndingPatternExtractor(only_bulleted_lines=False), storage=storage)
+    aggregated_properties = [posting_present_prop, skill_count_prop]
     # Regardless of their role in the final dataset, we need to compute
     # all properties from the dataset. Since the computed properties
     # partition their caches by day, for optimum performance one
@@ -76,7 +78,10 @@ with tempfile.TemporaryDirectory() as tmpdir:
         out_filename='2016Q1',
         grouping_properties=grouping_properties,
         aggregate_properties=aggregated_properties,
-        aggregate_functions={'posting_id_present': [numpy.sum]},
+        aggregate_functions=dict([
+            (posting_present_prop.property_name, [numpy.sum]),
+            (skill_count_prop.property_name, [partial(listy_n_most_common, 5)])
+        ]),
         storage=storage,
         aggregation_name='title_state_counts'
     )
