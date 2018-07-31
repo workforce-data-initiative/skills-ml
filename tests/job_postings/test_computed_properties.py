@@ -195,12 +195,8 @@ class SkillExtractTest(ComputedPropertyTestCase):
         s3_conn = boto.connect_s3()
         client = boto3.resource('s3')
         bucket = client.create_bucket(Bucket='test-bucket')
-        skills_path = 's3://test-bucket/skills_master_table.tsv'
-        utils.create_skills_file(skills_path)
         storage = S3Store('s3://test-bucket/computed_properties')
-        skill_extractor = ExactMatchSkillExtractor(
-            skill_lookup_path=skills_path,
-        )
+        skill_extractor = ExactMatchSkillExtractor(utils.sample_framework())
         self.computed_property = SkillCounts(
             skill_extractor=skill_extractor,
             storage=storage,
@@ -214,5 +210,5 @@ class SkillExtractTest(ComputedPropertyTestCase):
     def test_compute_func(self):
         cache = self.computed_property.cache_for_key(self.datestring)
         job_posting_id = self.job_postings[0]['id']
-        assert cache[job_posting_id] == {'skill_counts_onet_ksat_exact_match': ['reading comprehension']}
+        assert cache[job_posting_id] == {'skill_counts_sample_framework_exact_match': ['reading comprehension']}
 
