@@ -1,4 +1,5 @@
 from functools import reduce
+
 from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms, deep
 
 
@@ -13,11 +14,11 @@ class NLPPipeline(object):
         self.functions = list(functions)
 
     @property
-    def compose(self):
+    def _compose(self):
         return reduce(lambda f, g: lambda x: g(f(x)), self.functions, lambda x: x)
 
     def run(self, generator):
-        return list(self.compose(generator))
+        return list(self._compose(generator))
 
     @property
     def description(self):

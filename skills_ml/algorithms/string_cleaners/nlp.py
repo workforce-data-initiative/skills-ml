@@ -6,9 +6,10 @@ import nltk
 from functools import reduce, wraps
 
 class NLPTransforms(object):
-    # An object that performs common NLP transformations
-    # for unicodedata, see:
-    # http://www.unicode.org/reports/tr44/tr44-4.html#General_Category_Values
+    """An object that performs common NLP transformations
+    for unicodedata, see:
+    http://www.unicode.org/reports/tr44/tr44-4.html#General_Category_Values
+    """
     def __init__(self):
         self.punct = set(['P', 'S'])
         self.transforms = ['nlp_a']
@@ -93,7 +94,7 @@ class NLPTransforms(object):
 
 
 def deep(func):
-    """A decorator that apply a function to a nested list recursively
+    """A decorator that will apply a function to a nested list recursively
 
     Args:
         func (function): a function to be applied to a nested list
