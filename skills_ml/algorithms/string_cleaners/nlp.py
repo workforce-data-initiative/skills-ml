@@ -92,14 +92,22 @@ class NLPTransforms(object):
             return nltk.wordpunct_tokenize(text)
 
 
-def deep(function):
-    @wraps(function)
+def deep(func):
+    """A decorator that apply a function to a nested list recursively
+
+    Args:
+        func (function): a function to be applied to a nested list
+
+    Returns:
+        function: The wrapped function
+    """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if isinstance(args[0], list):
             if len(args[0]) == 1:
                 return wrapper(args[0][0])
             return [wrapper(i) for i in args[0]]
-        return function(args[0])
+        return func(args[0])
     return wrapper
 
 
