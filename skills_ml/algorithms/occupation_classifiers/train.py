@@ -3,7 +3,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 
 from skills_ml.storage import FSStore
 from skills_ml.ontologies.onet import majorgroupname
-from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
+from skills_ml.algorithms.string_cleaners.nlp import clean_str, word_tokenize
 from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
 from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, TrainingMatrix
 from skills_ml.job_postings.common_schema import JobPostingGeneratorType
@@ -98,8 +98,8 @@ def create_training_set(job_postings_generator: JobPostingGeneratorType,
         if target_variable.filter_func(job):
             label = target_variable.transformer(job)
 
-            text = ' '.join([NLPTransforms().clean_str(job[field]) for field in document_schema_fields])
-            tokens = NLPTransforms().word_tokenize(text)
+            text = ' '.join([clean_str(job[field]) for field in document_schema_fields])
+            tokens = word_tokenize(text)
             if embedding_model:
                 X.append(embedding_model.infer_vector(tokens))
             else:

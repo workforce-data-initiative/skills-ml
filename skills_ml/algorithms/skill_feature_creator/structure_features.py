@@ -1,7 +1,7 @@
 import json
 import csv
 from collections import OrderedDict
-from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
+from skills_ml.algorithms.string_cleaners.nlp import sentence_tokenize
 import re
 
 def struct_features(sent, i, desc_length, word_tokenizer):
@@ -52,7 +52,7 @@ def struct_features(sent, i, desc_length, word_tokenizer):
 
 
 def structFeatGeneration(job_posting):
-    sentences = NLPTransforms().sentence_tokenize(job_posting)
+    sentences = sentence_tokenize(job_posting)
     desc_length = len(sentences)
     features = [struct_features(sentences[i], i, desc_length) for i in range(desc_length)]
 

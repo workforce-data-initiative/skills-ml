@@ -1,104 +1,21 @@
-"""String transformations for cleaning"""
+"""String transformations for cleaning
+for unicodedata, see:
+http://www.unicode.org/reports/tr44/tr44-4.html#General_Category_Values
+"""
 import unicodedata
 import re
 from bs4 import BeautifulSoup
 import nltk
 from functools import reduce, wraps
+from typing import List, Set, Generator, Dict
 
-class NLPTransforms(object):
-    """An object that performs common NLP transformations
-    for unicodedata, see:
-    http://www.unicode.org/reports/tr44/tr44-4.html#General_Category_Values
-    """
-    def __init__(self):
-        self.punct = set(['P', 'S'])
-        self.transforms = ['nlp_a']
-
-    def normalize(self, text):
-        """
-        Args:
-            text: A unicode string
-        Returns:
-            The text, lowercased and in NFKD normal form
-        """
-        return unicodedata.normalize('NFKD', text.lower())
-
-    def clean_html(self, text):
-        markup = BeautifulSoup(text, "lxml")
-        return unicodedata.normalize('NFKD', markup.get_text())
-
-    def lowercase_strip_punc(self, text):
-        """
-        Args:
-            text: A unicode string
-        Returns:
-            The text, lowercased, sans  punctuation and in NFKD normal form
-        """
-        return ''.join(
-            char for char in self.normalize(text)
-            if not unicodedata.category(char)[0] in self.punct
-        )
-
-    def title_phase_one(self, text):
-        """
-        Args:
-            text: A unicode string
-        Returns:
-            The text, lowercased, sans punctuation, whitespace normalized
-        """
-        no_apos = re.sub(r'\'', '', self.normalize(text))
-        strip_punc = ''.join(
-            char if not unicodedata.category(char)[0] in self.punct else ' '
-            for char in no_apos
-        )
-        return re.sub(r'\s+', ' ', strip_punc.strip())
-
-    def clean_str(self, text):
-        """
-        Args:
-            text: A unicode string
-        Returns:
-            The array of split words in text, lowercased,
-            sans punctuation, non-English letters
-        """
-        RE_PREPROCESS = r'\W+|\d+'
-        text = re.sub(
-            RE_PREPROCESS,
-            ' ',
-            text.lower()
-        )
-        text = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", text)
-        text = re.sub(r"\'s", " \'s", text)
-        text = re.sub(r"\'ve", " \'ve", text)
-        text = re.sub(r"n\'t", " n\'t", text)
-        text = re.sub(r"\'re", " \'re", text)
-        text = re.sub(r"\'d", " \'d", text)
-        text = re.sub(r"\'ll", " \'ll", text)
-        text = re.sub(r"\s{2,}", " ", text)
-        return text
-
-    def sentence_tokenize(self, text):
-        sentences = re.split('\n', text)
-        sentences = list(filter(None, sentences))
-        try:
-            sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences.encode('utf-8')))
-        except:
-            sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences))
-        return sentences
-
-    def word_tokenize(self, text, punctuation=True):
-        if punctuation:
-            return nltk.word_tokenize(text)
-        else:
-            return nltk.wordpunct_tokenize(text)
-
+transforms = ['nlp_a']
 
 def deep(func):
     """A decorator that will apply a function to a nested list recursively
 
     Args:
         func (function): a function to be applied to a nested list
-
     Returns:
         function: The wrapped function
     """
@@ -112,3 +29,123 @@ def deep(func):
     return wrapper
 
 
+def normalize(text: str) -> str:
+    """
+    Args:
+        text (str): A unicode string
+    Returns:
+        str: The text, lowercased and in NFKD normal form
+    """
+    return unicodedata.normalize('NFKD', text.lower())
+
+@deep
+def clean_html(text: str) -> str:
+    markup = BeautifulSoup(text, "lxml")
+    return unicodedata.normalize('NFKD', markup.get_text())
+
+
+def lowercase_strip_punc(text: str, punct: Set[str]=None) -> str:
+    """
+    Args:
+        text (str): A unicode string
+        punct (:obj: `set`, optional)
+    Returns:
+        str: The text, lowercased, sans  punctuation and in NFKD normal form
+    """
+    if not punct:
+        punct = set(['P', 'S'])
+
+    return ''.join(
+        char for char in normalize(text)
+        if not unicodedata.category(char)[0] in punct
+    )
+
+
+def title_phase_one(text: str, punct: Set[str]=None) -> str:
+    """
+    Args:
+        text (str): A unicode string
+        punct (:obj: `set`, optional)
+    Returns:
+        str: The text, lowercased, sans punctuation, whitespace normalized
+    """
+    if not punct:
+        punct = set(['P', 'S'])
+    no_apos = re.sub(r'\'', '', normalize(text))
+    strip_punc = ''.join(
+        char if not unicodedata.category(char)[0] in punct else ' '
+        for char in no_apos
+    )
+    return re.sub(r'\s+', ' ', strip_punc.strip())
+
+@deep
+def clean_str(text: str) -> str:
+    """
+    Args:
+        text: A unicode string
+    Returns:
+        str: lowercased, sans punctuation, non-English letters
+    """
+    RE_PREPROCESS = r'\W+|\d+'
+    text = re.sub(
+        RE_PREPROCESS,
+        ' ',
+        text.lower()
+    )
+    text = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", text)
+    text = re.sub(r"\'s", " \'s", text)
+    text = re.sub(r"\'ve", " \'ve", text)
+    text = re.sub(r"n\'t", " n\'t", text)
+    text = re.sub(r"\'re", " \'re", text)
+    text = re.sub(r"\'d", " \'d", text)
+    text = re.sub(r"\'ll", " \'ll", text)
+    text = re.sub(r"\s{2,}", " ", text)
+    return text
+
+
+def sentence_tokenize(text: str) -> List[str]:
+    """
+    Args:
+        text (str): a unicode string
+    Returns:
+        list: tokenized sentence
+    """
+    sentences = re.split('\n', text)
+    sentences = list(filter(None, sentences))
+    try:
+        sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences.encode('utf-8')))
+    except:
+        sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences))
+    return sentences
+
+@deep
+def word_tokenize(text: str, punctuation=True) -> List[str]:
+    """
+    Args:
+        text (str): a unicode string
+    Returns:
+        list: tokenized words
+    """
+    if punctuation:
+        return nltk.word_tokenize(text)
+    else:
+        return nltk.wordpunct_tokenize(text)
+
+
+def fields_join(
+        document: Dict,
+        document_schema_fields: List[str]=None) -> str:
+    """
+    Args:
+        document (dict): a document dictionary
+        document_schema_fields (:obj: `list`, optional): a list of keys
+    Returns:
+        str: a text joined with selected fields.
+    """
+    if not document_schema_fields:
+        document_schema_fields = [
+                'description',
+                'experienceRequirements',
+                'qualifications',
+                'skills']
+    return ' '.join([document.get(field, '') for field in document_schema_fields])

@@ -1,7 +1,7 @@
 """Process ONET job titles into a common format"""
 import pandas as pd
 
-from skills_ml.algorithms.string_cleaners import NLPTransforms
+from skills_ml.algorithms.string_cleaners.nlp import transforms, lowercase_strip_punc
 
 
 class Onet_Title(object):
@@ -58,7 +58,6 @@ class OnetTitleExtractor(object):
             Creates a job titles CSV based on ONET occupation and title data
         """
         titles = Onet_Title(self.onet_source)
-        nlp = NLPTransforms()
         # TODO: Get descriptions, original title
         onet_titles = titles.extract(titles.occupation['name'],
                                      titles.occupation['fields'])
@@ -89,6 +88,6 @@ class OnetTitleExtractor(object):
                                    unique_titles,
                                    how='left',
                                    on=['O*NET-SOC Code'])
-        titles_complete[nlp.transforms[0]] = titles_complete['Title']\
-            .apply(nlp.lowercase_strip_punc)
+        titles_complete[transforms[0]] = titles_complete['Title']\
+            .apply(lowercase_strip_punc)
         titles_complete.to_csv(self.output_filename, sep='\t')

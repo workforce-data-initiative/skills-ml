@@ -1,11 +1,11 @@
-from skills_ml.job_postings.common_schema import JobPostingCollectionSample
-from skills_ml.job_postings.corpora import RawCorpusCreator
 from skills_ml.algorithms.skill_feature_creator import SequenceFeatureCreator, EmbeddingFeature
-from skills_ml.algorithms.string_cleaners import NLPTransforms
-
+from skills_ml.algorithms.string_cleaners.nlp import sentence_tokenize, word_tokenize
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
+
+from skills_ml.job_postings.corpora import RawCorpusCreator
 from skills_ml.job_postings.corpora import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 
 import numpy as np
 from itertools import tee
@@ -15,13 +15,13 @@ import unittest
 
 def sentence_tokenizer_gen(doc_gen):
     for doc in doc_gen:
-        sentences = NLPTransforms().sentence_tokenize(doc)
+        sentences = sentence_tokenize(doc)
         for sentence in sentences:
             yield sentence
 
 def word_tokenizer_gen(sent_gent):
     for sent in sent_gent:
-        yield NLPTransforms().word_tokenize(sent)
+        yield word_tokenize(sent)
 
 
 class TestSkillFeatureCreator(unittest.TestCase):
@@ -80,8 +80,8 @@ class TestSkillFeatureCreator(unittest.TestCase):
 
         fc = SequenceFeatureCreator(
             raw1,
-            sentence_tokenizer=NLPTransforms().sentence_tokenize,
-            word_tokenizer=NLPTransforms().word_tokenize,
+            sentence_tokenizer=sentence_tokenize,
+            word_tokenizer=word_tokenize,
             embedding_model=w2v,
             features=["EmbeddingFeature"]
         )

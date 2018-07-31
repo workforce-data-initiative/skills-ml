@@ -6,7 +6,7 @@ from collections import Counter
 
 
 from skills_ml.job_postings.corpora import SimpleCorpusCreator
-from skills_ml.algorithms.string_cleaners import NLPTransforms
+from skills_ml.algorithms.string_cleaners import nlp
 
 from typing import Dict, Callable, Text, Generator
 import re
@@ -123,7 +123,7 @@ class SkillExtractor(object, metaclass=ABCMeta):
         self.transform_func = transform_func
         if not self.transform_func:
             self.transform_func = SimpleCorpusCreator()._join
-        self.nlp = NLPTransforms()
+        self.nlp = nlp
 
     @property
     @abstractmethod
@@ -220,7 +220,7 @@ class ListBasedSkillExtractor(SkillExtractor):
 
     def candidate_skills_in_context(self, context):
         matches = self.trie_regex.findall(context)
-        for match in matches: 
+        for match in matches:
             logging.info('Yielding exact match %s in string %s', match, context)
             yield CandidateSkill(
                 skill_name=match.lower(),
