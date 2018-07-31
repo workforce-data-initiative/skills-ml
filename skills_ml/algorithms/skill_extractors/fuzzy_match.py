@@ -95,5 +95,9 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
                         skill_name=phrase,
                         matched_skill=match.term,
                         confidence=100*(length_of_phrase-match.distance)/length_of_phrase,
-                        context=sent
+                        context=sent,
+                        document_id=source_object['id'],
+                        document_type=source_object['@type'],
+                        source_object=source_object,
+                        skill_extractor_name=self.name
                     )

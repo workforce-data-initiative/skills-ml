@@ -20,7 +20,7 @@ def test_exactmatch_skill_extractor():
     assert competency_framework.name in extractor.name
     assert competency_framework.description in extractor.description
 
-    result = [extractor.document_skill_counts({'description': doc}) for doc in [
+    result = [extractor.document_skill_counts({'id': '1234', '@type': 'JobPosting', 'description': doc}) for doc in [
         'this is a job that needs active listening',
         'this is a reading comprehension job',
         'this is an active and reading listening job',

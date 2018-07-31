@@ -9,6 +9,7 @@ from skills_ml.ontologies.base import CompetencyFramework, Competency, Occupatio
 def sample_job_posting():
     return {
         "id": "TEST_12345",
+        '@type': 'JobPosting',
         "description": "The Hall Line Cook will maintain and prepare hot and cold foods for the\nrestaurant according to Chefs specifications and for catered events as\nrequired. One-two years cooking experience in a professional kitchen\nenvironment is desired, but willing to train someone with a positive attitude,\ndesire to learn and passion for food and service. Qualified candidates will\nhave the ability to follow directions, as well as being self directed.\nOrganization, Cleanliness, Trainability, team player, good communication skillz, Motivation, a Sense of Responsibility and Pride in your Performance\nare ESSENTIAL.",
         "onet_soc_code": '11-1012.00',
     }

@@ -68,5 +68,9 @@ class ExactMatchSkillExtractor(ListBasedSkillExtractor):
                     skill_name=match.lower(),
                     matched_skill=match,
                     confidence=100,
-                    context=sent
+                    context=sent,
+                    document_id=source_object['id'],
+                    document_type=source_object['@type'],
+                    source_object=source_object,
+                    skill_extractor_name=self.name
                 )

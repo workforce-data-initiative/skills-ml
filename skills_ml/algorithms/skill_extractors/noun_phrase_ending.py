@@ -203,7 +203,11 @@ class NPEndPatternExtractor(SkillExtractor):
                 skill_name=cleaned_phrase,
                 matched_skill=cleaned_phrase,
                 confidence=95,
-                context=orig_context
+                context=orig_context,
+                document_id=source_object['id'],
+                document_type=source_object['@type'],
+                source_object=source_object,
+                skill_extractor_name=self.name
             )
 
     def noun_phrases_matching_endings(self, document):

@@ -49,7 +49,7 @@ Primary Location-City Bristol
 Primary Location-State CT
 Primary Location-Country US
 Auto req ID 274081BR"""
-posting_object = {'description': posting_string}
+posting_object = {'id': '1234', '@type': 'JobPosting', 'description': posting_string}
 
 
 def test_counts_skill_pattern_extractor():

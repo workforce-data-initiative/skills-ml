@@ -2,7 +2,7 @@
 import logging
 from abc import ABCMeta, abstractmethod
 
-from collections import Counter
+from collections import Counter, namedtuple
 
 
 from skills_ml.job_postings.corpora import SimpleCorpusCreator
@@ -81,25 +81,16 @@ def trie_regex_from_words(words):
     return re.compile(r"\b" + trie.pattern() + r"\b", re.IGNORECASE)
 
 
-class CandidateSkill(object):
-    def __init__(self, skill_name: Text, matched_skill: Text, context: Text, confidence: float):
-        """An object holding a text snippet that may be a skill/competency.
-
-        Does not hold all needed contextual metadata about the document (like job posting id).
-        This is expected to be managed by the caller.
-
-        Args:
-            skill_name (string) The skill found in the text
-            matched_skill (string) The matching skill in some reference ontology.
-            context (string) The skill_name with surrounding context in the document.
-            confidence (float) How sure the skill extractor is that this is a skill (range 0-1)
-        """
-        self.skill_name = skill_name
-        self.matched_skill = matched_skill
-        if isinstance(self.matched_skill, (bytes, bytearray)):
-            self.matched_skill = matched_skill.decode('utf-8')
-        self.context = context
-        self.confidence = confidence
+CandidateSkill = namedtuple('CandidateSkill', [
+    'skill_name',
+    'matched_skill',
+    'context',
+    'confidence',
+    'document_id',
+    'document_type',
+    'source_object',
+    'skill_extractor_name'
+])
 
 
 CandidateSkillYielder = Generator[CandidateSkill, None, None]
