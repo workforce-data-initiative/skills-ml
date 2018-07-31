@@ -9,17 +9,17 @@ class IterablePipeline(object):
     to assert the same preprocessing procedrues.
 
     Example:
-        ```python
-        jp = JobPostingCollectionSample()
-        pipe = NLPPipeline(
-            partial(fields_joiner, document_schema_fields=['description']),
-            html_cleaner,
-            sentence_tokenizer,
-            str_cleaner,
-            word_tokenizer
-        )
-        result = pipe.run(jp)
-        ```
+    ```python
+    jp = JobPostingCollectionSample()
+    pipe = NLPPipeline(
+        partial(fields_joiner, document_schema_fields=['description']),
+        html_cleaner,
+        sentence_tokenizer,
+        str_cleaner,
+        word_tokenizer
+    )
+    result = pipe.run(jp)
+    ```
 
     Attributes:
         functions (generator): a series of generator functions that takes another generator as input
