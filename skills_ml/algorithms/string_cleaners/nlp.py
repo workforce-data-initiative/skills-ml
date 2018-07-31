@@ -3,7 +3,7 @@ import unicodedata
 import re
 from bs4 import BeautifulSoup
 import nltk
-from functools import reduce
+from functools import reduce, wraps
 
 class NLPTransforms(object):
     # An object that performs common NLP transformations
@@ -93,6 +93,7 @@ class NLPTransforms(object):
 
 
 def deep(function):
+    @wraps(function)
     def wrapper(*args, **kwargs):
         if isinstance(args[0], list):
             if len(args[0]) == 1:
@@ -100,4 +101,5 @@ def deep(function):
             return [wrapper(i) for i in args[0]]
         return function(args[0])
     return wrapper
+
 
