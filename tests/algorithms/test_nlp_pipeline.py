@@ -62,9 +62,9 @@ class TestNLPPipeline(unittest.TestCase):
 
         assert pipe1.run(self.jp) == pipe2.run(self.jp)
         assert pipe1.description == [f.__doc__ for f in pipe1.functions]
-        assert pipe1.description == ['join selected fields',
-                                     'remove html tags',
-                                     'tokenize sentences',
-                                     'remove punctuations, non-English letters, and lower case',
-                                     'tokenize words',
+        assert pipe1.description == ['Join selected fields. Each item is a document in json format.',
+                                     'Remove html tags. Each item is a chunk of text.',
+                                     'Tokenize sentences. Each item is a chunk of text.',
+                                     'Remove punctuations, non-English letters, and lower case. Each item is a chunk of text.',
+                                     'Tokenize words. Each item is a chunk of text.',
                                      'count sentence for a document']
