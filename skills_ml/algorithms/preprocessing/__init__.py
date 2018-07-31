@@ -2,7 +2,7 @@ from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms, deep
 from functools import reduce
 from typing import List, Generator, Dict
 
-class NLPPipeline(object):
+class IterablePipeline(object):
     """A simple nlp preprocessing pipeline.
 
     This class will compose preprocessing functions together to be passed to different stages(training/prediction)
@@ -22,11 +22,11 @@ class NLPPipeline(object):
         ```
 
     Attributes:
-        functions (func): a series of generator functions that takes another generator as input
+        functions (generator): a series of generator functions that takes another generator as input
 
     """
-    def __init__(self, *functions):
-        self.functions = list(functions)
+    def __init__(self, *functions: List[Generator]):
+        self.functions = functions
 
     @property
     def compose(self):
@@ -37,7 +37,7 @@ class NLPPipeline(object):
         """
         return reduce(lambda f, g: lambda x: g(f(x)), self.functions, lambda x: x)
 
-    def run(self, generator):
+    def run(self, generator: Generator):
         """materialize the generator object
 
         Returns:

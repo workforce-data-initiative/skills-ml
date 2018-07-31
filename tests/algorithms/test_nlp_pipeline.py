@@ -1,4 +1,4 @@
-from skills_ml.algorithms.preprocessing import NLPPipeline, fields_joiner, \
+from skills_ml.algorithms.preprocessing import IterablePipeline, fields_joiner, \
      html_cleaner, sentence_tokenizer, str_cleaner, word_tokenizer
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
@@ -45,7 +45,7 @@ class TestNLPPipeline(unittest.TestCase):
         updated_fields_joiner = partial(fields_joiner, document_schema_fields=['description'])
         update_wrapper(updated_fields_joiner, fields_joiner)
 
-        pipe1 = NLPPipeline(
+        pipe1 = IterablePipeline(
                 updated_fields_joiner,
                 html_cleaner,
                 sentence_tokenizer,
@@ -53,7 +53,7 @@ class TestNLPPipeline(unittest.TestCase):
                 word_tokenizer,
                 sentence_counter
                 )
-        pipe2 = NLPPipeline(
+        pipe2 = IterablePipeline(
                 updated_fields_joiner,
                 html_cleaner,
                 sentence_tokenizer,
