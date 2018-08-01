@@ -77,6 +77,9 @@ class KNNDoc2VecClassifier(ModelStorage):
         if not isinstance(embedding_model, Doc2VecModel):
             raise NotImplementedError("Only support doc2vec now.")
 
+        if not embedding_model.lookup_dict:
+            raise ValueError("`lookup_dict` is empty. Re-train the embedding model with `lookup=True` ")
+
         super().__init__(storage=kwargs.pop('storage', embedding_model._storage))
         self.model = embedding_model
         self.model_name = "knn_cls_" + self.model.model_name
