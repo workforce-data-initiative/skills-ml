@@ -1,9 +1,9 @@
 import unicodecsv as csv
 import json
 import tempfile
-import s3fs
 
 from contextlib import contextmanager
+from skills_ml.ontologies.base import CompetencyFramework, Competency
 
 
 @contextmanager
@@ -30,14 +30,12 @@ def job_posting_factory(**kwargs):
         return sample_job_posting
 
 
-def create_skills_file(skills_file_path):
-    content = [
-        ['', 'O*NET-SOC Code', 'Element ID', 'ONET KSA', 'Description', 'skill_uuid', 'nlp_a'],
-        ['1', '11-1011.00', '2.a.1.a', 'reading comprehension', '...', '2c77c703bd66e104c78b1392c3203362', 'reading comprehension'],
-        ['2', '11-1011.00', '2.a.1.b', 'active listening', '...', 'a636cb69257dcec699bce4f023a05126', 'active listening']
-    ]
-    s3 = s3fs.S3FileSystem()
-    with s3.open(skills_file_path, 'wb') as write_stream:
-        writer = csv.writer(write_stream, delimiter='\t')
-        for row in content:
-            writer.writerow(row)
+def sample_framework():
+    return CompetencyFramework(
+        name='sample_framework',
+        description='A few basic competencies',
+        competencies=[
+            Competency(identifier='a', name='Reading Comprehension'),
+            Competency(identifier='b', name='Active Listening'),
+        ]
+    )

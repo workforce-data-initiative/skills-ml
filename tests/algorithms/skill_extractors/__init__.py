@@ -2,6 +2,7 @@ import json
 import pytest
 
 from skills_ml.job_postings import JobPosting
+from skills_ml.ontologies.base import CompetencyFramework, Competency, Occupation, CompetencyOntology, CompetencyOccupationEdge
 
 
 @pytest.fixture
@@ -13,12 +14,37 @@ def sample_job_posting():
     }
 
 
-@pytest.fixture
-def sample_skills():
-    return [
-        ['', 'O*NET-SOC Code', 'Element ID', 'ONET KSA', 'Description', 'skill_uuid', 'nlp_a'],
-        ['1', '11-1011.00', '2.a.1.a', 'organization', '...', '...', 'organization'],
-        ['2', '11-1011.00', '2.a.1.b', 'communication skills', '...', '...', 'communication skills'],
-        ['3', '11-1011.00', '2.a.1.b', 'cooking', '...', '...', 'cooking'],
-        ['4', '11-1012.00', '2.a.1.a', 'organization', '...', '...', 'organization'],
-    ]
+def sample_framework():
+    return CompetencyFramework(
+        name='Sample Framework',
+        description='A few basic competencies',
+        competencies=[
+            Competency(identifier='a', name='Organization'),
+            Competency(identifier='b', name='Communication Skills'),
+            Competency(identifier='c', name='Cooking')
+        ]
+    )
+
+def sample_ontology():
+    return CompetencyOntology(
+        competency_name='Sample Framework',
+        competency_description='A few basic competencies',
+        edges=[
+            CompetencyOccupationEdge(
+                competency=Competency(identifier='a', name='Organization'),
+                occupation=Occupation(identifier='11-1011.00')
+            ),
+            CompetencyOccupationEdge(
+                competency=Competency(identifier='a', name='Organization'),
+                occupation=Occupation(identifier='11-1012.00')
+            ),
+            CompetencyOccupationEdge(
+                competency=Competency(identifier='b', name='Communication Skills'),
+                occupation=Occupation(identifier='11-1011.00')
+            ),
+            CompetencyOccupationEdge(
+                competency=Competency(identifier='c', name='Cooking'),
+                occupation=Occupation(identifier='11-1011.00')
+            ),
+        ]
+    )

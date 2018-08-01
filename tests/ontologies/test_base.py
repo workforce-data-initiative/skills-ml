@@ -1,4 +1,4 @@
-from skills_ml.ontologies import Competency, Occupation, CompetencyOccupationEdge, CompetencyOntology
+from skills_ml.ontologies import Competency, Occupation, CompetencyOccupationEdge, CompetencyOntology, CompetencyFramework
 from unittest import TestCase
 import json
 
@@ -62,6 +62,27 @@ class CompetencyTest(TestCase):
         target_competency.add_child(Competency(identifier='123'))
         competency = Competency.from_jsonld(jsonld_input)
         assert competency == target_competency
+
+
+class CompetencyFrameworkTest(TestCase):
+    def test_create(self):
+        competency = Competency(identifier='1', name='Doing Things', competencyText='The ability to do things')
+        framework = CompetencyFramework(
+            name='fundamentals_of_nothing',
+            description='Fundamentals of Nothing',
+            competencies=[competency]
+        )
+        assert len(framework) == 1
+        assert framework['1'].name == 'Doing Things'
+
+    def test_add(self):
+        framework = CompetencyFramework(
+            name='fundamentals_of_nothing',
+            description='Fundamentals of Nothing',
+        )
+        competency = Competency(identifier='1', name='Doing Things', competencyText='The ability to do things')
+        framework.add(competency)
+        assert len(framework) == 1
 
 
 class OccupationTest(TestCase):
