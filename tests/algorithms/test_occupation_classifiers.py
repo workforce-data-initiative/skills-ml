@@ -135,11 +135,18 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
         s3_path = f"s3://fake-open-skills/model_cache/soc_classifiers"
         s3_storage = S3Store(path=s3_path)
 
-
         corpus_generator = FakeCorpusGenerator()
+
+        # Embedding has no lookup_dict
         d2v = Doc2VecModel(storage=s3_storage, size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
         trainer = EmbeddingTrainer(corpus_generator, d2v)
-        trainer.train(True)
+        trainer.train(lookup=False)
+
+        self.assertRaises(ValueError, lambda: KNNDoc2VecClassifier(embedding_model=d2v))
+
+        d2v = Doc2VecModel(storage=s3_storage, size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
+        trainer = EmbeddingTrainer(corpus_generator, d2v)
+        trainer.train(lookup=True)
 
         # KNNDoc2VecClassifier only supports doc2vec now
         self.assertRaises(NotImplementedError, lambda: KNNDoc2VecClassifier(Word2VecModel()))
