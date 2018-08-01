@@ -2,7 +2,7 @@ from functools import reduce
 from typing import List, Generator, Dict
 
 class IterablePipeline(object):
-    """A simple nlp preprocessing pipeline.
+    """A simple iterable preprocessing pipeline.
 
     This class will compose preprocessing functions together to be passed to different stages(training/prediction)
     to assert the same preprocessing procedrues.
@@ -10,14 +10,14 @@ class IterablePipeline(object):
     Example:
     ```python
     jp = JobPostingCollectionSample()
-    pipe = NLPPipeline(
-        partial(fields_joiner, document_schema_fields=['description']),
-        html_cleaner,
-        sentence_tokenizer,
-        str_cleaner,
-        word_tokenizer
+    pipe = IterablePipeline(
+        partial(fields_join, document_schema_fields=['description']),
+        clean_html,
+        sentence_tokenize,
+        clean_str,
+        word_tokenize
     )
-    result = pipe.run(jp)
+    preprocessed_generator = pipe.build(jp)
     ```
 
     Attributes:
