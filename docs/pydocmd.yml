@@ -7,13 +7,14 @@ generate:
     skills_ml.algorithms.job_normalizers.elasticsearch+, skills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer+,
     skills_ml.algorithms.jobtitle_cleaner+, skills_ml.algorithms.jobtitle_cleaner.clean+,
     skills_ml.algorithms.occupation_classifiers+, skills_ml.algorithms.occupation_classifiers.classifiers+,
-    skills_ml.algorithms.sampling+, skills_ml.algorithms.sampling.methods+, skills_ml.algorithms.skill_extractors+,
+    skills_ml.algorithms.occupation_classifiers.train+, skills_ml.algorithms.sampling+,
+    skills_ml.algorithms.sampling.methods+, skills_ml.algorithms.skill_extractors+,
     skills_ml.algorithms.skill_extractors.base+, skills_ml.algorithms.skill_extractors.exact_match+,
     skills_ml.algorithms.skill_extractors.fuzzy_match+, skills_ml.algorithms.skill_extractors.noun_phrase_ending+,
-    skills_ml.algorithms.skill_extractors.soc_exact+, skills_ml.algorithms.skill_feature_creator+,
-    skills_ml.algorithms.skill_feature_creator.contextual_features+, skills_ml.algorithms.skill_feature_creator.posTags+,
-    skills_ml.algorithms.skill_feature_creator.structure_features+, skills_ml.algorithms.string_cleaners+,
-    skills_ml.algorithms.string_cleaners.nlp+]
+    skills_ml.algorithms.skill_extractors.soc_exact+, skills_ml.algorithms.skill_extractors.symspell+,
+    skills_ml.algorithms.skill_feature_creator+, skills_ml.algorithms.skill_feature_creator.contextual_features+,
+    skills_ml.algorithms.skill_feature_creator.posTags+, skills_ml.algorithms.skill_feature_creator.structure_features+,
+    skills_ml.algorithms.string_cleaners+, skills_ml.algorithms.string_cleaners.nlp+]
 - skills_ml.datasets.md: [skills_ml.datasets.cbsa_shapefile+, skills_ml.datasets.cousub_ua+,
     skills_ml.datasets.job_titles+, skills_ml.datasets.job_titles.elasticsearch+,
     skills_ml.datasets.job_titles.onet+, skills_ml.datasets.nber_county_cbsa+, skills_ml.datasets.negative_positive_dict+,
@@ -29,9 +30,9 @@ generate:
     skills_ml.job_postings.aggregate.field_values+, skills_ml.job_postings.aggregate.pandas+,
     skills_ml.job_postings.common_schema+, skills_ml.job_postings.computed_properties+,
     skills_ml.job_postings.computed_properties.aggregators+, skills_ml.job_postings.computed_properties.computers+,
-    skills_ml.job_postings.corpora+, skills_ml.job_postings.filtering+,
-    skills_ml.job_postings.geography_queriers+, skills_ml.job_postings.geography_queriers.cbsa+,
-    skills_ml.job_postings.geography_queriers.cbsa_from_geocode+, skills_ml.job_postings.raw+,
+    skills_ml.job_postings.corpora+, skills_ml.job_postings.filtering+, skills_ml.job_postings.geography_queriers+,
+    skills_ml.job_postings.geography_queriers.base+, skills_ml.job_postings.geography_queriers.cbsa+,
+    skills_ml.job_postings.geography_queriers.state+, skills_ml.job_postings.raw+,
     skills_ml.job_postings.raw.usajobs+, skills_ml.job_postings.raw.virginia+, skills_ml.job_postings.sample+]
 gens_dir: _build/pydocmd
 loader: pydocmd.loader.PythonLoader

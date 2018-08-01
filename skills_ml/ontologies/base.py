@@ -1,4 +1,5 @@
 from typing import Callable, Text, List
+from collections import MutableMapping
 import json
 
 
@@ -209,18 +210,59 @@ class CompetencyOccupationEdge(object):
         return hash(self.competency) + hash(self.occupation)
 
 
+class CompetencyFramework(MutableMapping):
+    """A list of competencies and metadata about them
+    
+    Implements MutableMapping, so the competencies may be interacted with as a dictionary.
+    """
+
+    def __init__(self, name=None, description=None, competencies=None):
+        self.name = name or ''
+        self.description = description or ''
+        self.competencies = {}
+        for competency in competencies or []:
+            self.competencies[competency.identifier] = competency
+
+    def __setitem__(self, key, value):
+        self.competencies[key] = value
+
+    def __getitem__(self, key):
+        return self.competencies[key]
+
+    def __delitem__(self, key):
+        del self.competencies[key]
+
+    def __iter__(self):
+        return iter(self.competencies)
+
+    def __len__(self):
+        return len(self.competencies)
+
+    def add(self, value):
+        if value.identifier in self.competencies:
+            raise ValueError(f"{value} already in framework")
+        self.competencies[value.identifier] = value
+        
+
 class CompetencyOntology(object):
     """An ontology of competencies and occupations and the edges between them
     
     Can be initialized with a set of edges, in which case the competencies and occupations will be initialized with any that are present in the edge list
     """
-    def __init__(self, edges=None):
+    def __init__(self, edges=None, competency_name=None, competency_description=None):
         if edges:
             self._competency_occupation_edges = edges
-            self._competencies = dict((edge.competency.identifier, edge.competency) for edge in edges)
+            self.competency_framework = CompetencyFramework(
+                name=competency_name,
+                description=competency_description,
+                competencies=[edge.competency for edge in edges]
+            )
             self._occupations = dict((edge.occupation.identifier, edge.occupation) for edge in edges)
         else:
-            self._competencies = dict()
+            self.competency_framework = CompetencyFramework(
+                name=competency_name,
+                description=competency_description,
+            )
             self._occupations = dict()
             self._competency_occupation_edges = set()
 
@@ -252,7 +294,7 @@ class CompetencyOntology(object):
 
     @property
     def competencies(self):
-        return set(self._competencies.values()) - {DummyCompetency()}
+        return set(self.competency_framework.values()) - {DummyCompetency()}
 
     @property
     def occupations(self):
@@ -269,8 +311,8 @@ class CompetencyOntology(object):
     def add_competency(self, competency: Competency):
         if not isinstance(competency, Competency):
             raise ValueError('Must add competency objects')
-        if competency.identifier not in self._competencies:
-            self._competencies[competency.identifier] = competency
+        if competency.identifier not in self.competency_framework:
+            self.competency_framework[competency.identifier] = competency
             self.add_edge(competency=competency, occupation=DummyOccupation())
 
     def add_occupation(self, occupation: Occupation):
@@ -291,16 +333,16 @@ class CompetencyOntology(object):
         self.add_occupation(occupation)
         edge = CompetencyOccupationEdge(
             occupation=self._occupations[occupation.identifier],
-            competency=self._competencies[competency.identifier]
+            competency=self.competency_framework[competency.identifier]
         )
         if edge not in self._competency_occupation_edges:
             self._competency_occupation_edges.add(edge)
 
-    def filter_by(self, func: Callable):
+    def filter_by(self, func: Callable, competency_name=None, competency_description=None):
         """Produce an ontology that is filtered by a callable that takes in an edge
         """
         matching_edges = set(edge for edge in self._competency_occupation_edges if func(edge))
-        return CompetencyOntology(edges=matching_edges)
+        return CompetencyOntology(edges=matching_edges, competency_name=competency_name, competency_description=competency_description)
 
     @property
     def jsonld(self):
