@@ -1,4 +1,4 @@
-from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
+from skills_ml.algorithms.string_cleaners.nlp import sentence_tokenize, word_tokenize
 from skills_ml.algorithms.skill_feature_creator.structure_features import struct_features
 from skills_ml.algorithms.skill_feature_creator.contextual_features import sent2features, pre_process
 
@@ -41,8 +41,8 @@ class SequenceFeatureCreator(object):
         self.all_features = [ f.__name__ for f in FeatureFactory.__subclasses__()]
         self.features = features
         self.job_posting_generator = job_posting_generator
-        self.sentence_tokenizer = NLPTransforms().sentence_tokenize if sentence_tokenizer is None else sentence_tokenizer
-        self.word_tokenizer = NLPTransforms().word_tokenize if word_tokenizer is None else word_tokenizer
+        self.sentence_tokenizer = sentence_tokenize if sentence_tokenizer is None else sentence_tokenizer
+        self.word_tokenizer = word_tokenize if word_tokenizer is None else word_tokenizer
         self.embedding_model = embedding_model
 
     @property

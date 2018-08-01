@@ -3,7 +3,7 @@ import csv
 import pandas as pd
 import logging
 
-from skills_ml.algorithms.string_cleaners import NLPTransforms
+from skills_ml.algorithms.string_cleaners.nlp import transforms, lowercase_strip_punc
 
 
 KSA_TYPE_CONFIG = {
@@ -76,7 +76,6 @@ class OnetSkillListProcessor(object):
             Creates a skills CSV based on ONET KSAT data,
             with descriptions fetched from the content model reference
         """
-        nlp = NLPTransforms()
         # create dataframes for each KSA type
         dataframes = [
             self.onet_to_pandas(*(KSA_TYPE_CONFIG[ksa_type]))
@@ -113,7 +112,7 @@ class OnetSkillListProcessor(object):
         onet_ksas.drop_duplicates('ONET KSA', inplace=True)
         onet_ksas['skill_uuid'] = onet_ksas['ONET KSA']\
             .apply(self.hash_function)
-        onet_ksas[nlp.transforms[0]] = onet_ksas['ONET KSA']\
-            .apply(nlp.lowercase_strip_punc)
+        onet_ksas[transforms[0]] = onet_ksas['ONET KSA']\
+            .apply(lowercase_strip_punc)
 
         onet_ksas.to_csv(self.output_filename, sep='\t')

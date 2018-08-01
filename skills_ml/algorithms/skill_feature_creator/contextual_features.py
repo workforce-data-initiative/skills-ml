@@ -1,6 +1,6 @@
 # coding: utf-8
 from skills_ml.algorithms.skill_feature_creator.posTags import tagMatching
-from skills_ml.algorithms.string_cleaners.nlp import NLPTransforms
+from skills_ml.algorithms.string_cleaners.nlp import sentence_tokenize
 from functools import reduce
 from operator import add
 import nltk
@@ -151,7 +151,7 @@ def pre_process(sentences, word_tokenizer):
     return sentences
 
 def local_contextual_features(job_posting):
-    sentences = NLPTransforms().sentence_tokenize(job_posting)
+    sentences = sentence_tokenize(job_posting)
     sentences = pre_process(sentences)
     features = [sent2features(s) for s in sentences]
     return features

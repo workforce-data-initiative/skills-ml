@@ -1,5 +1,5 @@
 from random import randint
-from skills_ml.algorithms.string_cleaners import NLPTransforms
+from skills_ml.algorithms.string_cleaners.nlp import clean_html, clean_str, lowercase_strip_punc, word_tokenize, sentence_tokenize
 from gensim.models.doc2vec import TaggedDocument
 from skills_utils.common import safe_get
 
@@ -38,7 +38,6 @@ class CorpusCreator(object):
     def __init__(self, job_posting_generator=None, document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills'],
                  raw=False):
         self.job_posting_generator = job_posting_generator
-        self.nlp = NLPTransforms()
         self.raw = raw
         self.document_schema_fields = document_schema_fields
         self.join_spaces = ' '.join
@@ -54,7 +53,7 @@ class CorpusCreator(object):
     def _clean(self, document):
         for f in self.document_schema_fields:
             try:
-                cleaned = self.nlp.clean_html(document[f]).replace('\n','')
+                cleaned = clean_html(document[f]).replace('\n','')
                 cleaned = " ".join(cleaned.split())
                 document[f] = cleaned
             except KeyError:
@@ -85,7 +84,7 @@ class SimpleCorpusCreator(CorpusCreator):
     """
     def _clean(self, document):
         return self.join_spaces([
-            self.nlp.lowercase_strip_punc(document.get(field, ''))
+            lowercase_strip_punc(document.get(field, ''))
             for field in self.document_schema_fields
         ])
 
@@ -116,7 +115,7 @@ class Doc2VecGensimCorpusCreator(CorpusCreator):
 
     def _clean(self, document):
         return self.join_spaces([
-            self.nlp.clean_str(document[field])
+            clean_str(document[field])
             for field in self.document_schema_fields
         ])
 
@@ -142,15 +141,15 @@ class Word2VecGensimCorpusCreator(CorpusCreator):
 
     def _clean(self, document):
         return self.join_spaces([
-            self.nlp.clean_str(document[field])
+            clean_str(document[field])
             for field in self.document_schema_fields
         ])
 
     def _transform(self, document):
         if self.raw:
-            return [self.nlp.word_tokenize(s) for s in self.nlp.sentence_tokenize(self._join(document))]
+            return [word_tokenize(s) for s in sentence_tokenize(self._join(document))]
         else:
-            return [self.nlp.word_tokenize(s) for s in self.nlp.sentence_tokenize(self._clean(document))]
+            return [word_tokenize(s) for s in sentence_tokenize(self._clean(document))]
 
     def __iter__(self):
         for document in self.job_posting_generator:
@@ -169,7 +168,7 @@ class JobCategoryCorpusCreator(CorpusCreator):
 
     def _transform(self, document):
         return self.join_spaces([
-            self.nlp.lowercase_strip_punc(document[field])
+            lowercase_strip_punc(document[field])
             for field in self.document_schema_fields
         ])
 

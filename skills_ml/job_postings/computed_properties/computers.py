@@ -1,7 +1,7 @@
 """Various computers of job posting properties. Each class is generally a generic algorithm (such as skill extraction or occupation classification) paired with enough configuration to run on its own"""
 from . import JobPostingComputedProperty, ComputedPropertyColumn
 
-from skills_ml.algorithms.string_cleaners import NLPTransforms
+from skills_ml.algorithms.string_cleaners.nlp import title_phase_one
 from skills_ml.algorithms.jobtitle_cleaner.clean import JobTitleStringClean
 from skills_ml.algorithms.occupation_classifiers.classifiers import \
     SocClassifier
@@ -30,7 +30,7 @@ class TitleCleanPhaseOne(JobPostingComputedProperty):
     ]
 
     def _compute_func_on_one(self):
-        title_func = NLPTransforms().title_phase_one
+        title_func = title_phase_one
         return lambda job_posting: title_func(job_posting['title'])
 
 
@@ -49,7 +49,7 @@ class TitleCleanPhaseTwo(JobPostingComputedProperty):
     ]
 
     def _compute_func_on_one(self):
-        return lambda job_posting: JobTitleStringClean().clean_title(NLPTransforms().title_phase_one(job_posting['title']))
+        return lambda job_posting: JobTitleStringClean().clean_title(title_phase_one(job_posting['title']))
 
 
 class Geography(JobPostingComputedProperty):
@@ -208,7 +208,7 @@ class YearlyPay(JobPostingComputedProperty, PayMixin):
 
 class SkillCounts(JobPostingComputedProperty):
     """Adding top skill counts from a skill extractor
-    
+
     Args: (skills_ml.algorithms.skill_extractors.base.SkillExtractorBase) A skill extractor object
     """
     def __init__(self, skill_extractor, *args, **kwargs):

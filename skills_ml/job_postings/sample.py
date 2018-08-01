@@ -1,7 +1,6 @@
 """Sample job postings"""
 
 import random
-from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.sampling.methods import reservoir, reservoir_weighted
 import numpy as np
 from skills_utils.common import safe_get
@@ -26,7 +25,6 @@ class JobSampler(object):
     """
     def __init__(self, job_posting_generator, major_group=False, keys=None, weights=None, random_state=None):
         self.job_posting_generator = job_posting_generator
-        self.nlp = NLPTransforms()
         self.major_group = major_group
         self.weights = weights
         self.keys = keys

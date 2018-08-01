@@ -6,7 +6,7 @@ from collections import Counter
 
 
 from skills_ml.job_postings.corpora import SimpleCorpusCreator
-from skills_ml.algorithms.string_cleaners import NLPTransforms
+from skills_ml.algorithms.string_cleaners import nlp
 from skills_ml.ontologies.base import CompetencyFramework
 
 from typing import Dict, Callable, Text, Generator
@@ -124,7 +124,7 @@ class SkillExtractor(object, metaclass=ABCMeta):
         self.transform_func = transform_func
         if not self.transform_func:
             self.transform_func = SimpleCorpusCreator()._join
-        self.nlp = NLPTransforms()
+        self.nlp = nlp
 
     @property
     @abstractmethod
@@ -165,7 +165,7 @@ class SkillExtractor(object, metaclass=ABCMeta):
 
 class ListBasedSkillExtractor(SkillExtractor):
     """Extract skills by comparing with a known lookup/list.
-    
+
     Subclasses must implement _skills_lookup and _document_skills_in_lookup
 
     Args:

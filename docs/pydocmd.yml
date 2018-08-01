@@ -21,11 +21,9 @@ generate:
     skills_ml.datasets.onet_cache+, skills_ml.datasets.onet_source+, skills_ml.datasets.partner_updaters+,
     skills_ml.datasets.partner_updaters.usa_jobs+, skills_ml.datasets.place_ua+, skills_ml.datasets.sba_city_county+,
     skills_ml.datasets.skill_importances+, skills_ml.datasets.skill_importances.onet+,
-    skills_ml.datasets.skills+, skills_ml.datasets.skills.ceasn_from_onet+, skills_ml.datasets.skills.onet_ksat+,
-    skills_ml.datasets.ua_cbsa+]
+    skills_ml.datasets.skills+, skills_ml.datasets.skills.onet_ksat+, skills_ml.datasets.ua_cbsa+]
 - skills_ml.evaluation.md: [skills_ml.evaluation.annotators+, skills_ml.evaluation.job_title_normalizers+,
-    skills_ml.evaluation.representativeness_calculators+, skills_ml.evaluation.representativeness_calculators.geo_occupation+,
-    skills_ml.evaluation.skill_extraction_metrics+]
+    skills_ml.evaluation.representativeness_calculators+, skills_ml.evaluation.representativeness_calculators.geo_occupation+]
 - skills_ml.job_postings.md: [skills_ml.job_postings.aggregate+, skills_ml.job_postings.aggregate.dataset_transform+,
     skills_ml.job_postings.aggregate.field_values+, skills_ml.job_postings.aggregate.pandas+,
     skills_ml.job_postings.common_schema+, skills_ml.job_postings.computed_properties+,
