@@ -16,7 +16,8 @@ from skills_ml.job_postings.computed_properties.computers import (
     TitleCleanPhaseTwo,
     Geography,
     SOCClassifyProperty,
-    SkillCounts
+    SkillCounts,
+    YearlyPay
 )
 
 from skills_ml.algorithms.skill_extractors import ExactMatchSkillExtractor
@@ -212,3 +213,21 @@ class SkillExtractTest(ComputedPropertyTestCase):
         job_posting_id = self.job_postings[0]['id']
         assert cache[job_posting_id] == {'skill_counts_sample_framework_exact_match': ['reading comprehension']}
 
+
+@mock_s3
+class YearlyPayTest(ComputedPropertyTestCase):
+    def setUp(self):
+        self.client = boto3.resource('s3')
+        self.client.create_bucket(Bucket='test-bucket')
+        self.storage = S3Store('s3://test-bucket/computed_properties')
+        self.computed_property = YearlyPay(self.storage)
+        self.job_postings = [utils.job_posting_factory(
+            datePosted=self.datestring,
+            baseSalary={'salaryFrequency': 'yearly', 'minValue': 5, 'maxValue': ''}
+        ),]
+        self.computed_property.compute_on_collection(self.job_postings)
+
+    def test_compute_func(self):
+        cache = self.computed_property.cache_for_key(self.datestring)
+        job_posting_id = self.job_postings[0]['id']
+        assert cache[str(job_posting_id)] == 5
