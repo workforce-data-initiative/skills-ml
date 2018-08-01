@@ -7,15 +7,14 @@ from skills_ml.algorithms.occupation_classifiers.classifiers import \
     SocClassifier
 from skills_ml.job_postings.corpora import SimpleCorpusCreator
 import logging
-import statistics
 
 
 NUMERIC_AGGREGATION_FUNCTION_PATHS = {
-    'statistics.mean': 'Arithemetic mean',
-    'statistics.median': 'Median (middle value)',
+    'numpy.mean': 'Arithemetic mean',
+    'numpy.median': 'Median (middle value)',
     'statistics.mode': 'Mode (most common value)',
-    'statistics.stdev': 'Sample standard deviation',
-    'statistics.variance': 'Sample variance',
+    'numpy.std': 'Sample standard deviation',
+    'numpy.var': 'Sample variance',
 }
 
 
@@ -142,18 +141,18 @@ class GivenSOC(JobPostingComputedProperty):
 
 
 class PayMixin(object):
-    def salary_from_job_posting(job_posting):
+    def salary_from_job_posting(self, job_posting):
         minSalary = None
         maxSalary = None
         try:
-            minSalary = float(job_posting['baseSalary']['minSalary'])
+            minSalary = float(job_posting['baseSalary']['minValue'])
         except ValueError:
-            logging.warning('Could not cast minValue string %s to float', job_posting['baseSalary']['minSalary'])
+            logging.warning('Could not cast minValue string %s to float', job_posting['baseSalary']['minValue'])
 
         try:
-            maxSalary = float(job_posting['baseSalary']['maxSalary'])
+            maxSalary = float(job_posting['baseSalary']['maxValue'])
         except ValueError:
-            logging.warning('Could not cast maxValue string %s to float', job_posting['baseSalary']['maxSalary'])
+            logging.warning('Could not cast maxValue string %s to float', job_posting['baseSalary']['maxValue'])
 
         if not maxSalary and not minSalary:
             logging.warning('Neither minSalary nor maxSalary could be converted to float, no extraction possible')
