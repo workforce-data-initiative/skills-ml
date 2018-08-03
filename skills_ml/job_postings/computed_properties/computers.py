@@ -7,12 +7,12 @@ from skills_ml.algorithms.occupation_classifiers.classifiers import \
     SocClassifier
 from skills_ml.job_postings.corpora import SimpleCorpusCreator
 import logging
+import statistics
 
 
 NUMERIC_AGGREGATION_FUNCTION_PATHS = {
     'numpy.mean': 'Arithemetic mean',
     'numpy.median': 'Median (middle value)',
-    'statistics.mode': 'Mode (most common value)',
     'numpy.std': 'Sample standard deviation',
     'numpy.var': 'Sample variance',
 }
@@ -180,7 +180,7 @@ class HourlyPay(JobPostingComputedProperty, PayMixin):
 
     def _compute_func_on_one(self):
         def func(job_posting):
-            if job_posting.get('baseSalary', {}).get('salaryFrequency', None) is not 'hourly':
+            if job_posting.get('baseSalary', {}).get('salaryFrequency', None) != 'hourly':
                 return None
             return self.salary_from_job_posting(job_posting)
         return func
@@ -199,7 +199,7 @@ class YearlyPay(JobPostingComputedProperty, PayMixin):
 
     def _compute_func_on_one(self):
         def func(job_posting):
-            if job_posting.get('baseSalary', {}).get('salaryFrequency', None) is not 'yearly':
+            if job_posting.get('baseSalary', {}).get('salaryFrequency', None) != 'yearly':
                 return None
             return self.salary_from_job_posting(job_posting)
         return func

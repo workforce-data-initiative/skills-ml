@@ -222,12 +222,17 @@ class YearlyPayTest(ComputedPropertyTestCase):
         self.storage = S3Store('s3://test-bucket/computed_properties')
         self.computed_property = YearlyPay(self.storage)
         self.job_postings = [utils.job_posting_factory(
+            id=5,
             datePosted=self.datestring,
             baseSalary={'salaryFrequency': 'yearly', 'minValue': 5, 'maxValue': ''}
-        ),]
+        ), utils.job_posting_factory(
+            id=6,
+            datePosted=self.datestring,
+            baseSalary={'salaryFrequency': 'yearly', 'minValue': '6.25', 'maxValue': '9.25'}
+        )]
         self.computed_property.compute_on_collection(self.job_postings)
 
     def test_compute_func(self):
         cache = self.computed_property.cache_for_key(self.datestring)
-        job_posting_id = self.job_postings[0]['id']
-        assert cache[str(job_posting_id)] == 5
+        assert cache[str(self.job_postings[0]['id'])] == 5
+        assert cache[str(self.job_postings[1]['id'])] == 7.75
