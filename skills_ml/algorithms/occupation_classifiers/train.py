@@ -10,6 +10,7 @@ from skills_ml.job_postings.common_schema import JobPostingGeneratorType
 
 import importlib
 import logging
+from itertools import zip_longest, tee
 from typing import Type, Union
 
 
@@ -79,8 +80,9 @@ class OccupationClassifierTrainer(object):
 
 def create_training_set(job_postings_generator: JobPostingGeneratorType,
                         target_variable: TargetVariable,
-                        embedding_model: Union[Word2VecModel, Doc2VecModel]=None,
-                        document_schema_fields=['description','experienceRequirements', 'qualifications', 'skills']) -> TrainingMatrix:
+                        pipe_x=None,
+                        pipe_y=None,
+                        embedding_model: Union[Word2VecModel, Doc2VecModel]=None) -> TrainingMatrix:
     """Create training set for occupation classifier from job postings generator and embedding model
 
     Args:
@@ -94,17 +96,23 @@ def create_training_set(job_postings_generator: JobPostingGeneratorType,
     """
     X = []
     y = []
-    for i, job in enumerate(job_postings_generator):
-        if target_variable.filter_func(job):
-            label = target_variable.transformer(job)
+    # for i, job in enumerate(job_postings_generator):
+    #     if target_variable.filter_func(job):
+    #         label = target_variable.transformer(job)
 
-            text = ' '.join([clean_str(job[field]) for field in document_schema_fields])
-            tokens = word_tokenize(text)
-            if embedding_model:
-                X.append(embedding_model.infer_vector(tokens))
-            else:
-                X.append(tokens)
-            y.append(label)
+    #         text = ' '.join([clean_str(job[field]) for field in document_schema_fields])
+    #         tokens = word_tokenize(text)
+    #         if embedding_model:
+    #             X.append(embedding_model.infer_vector(tokens))
+    #         else:
+    #             X.append(tokens)
+    #         y.append(label)
+    jp1, jp2 = tee(job_postings_generator, 2)
+    pxy = zip_longest(pipe_x.build(jp1), pipe_y.build(jp2))
+    for i, item in enumerate(pxy):
+        X.append(item[0])
+        y.append(item[1])
+
 
     total = i + 1
     filtered = len(y)

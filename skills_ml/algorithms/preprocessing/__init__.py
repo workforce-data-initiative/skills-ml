@@ -1,5 +1,6 @@
-from functools import reduce
-from typing import List, Generator, Dict
+from functools import reduce, wraps
+from typing import List, Generator, Dict, Callable
+import logging
 
 class IterablePipeline(object):
     """A simple iterable preprocessing pipeline.
@@ -24,27 +25,50 @@ class IterablePipeline(object):
         functions (generator): a series of generator functions that takes another generator as input
 
     """
-    def __init__(self, *functions: List[Generator]):
+    def __init__(self, *functions: Callable):
         self.functions = functions
 
     @property
-    def compose(self):
+    def _generators(self):
+        return [func2gen(f) for f in self.functions]
+
+    @property
+    def _compose(self):
         """compose functions
 
         Returns:
-            generator: a generator objet which is not materialized yet
+            function: a function object which is not materialized yet
         """
-        return reduce(lambda f, g: lambda x: g(f(x)), self.functions, lambda x: x)
+        return reduce(lambda f, g: lambda x: g(f(x)), self._generators, lambda x: x)
 
     def build(self, source_data_generator: Generator):
         """
 
         Returns:
-            list: a list of itmes after apply all the functions on them
+            generator: a generator object of itmes after apply all the functions on them
         """
-        return ( self.compose(item) for item in source_data_generator)
+        return self._compose(source_data_generator)
 
     @property
     def description(self):
         """pipeline description"""
         return [f.__doc__ for f in self.functions]
+
+
+def func2gen(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        for item in args[0]:
+            if item is not None:
+                yield func(item)
+    return wrapper
+
+
+def coroutine(func):
+    def start(*args, **kwargs):
+        cr = func(*args, **kwargs)
+        next(cr)
+        return cr
+    return start
+
+

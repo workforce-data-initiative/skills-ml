@@ -1,6 +1,6 @@
 from sklearn.preprocessing import LabelEncoder
 
-from skills_ml.ontologies.onet import majorgroupname
+from skills_ml.ontologies.onet import Onet, majorgroupname
 
 from abc import ABC, abstractmethod
 import numpy as np
@@ -19,10 +19,10 @@ class TargetVariable(ABC):
     def __init__(self, filters=None):
         self.default_filters = []
         self.filters = filters
-        self.filter_func =  lambda x: all(f(x) for f in self.all_filters)
+        self.filter_func =  lambda x: all(f(x) for f in self._all_filters)
 
     @property
-    def all_filters(self):
+    def _all_filters(self):
         if self.filters:
             if isinstance(self.filters, list):
                 return self.default_filters + self.filters
@@ -30,6 +30,11 @@ class TargetVariable(ABC):
                 return self.default_filters + [self.filters]
         else:
             return self.default_filters
+
+    @property
+    def filter(self, item):
+        if self.filter_func(item):
+            return item
 
     @property
     @abstractmethod
@@ -56,11 +61,26 @@ class SOCMajorGroup(TargetVariable):
         return lambda job_posting: self.encoder.transform([job_posting['onet_soc_code'][:2]])
 
 
+class FullSOC(TargetVariable):
+    name = 'full_soc'
+
+    def __init__(self, filters=None, onet_cache=None):
+        super().__init__(filters)
+        self.default_filters = [unknown_soc_filter, empty_soc_filter]
+        self.onet = Onet(onet_cache)
+        self.choices = self.onet.all_soc
+        self.encoder = SocEncoder(self.choices)
+
+    @property
+    def transformer(self):
+        return lambda job_posting: self.encoder.transform([job_posting['onet_soc_code']])
+
+
 class TrainingMatrix(object):
     def __init__(self, X, y, embedding_model, target_variable):
         self._X = X
         self._y = y
-        self.embedding_model = embedding_model
+        self.embedding_mode = embedding_model
         self.target_variable = target_variable
 
     @property

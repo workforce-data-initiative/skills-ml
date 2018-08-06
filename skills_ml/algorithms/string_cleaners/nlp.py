@@ -149,3 +149,16 @@ def fields_join(
                 'qualifications',
                 'skills']
     return ' '.join([document.get(field, '') for field in document_schema_fields])
+
+
+def vectorize(
+        tokenized_text: List[str],
+        embedding_model):
+    """
+    Args:
+        tokenized_text: a tokenized list of word tokens
+        embedding_model: the embedding model implements `.infer_vector()` method
+    Returns:
+        np.ndarray: a word embedding vector
+    """
+    return embedding_model.infer_vector(tokenized_text)
