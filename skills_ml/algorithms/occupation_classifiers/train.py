@@ -104,7 +104,7 @@ class OccupationClassifierTrainer(object):
             for class_name, cls_cv in cls_dict.items():
                 model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_)
                 with self.storage.open(os.path.join(store_path, score, model_hash), 'wb') as f:
-                    loggin.info(f"storing {class_name} {model_hash} to {store_path}")
+                    logging.info(f"storing {class_name} {model_hash} to {store_path}")
                     joblib.dump(cls_cv, f, compress=True)
 
 
