@@ -101,7 +101,7 @@ class OccupationClassifierTrainer(object):
         for score, cls_dict in self.best_classifiers.items():
             self.storage.path = os.path.join(self.storage.path, self.train_time, score)
             for class_name, cls_cv in cls_dict.items():
-                cls_cv_pickled = pickle.dumps(cls_cv)
+                cls_cv_pickled = pickle.dumps(cls_cv.best_estimator_)
                 self.storage.write(cls_cv_pickled, self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_) )
 
 
