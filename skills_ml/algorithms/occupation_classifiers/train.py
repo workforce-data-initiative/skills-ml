@@ -4,15 +4,18 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from skills_ml.storage import FSStore
 from skills_ml.ontologies.onet import majorgroupname
 from skills_ml.algorithms.string_cleaners.nlp import clean_str, word_tokenize
-from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
 from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, TrainingMatrix
+from skills_ml.algorithms.preprocessing import IterablePipeline
+from skills_ml.algorithms.embedding.base import ModelStorage
 from skills_ml.job_postings.common_schema import JobPostingGeneratorType
+from skills_ml.utils import filename_friendly_hash
 
 import importlib
 import logging
 from itertools import zip_longest, tee
 from typing import Type, Union
-
+import pickle
+import os
 
 class OccupationClassifierTrainer(object):
     """Trains a series of classifiers using the same training set
@@ -28,7 +31,6 @@ class OccupationClassifierTrainer(object):
                  random_state_for_split=None, scoring=['accuracy'], n_jobs=3):
         self.matrix = matrix
         self.storage = FSStore() if storage is None else storage
-        self.target_variable = self.matrix.target_variable
         self.k_folds = k_folds
         self.n_jobs = n_jobs
         self.grid_config = self.default_grid_config if grid_config is None else grid_config
@@ -63,26 +65,49 @@ class OccupationClassifierTrainer(object):
         X = self.matrix.X
         y = self.matrix.y
         for score in self.scoring:
+            self.cls_cv_result[score] = {}
+            self.best_classifiers[score] = {}
             for class_path, parameter_config in self.grid_config.items():
                 module_name, class_name = class_path.rsplit(".", 1)
                 module = importlib.import_module(module_name)
                 cls = getattr(module, class_name)
+                logging.info(f"training {class_name}")
                 kf = StratifiedKFold(n_splits=self.k_folds, random_state=self.random_state_for_split)
-
                 cls_cv = GridSearchCV(cls(), parameter_config, cv=kf, scoring=score, n_jobs=self.n_jobs)
                 cls_cv.fit(X, y)
-                self.cls_cv_result[score] = {class_name: cls_cv.cv_results_}
-                self.best_classifiers[score] = {class_name: cls_cv}
+                self.cls_cv_result[score][class_name] = cls_cv.cv_results_
+                self.best_classifiers[score][class_name] = cls_cv
 
-    def save_result(self):
-        return NotImplementedError
+    def unique_parameters(self, parameters):
+        return {
+            key: parameters[key]
+            for key in parameters.keys()
+            if key != 'n_jobs'
+        }
+
+    def _model_hash(self, matrix_metadata, class_path, parameters):
+        unique = {
+            'className': class_path,
+            'parameters': self.unique_parameters(parameters),
+            'project_path': self.storage.path,
+            'training_metadata': matrix_metadata
+        }
+        logging.info(f'Creating model hash from unique data {unique}')
+        return filename_friendly_hash(unique)
+
+    def save(self):
+        for score, cls_dict in self.best_classifiers.items():
+            self.storage.path = os.path.join(self.storage.path, score)
+            for class_name, cls_cv in cls_dict.items():
+                cls_cv_pickled = pickle.dumps(cls_cv)
+                self.storage.write(cls_cv_pickled, self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_) )
 
 
 def create_training_set(job_postings_generator: JobPostingGeneratorType,
                         target_variable: TargetVariable,
-                        pipe_x=None,
-                        pipe_y=None,
-                        embedding_model: Union[Word2VecModel, Doc2VecModel]=None) -> TrainingMatrix:
+                        pipe_x: IterablePipeline=None,
+                        pipe_y: IterablePipeline=None,
+                        ) -> TrainingMatrix:
     """Create training set for occupation classifier from job postings generator and embedding model
 
     Args:
@@ -120,5 +145,4 @@ def create_training_set(job_postings_generator: JobPostingGeneratorType,
     logging.info(f"total jobpostings: {total}")
     logging.info(f"filtered jobpostings: {filtered}")
     logging.info(f"dropped jobposting: {dropped}")
-
-    return TrainingMatrix(X, y, embedding_model, target_variable)
+    return TrainingMatrix(X, y, pipe_x, pipe_y, job_postings_generator.metadata)

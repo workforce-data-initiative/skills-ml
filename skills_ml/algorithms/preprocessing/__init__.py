@@ -63,12 +63,3 @@ def func2gen(func):
                 yield func(item)
     return wrapper
 
-
-def coroutine(func):
-    def start(*args, **kwargs):
-        cr = func(*args, **kwargs)
-        next(cr)
-        return cr
-    return start
-
-

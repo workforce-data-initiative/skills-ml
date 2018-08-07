@@ -77,11 +77,13 @@ class FullSOC(TargetVariable):
 
 
 class TrainingMatrix(object):
-    def __init__(self, X, y, embedding_model, target_variable):
+    def __init__(self, X, y, pipe_x, pipe_y, metadata):
         self._X = X
         self._y = y
-        self.embedding_mode = embedding_model
-        self.target_variable = target_variable
+        self.pipe_x = pipe_x
+        self.pipe_y = pipe_y
+        self.metadata = metadata
+        # self.target_variable = target_variable
 
     @property
     def X(self):
