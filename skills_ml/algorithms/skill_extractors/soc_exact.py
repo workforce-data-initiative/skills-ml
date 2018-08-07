@@ -1,13 +1,5 @@
-from collections import defaultdict
-import logging
-import re
-import unicodecsv as csv
-
-from smart_open import smart_open
-
 from skills_ml.ontologies.base import CompetencyOntology
 
-from .base import CandidateSkill, trie_regex_from_words
 from .exact_match import ExactMatchSkillExtractor
 
 
@@ -23,17 +15,21 @@ class SocScopedExactMatchSkillExtractor(ExactMatchSkillExtractor):
             raise ValueError('Must pass in a CompetencyOntology object')
         super().__init__(competency_ontology.competency_framework, *args, **kwargs)
 
+        self.competency_ontology = competency_ontology
         self.skill_extractor_by_soc = {}
-        for occupation in competency_ontology.occupations:
-            subontology = competency_ontology.filter_by(
-                lambda edge: edge.occupation == occupation,
-                competency_name='competencies_' + occupation.identifier,
-                competency_description='Competencies needed by ' + occupation.name
-            )
-            self.skill_extractor_by_soc[occupation.identifier] = ExactMatchSkillExtractor(subontology.competency_framework)
 
     def candidate_skills(self, source_object):
         soc_code = source_object.get('onet_soc_code', None)
-        if not soc_code or soc_code not in self.skill_extractor_by_soc:
+        if not soc_code:
             return
+        if soc_code not in self.skill_extractor_by_soc:
+            subontology = self.competency_ontology.filter_by(
+                lambda edge: edge.occupation.identifier == soc_code,
+                competency_name='competencies_' + soc_code,
+                competency_description='Competencies needed by ' + soc_code
+            )
+            if len(subontology.competencies) == 0:
+                return
+
+            self.skill_extractor_by_soc[soc_code] = ExactMatchSkillExtractor(subontology.competency_framework)
         yield from self.skill_extractor_by_soc[soc_code].candidate_skills(source_object)
