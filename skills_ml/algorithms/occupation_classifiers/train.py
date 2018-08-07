@@ -12,6 +12,7 @@ from skills_ml.utils import filename_friendly_hash
 
 import importlib
 import logging
+from datetime import datetime
 from itertools import zip_longest, tee
 from typing import Type, Union
 import pickle
@@ -38,6 +39,7 @@ class OccupationClassifierTrainer(object):
         self.scoring = scoring
         self.best_classifiers = {}
         self.random_state_for_split = random_state_for_split
+        self.train_time = datetime.today().isoformat()
 
     @property
     def default_grid_config(self):
@@ -97,7 +99,7 @@ class OccupationClassifierTrainer(object):
 
     def save(self):
         for score, cls_dict in self.best_classifiers.items():
-            self.storage.path = os.path.join(self.storage.path, score)
+            self.storage.path = os.path.join(self.storage.path, self.train_time, score)
             for class_name, cls_cv in cls_dict.items():
                 cls_cv_pickled = pickle.dumps(cls_cv)
                 self.storage.write(cls_cv_pickled, self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_) )
@@ -121,17 +123,6 @@ def create_training_set(job_postings_generator: JobPostingGeneratorType,
     """
     X = []
     y = []
-    # for i, job in enumerate(job_postings_generator):
-    #     if target_variable.filter_func(job):
-    #         label = target_variable.transformer(job)
-
-    #         text = ' '.join([clean_str(job[field]) for field in document_schema_fields])
-    #         tokens = word_tokenize(text)
-    #         if embedding_model:
-    #             X.append(embedding_model.infer_vector(tokens))
-    #         else:
-    #             X.append(tokens)
-    #         y.append(label)
     jp1, jp2 = tee(job_postings_generator, 2)
     pxy = zip_longest(pipe_x.build(jp1), pipe_y.build(jp2))
     for i, item in enumerate(pxy):
