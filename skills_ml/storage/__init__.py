@@ -3,7 +3,7 @@ import os
 import json
 import logging
 from collections.abc import MutableMapping
-
+from contextlib import contextmanager
 
 class Store(object):
     def __init__(self, path):
@@ -32,6 +32,12 @@ class S3Store(Store):
     def __init__(self, path):
         super().__init__(path=path)
 
+    @contextmanager
+    def open(self, path, *args, **kwargs):
+        s3 = s3fs.S3FileSystem()
+        with s3.open(path, *args, **kwargs) as f:
+            yield f
+
     def exists(self, fname):
         s3 = s3fs.S3FileSystem()
         return s3.exists(os.path.join(self.path, fname))
@@ -54,8 +60,28 @@ class S3Store(Store):
         s3 = s3fs.S3FileSystem()
         return [
             k.split('/')[-1] for k in
-            s3.ls(os.path.join(self.path, subpath))   
+            s3.ls(os.path.join(self.path, subpath))
         ]
+
+
+class S3ModelStore(Store):
+    def exists(self):
+        s3 = s3fs.S3FileSystem()
+        return s3.exists(self.path)
+
+    def write(self, obj):
+        s3 = s3fs.S3FileSystem()
+        with s3.open(self.path, 'wb') as f:
+            joblib.dump(obj, f, compress=True)
+
+    def load(self):
+        s3 = s3fs.S3FileSystem()
+        with s3.open(self.path, 'rb') as f:
+            return joblib.load(f)
+
+    def delete(self):
+        s3 = s3fs.S3FileSystem()
+        s3.rm(self.path)
 
 
 class FSStore(Store):

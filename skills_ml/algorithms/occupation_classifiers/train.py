@@ -1,5 +1,6 @@
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.externals import joblib
 
 from skills_ml.storage import FSStore
 from skills_ml.ontologies.onet import majorgroupname
@@ -98,11 +99,13 @@ class OccupationClassifierTrainer(object):
         return filename_friendly_hash(unique)
 
     def save(self):
+        store_path = os.path.join(self.storage.path, self.train_time)
         for score, cls_dict in self.best_classifiers.items():
-            self.storage.path = os.path.join(self.storage.path, self.train_time, score)
             for class_name, cls_cv in cls_dict.items():
-                cls_cv_pickled = pickle.dumps(cls_cv.best_estimator_)
-                self.storage.write(cls_cv_pickled, self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_) )
+                model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_)
+                with self.storage.open(os.path.join(store_path, score, model_hash), 'wb') as f:
+                    loggin.info(f"storing {class_name} {model_hash} to {store_path}")
+                    joblib.dump(cls_cv, f, compress=True)
 
 
 def create_training_set(job_postings_generator: JobPostingGeneratorType,
