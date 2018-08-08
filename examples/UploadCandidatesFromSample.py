@@ -44,7 +44,7 @@ if __name__ == '__main__':
         full_onet.filter_by(lambda edge: 'Ability' in edge.competency.categories, competency_name='onet_ability', competency_description='ONET Ability')
         full_onet.filter_by(lambda edge: 'Skill' in edge.competency.categories, competency_name='onet_skill', competency_description='ONET Skill')
     ]
-    for sample_name, skill_extractor_class, ontologies in product(sample_names, skill_extractor_classes, ontologies):
+    for sample_name, skill_extractor_class, ontology in product(sample_names, skill_extractor_classes, ontologies):
         sample = Sample(sample_path, sample_name)
         skill_extractor = skill_extractor_class(ontology.competency_framework)
         generate_skill_candidates_oneprocess(candidates_path, sample, skill_extractor)
