@@ -61,15 +61,16 @@ class OccupationClassifierTrainer(object):
                     }
                 }
 
-    def train(self):
+    def train(self, save=True):
         """Fit a model to a training set. Works on any modeling class that
         is vailable in this package's environment and implements .fit
         """
         X = self.matrix.X
         y = self.matrix.y
+        store_path = os.path.join(self.storage.path, self.train_time)
         for score in self.scoring:
             self.cls_cv_result[score] = {}
-            self.best_classifiers[score] = {}
+            # self.best_classifiers[score] = {}
             for class_path, parameter_config in self.grid_config.items():
                 module_name, class_name = class_path.rsplit(".", 1)
                 module = importlib.import_module(module_name)
@@ -79,7 +80,11 @@ class OccupationClassifierTrainer(object):
                 cls_cv = GridSearchCV(cls(), parameter_config, cv=kf, scoring=score, n_jobs=self.n_jobs)
                 cls_cv.fit(X, y)
                 self.cls_cv_result[score][class_name] = cls_cv.cv_results_
-                self.best_classifiers[score][class_name] = cls_cv
+                # self.best_classifiers[score][class_name] = cls_cv
+                if save:
+                    model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_)
+                    logging.info(f"storing {class_name} {model_hash} to {store_path}")
+                    self._save(cls_cv, os.path.join(store_path, score, model_hash))
 
     def unique_parameters(self, parameters):
         return {
@@ -98,14 +103,13 @@ class OccupationClassifierTrainer(object):
         logging.info(f'Creating model hash from unique data {unique}')
         return filename_friendly_hash(unique)
 
-    def save(self):
-        store_path = os.path.join(self.storage.path, self.train_time)
-        for score, cls_dict in self.best_classifiers.items():
-            for class_name, cls_cv in cls_dict.items():
-                model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_)
-                with self.storage.open(os.path.join(store_path, score, model_hash), 'wb') as f:
-                    logging.info(f"storing {class_name} {model_hash} to {store_path}")
-                    joblib.dump(cls_cv, f, compress=True)
+    def _save(self, cls_cv, path_to_save):
+        # store_path = os.path.join(self.storage.path, self.train_time)
+        # for score, cls_dict in self.best_classifiers.items():
+            # for class_name, cls_cv in cls_dict.items():
+                # model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_classifiers)
+        with self.storage.open(path_to_save, 'wb') as f:
+            joblib.dump(cls_cv, f, compress=True)
 
 
 def create_training_set(job_postings_generator: JobPostingGeneratorType,
