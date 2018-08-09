@@ -29,7 +29,7 @@ class CandidateSkillFactory(factory.Factory):
         model = CandidateSkill
 
     skill_name = factory.fuzzy.FuzzyText()
-    matched_skill = factory.LazyAttribute(lambda obj: obj.skill_name)
+    matched_skill_identifier = factory.fuzzy.FuzzyText()
     context = factory.LazyAttribute(lambda obj: f"{factory.fuzzy.FuzzyText()}{obj.skill_name}{factory.fuzzy.FuzzyText()}")
     confidence = factory.fuzzy.FuzzyFloat(0, 1)
     document_id = factory.fuzzy.FuzzyText()

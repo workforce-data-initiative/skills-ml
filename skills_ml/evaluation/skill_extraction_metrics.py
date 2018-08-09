@@ -26,7 +26,7 @@ class OntologyCompetencyRecall(SkillExtractorMetric):
 
     def __init__(self, ontology: CompetencyOntology):
         self.ontology = ontology
-        self.lookup = set(competency.name.lower() for competency in ontology.competencies)
+        self.lookup = set(competency.identifier for competency in ontology.competencies)
 
     def eval(self, candidate_skills: CandidateSkillYielder, sample_len: int) -> float:
         num_total_terms = len(self.lookup)
@@ -35,10 +35,10 @@ class OntologyCompetencyRecall(SkillExtractorMetric):
             return 0
         found_terms = set()
         for candidate_skill in candidate_skills:
-            if candidate_skill.matched_skill in found_terms:
+            if candidate_skill.matched_skill_identifier in found_terms:
                 continue
-            if candidate_skill.matched_skill in self.lookup:
-                found_terms.add(candidate_skill.matched_skill)
+            if candidate_skill.matched_skill_identifier in self.lookup:
+                found_terms.add(candidate_skill.matched_skill_identifier)
         num_found_terms = len(found_terms)
         logging.info('Found %s terms out of %s total', num_found_terms, num_total_terms)
         return float(num_found_terms)/num_total_terms

@@ -65,7 +65,7 @@ def test_OntologyCompetencyRecall():
     metric = OntologyCompetencyRecall(ontology)
     candidate_skills = CandidateSkillFactory.create_batch(
         50,
-        skill_name=list(ontology.competencies)[0].name.lower()
+        matched_skill_identifier=list(ontology.competencies)[0].identifier.lower()
     )
     assert metric.eval(candidate_skills, 50) ==\
         1/len(ontology.competencies)
