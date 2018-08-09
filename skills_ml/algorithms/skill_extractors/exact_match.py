@@ -31,15 +31,19 @@ class ExactMatchSkillExtractor(ListBasedSkillExtractor):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        list_entries = set(
-            competency.name
+        competencies = set(
+            competency
             for competency in self.competency_framework.values()
+            if competency.name
         )
+
+        self.id_lookup = dict((competency.name.lower(), competency.identifier) for competency in competencies)
+
         logging.info(
             'Found %s entries for lookup',
-            len(list_entries)
+            len(competencies)
         )
-        self.lookup_regex = trie_regex_from_words(list_entries)
+        self.lookup_regex = trie_regex_from_words(set(self.id_lookup.keys()))
 
     def _skills_lookup(self) -> set:
         """Create skills lookup
@@ -66,7 +70,7 @@ class ExactMatchSkillExtractor(ListBasedSkillExtractor):
                 logging.info('Yielding exact match %s in string %s', match, sent)
                 yield CandidateSkill(
                     skill_name=match.lower(),
-                    matched_skill=match,
+                    matched_skill_identifier=self.id_lookup[match.lower()],
                     confidence=100,
                     context=sent,
                     document_id=source_object['id'],

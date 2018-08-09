@@ -11,7 +11,7 @@ def test_fuzzymatch_skill_extractor_candidate_skills():
     )
 
     assert candidate_skills[0].skill_name == 'communication skillz'
-    assert candidate_skills[0].matched_skill == 'communication skills'
+    assert candidate_skills[0].matched_skill_identifier == 'b'
     assert candidate_skills[0].context == 'Organization, Cleanliness, Trainability, team player, good communication skillz, Motivation, a Sense of Responsibility and Pride in your Performance'
     assert candidate_skills[0].confidence == 95
 

@@ -29,16 +29,20 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        list_entries = set(
-            competency.name.lower()
+        competencies = set(
+            competency
             for competency in self.competency_framework.values()
+            if competency.name
         )
+
+        self.id_lookup = dict((competency.name.lower(), competency.identifier) for competency in competencies)
+
         logging.info(
             'Found %s entries for lookup',
-            len(list_entries)
+            len(competencies)
         )
         self.symspell = SymSpell(max_dictionary_edit_distance=4)
-        self.symspell.create_dictionary(list(list_entries))
+        self.symspell.create_dictionary(list(self.id_lookup.keys()))
 
     @property
     def method_name(self) -> Text:
@@ -93,7 +97,7 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
                     )
                     yield CandidateSkill(
                         skill_name=phrase,
-                        matched_skill=match.term,
+                        matched_skill_identifier=self.id_lookup[match.term],
                         confidence=100*(length_of_phrase-match.distance)/length_of_phrase,
                         context=sent,
                         document_id=source_object['id'],

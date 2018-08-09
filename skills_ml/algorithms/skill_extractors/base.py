@@ -83,7 +83,7 @@ def trie_regex_from_words(words):
 
 CandidateSkill = namedtuple('CandidateSkill', [
     'skill_name',
-    'matched_skill',
+    'matched_skill_identifier',
     'context',
     'confidence',
     'document_id',

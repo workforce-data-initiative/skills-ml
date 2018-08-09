@@ -201,7 +201,7 @@ class NPEndPatternExtractor(SkillExtractor):
             )
             yield CandidateSkill(
                 skill_name=cleaned_phrase,
-                matched_skill=cleaned_phrase,
+                matched_skill_identifier=None,
                 confidence=95,
                 context=orig_context,
                 document_id=source_object['id'],
