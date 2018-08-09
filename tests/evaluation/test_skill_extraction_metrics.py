@@ -2,6 +2,7 @@ from skills_ml.evaluation.skill_extraction_metrics import (
     OntologyCompetencyRecall,
     OntologyOccupationRecall,
     MedianSkillsPerDocument,
+    SkillsPerDocumentHistogram,
     PercentageNoSkillDocuments,
     TotalVocabularySize,
     TotalOccurrences
@@ -36,6 +37,17 @@ def test_MedianSkillsPerDocument():
     # and the median should be 5
     assert MedianSkillsPerDocument()\
         .eval(candidate_skills, sample_len=5) == 5
+
+
+def test_SkillsPerDocumentHistogram():
+    # 11 documents, each 1-9 having that # of candidate skills
+    # we tell the metric that there were 13 total documents, meaning that the extra two had 0
+    candidate_skills = []
+    for document_id in range(1, 12):
+        for cs in range(0, document_id):
+            candidate_skills.append(CandidateSkillFactory(document_id=str(document_id)))
+
+    assert SkillsPerDocumentHistogram(5).eval(candidate_skills, 13) == [4, 2, 2, 2, 3]
 
 
 def test_PercentageNoSkillDocument():

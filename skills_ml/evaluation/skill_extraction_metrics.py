@@ -6,6 +6,8 @@ from skills_ml.ontologies.base import CompetencyOntology
 from skills_ml.algorithms.skill_extractors.base import CandidateSkillYielder
 from skills_ml.algorithms.sampling import Sample
 from collections import defaultdict
+from typing import List
+import numpy
 import statistics
 
 
@@ -84,6 +86,28 @@ class MedianSkillsPerDocument(SkillExtractorMetric):
         for _ in range(0, sample_len - documents_with_skills):
             counts.append(0)
         return statistics.median(counts)
+
+
+class SkillsPerDocumentHistogram(SkillExtractorMetric):
+    """The"""
+    def __init__(self, bins=10, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bins = bins
+
+    @property
+    def name(self):
+        return f'skills_per_document_histogram_{self.bins}bins'
+
+    def eval(self, candidate_skills: CandidateSkillYielder, sample_len: int) -> List:
+        skills_in_document = defaultdict(set)
+        for candidate_skill in candidate_skills:
+            if candidate_skill.skill_name not in skills_in_document[candidate_skill.document_id]:
+                skills_in_document[candidate_skill.document_id].add(candidate_skill.skill_name)
+        documents_with_skills = len(skills_in_document.values())
+        counts = [len(skill_list) for skill_list in skills_in_document.values()]
+        for _ in range(0, sample_len - documents_with_skills):
+            counts.append(0)
+        return list(numpy.histogram(counts, bins=self.bins)[0])
 
 
 class PercentageNoSkillDocuments(SkillExtractorMetric):
