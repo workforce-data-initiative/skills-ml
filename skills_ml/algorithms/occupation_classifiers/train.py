@@ -5,7 +5,7 @@ from sklearn.externals import joblib
 from skills_ml.storage import FSStore
 from skills_ml.ontologies.onet import majorgroupname
 from skills_ml.algorithms.string_cleaners.nlp import clean_str, word_tokenize
-from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, TrainingMatrix
+from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, DesignMatrix
 from skills_ml.algorithms.preprocessing import IterablePipeline
 from skills_ml.algorithms.embedding.base import ModelStorage
 from skills_ml.job_postings.common_schema import JobPostingGeneratorType
@@ -70,7 +70,6 @@ class OccupationClassifierTrainer(object):
         store_path = os.path.join(self.storage.path, self.train_time)
         for score in self.scoring:
             self.cls_cv_result[score] = {}
-            # self.best_classifiers[score] = {}
             for class_path, parameter_config in self.grid_config.items():
                 module_name, class_name = class_path.rsplit(".", 1)
                 module = importlib.import_module(module_name)
@@ -80,7 +79,6 @@ class OccupationClassifierTrainer(object):
                 cls_cv = GridSearchCV(cls(), parameter_config, cv=kf, scoring=score, n_jobs=self.n_jobs)
                 cls_cv.fit(X, y)
                 self.cls_cv_result[score][class_name] = cls_cv.cv_results_
-                # self.best_classifiers[score][class_name] = cls_cv
                 if save:
                     model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_)
                     logging.info(f"storing {class_name} {model_hash} to {store_path}")
@@ -104,19 +102,14 @@ class OccupationClassifierTrainer(object):
         return filename_friendly_hash(unique)
 
     def _save(self, cls_cv, path_to_save):
-        # store_path = os.path.join(self.storage.path, self.train_time)
-        # for score, cls_dict in self.best_classifiers.items():
-            # for class_name, cls_cv in cls_dict.items():
-                # model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_classifiers)
         with self.storage.open(path_to_save, 'wb') as f:
             joblib.dump(cls_cv, f, compress=True)
 
 
 def create_training_set(job_postings_generator: JobPostingGeneratorType,
-                        target_variable: TargetVariable,
                         pipe_x: IterablePipeline=None,
                         pipe_y: IterablePipeline=None,
-                        ) -> TrainingMatrix:
+                        ):
     """Create training set for occupation classifier from job postings generator and embedding model
 
     Args:

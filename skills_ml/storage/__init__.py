@@ -64,29 +64,14 @@ class S3Store(Store):
         ]
 
 
-class S3ModelStore(Store):
-    def exists(self):
-        s3 = s3fs.S3FileSystem()
-        return s3.exists(self.path)
-
-    def write(self, obj):
-        s3 = s3fs.S3FileSystem()
-        with s3.open(self.path, 'wb') as f:
-            joblib.dump(obj, f, compress=True)
-
-    def load(self):
-        s3 = s3fs.S3FileSystem()
-        with s3.open(self.path, 'rb') as f:
-            return joblib.load(f)
-
-    def delete(self):
-        s3 = s3fs.S3FileSystem()
-        s3.rm(self.path)
-
-
 class FSStore(Store):
     def __init__(self, path=None):
         self.path = os.getcwd() if not path else path
+
+    @contextmanager
+    def open(self, path, *args, **kwargs):
+        with open(path, *args, **kwargs) as f:
+            yield f
 
     def exists(self, fname):
         return os.path.isfile(os.path.join(self.path, fname))

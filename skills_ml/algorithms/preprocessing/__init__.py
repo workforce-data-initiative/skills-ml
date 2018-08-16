@@ -27,10 +27,15 @@ class IterablePipeline(object):
     """
     def __init__(self, *functions: Callable):
         self.functions = functions
+        self._generators = [func2gen(f) for f in self.functions]
 
     @property
-    def _generators(self):
-        return [func2gen(f) for f in self.functions]
+    def generators(self):
+        return self._generators
+
+    @generators.setter
+    def generators(self, new_generators):
+        self._generators = new_generators
 
     @property
     def _compose(self):
