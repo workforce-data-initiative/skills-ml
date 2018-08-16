@@ -76,7 +76,7 @@ class OccupationClassifierTrainer(object):
                 cls = getattr(module, class_name)
                 logging.info(f"training {class_name}")
                 kf = StratifiedKFold(n_splits=self.k_folds, random_state=self.random_state_for_split)
-                cls_cv = GridSearchCV(cls(), parameter_config, cv=kf, scoring=score, n_jobs=self.n_jobs)
+                cls_cv = GridSearchCV(cls(n_jobs=self.n_jobs), parameter_config, cv=kf, scoring=score)
                 cls_cv.fit(X, y)
                 self.cls_cv_result[score][class_name] = cls_cv.cv_results_
                 if save:
