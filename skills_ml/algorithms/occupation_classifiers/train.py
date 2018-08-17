@@ -104,36 +104,3 @@ class OccupationClassifierTrainer(object):
     def _save(self, cls_cv, path_to_save):
         with self.storage.open(path_to_save, 'wb') as f:
             joblib.dump(cls_cv, f, compress=True)
-
-
-def create_training_set(job_postings_generator: JobPostingGeneratorType,
-                        pipe_x: IterablePipeline=None,
-                        pipe_y: IterablePipeline=None,
-                        ):
-    """Create training set for occupation classifier from job postings generator and embedding model
-
-    Args:
-        job_postings_generator (generator): job posting collection
-        emebdding_model (skills_ml.algorithm.embedding.models): embedding model
-        document_schema_fields (list): fields to be included in the training data
-
-    Returns:
-        (skills_ml.algorithm.occupation_classifiers.TrainingMatrix) a matrix class with properties of training data(X),
-        label(y), the embedding_model, target_variable and soc_encoder
-    """
-    X = []
-    y = []
-    jp1, jp2 = tee(job_postings_generator, 2)
-    pxy = zip_longest(pipe_x.build(jp1), pipe_y.build(jp2))
-    for i, item in enumerate(pxy):
-        X.append(item[0])
-        y.append(item[1])
-
-
-    total = i + 1
-    filtered = len(y)
-    dropped = 1 - float(len(y) / (i+1))
-    logging.info(f"total jobpostings: {total}")
-    logging.info(f"filtered jobpostings: {filtered}")
-    logging.info(f"dropped jobposting: {dropped}")
-    return TrainingMatrix(X, y, pipe_x, pipe_y, job_postings_generator.metadata)

@@ -60,7 +60,23 @@ class IterablePipeline(object):
         return [f.__doc__ for f in self.functions]
 
 
-def func2gen(func):
+def func2gen(func: Callable) -> Callable:
+    """A wrapper that change a document-transforming function that takes only one document the input
+    into a function that takes a generator/iterator as the input. When it instantiates, it will become
+    a generator.
+
+    Example:
+        @func2gen
+        def do_something(doc):
+            return do_something_to_the_doc(doc)
+
+    Args:
+        func (function): a function only take one document as the first argument input.
+
+    Returns:
+        func (function): a function that takes a generator as the first argument input.
+
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         for item in args[0]:
