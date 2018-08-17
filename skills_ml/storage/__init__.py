@@ -70,6 +70,9 @@ class FSStore(Store):
 
     @contextmanager
     def open(self, path, *args, **kwargs):
+        directory = os.path.dirname(path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         with open(path, *args, **kwargs) as f:
             yield f
 

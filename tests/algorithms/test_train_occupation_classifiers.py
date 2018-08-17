@@ -7,9 +7,13 @@ from skills_ml.algorithms.embedding.models import Word2VecModel
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.string_cleaners import nlp
 from skills_ml.algorithms.preprocessing import IterablePipeline
+from skills_ml.storage import FSStore
 
+import os
 import time
+import tempfile
 import unittest
+import mock
 from descriptors import cachedproperty
 from functools import partial
 
@@ -65,6 +69,10 @@ class TestClassifierTrainer(unittest.TestCase):
         return SOCMajorGroup()
 
     @cachedproperty
+    def full_soc(self):
+        return FullSOC()
+
+    @cachedproperty
     def embedding_model(self):
         w2v = Word2VecModel(size=10)
         return w2v
@@ -82,6 +90,10 @@ class TestClassifierTrainer(unittest.TestCase):
             filters = [self.has_soc_filter]
         return list(JobPostingFilterer(self.jobpostings, filters))
 
+    def test_full_soc(self):
+        job_posting = {'onet_soc_code': '11-1031.00'}
+        assert self.full_soc.transformer(job_posting)[0] == [3]
+
     def test_design_matrix(self):
         matrix = self.matrix
         assert matrix.target_variable.name == "major_group"
@@ -89,12 +101,27 @@ class TestClassifierTrainer(unittest.TestCase):
         assert matrix.y.shape[0] == len(self.filtered_jobpostings)
         assert matrix.target_variable.encoder.inverse_transform([0]) == '11'
 
-    def test_training(self):
+    def test_training_not_save(self):
         matrix = self.matrix
         assert matrix.target_variable.name == "major_group"
         occ_trainer = OccupationClassifierTrainer(matrix, k_folds=2, grid_config=grid, scoring=['accuracy'])
         occ_trainer.train(save=False)
         assert list(occ_trainer.cls_cv_result['accuracy'].keys()) == ['ExtraTreesClassifier']
+
+    @mock.patch('os.getcwd')
+    def test_training_save(self, mock_getcwd):
+        with tempfile.TemporaryDirectory() as td:
+            mock_getcwd.return_value = td
+            matrix = self.matrix
+            assert matrix.target_variable.name == "major_group"
+            occ_trainer = OccupationClassifierTrainer(
+                    matrix,
+                    k_folds=2,
+                    storage=FSStore(td),
+                    grid_config=grid,
+                    scoring=['accuracy'])
+            occ_trainer.train()
+            assert set(os.listdir(os.getcwd())) ==  set([occ_trainer.train_time])
 
     def test_one_filter(self):
         # First make sure 27 is in the data
