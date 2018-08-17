@@ -65,6 +65,7 @@ class OccupationClassifierTrainer(object):
         """Fit a model to a training set. Works on any modeling class that
         is vailable in this package's environment and implements .fit
         """
+        logging.info(f"Start training {self.train_time}")
         X = self.matrix.X
         y = self.matrix.y
         store_path = os.path.join(self.storage.path, self.train_time)
@@ -76,7 +77,10 @@ class OccupationClassifierTrainer(object):
                 cls = getattr(module, class_name)
                 logging.info(f"training {class_name}")
                 kf = StratifiedKFold(n_splits=self.k_folds, random_state=self.random_state_for_split)
-                cls_cv = GridSearchCV(cls(n_jobs=self.n_jobs), parameter_config, cv=kf, scoring=score)
+                if class_name == "SVC" or class_name == "MLPClassifier":
+                    cls_cv = GridSearchCV(cls(), parameter_config, cv=kf, scoring=score)
+                else:
+                    cls_cv = GridSearchCV(cls(n_jobs=self.n_jobs), parameter_config, cv=kf, scoring=score)
                 cls_cv.fit(X, y)
                 self.cls_cv_result[score][class_name] = cls_cv.cv_results_
                 if save:

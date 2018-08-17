@@ -12,6 +12,8 @@ from skills_ml.algorithms.string_cleaners import nlp
 from skills_ml.algorithms.occupation_classifiers.train import OccupationClassifierTrainer
 from skills_ml.algorithms.occupation_classifiers import FullSOC, DesignMatrix
 
+import os
+import json
 import random
 from functools import partial
 import logging
@@ -27,6 +29,10 @@ random.shuffle(job_24k)
 
 train_data = job_24k[:19200]
 test_data = job_24k[19200:]
+
+train_bytes = json.dumps(train_data).encode()
+test_bytes = json.dumps(test_data).encode()
+
 
 logging.info("Downloading Embedding Model")
 w2v = Word2VecModel.load(storage=S3Store('open-skills-private/model_cache/embedding'), model_name='word2vec_2018-07-27T20:01:27.895533.model')
@@ -63,7 +69,8 @@ pipe_y = IterablePipeline(
     full_soc.transformer
 )
 
-matrix = DesignMatrix(JobGenerator(), full_soc, pipe_x, pipe_y)
+matrix = DesignMatrix(JobGenerator(train_data), full_soc, pipe_x, pipe_y)
+matrix.build()
 
 grid_config = {
                  'sklearn.ensemble.ExtraTreesClassifier': {
@@ -81,7 +88,7 @@ grid_config = {
                      'min_samples_split': [10, 20]
                      },
                  'sklearn.neural_network.MLPClassifier': {
-                     'hidden_layer_sizes': [100, 200, 300, 500, 1000],
+                    'hidden_layer_sizes': [100, 200, 300, 500, 1000],
                      'activation': ['identity', 'logistic', 'tanh', 'relu'],
                      'solver': ['lbfgs', 'sgd', 'adam']
                      },
@@ -101,3 +108,8 @@ trainer = OccupationClassifierTrainer(
     n_jobs = num_of_worker
 )
 trainer.train()
+
+s3 = S3Store(os.path.join('open-skills-private/model_cache/soc_classifiers', trainer.train_time))
+s3.write(train_bytes, "train.data")
+s3.write(test_bytes, "test_data")
+
