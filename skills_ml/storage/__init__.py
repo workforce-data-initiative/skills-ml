@@ -83,7 +83,10 @@ class FSStore(Store):
 
 class InMemoryStore(Store):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        if 'path' not in kwargs and len(args) == 0:
+            super().__init__(path='nothing', *args, **kwargs)
+        else:
+            super().__init__(*args, **kwargs)
         self.store = {}
 
     def exists(self, fname):

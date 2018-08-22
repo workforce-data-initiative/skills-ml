@@ -36,6 +36,7 @@ class Onet(CompetencyOntology):
         super().__init__()
         self.is_built = False
         self.onet_cache = onet_cache or OnetSiteCache()
+        self.name = 'onet'
         self.competency_framework.name = 'onet_ksat'
         self.competency_framework.description = 'ONET Knowledge, Skills, Abilities, Tools, and Technology'
         self._build()

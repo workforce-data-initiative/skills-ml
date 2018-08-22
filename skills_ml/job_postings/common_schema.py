@@ -175,3 +175,13 @@ def batches_generator(iterable, batch_size):
     while True:
         batchiter = islice(sourceiter, batch_size)
         yield chain([next(batchiter)], batchiter)
+
+
+def get_onet_occupation(job_posting):
+    """Retrieve the occupation from the job posting
+
+    First checks the custom 'onet_soc_code' key,
+    then the standard 'occupationalCategory' key,
+    and falls back to the unknown occupation
+    """
+    return job_posting.get('onet_soc_code', job_posting.get('occupationalCategory', '99-9999.00'))

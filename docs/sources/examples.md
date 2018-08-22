@@ -15,15 +15,14 @@ from Virginia Tech's open data portal and run them through the skill extractor.
 In the end, we have the most commonly occurring noun phrases ending in
 'skill' or 'skills'.
 
-## [Generate Skill Candidates for Further Evaluation](https://github.com/workforce-data-initiative/skills-ml/blob/master/examples/UploadCandidatesFromSample.py)
+## [Skill Extraction and Evaluation Loop](https://github.com/workforce-data-initiative/skills-ml/blob/master/examples/SkillExtractionEvaluation.py)
 
 To showcase how skill extraction algorithms can be tested, we run extraction several times with different parameters:
 
 - Skill extraction algorithms (exact, fuzzy matching)
-- Base skill lists (ONET abilities, ONET skills, ONET knowledge)
-- Samples (a 300 job posting sample, a 10k job posting sample)
+- Base ontologies, consisting of ONET subsetted to Abilities, Skills, Knowledge)
+- Metrics (Total Vocabulary Size, Total Candidate Skills, Recall of Given Ontology)
 
-For each combination of the above parameters, we upload the extracted skill candidates to S3 for further evaluation, for instance by a human labeller. In addition, this example shows how to parallelize the skill extraction.
 
 ## [Train an Word2Vec Embedding Model using Quarterly Jobposting Data](https://github.com/workforce-data-initiative/skills-ml/blob/master/examples/TrainEmbedding.py)
 
