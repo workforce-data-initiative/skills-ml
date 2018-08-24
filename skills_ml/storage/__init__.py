@@ -32,8 +32,9 @@ class S3Store(Store):
     def __init__(self, path):
         super().__init__(path=path)
 
+    @staticmethod
     @contextmanager
-    def open(self, path, *args, **kwargs):
+    def open(path, *args, **kwargs):
         s3 = s3fs.S3FileSystem()
         with s3.open(path, *args, **kwargs) as f:
             yield f
@@ -68,11 +69,10 @@ class FSStore(Store):
     def __init__(self, path=None):
         self.path = os.getcwd() if not path else path
 
+    @staticmethod
     @contextmanager
-    def open(self, path, *args, **kwargs):
-        directory = os.path.dirname(path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    def open(path, *args, **kwargs):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, *args, **kwargs) as f:
             yield f
 
