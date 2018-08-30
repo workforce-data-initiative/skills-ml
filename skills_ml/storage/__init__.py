@@ -3,6 +3,11 @@ import os
 import json
 import logging
 from collections.abc import MutableMapping
+from retrying import retry
+
+
+def retry_if_io_error(exception):
+    return isinstance(exception, IOError)
 
 
 class Store(object):
@@ -32,24 +37,29 @@ class S3Store(Store):
     def __init__(self, path):
         super().__init__(path=path)
 
+    @retry(retry_on_exception=retry_if_io_error)
     def exists(self, fname):
         s3 = s3fs.S3FileSystem()
         return s3.exists(os.path.join(self.path, fname))
 
+    @retry(retry_on_exception=retry_if_io_error)
     def write(self, bytes_obj, fname):
         s3 = s3fs.S3FileSystem()
         with s3.open(os.path.join(self.path, fname), 'wb') as f:
             f.write(bytes_obj)
 
+    @retry(retry_on_exception=retry_if_io_error)
     def load(self, fname):
         s3 = s3fs.S3FileSystem()
         with s3.open(os.path.join(self.path, fname), 'rb') as f:
             return f.read()
 
+    @retry(retry_on_exception=retry_if_io_error)
     def delete(self, fname):
         s3 = s3fs.S3FileSystem()
         s3.rm(os.path.join(self.path, fname))
 
+    @retry(retry_on_exception=retry_if_io_error)
     def list(self, subpath):
         s3 = s3fs.S3FileSystem()
         return [
