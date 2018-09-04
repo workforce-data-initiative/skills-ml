@@ -1,5 +1,7 @@
-from skills_ml.storage import S3Store, FSStore, PersistedJSONDict
+from skills_ml.storage import open_sesame, S3Store, FSStore, PersistedJSONDict
 from skills_utils.s3 import upload, list_files
+
+from sklearn.externals import joblib
 
 from moto import mock_s3
 import tempfile
@@ -30,10 +32,20 @@ class TestS3Storage(unittest.TestCase):
 
         assert storage.exists("for_testing.model")
 
+        with storage.open("for_testing_compressed.model", "wb") as f:
+            joblib.dump(model, f, compress=True)
+
+        assert storage.exists("for_testing_compressed.model")
+
+
+        with open_sesame("s3://fake-open-skills/model_cache/for_testing_compressed.model", "rb") as f:
+            model_loaded = joblib.load(f)
+        assert model.val == model_loaded.val
+
+
         model_loaded = storage.load('for_testing.model')
         model_loaded = pickle.loads(model_loaded)
         assert model_loaded.val == 'val'
-
 
         fake_lookup = {'1': 1, '2': 2, '3': 3}
         fake_lookup_bytes = json.dumps(fake_lookup).encode()
@@ -52,9 +64,19 @@ class TestFSStorage(unittest.TestCase):
     def test_fsstore(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             storage = FSStore(tmpdir)
-            model = pickle.dumps(FakeModel('val'))
-            storage.write(model, 'for_testing.model')
+            model = FakeModel('val')
+            model_pickled = pickle.dumps(model)
+            storage.write(model_pickled, 'for_testing.model')
             assert os.path.isfile(os.path.join(tmpdir, 'for_testing.model')) == storage.exists('for_testing.model') == True
+
+            with storage.open("for_testing_compressed.model", "wb") as f:
+                joblib.dump(model, f, compress=True)
+
+            assert storage.exists("for_testing_compressed.model")
+
+            with open_sesame(os.path.join(tmpdir, "for_testing_compressed.model"), "rb") as f:
+                model_loaded = joblib.load(f)
+            assert model.val ==  model_loaded.val
 
             model_loaded = storage.load('for_testing.model')
             model_loaded = pickle.loads(model_loaded)
