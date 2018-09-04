@@ -31,6 +31,7 @@ class CandidateSkillFactory(factory.Factory):
     skill_name = factory.fuzzy.FuzzyText()
     matched_skill_identifier = factory.fuzzy.FuzzyText()
     context = factory.LazyAttribute(lambda obj: f"{factory.fuzzy.FuzzyText()}{obj.skill_name}{factory.fuzzy.FuzzyText()}")
+    start_index = factory.fuzzy.FuzzyInteger(0, 100)
     confidence = factory.fuzzy.FuzzyFloat(0, 1)
     document_id = factory.fuzzy.FuzzyText()
     document_type = '@JobPosting',

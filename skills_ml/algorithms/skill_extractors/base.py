@@ -85,6 +85,7 @@ CandidateSkill = namedtuple('CandidateSkill', [
     'skill_name',
     'matched_skill_identifier',
     'context',
+    'start_index',
     'confidence',
     'document_id',
     'document_type',

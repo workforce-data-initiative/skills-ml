@@ -64,17 +64,20 @@ class ExactMatchSkillExtractor(ListBasedSkillExtractor):
         """
         document = self.transform_func(source_object)
         sentences = self.nlp.sentence_tokenize(document)
+        sentence_start = 0
         for sent in sentences:
-            matches = self.lookup_regex.findall(sent)
+            matches = self.lookup_regex.finditer(sent)
             for match in matches: 
                 logging.info('Yielding exact match %s in string %s', match, sent)
                 yield CandidateSkill(
-                    skill_name=match.lower(),
-                    matched_skill_identifier=self.id_lookup[match.lower()],
+                    skill_name=match[0].lower(),
+                    matched_skill_identifier=self.id_lookup[match[0].lower()],
                     confidence=100,
                     context=sent,
+                    start_index=sentence_start + match.start(),
                     document_id=source_object['id'],
                     document_type=source_object['@type'],
                     source_object=source_object,
                     skill_extractor_name=self.name
                 )
+            sentence_start += len(sent)
