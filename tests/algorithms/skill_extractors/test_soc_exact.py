@@ -24,61 +24,85 @@ def test_occupation_scoped_freetext_skill_extractor():
     extractor = SocScopedExactMatchSkillExtractor(ontology)
     documents = [
         {
+            'id': '1234',
+            '@type': 'JobPosting',
             'onet_soc_code': '11-1011.00',
             'description': 'this is a job that needs active listening', 
             'expected_value': Counter({'active listening': 1})
         },
         {
+            'id': '2234',
+            '@type': 'JobPosting',
             'onet_soc_code': '11-1011.00',
             'description': 'this is a reading comprehension job',
             'expected_value': Counter({'reading comprehension': 1})
         },
         {
+            'id': '3234',
+            '@type': 'JobPosting',
             'onet_soc_code': '11-1011.00',
             'description': 'this is an active and reading listening job', 
             'expected_value': Counter(),
         },
         {
+            'id': '4234',
+            '@type': 'JobPosting',
             'onet_soc_code': '11-1011.00',
             'description': 'this is a reading comprehension and active listening job', 
             'expected_value': Counter({'active listening': 1, 'reading comprehension': 1})
         },
         {
+            'id': '5234',
+            '@type': 'JobPosting',
             'onet_soc_code': '11-1021.00',
             'description': 'this is a job that needs active listening', 
             'expected_value': Counter()
         },
         {
+            'id': '6234',
+            '@type': 'JobPosting',
             'onet_soc_code': '11-1021.00',
             'description': 'this is a reading comprehension job',
             'expected_value': Counter()
         },
         {
+            'id': '7234',
+            '@type': 'JobPosting',
             'onet_soc_code': '11-1021.00',
             'description': 'this is an active and reading listening job', 
             'expected_value': Counter(),
         },
         {
+            'id': '8234',
+            '@type': 'JobPosting',
             'onet_soc_code': '11-1021.00',
             'description': 'this is a reading comprehension and active listening job', 
             'expected_value': Counter()
         },
         {
+            'id': '9234',
+            '@type': 'JobPosting',
             'onet_soc_code': None,
             'description': 'this is a job that needs active listening', 
             'expected_value': Counter()
         },
         {
+            'id': '1334',
+            '@type': 'JobPosting',
             'onet_soc_code': None,
             'description': 'this is a reading comprehension job',
             'expected_value': Counter()
         },
         {
+            'id': '1434',
+            '@type': 'JobPosting',
             'onet_soc_code': None,
             'description': 'this is an active and reading listening job', 
             'expected_value': Counter(),
         },
         {
+            'id': '1534',
+            '@type': 'JobPosting',
             'onet_soc_code': None,
             'description': 'this is a reading comprehension and active listening job', 
             'expected_value': Counter()

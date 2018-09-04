@@ -1,17 +1,21 @@
 """Generate and store samples of datasets"""
 
-from smart_open import smart_open
+from io import BytesIO
 
 
 class Sample(object):
-    def __init__(self, base_path, sample_name):
-        self.base_path = base_path
+    def __init__(self, storage, sample_name):
+        self.storage = storage
         self.name = sample_name
-        self.full_path = '/'.join([self.base_path, self.name])
+
+    @property
+    def base_path(self):
+        return self.storage.path
 
     def __iter__(self):
-        lines = []
-        with smart_open(self.full_path) as f:
-            lines = [line for line in f]
-        for line in lines:
+        fh = BytesIO(self.storage.load(self.name))
+        for line in fh:
             yield line
+
+    def __len__(self):
+        return sum(1 for item in self)

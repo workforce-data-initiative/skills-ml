@@ -24,6 +24,10 @@ def open_sesame(path, *args, **kwargs):
             yield f
 
 
+def retry_if_io_error(exception):
+    return isinstance(exception, IOError)
+
+
 class Store(object):
     def __init__(self, path):
         self.path = path
@@ -57,24 +61,29 @@ class S3Store(Store):
         with s3.open(os.path.join(self.path, fname), *args, **kwargs) as f:
             yield f
 
+    @retry(retry_on_exception=retry_if_io_error)
     def exists(self, fname):
         s3 = s3fs.S3FileSystem()
         return s3.exists(os.path.join(self.path, fname))
 
+    @retry(retry_on_exception=retry_if_io_error)
     def write(self, bytes_obj, fname):
         s3 = s3fs.S3FileSystem()
         with s3.open(os.path.join(self.path, fname), 'wb') as f:
             f.write(bytes_obj)
 
+    @retry(retry_on_exception=retry_if_io_error)
     def load(self, fname):
         s3 = s3fs.S3FileSystem()
         with s3.open(os.path.join(self.path, fname), 'rb') as f:
             return f.read()
 
+    @retry(retry_on_exception=retry_if_io_error)
     def delete(self, fname):
         s3 = s3fs.S3FileSystem()
         s3.rm(os.path.join(self.path, fname))
 
+    @retry(retry_on_exception=retry_if_io_error)
     def list(self, subpath):
         s3 = s3fs.S3FileSystem()
         return [
@@ -114,7 +123,10 @@ class FSStore(Store):
 
 class InMemoryStore(Store):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        if 'path' not in kwargs and len(args) == 0:
+            super().__init__(path='nothing', *args, **kwargs)
+        else:
+            super().__init__(*args, **kwargs)
         self.store = {}
 
     def exists(self, fname):

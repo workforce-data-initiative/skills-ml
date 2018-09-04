@@ -167,12 +167,13 @@ class NPEndPatternExtractor(SkillExtractor):
         only_bulleted_lines (bool, default True): Whether or not to only consider lines
             that look like they are items in a list
     """
-    def __init__(self, endings, stop_phrases, only_bulleted_lines=True, *args, **kwargs):
+    def __init__(self, endings, stop_phrases, only_bulleted_lines=True, confidence=95,  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.endings = endings
         self.stop_phrases = stop_phrases
         self.only_bulleted_lines = only_bulleted_lines
         self.detokenizer = MosesDetokenizer()
+        self.confidence = confidence
 
     @property
     def description(self):
@@ -201,9 +202,13 @@ class NPEndPatternExtractor(SkillExtractor):
             )
             yield CandidateSkill(
                 skill_name=cleaned_phrase,
-                matched_skill=cleaned_phrase,
-                confidence=95,
-                context=orig_context
+                matched_skill_identifier=None,
+                confidence=self.confidence,
+                context=orig_context,
+                document_id=source_object['id'],
+                document_type=source_object['@type'],
+                source_object=source_object,
+                skill_extractor_name=self.name
             )
 
     def noun_phrases_matching_endings(self, document):

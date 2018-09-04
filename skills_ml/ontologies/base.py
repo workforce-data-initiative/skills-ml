@@ -249,7 +249,11 @@ class CompetencyOntology(object):
     
     Can be initialized with a set of edges, in which case the competencies and occupations will be initialized with any that are present in the edge list
     """
-    def __init__(self, edges=None, competency_name=None, competency_description=None):
+    name = 'unnamed_ontology'
+
+    def __init__(self, edges=None, name=None, competency_name=None, competency_description=None):
+        if name:
+            self.name = name
         if edges:
             self._competency_occupation_edges = edges
             self.competency_framework = CompetencyFramework(

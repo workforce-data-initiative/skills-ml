@@ -49,7 +49,7 @@ Primary Location-City Bristol
 Primary Location-State CT
 Primary Location-Country US
 Auto req ID 274081BR"""
-posting_object = {'description': posting_string}
+posting_object = {'id': '1234', '@type': 'JobPosting', 'description': posting_string}
 
 
 def test_counts_skill_pattern_extractor():
@@ -62,10 +62,10 @@ def test_counts_skill_pattern_extractor():
 
 def test_candidates_skill_pattern_extractor():
     extractor = SkillEndingPatternExtractor()
-    candidate_skills = sorted([cs for cs in extractor.candidate_skills(posting_object)], key=lambda x: x.matched_skill)
-    assert candidate_skills[0].matched_skill == 'strong analytical skills'
+    candidate_skills = sorted([cs for cs in extractor.candidate_skills(posting_object)], key=lambda x: x.skill_name)
+    assert candidate_skills[0].skill_name == 'strong analytical skills'
     assert candidate_skills[0].context == '* Must have strong analytical skills using Omniture, Google Analytics or related products'
-    assert candidate_skills[1].matched_skill == 'strong communication skills'
+    assert candidate_skills[1].skill_name == 'strong communication skills'
     assert candidate_skills[1].context == '* Strong communication skills'
 
 def test_counts_skill_pattern_extractor_not_just_bullets():

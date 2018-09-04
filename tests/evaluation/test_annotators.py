@@ -1,11 +1,13 @@
 from skills_utils.hash import md5
 from skills_ml.evaluation.annotators import BratExperiment
 from skills_ml.algorithms.sampling import Sample
+from skills_ml.storage import S3Store
 from moto import mock_s3, mock_s3_deprecated
 import boto3
 import json
 import s3fs
 from unittest.mock import MagicMock
+from tests.utils import job_posting_factory, sample_factory
 import pytest
 import unittest
 
@@ -16,20 +18,25 @@ def test_BratExperiment_start():
     # create a bucket that will contain both the source samples and BRAT config
     s3 = boto3.resource('s3')
     bucket = s3.create_bucket(Bucket='test-bucket')
+    storage = S3Store('s3://test-bucket/samples')
 
     # create a sample.
     # sample format is one file, one job posting per line, in common schema JSON format
-    bucket.put_object(
-        Body='\n'.join(json.dumps({'id': i, 'description': str(i)}) for i in range(100, 200)),
-        Key='samples/300_weighted'
-    )
+    job_postings = [job_posting_factory(
+        id=i,
+        description=str(i),
+        experienceRequirements='',
+        qualifications='',
+        skills=''
+    ) for i in range(100, 200)]
+    sample = sample_factory(job_postings, name='300_weighted', storage=storage)
 
     experiment = BratExperiment(
         experiment_name='initial_skills_tag',
         brat_s3_path='test-bucket/brat'
     )
     experiment.start(
-        sample=Sample(base_path='s3://test-bucket/samples', sample_name='300_weighted'),
+        sample=sample,
         minimum_annotations_per_posting=2,
         max_postings_per_allocation=20,
         entities_with_shortcuts=(
@@ -128,18 +135,17 @@ def test_BratExperiment_add_allocation():
 
     # setup: create a bucket for the brat config
     s3 = boto3.resource('s3')
-    bucket = s3.create_bucket(Bucket='test-bucket')
-    bucket.put_object(
-        Body='\n'.join(json.dumps({'id': i, 'description': str(i)}) for i in range(100, 200)),
-        Key='samples/300_weighted'
-    )
+    storage = S3Store('s3://test-bucket/samples')
+    s3.create_bucket(Bucket='test-bucket')
+    job_postings = [job_posting_factory(id=i, description=str(i)) for i in range(100, 200)]
+    sample = sample_factory(job_postings, name='300_weighted', storage=storage)
 
     experiment = BratExperiment(
         experiment_name='initial_skills_tag',
         brat_s3_path='test-bucket/brat'
     )
     experiment.start(
-        sample=Sample(base_path='s3://test-bucket/samples', sample_name='300_weighted'),
+        sample=sample,
         minimum_annotations_per_posting=2,
         max_postings_per_allocation=20,
         entities_with_shortcuts=(
