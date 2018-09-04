@@ -111,7 +111,7 @@ trainer = OccupationClassifierTrainer(
     matrix=matrix,
     k_folds=3,
     grid_config=grid_config,
-    storage=S3Store('open-skills-private/model_cache/soc_classifiers'),
+    storage=FSStore('tmp/soc_classifiers'),
     n_jobs = num_of_worker
 )
 trainer.train()
