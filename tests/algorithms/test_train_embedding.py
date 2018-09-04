@@ -1,5 +1,5 @@
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
-from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
+from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel, FastTextModel
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 from skills_ml.storage import S3Store, FSStore
@@ -191,3 +191,22 @@ class TestTrainEmbedding(unittest.TestCase):
             new_path = os.path.join(td, 'other_directory')
             new_trainer.save_model(FSStore(new_path))
             assert set(os.listdir(new_path)) == set([new_trainer.model_name])
+
+    @mock.patch('os.getcwd')
+    def test_embedding_trainer_fasttext_local(self, mock_getcwd):
+        document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
+        with tempfile.TemporaryDirectory() as td:
+            mock_getcwd.return_value = td
+            job_postings_generator = JobPostingCollectionSample(num_records=30)
+            corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
+            fasttext = FastTextModel(storage=FSStore(td), size=10, min_count=3, iter=4, window=6, workers=3)
+
+            trainer = EmbeddingTrainer(corpus_generator, fasttext)
+            trainer.train()
+            trainer.save_model()
+
+            vocab_size = len(fasttext.wv.vocab.keys())
+
+            assert fasttext.model_name == trainer.model_name
+            assert set(os.listdir(os.getcwd())) == set([trainer.model_name])
+
