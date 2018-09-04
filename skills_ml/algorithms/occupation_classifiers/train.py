@@ -2,7 +2,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.externals import joblib
 
-from skills_ml.storage import FSStore
+from skills_ml.storage import FSStore, open_sesame
 from skills_ml.ontologies.onet import majorgroupname
 from skills_ml.algorithms.string_cleaners.nlp import clean_str, word_tokenize
 from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, DesignMatrix
@@ -106,5 +106,5 @@ class OccupationClassifierTrainer(object):
         return filename_friendly_hash(unique)
 
     def _save(self, cls_cv, path_to_save):
-        with self.storage.open(path_to_save, 'wb') as f:
+        with open_sesame(path_to_save, 'wb') as f:
             joblib.dump(cls_cv, f, compress=True)

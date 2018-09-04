@@ -2,6 +2,7 @@ from sklearn.preprocessing import LabelEncoder
 
 from skills_ml.algorithms.preprocessing import IterablePipeline
 from skills_ml.ontologies.onet import Onet, majorgroupname
+from skills_ml.job_postings.common_schema import get_onet_occupation
 
 from abc import ABC, abstractmethod
 import numpy as np
@@ -61,7 +62,7 @@ class SOCMajorGroup(TargetVariable):
 
     @property
     def transformer(self):
-        return lambda job_posting: self.encoder.transform([job_posting['onet_soc_code'][:2]])
+        return lambda job_posting: self.encoder.transform([get_onet_occupation(job_posting)[:2]])
 
 
 class FullSOC(TargetVariable):
@@ -76,7 +77,7 @@ class FullSOC(TargetVariable):
 
     @property
     def transformer(self):
-        return lambda job_posting: self.encoder.transform([job_posting['onet_soc_code']])
+        return lambda job_posting: self.encoder.transform([get_onet_occupation(job_posting)])
 
 
 class DesignMatrix(object):

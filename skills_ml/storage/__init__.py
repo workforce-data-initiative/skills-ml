@@ -1,9 +1,28 @@
 import s3fs
 import os
+from os.path import dirname
 import json
 import logging
 from collections.abc import MutableMapping
 from contextlib import contextmanager
+from retrying import retry
+from urllib.parse import urlparse
+
+@retry(stop_max_delay=150000, wait_fixed=3000)
+@contextmanager
+def open_sesame(path, *args, **kwargs):
+    path_parsed = urlparse(path)
+    scheme = path_parsed.scheme
+
+    if not scheme or scheme == 'file':
+        os.makedirs(dirname(path), exist_ok=True)
+        with open(path, *args, **kwargs) as f:
+            yield f
+    elif scheme == 's3':
+        s3 = s3fs.S3FileSystem()
+        with s3.open(path, *args, **kwargs) as f:
+            yield f
+
 
 class Store(object):
     def __init__(self, path):
@@ -32,11 +51,10 @@ class S3Store(Store):
     def __init__(self, path):
         super().__init__(path=path)
 
-    @staticmethod
     @contextmanager
-    def open(path, *args, **kwargs):
+    def open(self, fname, *args, **kwargs):
         s3 = s3fs.S3FileSystem()
-        with s3.open(path, *args, **kwargs) as f:
+        with s3.open(os.path.join(self.path, fname), *args, **kwargs) as f:
             yield f
 
     def exists(self, fname):
@@ -69,11 +87,10 @@ class FSStore(Store):
     def __init__(self, path=None):
         self.path = os.getcwd() if not path else path
 
-    @staticmethod
     @contextmanager
-    def open(path, *args, **kwargs):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, *args, **kwargs) as f:
+    def open(self, fname, *args, **kwargs):
+        os.makedirs(self.path, exist_ok=True)
+        with open(os.path.join(self.path, fname), *args, **kwargs) as f:
             yield f
 
     def exists(self, fname):
