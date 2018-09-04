@@ -52,7 +52,6 @@ class EmbeddingTrainer(object):
             metadata (:dict): model metadata
             training_time (:str): training time
             batch_size (:int): batch size
-            model_type (:str): 'word2vec' or 'doc2vec'
             vocab_size_cumu (:list): record the number of vocab every batch for word2vec
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             lookup (:dict): dictionary for storing the training documents and keys for doc2vec
@@ -64,6 +63,7 @@ class EmbeddingTrainer(object):
         self.vocab_size_cumu = []
         self.lookup_dict = None
         self._model = model
+        self.model_type = model.model_type
 
     def train(self, lookup=False, *args, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
@@ -112,14 +112,14 @@ class EmbeddingTrainer(object):
             self._model.save(self.model_name)
         logging.info(f"{self.model_name} has been saved.")
 
-    @property
-    def model_type(self):
-        if self._model.__class__.__name__ == 'Doc2VecModel':
-            return 'doc2vec'
-        elif self._model.__class__.__name__ == 'Word2VecModel':
-            return 'word2vec'
-        elif self._model.__class__.__name__ == 'FastTextModel':
-            return 'fasttext'
+    # @property
+    # def model_type(self):
+    #     if self._model.__class__.__name__ == 'Doc2VecModel':
+    #         return 'doc2vec'
+    #     elif self._model.__class__.__name__ == 'Word2VecModel':
+    #         return 'word2vec'
+    #     elif self._model.__class__.__name__ == 'FastTextModel':
+    #         return 'fasttext'
 
     @property
     def model_name(self):

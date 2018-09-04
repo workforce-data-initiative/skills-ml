@@ -51,8 +51,7 @@ class TestTrainEmbedding(unittest.TestCase):
 
         # Load
         d2v_loaded = Doc2VecModel.load(s3_storage, trainer.model_name)
-        self.assertDictEqual(d2v_loaded.metadata, trainer.metadata)
-
+        assert d2v_loaded.metadata['embedding_model']['hyperparameters']['vector_size'] ==  trainer.metadata['embedding_model']['hyperparameters']['vector_size']
         # Change the store directory
         new_s3_path = "s3://fake-open-skills/model_cache/embedding/other_directory"
         trainer.save_model(S3Store(new_s3_path))
@@ -98,7 +97,7 @@ class TestTrainEmbedding(unittest.TestCase):
         s3 = s3fs.S3FileSystem()
         files = [f.split('/')[-1] for f in s3.ls(s3_path)]
         assert set(files) == set([new_trainer.model_name, trainer.model_name])
-        assert new_trainer.metadata['embedding_trainer']['hyperparameters'] == trainer.metadata['embedding_trainer']['hyperparameters']
+        assert new_trainer.metadata['embedding_trainer']['model_name'] != trainer.metadata['embedding_trainer']['model_name']
         assert vocab_size <= new_vocab_size
 
         # Save as different name
@@ -141,7 +140,7 @@ class TestTrainEmbedding(unittest.TestCase):
 
             # Load
             d2v_loaded = Doc2VecModel.load(FSStore(td), trainer.model_name)
-            self.assertDictEqual(d2v_loaded.metadata, trainer.metadata)
+            assert d2v_loaded.metadata["embedding_model"]["model_type"] == trainer.metadata["embedding_model"]["model_type"]
 
             # Change the store directory
             new_path = os.path.join(td, 'other_directory')
@@ -180,7 +179,7 @@ class TestTrainEmbedding(unittest.TestCase):
             new_vocab_size = len(w2v_loaded.wv.vocab.keys())
 
             assert set(os.listdir(os.getcwd())) == set([trainer.model_name, new_trainer.model_name])
-            assert new_trainer.metadata['embedding_trainer']['hyperparameters'] == trainer.metadata['embedding_trainer']['hyperparameters']
+            assert new_trainer.metadata['embedding_trainer']['model_name'] != trainer.metadata['embedding_trainer']['model_name']
             assert vocab_size <= new_vocab_size
 
             # Save as different name

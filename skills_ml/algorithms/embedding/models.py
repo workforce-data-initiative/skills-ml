@@ -25,6 +25,7 @@ class Word2VecModel(ModelStorage, Word2Vec):
         ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
         Word2Vec.__init__(self, *args, **kwargs)
         self.model_name = ""
+        self.model_type = "word2vec"
         self._metadata = None
 
     def infer_vector(self, doc_words):
@@ -50,24 +51,28 @@ class Word2VecModel(ModelStorage, Word2Vec):
     @property
     def metadata(self):
         meta_dict = {"embedding_model": {}}
-        meta_dict['embedding_model']['hyperparameters'] = {
-                                             'vector_size': self.vector_size,
-                                             'window': self.window,
-                                             'min_count': self.min_count,
-                                             'workers': self.workers,
-                                             'sample': self.sample,
-                                             'alpha': self.alpha,
-                                             'seed': self.seed,
-                                             'iter': self.iter,
-                                             'hs': self.hs,
-                                             'negative': self.negative,
-                                             'dm_mean': self.dm_mean if 'dm_mean' in self else None,
-                                             'cbow_mean': self.cbow_mean if 'cbow_mean' in self else None,
-                                             'dm': self.dm if hasattr(self, 'dm') else None,
-                                             'dbow_words': self.dbow_words if hasattr(self, 'dbow_words') else None,
-                                             'dm_concat': self.dm_concat if hasattr(self, 'dm_concat') else None,
-                                             'dm_tag_count': self.dm_tag_count if hasattr(self, 'dm_tag_count') else None
-                                             }
+        meta_dict['embedding_model']['model_type'] = self.model_type
+        meta_dict['embedding_model']['hyperparameters'] = self.__dict__
+        # meta_dict['embedding_model']['hyperparameters'] = {
+        #                                      'vector_size': self.vector_size,
+        #                                      'window': self.window,
+        #                                      'min_count': self.min_count,
+        #                                      'workers': self.workers,
+        #                                      'sample': self.sample,
+        #                                      'alpha': self.alpha,
+        #                                      'seed': self.seed,
+        #                                      'iter': self.iter,
+        #                                      'hs': self.hs,
+        #                                      'negative': self.negative,
+        #                                      'dm_mean': self.dm_mean if 'dm_mean' in self else None,
+        #                                      'cbow_mean': self.cbow_mean if 'cbow_mean' in self else None,
+        #                                      'dm': self.dm if hasattr(self, 'dm') else None,
+        #                                      'dbow_words': self.dbow_words if hasattr(self, 'dbow_words') else None,
+        #                                      'dm_concat': self.dm_concat if hasattr(self, 'dm_concat') else None,
+        #                                      'dm_tag_count': self.dm_tag_count if hasattr(self, 'dm_tag_count') else None
+        #                                      }
+        return meta_dict
+
 
 class Doc2VecModel(ModelStorage, Doc2Vec):
     """The Doc2VecModel Object is a base object which specifies which word-embeding model.
@@ -84,7 +89,15 @@ class Doc2VecModel(ModelStorage, Doc2Vec):
         ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
         Doc2Vec.__init__(self, *args, **kwargs)
         self.model_name = ""
+        self.model_type = "doc2vec"
         self.lookup_dict = None
+
+    @property
+    def metadata(self):
+        meta_dict = {"embedding_model": {}}
+        meta_dict['embedding_model']['model_type'] = self.model_type
+        meta_dict['embedding_model']['hyperparameters'] = self.__dict__
+        return meta_dict
 
 
 class FastTextModel(ModelStorage, FT_gensim):
@@ -99,6 +112,7 @@ class FastTextModel(ModelStorage, FT_gensim):
         ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
         FT_gensim.__init__(self, *args, **kwargs)
         self.model_name = ""
+        self.model_type = "fasttext"
 
     def infer_vector(self, doc_words):
          """
@@ -122,7 +136,11 @@ class FastTextModel(ModelStorage, FT_gensim):
 
     @property
     def metadata(self):
-        return {'embedding_model': {'name': "fasttext"}}
+        meta_dict = {"embedding_model": {}}
+        meta_dict['embedding_model']['model_type'] = self.model_type
+        meta_dict['embedding_model']['hyperparameters'] = self.__dict__
+        return meta_dict
+
 
 class EmbeddingTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, embedding_model):
