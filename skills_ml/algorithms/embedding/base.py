@@ -51,5 +51,3 @@ class ModelStorage(object):
         meta_dict['embedding_model']['gensim_version'] = gensim_name + gensim_version
         return meta_dict
 
-    def infer_vector(self, doc):
-        raise NotImplementedError

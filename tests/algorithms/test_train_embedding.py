@@ -223,4 +223,3 @@ class TestTrainEmbedding(unittest.TestCase):
             assert set(os.listdir(os.getcwd())) == set([trainer.model_name, new_trainer.model_name])
             assert new_trainer.metadata['embedding_trainer']['model_name'] != trainer.metadata['embedding_trainer']['model_name']
             assert vocab_size <= new_vocab_size
-
