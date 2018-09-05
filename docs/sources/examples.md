@@ -45,3 +45,14 @@ To enable this example to be run with as few dependencies as possible, we use:
 - a fake local s3 instance
 - a sample of the Virginia Tech open job postings dataset
 - only title cleaning and job counting.
+
+## [Train an Occupation Classifier with Sample Jobposting Data](https://github.com/workforce-data-initiative/skills-ml/blob/master/examples/TrainOccupationClassifier.py)
+
+To showcase how occupation classifier can be trained using grid search and cross-validation:
+
+- A sample of the Virginia Tech open job postings dataset
+- An embedding model that is trained already
+- The pipeline objects that takes in all steps including filters, transformation, tokenization and vectorization
+- A config dictionary for grid search
+- A matrix object that specifies the data source, target variable, pipelines
+- An occupation classifier trainer object that specifies input matrix, number of folds, grid search config, storage and number of workers
