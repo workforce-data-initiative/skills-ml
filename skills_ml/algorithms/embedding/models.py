@@ -10,7 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 import logging
 
-class Word2VecModel(EmbeddingModelBase, Word2Vec):
+class Word2VecModel(ModelStorage, Word2Vec):
     """The Word2VecModel inherited from gensim's Word2Vec model (
     https://radimrehurek.com/gensim/models/word2vec.html) for training,
     using and evaluating word embedding with extension methods.
@@ -54,7 +54,7 @@ class Word2VecModel(EmbeddingModelBase, Word2Vec):
         return sentence_vector
 
 
-class Doc2VecModel(EmbeddingModelBase, Doc2Vec):
+class Doc2VecModel(ModelStorage, Doc2Vec):
     """The Doc2VecModel inherited from gensim's Doc2Vec model (
     https://radimrehurek.com/gensim/models/doc2vec) for training,
     using and evaluating word embedding with extension methods.
@@ -74,7 +74,7 @@ class Doc2VecModel(EmbeddingModelBase, Doc2Vec):
         self.lookup_dict = None
 
 
-class FastTextModel(EmbeddingModelBase, FT_gensim):
+class FastTextModel(ModelStorage, FT_gensim):
     """The FastTextModel inhereited from gensim's FastText model (
     https://radimrehurek.com/gensim/models/fasttext.html) for training,
     using and evaluating word embedding with extension methods.
