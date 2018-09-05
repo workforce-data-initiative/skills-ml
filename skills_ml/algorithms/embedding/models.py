@@ -31,6 +31,10 @@ class Word2VecModel(ModelStorage, Word2Vec):
     def infer_vector(self, doc_words):
         """
         Average all the word-vectors together and ignore the unseen words
+        Arg:
+            doc_words (list): a list of tokenized words
+        Returns:
+            a vector representing a whole doc/sentence
         """
         sum_vector = np.zeros(self.vector_size)
         words_in_vocab = []
@@ -48,30 +52,13 @@ class Word2VecModel(ModelStorage, Word2Vec):
         sentence_vector = sum_vector / len(words_in_vocab)
         return sentence_vector
 
-    @property
-    def metadata(self):
-        meta_dict = {"embedding_model": {}}
-        meta_dict['embedding_model']['model_type'] = self.model_type
-        meta_dict['embedding_model']['hyperparameters'] = self.__dict__
-        # meta_dict['embedding_model']['hyperparameters'] = {
-        #                                      'vector_size': self.vector_size,
-        #                                      'window': self.window,
-        #                                      'min_count': self.min_count,
-        #                                      'workers': self.workers,
-        #                                      'sample': self.sample,
-        #                                      'alpha': self.alpha,
-        #                                      'seed': self.seed,
-        #                                      'iter': self.iter,
-        #                                      'hs': self.hs,
-        #                                      'negative': self.negative,
-        #                                      'dm_mean': self.dm_mean if 'dm_mean' in self else None,
-        #                                      'cbow_mean': self.cbow_mean if 'cbow_mean' in self else None,
-        #                                      'dm': self.dm if hasattr(self, 'dm') else None,
-        #                                      'dbow_words': self.dbow_words if hasattr(self, 'dbow_words') else None,
-        #                                      'dm_concat': self.dm_concat if hasattr(self, 'dm_concat') else None,
-        #                                      'dm_tag_count': self.dm_tag_count if hasattr(self, 'dm_tag_count') else None
-        #                                      }
-        return meta_dict
+    # @property
+    # def metadata(self):
+    #     meta_dict = {"embedding_model": {}}
+    #     meta_dict['embedding_model']['model_type'] = self.model_type
+    #     meta_dict['embedding_model']['hyperparameters'] = self.__dict__
+    #     meta_dict['embedding_model']['gensim_version'] = gensim_name + gensim_version
+    #     return meta_dict
 
 
 class Doc2VecModel(ModelStorage, Doc2Vec):
@@ -92,12 +79,13 @@ class Doc2VecModel(ModelStorage, Doc2Vec):
         self.model_type = "doc2vec"
         self.lookup_dict = None
 
-    @property
-    def metadata(self):
-        meta_dict = {"embedding_model": {}}
-        meta_dict['embedding_model']['model_type'] = self.model_type
-        meta_dict['embedding_model']['hyperparameters'] = self.__dict__
-        return meta_dict
+    # @property
+    # def metadata(self):
+    #     meta_dict = {"embedding_model": {}}
+    #     meta_dict['embedding_model']['model_type'] = self.model_type
+    #     meta_dict['embedding_model']['hyperparameters'] = self.__dict__
+    #     meta_dict['embedding_model']['gensim_version'] = gensim_name + gensim_version
+    #     return meta_dict
 
 
 class FastTextModel(ModelStorage, FT_gensim):
@@ -134,12 +122,13 @@ class FastTextModel(ModelStorage, FT_gensim):
          sentence_vector = sum_vector / len(words_in_vocab)
          return sentence_vector
 
-    @property
-    def metadata(self):
-        meta_dict = {"embedding_model": {}}
-        meta_dict['embedding_model']['model_type'] = self.model_type
-        meta_dict['embedding_model']['hyperparameters'] = self.__dict__
-        return meta_dict
+    # @property
+    # def metadata(self):
+    #     meta_dict = {"embedding_model": {}}
+    #     meta_dict['embedding_model']['model_type'] = self.model_type
+    #     meta_dict['embedding_model']['hyperparameters'] = self.__dict__
+    #     meta_dict['embedding_model']['gensim_version'] = gensim_name + gensim_version
+    #     return meta_dict
 
 
 class EmbeddingTransformer(BaseEstimator, TransformerMixin):

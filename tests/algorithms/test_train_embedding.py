@@ -209,3 +209,18 @@ class TestTrainEmbedding(unittest.TestCase):
             assert fasttext.model_name == trainer.model_name
             assert set(os.listdir(os.getcwd())) == set([trainer.model_name])
 
+            # Test Online Training
+            job_postings_generator = JobPostingCollectionSample(num_records=50)
+            corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
+
+            fasttext_loaded = FastTextModel.load(FSStore(td), fasttext.model_name)
+            new_trainer = EmbeddingTrainer(corpus_generator, fasttext_loaded)
+            new_trainer.train()
+            new_trainer.save_model()
+
+            new_vocab_size = len(fasttext_loaded.wv.vocab.keys())
+
+            assert set(os.listdir(os.getcwd())) == set([trainer.model_name, new_trainer.model_name])
+            assert new_trainer.metadata['embedding_trainer']['model_name'] != trainer.metadata['embedding_trainer']['model_name']
+            assert vocab_size <= new_vocab_size
+
