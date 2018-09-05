@@ -10,13 +10,14 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 import logging
 
-class Word2VecModel(ModelStorage, Word2Vec):
-    """The Word2VecModel Object is a base object which specifies which word-embeding model.
-    Inherited from gensim's Word2Vec model.
+class Word2VecModel(EmbeddingModelBase, Word2Vec):
+    """The Word2VecModel inherited from gensim's Word2Vec model (
+    https://radimrehurek.com/gensim/models/word2vec.html) for training,
+    using and evaluating word embedding with extension methods.
 
     Example:
     ```
-    from skills_ml.algorithms.embedding.base import Word2VecModel
+    from skills_ml.algorithms.embedding.models import Word2VecModel
 
     word2vec_model = Word2VecModel()
     ```
@@ -43,7 +44,7 @@ class Word2VecModel(ModelStorage, Word2Vec):
                 sum_vector += self[token]
                 words_in_vocab.append(token)
             except KeyError as e:
-                # logging.warning("".join([str(e), ". Ignore the word."]))
+                logging.warning("".join([str(e), ". Ignore the word."]))
                 pass
 
         if len(words_in_vocab) == 0:
@@ -52,22 +53,15 @@ class Word2VecModel(ModelStorage, Word2Vec):
         sentence_vector = sum_vector / len(words_in_vocab)
         return sentence_vector
 
-    # @property
-    # def metadata(self):
-    #     meta_dict = {"embedding_model": {}}
-    #     meta_dict['embedding_model']['model_type'] = self.model_type
-    #     meta_dict['embedding_model']['hyperparameters'] = self.__dict__
-    #     meta_dict['embedding_model']['gensim_version'] = gensim_name + gensim_version
-    #     return meta_dict
 
-
-class Doc2VecModel(ModelStorage, Doc2Vec):
-    """The Doc2VecModel Object is a base object which specifies which word-embeding model.
-    Inherited from gensim's Doc2Vec model.
+class Doc2VecModel(EmbeddingModelBase, Doc2Vec):
+    """The Doc2VecModel inherited from gensim's Doc2Vec model (
+    https://radimrehurek.com/gensim/models/doc2vec) for training,
+    using and evaluating word embedding with extension methods.
 
     Example:
     ```
-    from skills_ml.algorithms.embedding.base import Doc2VecModel
+    from skills_ml.algorithms.embedding.models import Doc2VecModel
 
     doc2vec_model = Doc2VecModel()
     ```
@@ -79,24 +73,20 @@ class Doc2VecModel(ModelStorage, Doc2Vec):
         self.model_type = "doc2vec"
         self.lookup_dict = None
 
-    # @property
-    # def metadata(self):
-    #     meta_dict = {"embedding_model": {}}
-    #     meta_dict['embedding_model']['model_type'] = self.model_type
-    #     meta_dict['embedding_model']['hyperparameters'] = self.__dict__
-    #     meta_dict['embedding_model']['gensim_version'] = gensim_name + gensim_version
-    #     return meta_dict
 
+class FastTextModel(EmbeddingModelBase, FT_gensim):
+    """The FastTextModel inhereited from gensim's FastText model (
+    https://radimrehurek.com/gensim/models/fasttext.html) for training,
+    using and evaluating word embedding with extension methods.
 
-class FastTextModel(ModelStorage, FT_gensim):
-    """The FastTextModel Object is a base object which sepcifies which word-embedding model.
-    Inhereited from gensim's FastText model.
+    Example:
+        ```
+        from skills_ml.algorithms.embedding.models import import FastTextModel
 
+        fasttext = FastTextModel()
+        ```
     """
     def __init__(self, *args, **kwargs):
-        """
-
-        """
         ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
         FT_gensim.__init__(self, *args, **kwargs)
         self.model_name = ""
@@ -113,7 +103,7 @@ class FastTextModel(ModelStorage, FT_gensim):
                  sum_vector += self[token]
                  words_in_vocab.append(token)
              except KeyError as e:
-                 # logging.warning("".join([str(e), ". Ignore the word."]))
+                 logging.warning("".join([str(e), ". Ignore the word."]))
                  pass
 
          if len(words_in_vocab) == 0:
@@ -121,14 +111,6 @@ class FastTextModel(ModelStorage, FT_gensim):
              return np.random.rand(self.vector_size)
          sentence_vector = sum_vector / len(words_in_vocab)
          return sentence_vector
-
-    # @property
-    # def metadata(self):
-    #     meta_dict = {"embedding_model": {}}
-    #     meta_dict['embedding_model']['model_type'] = self.model_type
-    #     meta_dict['embedding_model']['hyperparameters'] = self.__dict__
-    #     meta_dict['embedding_model']['gensim_version'] = gensim_name + gensim_version
-    #     return meta_dict
 
 
 class EmbeddingTransformer(BaseEstimator, TransformerMixin):
