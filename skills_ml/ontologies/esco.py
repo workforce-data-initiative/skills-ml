@@ -1,109 +1,81 @@
-#from .base import Competency, Occupation, CompetencyOntology
+from .base import Competency, Occupation, CompetencyOntology
 import logging
 import csv
 import requests
 
-majorgroupname = {
-    '01': 'Commissioned Armed Forces Officers',
-    '02': 'Non-commissioned Armed Forces Officers',
-    '03': 'Armed Forces Occupations, Other Ranks',
-    '11': 'Chief Executives, Senior Officials and Legislators',
-    '12': 'Administrative and Commercial Managers',
-    '13': 'Production and Specialized Services Managers',
-    '14': 'Hospitality, Retail and Other Services Managers',
-    '21': 'Science and Engineering Professionals',
-    '22': 'Health Professionals',
-    '23': 'Teaching Professionals',
-    '24': 'Business and Administration Professionals',
-    '25': 'Information and Communications Technology Professionals',
-    '26': 'Legal, Social and Cultural Professionals',
-    '31': 'Science and Engineering Associate Professionals',
-    '32': 'Health Associate Professionals', 
-    '33': 'Business and Administration Associate Professionals',
-    '34': 'Legal, Social, Cultural and Related Associate Professionals',
-    '35': 'Information and Communications Technicians',
-    '41': 'General and Keyboard Clerks',
-    '42': 'Customer Services Clerks',
-    '43': 'Numerical and Material Recording Clerks',
-    '44': 'Other Clerical Support Workers',
-    '51': 'Personal Services Workers',
-    '52': 'Sales Workers',
-    '53': 'Personal Care Workers',
-    '54': 'Protective Services Workers',
-    '61': 'Market-oriented Skilled Agricultural Workers',
-    '62': 'Market-oriented Skilled Forestry, Fishery and Hunting Workers',
-    '63': 'Subsistence Farmers, Fishers, Hunters and Gatherers',
-    '71': 'Building and Related Trades Workers (excluding electricians)',
-    '72': 'Metal, Machinery and Related Trades Workers',
-    '73': 'Handicraft and Printing Workers',
-    '74': 'Electrical and Electronics Trades Workers',
-    '75': 'Food Processing, Woodworking, Garment and Other Craft and Related Trades Workers',
-    '81': 'Stationary Plant and Machine Operators',
-    '82': 'Assemblers',
-    '83': 'Drivers and Mobile Plant Operators',
-    '91': 'Cleaners and Helpers',
-    '92': 'Agricultural, Forestry and Fishery Labourers',
-    '93': 'Labourers in Mining, Construction, Manufacturing and Transport',
-    '94': 'Food Preparation Assistants',
-    '95': 'Street and Related Sales and Services Workers',
-    '96': 'Refuse Workers and Other Elementary Workers'
-}
-api_occ = 'https://ec.europa.eu/esco/api/resource/occupation?uri='
 lang = '&language=en'
-api_skills = 'https://ec.europa.eu/esco/api/resource/skill?uri='
+api_tax = 'https://ec.europa.eu/esco/api/resource/taxonomy?uri=http://data.europa.eu/esco/concept-scheme/isco&language=en'
+
 
 class Esco(CompetencyOntology):
-     def __init__(self):
+    def __init__(self):
         super().__init__()
         self.is_built = False
-        self.competency_framework.name = 'esco_ksat'
+        self.competency_framework.name = 'esco_skills'
         self.competency_framework.description = 'ESCO Knowledge, Skills/Competencies'
         self._build()
     
-     def _build(self):
+    def _build(self):
         if not self.is_built:
-            logging.info('Processing occupation data')
-            with open('esco/occupations_en.csv') as occupations_csv:
-                reader = csv.DictReader(occupations_csv)
-                for row in reader:
-                    uri = row['conceptUri']
-                    occupation = Occupation(
-                        identifier=row['iscoGroup'],
-                        name=row['preferredLabel'],
-                        description=row['description'],
-                        categories=['ESCO Occupation'] 
-                    )
-                    major_group_num = row['iscoGroup'][0:2]
-                    major_group = Occupation(
-                        identifier=major_group_num,
-                        name=majorgroupname[major_group_num],
-                        categories=['ESCO Occupation'] 
-                    )
-                    occupation.add_parent(major_group)
-                    self.add_occupation(occupation)
-                    self.add_occupation(major_group)
-                    
-                    logging.info('Processing Skills/Competencies & Knowledge')
-                    reqOcc = requests.get(api_occ + uri + lang)
-                    essentialSkills = reqOcc.json()['_links']['hasEssentialSkill']
-                    for essSkill in essentialSkills:
-                        reqSkill = requests.get(api_skills + essSkill['uri'] + lang)
-                        inSkill = reqSkill.json()['_links']['hasSkillType']
-                        competency = Competency(
-                            identifier=essSkill['uri']
-                            name=essSkill['title']
-                            categories=inSkill[0]['title']
-                            competencyText=reqSkill.json()['description']['en']['literal']
-                        )
-                    self.add_competency(competency)
-                    occupation = Occupation(identifier=row['iscoGroup'])
-                    self.add_edge(competency=competency, occupation=occupation)
-            
-                self.is_built = True
-                occupations_csv.close()
+            reqTax = requests.get(api_tax)
+            getConcepts = reqTax.json()['_links']['hasTopConcept']
+            for concept in getConcepts:
+                _conceptProcessing(concept['href'])
         else:
             logging.warning('ESCO Ontology is already built!')
-            
-                
-                
-            
+
+    def _conceptProcessing(href):
+        print href
+        reqOcc = requests.get(href)
+        if 'narrowerOccupation' in reqOcc.json()['_links']:
+            _occupationProcessing(reqOcc.json()['_links']['narrowerOccupation'])
+        elif 'narrowerConcept' in reqOcc.json()['_links']:
+            _concepts = reqOcc.json()['_links']['narrowerConcept']
+            for _concept in _concepts:
+                _conceptProcessing(_concept['href'])
+
+    def _occupationProcessing(_occupations):
+        logging.info('Processing Occupations')
+        for occ in _occupations:
+            reqOcc = requests.get(occ['href'])
+            occupation = Occupation(
+                identifier=occ['uri'],
+                name=occ['title'],
+                description=reqOcc.json()['description']['en']['literal'],
+                categories='ESCO Occupation')
+            #print "Number of occupations: " + str(occupation_no)
+            #print "Occupation: " + occ['title']
+            iscoGrps = reqOcc.json()['_links']['broaderIscoGroup']
+            self.add_occupation(occupation)
+            _parentProcessing(iscoGrps, occupation)
+
+            logging.info('Processing corresponding Skills/Competencies & Knowledge')
+            if 'hasEssentialSkill' in reqOcc.json()['_links']:
+                essentialSkills = reqOcc.json()['_links']['hasEssentialSkill']
+            if 'hasOptionalSkill' in reqOcc.json()['_links']:
+                optionalSkills = reqOcc.json()['_links']['hasOptionalSkill']
+            allSkills = essentialSkills + optionalSkills
+            for skill in allSkills:
+                reqSkill = requests.get(skill['href'])
+                inSkill = reqSkill.json()['_links']['hasSkillType']
+                competency = Occupation(
+                    identifier=skill['uri'],
+                    name=skill['title'],
+                    categories=inSkill[0]['title'],
+                    competencyText=reqSkill.json()['description']['en']['literal'])
+                #print "Skill needed: " + skill['title']
+                self.add_competency(competency)
+                occupation = Occupation(identifier=skill['uri'])
+                self.add_edge(competency=competency, occupation=occupation)
+                self.is_built = True
+
+    def _parentProcessing (concepts, occupation):
+        for iscoGrp in concepts:
+            major_group = Occupation(
+                identifier=iscoGrp['uri'],
+                name=iscoGrp['title'],
+                categories='ESCO Concept')
+            occupation.add_parent(major_group)
+            self.add_occupation(major_group)
+            if 'broaderConcept' in iscoGrp:
+                _parentProcessing (iscoGrp['broaderConcept'], major_group)
