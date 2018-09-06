@@ -29,7 +29,7 @@ class Word2VecModel(ModelStorage, Word2Vec):
         self.model_type = "word2vec"
         self._metadata = None
 
-    def infer_vector(self, doc_words):
+    def infer_vector(self, doc_words, warning=False):
         """
         Average all the word-vectors together and ignore the unseen words
         Arg:
@@ -44,7 +44,8 @@ class Word2VecModel(ModelStorage, Word2Vec):
                 sum_vector += self[token]
                 words_in_vocab.append(token)
             except KeyError as e:
-                logging.warning("".join([str(e), ". Ignore the word."]))
+                if warning:
+                    logging.warning("".join([str(e), ". Ignore the word."]))
                 pass
 
         if len(words_in_vocab) == 0:
@@ -92,7 +93,7 @@ class FastTextModel(ModelStorage, FT_gensim):
         self.model_name = ""
         self.model_type = "fasttext"
 
-    def infer_vector(self, doc_words):
+    def infer_vector(self, doc_words, warning=False):
          """
          Average all the word-vectors together and ignore the unseen words
          """
@@ -103,7 +104,8 @@ class FastTextModel(ModelStorage, FT_gensim):
                  sum_vector += self[token]
                  words_in_vocab.append(token)
              except KeyError as e:
-                 logging.warning("".join([str(e), ". Ignore the word."]))
+                 if warning:
+                    logging.warning("".join([str(e), ". Ignore the word."]))
                  pass
 
          if len(words_in_vocab) == 0:
