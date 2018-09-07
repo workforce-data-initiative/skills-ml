@@ -1,5 +1,3 @@
-from gensim import __version__ as gensim_version
-from gensim import __name__ as gensim_name
 import gensim.models.doc2vec
 assert gensim.models.doc2vec.FAST_VERSION > -1
 
@@ -52,7 +50,6 @@ class EmbeddingTrainer(object):
             metadata (:dict): model metadata
             training_time (:str): training time
             batch_size (:int): batch size
-            model_type (:str): 'word2vec' or 'doc2vec'
             vocab_size_cumu (:list): record the number of vocab every batch for word2vec
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             lookup (:dict): dictionary for storing the training documents and keys for doc2vec
@@ -64,14 +61,15 @@ class EmbeddingTrainer(object):
         self.vocab_size_cumu = []
         self.lookup_dict = None
         self._model = model
+        self.model_type = model.model_type
 
     def train(self, lookup=False, *args, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
 
         Args:
-            kwargs: all arguments that gensim.models.doc2vec.Docvec will take.
+            kwargs: all arguments that gensim.models will take.
         """
-        if self.model_type == 'word2vec':
+        if self.model_type in ['word2vec', 'fasttext']:
             if self._model.wv.vocab:
                 logging.info("Model has been trained")
                 self.update = True
@@ -101,7 +99,6 @@ class EmbeddingTrainer(object):
                 self.lookup_dict = corpus_gen.lookup
                 self._model.lookup_dict = self.lookup_dict
 
-        self._model.metadata = self.metadata
         self._model.model_name = self.model_name
 
     def save_model(self, storage=None):
@@ -113,13 +110,6 @@ class EmbeddingTrainer(object):
         logging.info(f"{self.model_name} has been saved.")
 
     @property
-    def model_type(self):
-        if self._model.__class__.__name__ == 'Doc2VecModel':
-            return 'doc2vec'
-        elif self._model.__class__.__name__ == 'Word2VecModel':
-            return 'word2vec'
-
-    @property
     def model_name(self):
         return self.model_type + '_' + self.training_time + '.model'
 
@@ -128,33 +118,14 @@ class EmbeddingTrainer(object):
         meta_dict = {'embedding_trainer': {}}
         if self._model:
             meta_dict['embedding_trainer']['model_name'] = self.model_name
-            meta_dict['embedding_trainer']['hyperparameters'] = {
-                                            'vector_size': self._model.vector_size,
-                                            'window': self._model.window,
-                                            'min_count': self._model.min_count,
-                                            'workers': self._model.workers,
-                                            'sample': self._model.sample,
-                                            'alpha': self._model.alpha,
-                                            'seed': self._model.seed,
-                                            'iter': self._model.iter,
-                                            'hs': self._model.hs,
-                                            'negative': self._model.negative,
-                                            'dm_mean': self._model.dm_mean if 'dm_mean' in self._model else None,
-                                            'cbow_mean': self._model.cbow_mean if 'cbow_mean' in self._model else None,
-                                            'dm': self._model.dm if hasattr(self._model, 'dm') else None,
-                                            'dbow_words': self._model.dbow_words if hasattr(self._model, 'dbow_words') else None,
-                                            'dm_concat': self._model.dm_concat if hasattr(self._model, 'dm_concat') else None,
-                                            'dm_tag_count': self._model.dm_tag_count if hasattr(self._model, 'dm_tag_count') else None
-                                            }
-            meta_dict['embedding_trainer']['gensim_version']  = gensim_name + gensim_version
             meta_dict['embedding_trainer']['training_time'] = self.training_time
             meta_dict['embedding_trainer']['vocab_size_cumu'] = self.vocab_size_cumu
-
         else:
             print("Haven't trained the model yet!")
 
         try:
             meta_dict.update(self.corpus_generator.metadata)
+            meta_dict.update(self._model.metadata)
         except AttributeError:
             logging.info(self.corpus_generator.__class__.__name__ + " has no metadata!")
 
