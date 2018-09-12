@@ -244,7 +244,7 @@ class OntologyTest(TestCase):
         assert civil_engineer_ontology.occupations == {civil_engineer}
 
     def ontology(self):
-        ontology = CompetencyOntology()
+        ontology = CompetencyOntology(name='Test Ontology')
         comm = Competency(identifier='123', name='communication', categories=['social skills'])
         python = Competency(identifier='999', name='python', categories=['Technologies'])
         math = Competency(identifier='111', name='mathematics', categories=['Knowledge'])
@@ -262,6 +262,7 @@ class OntologyTest(TestCase):
 
     def jsonld(self):
         return json.dumps({
+            'name': 'Test Ontology',
             'occupations': [{
                 '@type': 'Occupation',
                 '@id': '123',
