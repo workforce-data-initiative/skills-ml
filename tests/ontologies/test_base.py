@@ -337,3 +337,9 @@ class OntologyTest(TestCase):
 
     def test_import_from_jsonld(self):
         assert CompetencyOntology.from_jsonld(self.jsonld()) == self.ontology()
+
+    def test_competency_counts_per_occupation(self):
+        assert sorted(self.ontology().competency_counts_per_occupation) == [2]
+
+    def test_occupation_counts_per_competency(self):
+        assert sorted(self.ontology().occupation_counts_per_competency) == [0, 0, 1, 1]

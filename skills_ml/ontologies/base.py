@@ -389,21 +389,28 @@ class CompetencyOntology(object):
     @property
     def occupation_counts_per_competency(self):
         counts = []
-        for k, g in itertools.groupby(
-            sorted(self.edges, key=lambda edge: edge.competency),
+        for competency, edges in itertools.groupby(
+            sorted(self._competency_occupation_edges, key=lambda edge: edge.competency),
             lambda edge: edge.competency
         ):
-            counts.append(len(set([edge.occupation for edge in list(g)])))
+            if competency != DummyCompetency():
+                counts.append(len(set([
+                    edge.occupation for edge in list(edges) if edge.occupation != DummyOccupation()
+                ])))
         return counts
 
     @property
     def competency_counts_per_occupation(self):
         counts = []
-        for k, g in itertools.groupby(
-            sorted(self.edges, key=lambda edge: edge.occupation),
+        for occupation, edges in itertools.groupby(
+            sorted(self._competency_occupation_edges, key=lambda edge: edge.occupation),
             lambda edge: edge.occupation
         ):
-            counts.append(len(set([edge.competency for edge in list(g)])))
+            if occupation != DummyOccupation():
+                counts.append(len(set([
+                    edge.competency for edge in list(edges)
+                    if edge.competency != DummyCompetency()
+                ])))
         return counts
 
     def print_summary_stats(self):
