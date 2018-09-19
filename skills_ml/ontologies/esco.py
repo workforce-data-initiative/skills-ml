@@ -24,7 +24,7 @@ class Esco(CompetencyOntology):
         else:
             logging.warning('ESCO Ontology is already built!')
 
-    def _conceptProcessing(href):
+    def _conceptProcessing(self, href):
         reqOcc = requests.get(href)
         if 'narrowerOccupation' in reqOcc.json()['_links']:
             self._occupationProcessing(reqOcc.json()['_links']['narrowerOccupation'])
@@ -33,7 +33,7 @@ class Esco(CompetencyOntology):
             for _concept in _concepts:
                 self._conceptProcessing(_concept['href'])
 
-    def _occupationProcessing(_occupations):
+    def _occupationProcessing(self, _occupations):
         logging.info('Processing Occupations')
         for occ in _occupations:
             reqOcc = requests.get(occ['href'])
@@ -66,7 +66,7 @@ class Esco(CompetencyOntology):
                 self.add_edge(competency=competency, occupation=occupation)
                 self.is_built = True
 
-    def _parentProcessing (concepts, occupation):
+    def _parentProcessing (self, concepts, occupation):
         for iscoGrp in concepts:
             major_group = Occupation(
                 identifier=iscoGrp['uri'],
