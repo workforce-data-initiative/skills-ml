@@ -3,6 +3,7 @@ from .fuzzy_match import FuzzyMatchSkillExtractor
 from .exact_match import ExactMatchSkillExtractor
 from .soc_exact import SocScopedExactMatchSkillExtractor
 from .noun_phrase_ending import SkillEndingPatternExtractor, AbilityEndingPatternExtractor
+from .section_extract import SectionExtractSkillExtractor
 
 
 __all__ = [
@@ -10,5 +11,6 @@ __all__ = [
     'FuzzyMatchSkillExtractor',
     'SocScopedExactMatchSkillExtractor',
     'SkillEndingPatternExtractor',
-    'AbilityEndingPatternExtractor'
+    'AbilityEndingPatternExtractor',
+    'SectionExtractSkillExtractor'
 ]

@@ -150,7 +150,7 @@ class SkillExtractor(object, metaclass=ABCMeta):
         """
         skill_counts = Counter()
         for candidate_skill in self.candidate_skills(source_object):
-            skill_counts[self.nlp.lowercase_strip_punc(candidate_skill.skill_name)] += 1
+            skill_counts[self.nlp.lowercase_strip_punc(candidate_skill.skill_name).lstrip().rstrip()] += 1
         return skill_counts
 
 
