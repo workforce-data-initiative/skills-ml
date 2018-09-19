@@ -1,6 +1,11 @@
 """ModelStorage class to handle gensim model storage"""
 from skills_ml.storage import FSStore
+
+from gensim import __version__ as gensim_version
+from gensim import __name__ as gensim_name
+
 import pickle
+
 
 class ModelStorage(object):
     def __init__(self, storage=None):
@@ -37,3 +42,12 @@ class ModelStorage(object):
 
         model_pickled = pickle.dumps(self)
         self.storage.write(model_pickled, model_name)
+
+    @property
+    def metadata(self):
+        meta_dict = {"embedding_model": {}}
+        meta_dict['embedding_model']['model_type'] = self.model_type
+        meta_dict['embedding_model']['hyperparameters'] = self.__dict__
+        meta_dict['embedding_model']['gensim_version'] = gensim_name + gensim_version
+        return meta_dict
+

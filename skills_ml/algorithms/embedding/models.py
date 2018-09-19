@@ -3,34 +3,39 @@ from skills_ml.storage import FSStore
 from skills_ml.algorithms.embedding.base import ModelStorage
 
 from gensim.models import Doc2Vec, Word2Vec
+from gensim.models.fasttext import FastText as FT_gensim
+
 from sklearn.base import BaseEstimator, TransformerMixin
+
 import numpy as np
 import logging
 
 class Word2VecModel(ModelStorage, Word2Vec):
-    """The Word2VecModel Object is a base object which specifies which word-embeding model.
+    """The Word2VecModel inherited from gensim's Word2Vec model (
+    https://radimrehurek.com/gensim/models/word2vec.html) for training,
+    using and evaluating word embedding with extension methods.
 
     Example:
     ```
-    from skills_ml.algorithms.embedding.base import Word2VecModel
+    from skills_ml.algorithms.embedding.models import Word2VecModel
 
     word2vec_model = Word2VecModel()
     ```
     """
     def __init__(self, *args, **kwargs):
-        """
-        Attributes:
-            storage (:obj: `skills_ml.Store`): skills_ml Store object
-            model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
-        """
         ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
         Word2Vec.__init__(self, *args, **kwargs)
         self.model_name = ""
+        self.model_type = "word2vec"
         self._metadata = None
 
-    def infer_vector(self, doc_words):
+    def infer_vector(self, doc_words, warning=False):
         """
         Average all the word-vectors together and ignore the unseen words
+        Arg:
+            doc_words (list): a list of tokenized words
+        Returns:
+            a vector representing a whole doc/sentence
         """
         sum_vector = np.zeros(self.vector_size)
         words_in_vocab = []
@@ -39,7 +44,8 @@ class Word2VecModel(ModelStorage, Word2Vec):
                 sum_vector += self[token]
                 words_in_vocab.append(token)
             except KeyError as e:
-                # logging.warning("".join([str(e), ". Ignore the word."]))
+                if warning:
+                    logging.warning("".join([str(e), ". Ignore the word."]))
                 pass
 
         if len(words_in_vocab) == 0:
@@ -50,28 +56,63 @@ class Word2VecModel(ModelStorage, Word2Vec):
 
 
 class Doc2VecModel(ModelStorage, Doc2Vec):
-    """The Doc2VecModel Object is a base object which specifies which word-embeding model.
+    """The Doc2VecModel inherited from gensim's Doc2Vec model (
+    https://radimrehurek.com/gensim/models/doc2vec) for training,
+    using and evaluating word embedding with extension methods.
 
     Example:
     ```
-    from skills_ml.algorithms.embedding.base import Doc2VecModel
+    from skills_ml.algorithms.embedding.models import Doc2VecModel
 
     doc2vec_model = Doc2VecModel()
     ```
     """
     def __init__(self, *args, **kwargs):
-        """
-        Attributes:
-            storage (:obj: `skills_ml.Store`): skills_ml Store object
-            _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
-            lookup (dict): lookup table for mapping each jobposting index to soc code.
-            training_data (np.ndarray): a document vector array where each row is a document vector.
-            target (np.ndarray): a label array.
-        """
         ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
         Doc2Vec.__init__(self, *args, **kwargs)
         self.model_name = ""
+        self.model_type = "doc2vec"
         self.lookup_dict = None
+
+
+class FastTextModel(ModelStorage, FT_gensim):
+    """The FastTextModel inhereited from gensim's FastText model (
+    https://radimrehurek.com/gensim/models/fasttext.html) for training,
+    using and evaluating word embedding with extension methods.
+
+    Example:
+        ```
+        from skills_ml.algorithms.embedding.models import import FastTextModel
+
+        fasttext = FastTextModel()
+        ```
+    """
+    def __init__(self, *args, **kwargs):
+        ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
+        FT_gensim.__init__(self, *args, **kwargs)
+        self.model_name = ""
+        self.model_type = "fasttext"
+
+    def infer_vector(self, doc_words, warning=False):
+         """
+         Average all the word-vectors together and ignore the unseen words
+         """
+         sum_vector = np.zeros(self.vector_size)
+         words_in_vocab = []
+         for token in doc_words:
+             try:
+                 sum_vector += self[token]
+                 words_in_vocab.append(token)
+             except KeyError as e:
+                 if warning:
+                    logging.warning("".join([str(e), ". Ignore the word."]))
+                 pass
+
+         if len(words_in_vocab) == 0:
+             logging.warning("None of the words is in vocabulary.")
+             return np.random.rand(self.vector_size)
+         sentence_vector = sum_vector / len(words_in_vocab)
+         return sentence_vector
 
 
 class EmbeddingTransformer(BaseEstimator, TransformerMixin):
