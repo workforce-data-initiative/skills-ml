@@ -20,19 +20,18 @@ class Esco(CompetencyOntology):
             reqTax = requests.get(api_tax)
             getConcepts = reqTax.json()['_links']['hasTopConcept']
             for concept in getConcepts:
-                _conceptProcessing(concept['href'])
+                self._conceptProcessing(concept['href'])
         else:
             logging.warning('ESCO Ontology is already built!')
 
     def _conceptProcessing(href):
-        print href
         reqOcc = requests.get(href)
         if 'narrowerOccupation' in reqOcc.json()['_links']:
-            _occupationProcessing(reqOcc.json()['_links']['narrowerOccupation'])
+            self._occupationProcessing(reqOcc.json()['_links']['narrowerOccupation'])
         elif 'narrowerConcept' in reqOcc.json()['_links']:
             _concepts = reqOcc.json()['_links']['narrowerConcept']
             for _concept in _concepts:
-                _conceptProcessing(_concept['href'])
+                self._conceptProcessing(_concept['href'])
 
     def _occupationProcessing(_occupations):
         logging.info('Processing Occupations')
@@ -43,11 +42,9 @@ class Esco(CompetencyOntology):
                 name=occ['title'],
                 description=reqOcc.json()['description']['en']['literal'],
                 categories='ESCO Occupation')
-            #print "Number of occupations: " + str(occupation_no)
-            #print "Occupation: " + occ['title']
             iscoGrps = reqOcc.json()['_links']['broaderIscoGroup']
             self.add_occupation(occupation)
-            _parentProcessing(iscoGrps, occupation)
+            self._parentProcessing(iscoGrps, occupation)
 
             logging.info('Processing corresponding Skills/Competencies & Knowledge')
             if 'hasEssentialSkill' in reqOcc.json()['_links']:
@@ -78,4 +75,4 @@ class Esco(CompetencyOntology):
             occupation.add_parent(major_group)
             self.add_occupation(major_group)
             if 'broaderConcept' in iscoGrp:
-                _parentProcessing (iscoGrp['broaderConcept'], major_group)
+                self._parentProcessing (iscoGrp['broaderConcept'], major_group)
