@@ -7,9 +7,11 @@ import re
 from bs4 import BeautifulSoup
 import nltk
 from functools import reduce, wraps
-from typing import List, Set, Generator, Dict
+from typing import List, Set, Generator, Dict, Pattern
 
 transforms = ['nlp_a']
+BULLET_CHARACTERS = ['+', '*', '-']
+
 
 def deep(func):
     """A decorator that will apply a function to a nested list recursively
@@ -162,3 +164,63 @@ def vectorize(
         np.ndarray: a word embedding vector
     """
     return embedding_model.infer_vector(tokenized_text)
+
+
+def section_extract(section_regex: Pattern, document: str) -> List:
+    """Only return the contents of the configured section heading
+
+    Defines a 'heading' as the text of a sentence that:
+        - does not itself start with a bullet character
+        - either has between 1 and 3 words or ends in a colon
+
+    For a heading that matches the given pattern, returns each sentence between it and the next heading.
+
+    Heavily relies on the fact that sentence_tokenize does line splitting
+    as well as standard sentence tokenization. In this way, it should work both
+    for text strings that have newlines and for text strings that don't.
+
+    In addition, this function splits each sentence by bullet characters as often bullets denote
+    what we want to call 'sentences', but authors often take advantage of the bullet characters
+    to make the contents of each 'sentence' into small sentence fragments, which makes standard
+    sentence tokenization insufficient if the newlines have been taken out.
+    """
+    units_in_section = []
+    sentences = sentence_tokenize(document)
+    units = [
+        unit
+        for sentence in sentences
+        for unit in split_by_bullets(sentence)
+    ]
+
+    heading = ''
+    for unit in units:
+        words_in_unit = len(unit.lstrip().rstrip().split(' '))
+        if unit.strip() and unit[0] not in BULLET_CHARACTERS and ((words_in_unit > 0 and words_in_unit < 4) or unit.endswith(':')):
+            heading = unit
+        if re.match(section_regex, heading) and unit != heading and len(unit.strip()) > 0:
+            units_in_section.append(unit.lstrip().rstrip())
+    return units_in_section
+
+
+def split_by_bullets(sentence: str) -> List:
+    """Split sentence by bullet characters"""
+    units = []
+    for bullet_char in BULLET_CHARACTERS:
+        padded_bullet = bullet_char + ' '
+        if sentence.count(padded_bullet) > 1:
+            for i, fragment in enumerate(sentence.split(padded_bullet)):
+                if i > 0:
+                    units.append(padded_bullet + fragment)
+                else:
+                    units.append(fragment)
+            return units
+    units.append(sentence)
+    return units
+
+
+def strip_bullets_from_line(line: str) -> str:
+    """Remove bullets from beginning of line"""
+    for bullet_char in BULLET_CHARACTERS:
+        if line.startswith(bullet_char):
+            line = line.replace(bullet_char, '')
+    return line

@@ -1,7 +1,8 @@
 from random import randint
-from skills_ml.algorithms.string_cleaners.nlp import clean_html, clean_str, lowercase_strip_punc, word_tokenize, sentence_tokenize
+from skills_ml.algorithms.string_cleaners.nlp import clean_html, clean_str, lowercase_strip_punc, word_tokenize, sentence_tokenize, section_extract, strip_bullets_from_line
 from gensim.models.doc2vec import TaggedDocument
 from skills_utils.common import safe_get
+
 
 class CorpusCreator(object):
     """
@@ -171,6 +172,21 @@ class JobCategoryCorpusCreator(CorpusCreator):
             lowercase_strip_punc(document[field])
             for field in self.document_schema_fields
         ])
+
+
+class SectionExtractWord2VecCorpusCreator(Word2VecGensimCorpusCreator):
+    """Only return the contents of the configured section headers.
+
+    Heavily utilizes skills_ml.algorithms.string_cleaners.nlp.section_extract.
+    For more detail on how to define 'sections', refer to its docstring.
+    """
+    def __init__(self, section_regex, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.section_regex = section_regex
+
+    def _transform(self, document):
+        lines_from_section = section_extract(self.section_regex, document['description'])
+        return [word_tokenize(clean_str(strip_bullets_from_line(line))) for line in lines_from_section]
 
 
 class RawCorpusCreator(CorpusCreator):
