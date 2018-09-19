@@ -8,6 +8,10 @@ from contextlib import contextmanager
 from retrying import retry
 from urllib.parse import urlparse
 
+from sklearn.externals import joblib
+import dill as pickle
+
+
 @retry(stop_max_delay=150000, wait_fixed=3000)
 @contextmanager
 def open_sesame(path, *args, **kwargs):
@@ -199,3 +203,79 @@ class PersistedJSONDict(MutableMapping):
 
         json_bytes = json.dumps(self._storage).encode()
         self.fs.write(json_bytes, self.fname)
+
+
+class ModelStorage(object):
+    def __init__(self, storage=None):
+        self._storage = FSStore() if storage is None else storage
+
+    @property
+    def storage(self):
+        return self._storage
+
+    @storage.setter
+    def storage(self, value):
+        if hasattr(value, 'write') and hasattr(value, 'load'):
+            self._storage = value
+        else:
+            raise Exception(f"{value} should have methods 'write()' and 'load()'")
+
+    def load_model(self, model_name, **kwargs):
+        """The method to load the model from where Storage object specified
+
+        model_name (str): name of the model to be used.
+        """
+        with self.storage.open(model_name, "rb") as f:
+            model = joblib.load(f)
+
+        return model
+
+    def save_model(self, model, model_name):
+        """The method to write the model to where the Storage object specified
+
+        model_name (str): name of the model to be used.
+        """
+        with self.storage.open(model_name, "wb") as f:
+            joblib.dump(model, f, compress=True)
+
+
+class SerializableModel(object):
+    def __init__(self, model=None, storage=None, model_name=None):
+        self._model = model
+        self.storage = storage
+        self.model_name = model_name
+
+    def __getitem__(self, item):
+        if self._model is None:
+            logging.info("Model wasn't loaded yet!")
+        result = self.model[item]
+        return result
+
+    def __getattr__(self, item):
+        if item not in self.__dict__.keys():
+            if self._model is None:
+                logging.info("Model wasn't loaded yet!")
+            result = getattr(self.model, item)
+            return result
+
+    @property
+    def model(self):
+        if self._model is None:
+            logging.info(f"Loading Model-{self.model_name} from {self.storage.path}")
+            self._model = ModelStorage.load_model(self.storage, self.model_name)
+        return self._model
+
+    @model.setter
+    def model(self, model):
+        self._model = model
+
+    def __getstate__(self):
+        result = self.__dict__.copy()
+        result['_model'] = None
+        return result
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+        model_storage = state['storage']
+        model_name = state['model_name']
+
