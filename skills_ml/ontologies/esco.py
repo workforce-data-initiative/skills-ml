@@ -19,17 +19,20 @@ class Esco(CompetencyOntology):
         if not self.is_built:
             reqTax = requests.get(api_tax)
             getConcepts = reqTax.json()['_links']['hasTopConcept']
-            for concept in getConcepts:
+            num_concepts = len(getConcepts)
+            for i, concept in enumerate(getConcepts):
+                logging.info('Processing concept %s of %s: %s', i, num_concepts, concept['href'])
                 self._conceptProcessing(concept['href'])
         else:
             logging.warning('ESCO Ontology is already built!')
 
     def _conceptProcessing(self, href):
         reqOcc = requests.get(href)
-        if 'narrowerOccupation' in reqOcc.json()['_links']:
-            self._occupationProcessing(reqOcc.json()['_links']['narrowerOccupation'])
-        elif 'narrowerConcept' in reqOcc.json()['_links']:
-            _concepts = reqOcc.json()['_links']['narrowerConcept']
+        links = reqOcc.json()['_links']
+        if 'narrowerOccupation' in links:
+            self._occupationProcessing(links['narrowerOccupation'])
+        elif 'narrowerConcept' in links:
+            _concepts = links['narrowerConcept']
             for _concept in _concepts:
                 self._conceptProcessing(_concept['href'])
 
@@ -37,30 +40,30 @@ class Esco(CompetencyOntology):
         logging.info('Processing Occupations')
         for occ in _occupations:
             reqOcc = requests.get(occ['href'])
+            reqOccJSON = reqOcc.json()
             occupation = Occupation(
                 identifier=occ['uri'],
                 name=occ['title'],
-                description=reqOcc.json()['description']['en']['literal'],
+                description=reqOccJSON['description']['en']['literal'],
                 categories='ESCO Occupation')
-            iscoGrps = reqOcc.json()['_links']['broaderIscoGroup']
+            iscoGrps = reqOccJSON['_links']['broaderIscoGroup']
             self.add_occupation(occupation)
             self._parentProcessing(iscoGrps, occupation)
 
-            logging.info('Processing corresponding Skills/Competencies & Knowledge')
-            if 'hasEssentialSkill' in reqOcc.json()['_links']:
-                essentialSkills = reqOcc.json()['_links']['hasEssentialSkill']
-            if 'hasOptionalSkill' in reqOcc.json()['_links']:
-                optionalSkills = reqOcc.json()['_links']['hasOptionalSkill']
+            logging.info('Processing Skills/Competencies & Knowledge for the %s occupation', occ['title'])
+            if 'hasEssentialSkill' in reqOccJSON['_links']:
+                essentialSkills = reqOccJSON['_links']['hasEssentialSkill']
+            if 'hasOptionalSkill' in reqOccJSON['_links']:
+                optionalSkills = reqOccJSON['_links']['hasOptionalSkill']
             allSkills = essentialSkills + optionalSkills
             for skill in allSkills:
                 reqSkill = requests.get(skill['href'])
-                inSkill = reqSkill.json()['_links']['hasSkillType']
+                inSkill = reqOccJSON['_links']['hasSkillType']
                 competency = Competency(
                     identifier=skill['uri'],
                     name=skill['title'],
                     categories=inSkill[0]['title'],
-                    competencyText=reqSkill.json()['description']['en']['literal'])
-                #print "Skill needed: " + skill['title']
+                    competencyText=reqOccJSON['description']['en']['literal'])
                 self.add_competency(competency)
                 occupation = Occupation(identifier=skill['uri'])
                 self.add_edge(competency=competency, occupation=occupation)
