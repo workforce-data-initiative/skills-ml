@@ -9,8 +9,6 @@ import nltk
 from functools import reduce, wraps
 from typing import List, Set, Generator, Dict
 
-from skills_ml.storage import open_sesame
-import pickle
 
 transforms = ['nlp_a']
 

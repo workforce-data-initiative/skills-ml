@@ -39,7 +39,6 @@ class OccupationClassifierTrainer(object):
         self.grid_config = self.default_grid_config if grid_config is None else grid_config
         self.cls_cv_result = {}
         self.scoring = scoring
-        self.best_classifiers = []
         self.random_state_for_split = random_state_for_split
         self.train_time = datetime.today().isoformat()
 

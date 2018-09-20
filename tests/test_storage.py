@@ -9,6 +9,7 @@ from sklearn.externals import joblib
 from functools import partial
 from moto import mock_s3
 import tempfile
+import mock
 import os
 import unittest
 import s3fs
@@ -196,6 +197,19 @@ class TestPersistedJSONDict(unittest.TestCase):
             ('key5', 'value5')
 
         ]
+
+
+class TestModelStorage(unittest.TestCase):
+    @mock.patch('os.getcwd')
+    def test_model_storage(self, mock_getcwd):
+        with tempfile.TemporaryDirectory() as td:
+            mock_getcwd.return_value = td
+            ms = ModelStorage(FSStore(td))
+            fake = FakeModel(1)
+            ms.save_model(fake, 'test.model')
+            assert set(os.listdir(os.getcwd())) == set(['test.model'])
+            new_model = ms.load_model('test.model')
+            assert new_model.val == fake.val
 
 
 class TestSerializableModel(unittest.TestCase):

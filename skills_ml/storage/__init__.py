@@ -9,7 +9,6 @@ from retrying import retry
 from urllib.parse import urlparse
 
 from sklearn.externals import joblib
-import dill as pickle
 
 
 @retry(stop_max_delay=150000, wait_fixed=3000)
