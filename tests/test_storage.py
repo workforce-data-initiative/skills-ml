@@ -1,19 +1,28 @@
-from skills_ml.storage import open_sesame, S3Store, FSStore, PersistedJSONDict
+from skills_ml.storage import open_sesame, ModelStorage, S3Store, FSStore, PersistedJSONDict, SerializableModel
+from skills_ml.algorithms.preprocessing import IterablePipeline
+from skills_ml.algorithms.string_cleaners.nlp import vectorize
+
 from skills_utils.s3 import upload, list_files
 
 from sklearn.externals import joblib
 
+from functools import partial
 from moto import mock_s3
 import tempfile
 import os
 import unittest
 import s3fs
 import json
-import pickle
+import dill as pickle
+
 
 class FakeModel(object):
     def __init__(self, val):
         self.val = val
+        self.model_name = 'fake_model'
+
+    def infer_vector(self, doc_words):
+        return [1, 2, 3, 4]
 
 @mock_s3
 class TestS3Storage(unittest.TestCase):
@@ -188,3 +197,53 @@ class TestPersistedJSONDict(unittest.TestCase):
 
         ]
 
+
+class TestSerializableModel(unittest.TestCase):
+    @mock_s3
+    def test_pickle_s3(self):
+        import boto3
+        client = boto3.client('s3')
+        client.create_bucket(Bucket='fake-open-skills', ACL='public-read-write')
+        s3 = S3Store('fake-open-skills/models')
+        model_storage = ModelStorage(storage=s3)
+        fake = FakeModel('fake')
+        model_storage.save_model(fake, fake.model_name)
+
+        s_fake = SerializableModel(fake, s3, fake.model_name)
+        fake_unpickled = pickle.loads(pickle.dumps(s_fake))
+        # make sure the fake model wasn't pickled but the reference
+        assert fake_unpickled._model == None
+        assert fake_unpickled.storage.path == s3.path
+        assert fake_unpickled.val == fake.val
+
+    def test_delegation(self):
+        fake = FakeModel('fake')
+        s_fake = SerializableModel(model=fake, model_name=fake.model_name)
+        assert fake.val == s_fake.val
+
+    @mock_s3
+    def test_with_iterable_pipelin(self):
+        import boto3
+        client=boto3.client('s3')
+        client.create_bucket(Bucket='fake-open-skills', ACL='public-read-write')
+        s3 = S3Store('fake-open-skills/models')
+        model_storage = ModelStorage(storage=s3)
+        fake = FakeModel('fake')
+
+        model_storage.save_model(fake, fake.model_name)
+
+        pipe = IterablePipeline(
+                partial(
+                    vectorize,
+                    embedding_model=SerializableModel(
+                        storage=s3,
+                        model_name=fake.model_name,
+                        model=fake)
+                    ))
+
+        pipe_unpickled = pickle.loads(pickle.dumps(pipe))
+        # make sure the fake model wasn't pickled but the reference
+        assert pipe_unpickled.functions[-1].keywords['embedding_model']._model ==  None
+        assert pipe_unpickled.functions[-1].keywords['embedding_model'].storage.path == s3.path
+        # The model will be loaded when it's needed
+        assert list(pipe_unpickled.build([1])) == [[1, 2, 3, 4]]

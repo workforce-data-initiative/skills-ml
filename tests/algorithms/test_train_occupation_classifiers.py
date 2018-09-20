@@ -124,12 +124,6 @@ class TestClassifierTrainer(unittest.TestCase):
                     scoring=['accuracy'])
             occ_trainer.train(save=True)
             assert set(os.listdir(os.getcwd())) ==  set([occ_trainer.train_time])
-            # with FSStore(os.path.join(td, occ_trainer.train_time, "accuracy")).open(occ_trainer.best_classifiers[0], "rb") as f:
-                # model = joblib.load(f)
-
-            # print(model.storage)
-            # assert False
-
 
     def test_one_filter(self):
         # First make sure 27 is in the data

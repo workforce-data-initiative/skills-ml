@@ -255,19 +255,24 @@ class SerializableModel(object):
         if item not in self.__dict__.keys():
             if self._model is None:
                 logging.info("Model wasn't loaded yet!")
-            result = getattr(self.model, item)
+                self._model = self.load_model()
+            result = getattr(self._model, item)
             return result
 
     @property
     def model(self):
         if self._model is None:
             logging.info(f"Loading Model-{self.model_name} from {self.storage.path}")
-            self._model = ModelStorage.load_model(self.storage, self.model_name)
+            self._model = self.load_model()
         return self._model
 
     @model.setter
     def model(self, model):
         self._model = model
+
+    def load_model(self):
+        ms = ModelStorage(self.storage)
+        return ms.load_model(self.model_name)
 
     def __getstate__(self):
         result = self.__dict__.copy()
