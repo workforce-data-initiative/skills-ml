@@ -29,12 +29,7 @@ class Word2VecModel(BaseEmbeddingModel, Word2Vec):
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
         """
         BaseEmbeddingModel.__init__(self, model_name=model_name, model_storage=model_storage)
-        # super(BaseEmbeddingModel, self).__init__()
-        # self.storage = kwargs.pop('storage', None)
         Word2Vec.__init__(self, *args, **kwargs)
-        # super().__init__(model_name=model_name, *args, **kwargs)
-        # self.storage = FSStore() if None else storage
-        # self.model_name = ""
         self.model_type = Word2Vec.__name__.lower()
 
     def infer_vector(self, doc_words, warning=False):

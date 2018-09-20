@@ -164,8 +164,5 @@ def vectorize(
     Returns:
         np.ndarray: a word embedding vector
     """
-    # if isinstance(embedding_model, str):
-    #     with open_sesame(embedding_model, "rb") as f:
-    #         embedding_model = pickle.load(f)
 
     return embedding_model.infer_vector(tokenized_text)

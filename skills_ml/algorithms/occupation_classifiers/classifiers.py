@@ -154,9 +154,9 @@ class KNNDoc2VecClassifier(BaseEmbeddingModel):
         if model_name is None:
             model_name = self.model_name
 
-        model_pickled = pickle.dumps(self)
-        self.model_storage.storage.write(model_pickled, model_name)
-        # self.model_storage.save_model(self, model_name)
+        # model_pickled = pickle.dumps(self)
+        # self.model_storage.storage.write(model_pickled, model_name)
+        self.model_storage.save_model(self, model_name)
         self.indexer = tmp_annoy_index
 
     @property
