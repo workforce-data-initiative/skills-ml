@@ -55,7 +55,7 @@ class Esco(CompetencyOntology):
             for skill in allSkills:
                 reqSkill = requests.get(skill['href'])
                 inSkill = reqSkill.json()['_links']['hasSkillType']
-                competency = Occupation(
+                competency = Competency(
                     identifier=skill['uri'],
                     name=skill['title'],
                     categories=inSkill[0]['title'],
