@@ -1,6 +1,7 @@
 from functools import reduce, wraps
 from typing import List, Generator, Dict, Callable
 import logging
+import inspect
 
 class IterablePipeline(object):
     """A simple iterable preprocessing pipeline.
@@ -77,10 +78,13 @@ def func2gen(func: Callable) -> Callable:
         func (function): a function that takes a generator as the first argument input.
 
     """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        for item in args[0]:
-            if item is not None:
-                yield func(item)
-    return wrapper
+    if inspect.isgeneratorfunction(func):
+        return func
+    else:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for item in args[0]:
+                if item is not None:
+                    yield func(item)
+        return wrapper
 

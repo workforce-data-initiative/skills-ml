@@ -9,6 +9,28 @@ from retrying import retry
 from urllib.parse import urlparse
 
 from sklearn.externals import joblib
+import wrapt
+
+
+class ProxyObjectWithStorage(wrapt.ObjectProxy):
+    __slots__ = ('storage', 'model_name','by_ref')
+    def __init__(self, model_obj, storage=None, model_name=None, by_ref=False):
+        self.storage = storage
+        self.model_name = model_name
+        self.by_ref = by_ref
+        super().__init__(model_obj)
+        self._model_obj = model_obj
+
+    @classmethod
+    def __reconstruct__(cls, model_obj, storage, model_name, by_ref):
+        if by_ref:
+            model_obj = ModelStorage(storage).load_model(model_name)
+        return cls(model_obj, storage, model_name, by_ref=by_ref)
+
+    def __reduce__(self):
+        if self.by_ref:
+            return (self.__reconstruct__, (None, self.storage, self.model_name, self.by_ref))
+        return (self.__reconstruct__, (self._model_obj, self.storage, self.model_name, self.by_ref))
 
 
 @retry(stop_max_delay=150000, wait_fixed=3000)

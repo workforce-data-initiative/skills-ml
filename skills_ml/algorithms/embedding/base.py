@@ -1,10 +1,12 @@
 from gensim import __version__ as gensim_version
 from gensim import __name__ as gensim_name
 
+from skills_ml.storage import ModelStorage
+
 class BaseEmbeddingModel(object):
-    def __init__(self, model_name=None, model_storage=None, *args, **kwargs):
+    def __init__(self, model_name=None, storage=None, *args, **kwargs):
         self._model_name = model_name
-        self.model_storage = model_storage
+        self.storage = storage
 
     @property
     def model_name(self):
@@ -15,9 +17,10 @@ class BaseEmbeddingModel(object):
         self._model_name = model_name
 
     def save(self):
-        if self.model_storage:
+        if self.storage:
+            model_storage = ModelStorage(self.storage)
             if self.model_name:
-                self.model_storage.save_model(self, self.model_name)
+                model_storage.save_model(self, self.model_name)
             else:
                 raise AttributeError("'self.model_name' shouldn't be {self.model_name}")
         else:

@@ -22,13 +22,13 @@ class Word2VecModel(BaseEmbeddingModel, Word2Vec):
     word2vec_model = Word2VecModel()
     ```
     """
-    def __init__(self, model_name=None, model_storage=None, *args, **kwargs):
+    def __init__(self, model_name=None, storage=None, *args, **kwargs):
         """
         Attributes:
             storage (:obj: `skills_ml.Store`): skills_ml Store object
             model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
         """
-        BaseEmbeddingModel.__init__(self, model_name=model_name, model_storage=model_storage)
+        BaseEmbeddingModel.__init__(self, model_name=model_name, storage=storage)
         Word2Vec.__init__(self, *args, **kwargs)
         self.model_type = Word2Vec.__name__.lower()
 
@@ -70,8 +70,8 @@ class Doc2VecModel(BaseEmbeddingModel, Doc2Vec):
     doc2vec_model = Doc2VecModel()
     ```
     """
-    def __init__(self, model_name=None, model_storage=None, *args, **kwargs):
-        BaseEmbeddingModel.__init__(self, model_name=model_name, model_storage=model_storage)
+    def __init__(self, model_name=None, storage=None, *args, **kwargs):
+        BaseEmbeddingModel.__init__(self, model_name=model_name, storage=storage)
         Doc2Vec.__init__(self, *args, **kwargs)
         self.model_type = Doc2Vec.__name__.lower()
         self.lookup_dict = None
@@ -88,8 +88,8 @@ class FastTextModel(BaseEmbeddingModel, FT_gensim):
         fasttext = FastTextModel()
         ```
     """
-    def __init__(self, model_name=None, model_storage=None, *args, **kwargs):
-        BaseEmbeddingModel.__init__(self, model_name=model_name, model_storage=model_storage)
+    def __init__(self, model_name=None, storage=None, *args, **kwargs):
+        BaseEmbeddingModel.__init__(self, model_name=model_name, storage=storage)
         FT_gensim.__init__(self, *args, **kwargs)
         self.model_type = FT_gensim.__name__.lower()
 
