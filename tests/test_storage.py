@@ -14,6 +14,7 @@ import os
 import unittest
 import s3fs
 import json
+import numpy as np
 import dill as pickle
 pickle.settings['byref'] = True
 
@@ -304,4 +305,29 @@ class TestProxyObject(unittest.TestCase):
         pipe_unpickled = pickle.loads(s3.load('fake.pipe'))
 
         assert list(pipe_unpickled.build([1])) == [[1, 2, 3, 4]]
+
+    @mock_s3
+    def test_with_grid_search(self):
+        import boto3
+        client=boto3.client('s3')
+        client.create_bucket(Bucket='fake-open-skills', ACL='public-read-write')
+        s3 = S3Store('fake-open-skills')
+        model_storage = ModelStorage(s3)
+
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.model_selection import GridSearchCV
+
+        gs = GridSearchCV(RandomForestClassifier(), {})
+        proxy_gs = ProxyObjectWithStorage(model_obj=gs, storage=s3, model_name='rf.grid')
+
+        X = np.random.rand(20, 2)
+        y = np.random.randint(2, size=20)
+
+        proxy_gs.fit(X, y)
+        model_storage.save_model(proxy_gs, 'rf.grid')
+
+        loaded_proxy_gs = model_storage.load_model('rf.grid')
+
+        assert loaded_proxy_gs.storage.path == s3.path
+        assert proxy_gs.predict([[5, 6]]) == gs.predict([[5, 6]])
 

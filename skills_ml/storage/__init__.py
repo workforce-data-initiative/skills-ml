@@ -302,6 +302,4 @@ class SerializableModel(object):
 
     def __setstate__(self, state):
         self.__dict__ = state
-        model_storage = state['storage']
-        model_name = state['model_name']
 
