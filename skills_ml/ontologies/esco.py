@@ -36,6 +36,36 @@ class Esco(CompetencyOntology):
             for _concept in _concepts:
                 self._conceptProcessing(_concept['href'])
 
+    def getOrCreateCompetency(self, skill):
+        competency = self.competency_framework.competencies.get(skill['uri'], None)
+        if not competency:
+            logging.info('Competency %s not found, getting data', skill['uri'])
+            competency = self._addCompetency(skill['href'], skill['uri'], skill['title'])
+        else:
+            logging.info('Competency %s found, no need to get data!', skill['uri'])
+        return competency
+
+    def _addCompetency(self, href, uri, title):
+        reqSkill = requests.get(href).json()
+        competency = Competency(
+            identifier=uri,
+            name=title,
+            categories=reqSkill['_links']['hasSkillType'][0]['title'],
+            competencyText=reqSkill['description']['en']['literal']
+        )
+        self.add_competency(competency)
+        for skill in reqSkill['_links'].get('broaderSkill', []):
+            logging.info('Processing broader skill %s', skill)
+            broaderCompetency = self.getOrCreateCompetency(skill)
+            broaderCompetency.add_child(competency)
+            self.add_competency(broaderCompetency)
+        for skill in reqSkill['_links'].get('narrowerSkill', []):
+            logging.info('Processing narrower skill %s', skill)
+            narrowerCompetency = self.getOrCreateCompetency(skill)
+            narrowerCompetency.add_parent(competency)
+            self.add_competency(narrowerCompetency)
+        return competency
+
     def _occupationProcessing(self, _occupations):
         logging.info('Processing Occupations')
         for occ in _occupations:
@@ -51,23 +81,13 @@ class Esco(CompetencyOntology):
             self._parentProcessing(iscoGrps, occupation)
 
             logging.info('Processing Skills/Competencies & Knowledge for the %s occupation', occ['title'])
-            if 'hasEssentialSkill' in reqOccJSON['_links']:
-                essentialSkills = reqOccJSON['_links']['hasEssentialSkill']
-            if 'hasOptionalSkill' in reqOccJSON['_links']:
-                optionalSkills = reqOccJSON['_links']['hasOptionalSkill']
+            essentialSkills = reqOccJSON['_links'].get('hasEssentialSkill', [])
+            optionalSkills = reqOccJSON['_links'].get('hasOptionalSkill', [])
             allSkills = essentialSkills + optionalSkills
             for skill in allSkills:
-                reqSkill = requests.get(skill['href'])
-                inSkill = reqOccJSON['_links']['hasSkillType']
-                competency = Competency(
-                    identifier=skill['uri'],
-                    name=skill['title'],
-                    categories=inSkill[0]['title'],
-                    competencyText=reqOccJSON['description']['en']['literal'])
-                self.add_competency(competency)
-                occupation = Occupation(identifier=skill['uri'])
+                competency = self.getOrCreateCompetency(skill)
                 self.add_edge(competency=competency, occupation=occupation)
-                self.is_built = True
+            self.is_built = True
 
     def _parentProcessing (self, concepts, occupation):
         for iscoGrp in concepts:
