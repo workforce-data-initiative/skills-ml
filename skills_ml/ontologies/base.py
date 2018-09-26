@@ -1,8 +1,12 @@
 from typing import Callable, Text, List
 from collections import MutableMapping
 import json
+from statistics import median
+from functools import total_ordering
+import itertools
 
 
+@total_ordering
 class Competency(object):
     """Represents a competency not necessarily tied to an ontology
 
@@ -36,8 +40,14 @@ class Competency(object):
         return obj
 
     def __eq__(self, other):
-        if isinstance(self, other.__class__):
-            return self.identifier == other.identifier
+        if not isinstance(self, other.__class__):
+            return NotImplemented
+        return self.identifier == other.identifier
+
+    def __lt__(self, other):
+        if not isinstance(self, other.__class__):
+            return NotImplemented
+        return self.identifier < other.identifier
 
     def __hash__(self):
         return hash(self.identifier)
@@ -81,6 +91,7 @@ class Competency(object):
             parent.add_child(self)
 
 
+@total_ordering
 class Occupation(object):
     """Represents an occupation that may or may not be part of an ontology
     
@@ -111,8 +122,14 @@ class Occupation(object):
         return obj
 
     def __eq__(self, other):
-        if isinstance(self, other.__class__):
-            return self.identifier == other.identifier
+        if not isinstance(self, other.__class__):
+            return NotImplemented
+        return self.identifier == other.identifier
+
+    def __lt__(self, other):
+        if not isinstance(self, other.__class__):
+            return NotImplemented
+        return self.identifier < other.identifier
 
     def __hash__(self):
         return hash(self.identifier)
@@ -273,7 +290,7 @@ class CompetencyOntology(object):
     @classmethod
     def from_jsonld(cls, jsonld_string: Text):
         jsonld_input = json.loads(jsonld_string)
-        obj = cls()
+        obj = cls(name=jsonld_input.get('name', 'unnamed ontology'))
         for competency_jsonld in jsonld_input['competencies']:
             obj.add_competency(Competency.from_jsonld(competency_jsonld))
         for occupation_jsonld in jsonld_input['occupations']:
@@ -351,6 +368,7 @@ class CompetencyOntology(object):
     @property
     def jsonld(self):
         return json.dumps({
+            'name': self.name,
             'competencies': [
                 competency.jsonld_full
                 for competency in
@@ -367,3 +385,38 @@ class CompetencyOntology(object):
                 sorted(self.edges, key=lambda edge: edge.identifier)
             ]
         }, sort_keys=True)
+
+    @property
+    def occupation_counts_per_competency(self):
+        counts = []
+        for competency, edges in itertools.groupby(
+            sorted(self._competency_occupation_edges, key=lambda edge: edge.competency),
+            lambda edge: edge.competency
+        ):
+            if competency != DummyCompetency():
+                counts.append(len(set([
+                    edge.occupation for edge in list(edges) if edge.occupation != DummyOccupation()
+                ])))
+        return counts
+
+    @property
+    def competency_counts_per_occupation(self):
+        counts = []
+        for occupation, edges in itertools.groupby(
+            sorted(self._competency_occupation_edges, key=lambda edge: edge.occupation),
+            lambda edge: edge.occupation
+        ):
+            if occupation != DummyOccupation():
+                counts.append(len(set([
+                    edge.competency for edge in list(edges)
+                    if edge.competency != DummyCompetency()
+                ])))
+        return counts
+
+    def print_summary_stats(self):
+        print(f'Ontology summary statistics for {self.name}')
+        print(f'Num competencies: {len(self.competency_framework)}')
+        print(f'Num occupations: {len(self.occupations)}')
+        print(f'Num competency-occupation edges: {len(self.edges)}')
+        print(f'Median occupations per competency: {median(self.occupation_counts_per_competency)}')
+        print(f'Median competencies per occupation: {median(self.competency_counts_per_occupation)}')

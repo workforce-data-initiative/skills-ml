@@ -70,15 +70,16 @@ class Onet(CompetencyOntology):
             logging.info('Processing Knowledge, Skills, Abilities')
             for content_model_file in {'Knowledge', 'Abilities', 'Skills'}:
                 for row in onet_cache.reader(content_model_file):
-                    competency = Competency(
-                        identifier=row['Element ID'],
-                        name=row['Element Name'],
-                        categories=[content_model_file],
-                        competencyText=description_lookup[row['Element ID']]
-                    )
-                    self.add_competency(competency)
-                    occupation = Occupation(identifier=row['O*NET-SOC Code'])
-                    self.add_edge(competency=competency, occupation=occupation)
+                    if row['Scale ID'] == 'IM' and float(row['Data Value']) >= 3:
+                        competency = Competency(
+                            identifier=row['Element ID'],
+                            name=row['Element Name'],
+                            categories=[content_model_file],
+                            competencyText=description_lookup[row['Element ID']]
+                        )
+                        self.add_competency(competency)
+                        occupation = Occupation(identifier=row['O*NET-SOC Code'])
+                        self.add_edge(competency=competency, occupation=occupation)
 
             logging.info('Processing tools and technology')
             for row in onet_cache.reader('Tools and Technology'):
