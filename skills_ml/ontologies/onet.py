@@ -118,6 +118,20 @@ class Onet(CompetencyOntology):
         major_groups = []
         for occ in occupations:
             if 'O*NET-SOC Major Group' in occ.other_attributes['categories']:
-                major_groups.append(occ.identifier)
-        return sorted(major_groups)
+                major_groups.append(occ)
+        return sorted(major_groups, key=lambda k: k.identifier)
+
+    @cachedproperty
+    def generate_major_group_occupation_clusters(self):
+        d = {}
+        for mg in self.all_major_groups:
+            d[mg.name] = [child.name for child in mg.children]
+        return d
+
+    @cachedproperty
+    def generate_major_group_competencies_clusters(self):
+        d = {}
+        for mg in self.all_major_groups:
+            d[int(mg)] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == str(mg)).competencies
+        return d
 
