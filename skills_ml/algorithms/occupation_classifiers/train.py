@@ -82,17 +82,17 @@ class OccupationClassifierTrainer(object):
                 trained_model_name = class_name.lower() + "_" + model_hash
                 self.storage.path = os.path.join(store_path, score, trained_model_name)
                 if class_name == "SVC" or class_name == "MLPClassifier":
-                    cls_cv = GridSearchCV(estimator=cls(), param_grid=parameter_config, cv=kf, scoring=score)
-                    cls_cv = ProxyObjectWithStorage(model_obj=cls_cv, storage=self.storage, model_name=trained_model_name)
+                    cls_cv = ProxyObjectWithStorage(
+                            model_obj=GridSearchCV(estimator=cls(), param_grid=parameter_config, cv=kf, scoring=score),
+                            storage=self.storage,
+                            model_name=trained_model_name)
                 else:
                     cls_cv = GridSearchCV(estimator=cls(n_jobs=self.n_jobs), param_grid=parameter_config, cv=kf, scoring=score)
                     cls_cv = ProxyObjectWithStorage(model_obj=cls_cv, storage=self.storage, model_name=trained_model_name)
                 cls_cv.fit(X, y)
                 self.cls_cv_result[score][class_name] = cls_cv.cv_results_
                 if save:
-                    # model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_)
                     logging.info(f"storing {class_name} {model_hash} to {store_path}")
-                    # trained_model_name = class_name.lower() + "_" + model_hash
                     self._save(cls_cv, os.path.join(store_path, score, trained_model_name))
 
     def unique_parameters(self, parameters):

@@ -1,4 +1,4 @@
-from skills_ml.storage import open_sesame, ModelStorage, S3Store, FSStore, PersistedJSONDict, ProxyObjectWithStorage, SerializableModel
+from skills_ml.storage import open_sesame, ModelStorage, S3Store, FSStore, PersistedJSONDict, ProxyObjectWithStorage, SerializedByStorage
 from skills_ml.algorithms.preprocessing import IterablePipeline
 from skills_ml.algorithms.string_cleaners import nlp
 
@@ -213,7 +213,7 @@ class TestModelStorage(unittest.TestCase):
             assert new_model.val == fake.val
 
 
-class TestSerializableModel(unittest.TestCase):
+class TestSerializedByStorage(unittest.TestCase):
     @mock_s3
     def test_pickle_s3(self):
         import boto3
@@ -224,16 +224,24 @@ class TestSerializableModel(unittest.TestCase):
         fake = FakeModel('fake')
         model_storage.save_model(fake, fake.model_name)
 
-        s_fake = SerializableModel(fake, s3, fake.model_name)
-        fake_unpickled = pickle.loads(pickle.dumps(s_fake))
+        s_fake = SerializedByStorage(fake, s3, fake.model_name)
+        s3.write(pickle.dumps(s_fake), 'fake.pickle')
+        fake_unpickled = pickle.loads(s3.load('fake.pickle'))
         # make sure the fake model wasn't pickled but the reference
         assert fake_unpickled._model == None
         assert fake_unpickled.storage.path == s3.path
         assert fake_unpickled.val == fake.val
 
+        # if the object to be pickled doesn't have storage attribute and didn't provide the storage
+        # to SerializedByStorage, it will be serialized normally
+        s_fake = SerializedByStorage(model=fake, model_name=fake.model_name)
+        s3.write(pickle.dumps(s_fake), 'fake.pickle')
+        fake_unpickled = pickle.loads(s3.load('fake.pickle'))
+        assert fake_unpickled._model != None
+
     def test_delegation(self):
         fake = FakeModel('fake')
-        s_fake = SerializableModel(model=fake, model_name=fake.model_name)
+        s_fake = SerializedByStorage(model=fake, model_name=fake.model_name)
         assert fake.val == s_fake.val
 
     @mock_s3
@@ -246,7 +254,7 @@ class TestSerializableModel(unittest.TestCase):
         fake = FakeModel('fake')
 
         model_storage.save_model(fake, fake.model_name)
-        vectorize_for_pipeline = partial(nlp.vectorize, embedding_model=SerializableModel(storage=s3, model_name=fake.model_name, model=fake))
+        vectorize_for_pipeline = partial(nlp.vectorize, embedding_model=SerializedByStorage(storage=s3, model_name=fake.model_name, model=fake))
         pipe = IterablePipeline(vectorize_for_pipeline)
 
         pipe_unpickled = pickle.loads(pickle.dumps(pipe))
@@ -273,11 +281,10 @@ class TestProxyObject(unittest.TestCase):
         fake = FakeModel('fake')
 
         model_storage.save_model(fake, fake.model_name)
-        proxy_fake = ProxyObjectWithStorage(model_obj=fake, storage=s3, model_name=fake.model_name, by_ref=False)
+        proxy_fake = ProxyObjectWithStorage(model_obj=fake, storage=s3, model_name=fake.model_name)
 
         assert proxy_fake.storage == s3
 
-        # The proxy object itself can be pickled not like SerializableModel
         proxy_fake_unpickled = pickle.loads(pickle.dumps(proxy_fake))
         assert proxy_fake_unpickled.val == proxy_fake.val
 
@@ -293,12 +300,11 @@ class TestProxyObject(unittest.TestCase):
         client.create_bucket(Bucket='fake-open-skills', ACL='public-read-write')
         s3 = S3Store('fake-open-skills')
         model_storage = ModelStorage(s3)
-        fake = FakeModel('fake')
 
-        model_storage.save_model(fake, fake.model_name)
-        proxy_fake = ProxyObjectWithStorage(model_obj=fake, storage=s3, model_name=fake.model_name, by_ref=True)
+        proxy_fake = ProxyObjectWithStorage(model_obj=FakeModel('fake'), storage=s3, model_name='fake')
+        model_storage.save_model(proxy_fake, proxy_fake.model_name)
 
-        vectorize_for_pipeline = partial(nlp.vectorize, embedding_model=ProxyObjectWithStorage(model_obj=fake, storage=s3, model_name=fake.model_name, by_ref=True))
+        vectorize_for_pipeline = partial(nlp.vectorize, embedding_model=SerializedByStorage(model=proxy_fake, model_name=proxy_fake.model_name))
         pipe = IterablePipeline(vectorize_for_pipeline)
 
         s3.write(pickle.dumps(pipe), 'fake.pipe')

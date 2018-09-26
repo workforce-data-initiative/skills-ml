@@ -13,24 +13,39 @@ import wrapt
 
 
 class ProxyObjectWithStorage(wrapt.ObjectProxy):
+    """A proxy object for especially scikit-learn models to be equipped
+    with extra attributes storage and model_name without using inheritance.
+
+    Example
+    ```python
+    from sklearn.ensemble import RandomForestClassifier
+    from skills_ml.storage import S3Store
+
+    rf = RandomForestClassifier(n_estimator=100)
+    proxy_rf = ProxyObjectWithStorage(model_obj=rf, storage=S3Store('s3://some_director'), model_name='rf.model')
+    proxy_rf.fit(X, y)
+    ```
+
+
+    Args:
+        storage (skills_ml.storage.Store): the skill_ml storage object
+        model_obj (object): target model object
+        model_name (str): model name
+
+    """
     __slots__ = ('storage', 'model_name','by_ref')
-    def __init__(self, model_obj, storage=None, model_name=None, by_ref=False):
+    def __init__(self, model_obj, storage=None, model_name=None):
         self.storage = storage
         self.model_name = model_name
-        self.by_ref = by_ref
         super().__init__(model_obj)
         self._model_obj = model_obj
 
     @classmethod
-    def __reconstruct__(cls, model_obj, storage, model_name, by_ref):
-        if by_ref:
-            model_obj = ModelStorage(storage).load_model(model_name)
-        return cls(model_obj, storage, model_name, by_ref=by_ref)
+    def __reconstruct__(cls, model_obj, storage, model_name):
+        return cls(model_obj, storage, model_name)
 
     def __reduce__(self):
-        if self.by_ref:
-            return (self.__reconstruct__, (None, self.storage, self.model_name, self.by_ref))
-        return (self.__reconstruct__, (self._model_obj, self.storage, self.model_name, self.by_ref))
+        return (self.__reconstruct__, (self._model_obj, self.storage, self.model_name))
 
 
 @retry(stop_max_delay=150000, wait_fixed=3000)
@@ -260,10 +275,26 @@ class ModelStorage(object):
             joblib.dump(model, f, compress=True)
 
 
-class SerializableModel(object):
+class SerializedByStorage(object):
+    """It's a wrapper of a model that we want any other object containing it could be serialized
+    by the storage, so that those model already stored somewhere won't be pickled again, but the
+    reference(storage).
+
+    Args:
+        model (object): target object to be serialized by storage
+        storage (skills_ml.storage.Store): skills_ml storage object
+        model_name (str): model name
+
+    """
     def __init__(self, model=None, storage=None, model_name=None):
         self._model = model
-        self.storage = storage
+        if storage is not None:
+            self.storage = storage
+        else:
+            if hasattr(model, 'storage'):
+                self.storage = model.storage
+            else:
+                self.storage = None
         self.model_name = model_name
 
     def __getitem__(self, item):
@@ -297,7 +328,8 @@ class SerializableModel(object):
 
     def __getstate__(self):
         result = self.__dict__.copy()
-        result['_model'] = None
+        if self.storage is not None:
+            result['_model'] = None
         return result
 
     def __setstate__(self, state):

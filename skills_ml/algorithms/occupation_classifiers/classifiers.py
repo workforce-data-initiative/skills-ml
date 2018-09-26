@@ -2,7 +2,7 @@ from skills_ml.algorithms.embedding.base import BaseEmbeddingModel
 from skills_ml.algorithms.embedding.models import Doc2VecModel, EmbeddingTransformer
 from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
 from skills_ml.ontologies.onet import majorgroupname
-from skills_ml.storage import SerializableModel
+from skills_ml.storage import SerializedByStorage
 
 from sklearn.pipeline import  Pipeline
 
@@ -43,8 +43,8 @@ class SocClassifier(object):
 
 class CombinedClassifier(object):
     def __init__(self, embedding, classifier, target_variable,  **kwargs):
-        self.embedding = SerializableModel(embedding)
-        self.classifier = SerializableModel(classifier)
+        self.embedding = SerializedByStorage(embedding)
+        self.classifier = SerializedByStorage(classifier)
         self.target_variable = target_variable
 
     @property
