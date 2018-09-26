@@ -335,6 +335,9 @@ class CompetencyOntology(object):
         if competency.identifier not in self.competency_framework:
             self.competency_framework[competency.identifier] = competency
             self.add_edge(competency=competency, occupation=DummyOccupation())
+        else:
+            self.competency_framework[competency.identifier].children.update(competency.children)
+            self.competency_framework[competency.identifier].parents.update(competency.parents)
 
     def add_occupation(self, occupation: Occupation):
         if not isinstance(occupation, Occupation):
@@ -342,6 +345,9 @@ class CompetencyOntology(object):
         if occupation.identifier not in self._occupations:
             self._occupations[occupation.identifier] = occupation
             self.add_edge(competency=DummyCompetency(), occupation=occupation)
+        else:
+            self._occupations[occupation.identifier].children.update(occupation.children)
+            self._occupations[occupation.identifier].parents.update(occupation.parents)
 
     def add_edge(self, occupation: Occupation=None, competency: Competency=None, edge: CompetencyOccupationEdge=None):
         if edge:

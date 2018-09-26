@@ -208,6 +208,43 @@ class OntologyTest(TestCase):
         assert len(ontology.occupations) == 1
         assert occupation in ontology.occupations
 
+    def test_add_occupation_merge(self):
+        # Should be able to add an occupation that already exists, and it will merge the attributes
+        first_child = Occupation(identifier='456', name='Civil Engineer')
+        parent_occupation = Occupation(identifier='45', name='Engineers')
+        ontology = CompetencyOntology()
+        first_child.add_parent(parent_occupation)
+        ontology.add_occupation(first_child)
+        ontology.add_occupation(parent_occupation)
+
+        parent_occupation = Occupation(identifier='45', name='Engineers')
+        second_child = Occupation(identifier='457', name='Structural Engineer')
+        second_child.add_parent(parent_occupation)
+        ontology.add_occupation(second_child)
+        ontology.add_occupation(parent_occupation)
+
+        assert len(ontology.occupations) == 3
+        assert len(list(ontology.filter_by(lambda edge: edge.occupation.identifier == '45').occupations)[0].children) == 2
+
+    def test_add_competency_merge(self):
+        # Should be able to add an competency that already exists, and it will merge the attributes
+        # Should be able to add a competency to an ontology
+        first_child = Competency(identifier='123', name='writing blog posts')
+        parent_competency = Competency(identifier='12', name='communication')
+        first_child.add_parent(parent_competency)
+        ontology = CompetencyOntology()
+        ontology.add_competency(first_child)
+        ontology.add_competency(parent_competency)
+
+        parent_competency = Competency(identifier='12', name='communication')
+        second_child = Competency(identifier='124', name='public speaking')
+        second_child.add_parent(parent_competency)
+        ontology.add_competency(second_child)
+        ontology.add_competency(parent_competency)
+
+        assert len(ontology.competencies) == 3
+        assert len(list(ontology.filter_by(lambda edge: edge.competency.identifier == '12').competencies)[0].children) == 2
+
     def test_add_edge(self):
         # Should be able to add an edge between an occupation and a competency to an ontology
         occupation = Occupation(identifier='456', name='Civil Engineer')
