@@ -115,11 +115,7 @@ def sentence_tokenize(text: str) -> List[str]:
     """
     sentences = re.split('\n', text)
     sentences = list(filter(None, sentences))
-    try:
-        sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences.encode('utf-8')))
-    except:
-        sentences = reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences))
-    return sentences
+    return reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences))
 
 @deep
 def word_tokenize(text: str, punctuation=True) -> List[str]:
@@ -187,6 +183,8 @@ def section_extract(section_regex: Pattern, document: str) -> List:
     sentence tokenization insufficient if the newlines have been taken out.
     """
     units_in_section = []
+    if not document:
+        return units_in_section
     sentences = sentence_tokenize(document)
     units = [
         unit
@@ -200,7 +198,7 @@ def section_extract(section_regex: Pattern, document: str) -> List:
         if unit.strip() and unit[0] not in BULLET_CHARACTERS and ((words_in_unit > 0 and words_in_unit < 4) or unit.endswith(':')):
             heading = unit
         if re.match(section_regex, heading) and unit != heading and len(unit.strip()) > 0:
-            units_in_section.append(unit.lstrip().rstrip())
+            units_in_section.append(strip_bullets_from_line(unit).lstrip().rstrip())
     return units_in_section
 
 
