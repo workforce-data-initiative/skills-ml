@@ -1,5 +1,8 @@
-from skills_ml.ontologies import Competency, Occupation, CompetencyOccupationEdge, CompetencyOntology, CompetencyFramework
+from skills_ml.ontologies import Competency, Occupation, CompetencyOccupationEdge, CompetencyOntology, CompetencyFramework, research_hub_url
+from skills_ml.storage import FSStore
 from unittest import TestCase
+import tempfile
+import httpretty
 import json
 
 
@@ -336,7 +339,35 @@ class OntologyTest(TestCase):
         assert self.ontology().jsonld == self.jsonld()
 
     def test_import_from_jsonld(self):
-        assert CompetencyOntology.from_jsonld(self.jsonld()) == self.ontology()
+        assert CompetencyOntology(jsonld_string=self.jsonld()) == self.ontology()
+
+    @httpretty.activate
+    def test_import_from_url(self):
+        url = 'http://testurl.com/ontology.json'
+        httpretty.register_uri(
+            httpretty.GET,
+            url,
+            body=self.jsonld(),
+            content_type='application/json'
+        )
+        assert CompetencyOntology(url=url) == self.ontology()
+
+    @httpretty.activate
+    def test_import_from_researchhub(self):
+        url = research_hub_url('testontology')
+        httpretty.register_uri(
+            httpretty.GET,
+            url,
+            body=self.jsonld(),
+            content_type='application/json'
+        )
+        assert CompetencyOntology(research_hub_name='testontology') == self.ontology()
+
+    def test_save(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            storage = FSStore(temp_dir)
+            self.ontology().save(storage)
+            assert CompetencyOntology(jsonld_string=storage.load('Test Ontology.json')) == self.ontology()
 
     def test_competency_counts_per_occupation(self):
         assert sorted(self.ontology().competency_counts_per_occupation) == [2]

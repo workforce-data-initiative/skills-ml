@@ -8,12 +8,22 @@ api_tax = 'https://ec.europa.eu/esco/api/resource/taxonomy?uri=http://data.europ
 
 
 class Esco(CompetencyOntology):
-    def __init__(self):
-        super().__init__()
-        self.is_built = False
-        self.competency_framework.name = 'esco_skills'
-        self.competency_framework.description = 'ESCO Knowledge, Skills/Competencies'
-        self._build()
+    name = 'esco'
+
+    def __init__(self, manual_build=False):
+        if manual_build:
+            logging.info('Manual build specified. Building ESCO CompetencyOntology via direct querying from ESCO. Beware, this could take hours!')
+            super().__init__()
+            self.is_built = False
+            self.competency_framework.name = 'esco_skills'
+            self.competency_framework.description = 'ESCO Knowledge, Skills/Competencies'
+            self._build()
+            self.is_built = True
+        else:
+            # by default, build from research hub
+            logging.info('Building ESCO CompetencyOntology via Research Hub-hosted JSON-LD')
+            super().__init__(research_hub_name='esco')
+
     
     def _build(self):
         if not self.is_built:
@@ -87,7 +97,6 @@ class Esco(CompetencyOntology):
             for skill in allSkills:
                 competency = self.getOrCreateCompetency(skill)
                 self.add_edge(competency=competency, occupation=occupation)
-            self.is_built = True
 
     def _parentProcessing (self, concepts, occupation):
         for iscoGrp in concepts:
