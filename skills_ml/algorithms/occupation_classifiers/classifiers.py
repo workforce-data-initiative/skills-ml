@@ -1,7 +1,8 @@
-from skills_ml.algorithms.embedding.base import ModelStorage
+from skills_ml.algorithms.embedding.base import BaseEmbeddingModel
 from skills_ml.algorithms.embedding.models import Doc2VecModel, EmbeddingTransformer
 from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup
 from skills_ml.ontologies.onet import majorgroupname
+from skills_ml.storage import SerializedByStorage
 
 from sklearn.pipeline import  Pipeline
 
@@ -11,6 +12,7 @@ import logging
 from collections import Counter, defaultdict
 import pickle
 import re
+
 
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
@@ -41,10 +43,13 @@ class SocClassifier(object):
 
 class CombinedClassifier(object):
     def __init__(self, embedding, classifier, target_variable,  **kwargs):
-        self.embedding = embedding
-        self.classifier = classifier
+        self.embedding = SerializedByStorage(embedding)
+        self.classifier = SerializedByStorage(classifier)
         self.target_variable = target_variable
-        self.combined = Pipeline([
+
+    @property
+    def combined(self):
+        return Pipeline([
             ('tokens_to_vector', EmbeddingTransformer(self.embedding)),
             ('classify', self.classifier)
         ])
@@ -62,7 +67,7 @@ class CombinedClassifier(object):
         return f"combined model of {self.embedding.__class__.__name__} and {self.classifier.__class__.__name__}"
 
 
-class KNNDoc2VecClassifier(ModelStorage):
+class KNNDoc2VecClassifier(BaseEmbeddingModel):
     """Nearest neightbors model to classify the jobposting data into soc code.
     If the indexer is passed, then NearestNeighbors will use approximate nearest
     neighbor approach which is much faster than the built-in knn in gensim.
@@ -73,14 +78,14 @@ class KNNDoc2VecClassifier(ModelStorage):
                  If k > 1, classify the soc code by the majority vote of nearest k neighbors.
         indexer (:obj: `gensim.similarities.index`): any kind of gensim compatible indexer
     """
-    def __init__(self, embedding_model, k=1, indexer=None, **kwargs):
+    def __init__(self, embedding_model, k=1, indexer=None, model_name=None, model_storage=None, **kwargs):
         if not isinstance(embedding_model, Doc2VecModel):
             raise NotImplementedError("Only support doc2vec now.")
 
         if not embedding_model.lookup_dict:
             raise ValueError("`lookup_dict` is empty. Re-train the embedding model with `lookup=True` ")
 
-        super().__init__(storage=kwargs.pop('storage', embedding_model._storage))
+        super().__init__(model_name=model_name, model_storage=model_storage)
         self.model = embedding_model
         self.model_name = "knn_cls_" + self.model.model_name
         self.indexer = indexer
@@ -149,8 +154,7 @@ class KNNDoc2VecClassifier(ModelStorage):
         if model_name is None:
             model_name = self.model_name
 
-        model_pickled = pickle.dumps(self)
-        self.storage.write(model_pickled, model_name)
+        self.model_storage.save_model(self, model_name)
         self.indexer = tmp_annoy_index
 
     @property
@@ -164,4 +168,7 @@ class KNNDoc2VecClassifier(ModelStorage):
         elif self.k > 1:
             return f"majority vote of {self.k} nearest neighbors"
 
-
+    def __getstate__(self):
+        result = self.__dict__.copy()
+        result['indexer'] = None
+        return result

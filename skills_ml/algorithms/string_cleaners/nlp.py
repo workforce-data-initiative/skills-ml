@@ -9,6 +9,7 @@ import nltk
 from functools import reduce, wraps
 from typing import List, Set, Generator, Dict, Pattern
 
+
 transforms = ['nlp_a']
 BULLET_CHARACTERS = ['+', '*', '-']
 
@@ -163,6 +164,7 @@ def vectorize(
     Returns:
         np.ndarray: a word embedding vector
     """
+
     return embedding_model.infer_vector(tokenized_text)
 
 

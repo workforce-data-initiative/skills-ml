@@ -8,6 +8,46 @@ from contextlib import contextmanager
 from retrying import retry
 from urllib.parse import urlparse
 
+from sklearn.externals import joblib
+import wrapt
+
+
+class ProxyObjectWithStorage(wrapt.ObjectProxy):
+    """A proxy object for especially scikit-learn models to be equipped
+    with extra attributes storage and model_name without using inheritance.
+
+    Example
+    ```python
+    from sklearn.ensemble import RandomForestClassifier
+    from skills_ml.storage import S3Store
+
+    rf = RandomForestClassifier(n_estimator=100)
+    proxy_rf = ProxyObjectWithStorage(model_obj=rf, storage=S3Store('s3://some_director'), model_name='rf.model')
+    proxy_rf.fit(X, y)
+    ```
+
+
+    Args:
+        storage (skills_ml.storage.Store): the skill_ml storage object
+        model_obj (object): target model object
+        model_name (str): model name
+
+    """
+    __slots__ = ('storage', 'model_name','by_ref')
+    def __init__(self, model_obj, storage=None, model_name=None):
+        self.storage = storage
+        self.model_name = model_name
+        super().__init__(model_obj)
+        self._model_obj = model_obj
+
+    @classmethod
+    def __reconstruct__(cls, model_obj, storage, model_name):
+        return cls(model_obj, storage, model_name)
+
+    def __reduce__(self):
+        return (self.__reconstruct__, (self._model_obj, self.storage, self.model_name))
+
+
 @retry(stop_max_delay=150000, wait_fixed=3000)
 @contextmanager
 def open_sesame(path, *args, **kwargs):
@@ -199,3 +239,99 @@ class PersistedJSONDict(MutableMapping):
 
         json_bytes = json.dumps(self._storage).encode()
         self.fs.write(json_bytes, self.fname)
+
+
+class ModelStorage(object):
+    def __init__(self, storage=None):
+        self._storage = FSStore() if storage is None else storage
+
+    @property
+    def storage(self):
+        return self._storage
+
+    @storage.setter
+    def storage(self, value):
+        if hasattr(value, 'write') and hasattr(value, 'load'):
+            self._storage = value
+        else:
+            raise Exception(f"{value} should have methods 'write()' and 'load()'")
+
+    def load_model(self, model_name, **kwargs):
+        """The method to load the model from where Storage object specified
+
+        model_name (str): name of the model to be used.
+        """
+        with self.storage.open(model_name, "rb") as f:
+            model = joblib.load(f)
+
+        return model
+
+    def save_model(self, model, model_name):
+        """The method to write the model to where the Storage object specified
+
+        model_name (str): name of the model to be used.
+        """
+        with self.storage.open(model_name, "wb") as f:
+            joblib.dump(model, f, compress=True)
+
+
+class SerializedByStorage(object):
+    """It's a wrapper of a model that we want any other object containing it could be serialized
+    by the storage, so that those model already stored somewhere won't be pickled again, but the
+    reference(storage).
+
+    Args:
+        model (object): target object to be serialized by storage
+        storage (skills_ml.storage.Store): skills_ml storage object
+        model_name (str): model name
+
+    """
+    def __init__(self, model=None, storage=None, model_name=None):
+        self._model = model
+        if storage is not None:
+            self.storage = storage
+        else:
+            if hasattr(model, 'storage'):
+                self.storage = model.storage
+            else:
+                self.storage = None
+        self.model_name = model_name
+
+    def __getitem__(self, item):
+        if self._model is None:
+            logging.info("Model wasn't loaded yet!")
+        result = self.model[item]
+        return result
+
+    def __getattr__(self, item):
+        if item not in self.__dict__.keys():
+            if self._model is None:
+                logging.info("Model wasn't loaded yet!")
+                self._model = self.load_model()
+            result = getattr(self._model, item)
+            return result
+
+    @property
+    def model(self):
+        if self._model is None:
+            logging.info(f"Loading Model-{self.model_name} from {self.storage.path}")
+            self._model = self.load_model()
+        return self._model
+
+    @model.setter
+    def model(self, model):
+        self._model = model
+
+    def load_model(self):
+        ms = ModelStorage(self.storage)
+        return ms.load_model(self.model_name)
+
+    def __getstate__(self):
+        result = self.__dict__.copy()
+        if self.storage is not None:
+            result['_model'] = None
+        return result
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+

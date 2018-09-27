@@ -1,7 +1,9 @@
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
+from skills_ml.algorithms.embedding.base import BaseEmbeddingModel
 from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel, FastTextModel
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
+from skills_ml.storage import ModelStorage
 
 from numpy.testing import assert_array_equal, assert_almost_equal
 
@@ -11,7 +13,21 @@ import logging
 logging.getLogger('boto').setLevel(logging.CRITICAL)
 
 
+class FakeModel(BaseEmbeddingModel):
+    def __init__(self, model_name=None, model_storage=None):
+        super()
+        self.model_type = "fake"
+
+
 class TestEmbeddingModels(unittest.TestCase):
+    def test_base_embedding(self):
+        model_storage = ModelStorage()
+        fake = FakeModel()
+        self.assertRaises(AttributeError, lambda: fake.save() )
+
+        fake = FakeModel(model_storage=model_storage)
+        self.assertRaises(AttributeError, lambda: fake.save())
+
     def test_word2vec(self):
         document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
         job_postings_generator = JobPostingCollectionSample(num_records=50)

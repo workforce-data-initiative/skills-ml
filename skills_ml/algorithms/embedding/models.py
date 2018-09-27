@@ -1,6 +1,6 @@
 """Embedding model class inherited the interface from gensim"""
-from skills_ml.storage import FSStore
-from skills_ml.algorithms.embedding.base import ModelStorage
+from skills_ml.storage import FSStore, ModelStorage
+from skills_ml.algorithms.embedding.base import BaseEmbeddingModel
 
 from gensim.models import Doc2Vec, Word2Vec
 from gensim.models.fasttext import FastText as FT_gensim
@@ -10,7 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 import logging
 
-class Word2VecModel(ModelStorage, Word2Vec):
+class Word2VecModel(BaseEmbeddingModel, Word2Vec):
     """The Word2VecModel inherited from gensim's Word2Vec model (
     https://radimrehurek.com/gensim/models/word2vec.html) for training,
     using and evaluating word embedding with extension methods.
@@ -22,12 +22,15 @@ class Word2VecModel(ModelStorage, Word2Vec):
     word2vec_model = Word2VecModel()
     ```
     """
-    def __init__(self, *args, **kwargs):
-        ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
+    def __init__(self, model_name=None, storage=None, *args, **kwargs):
+        """
+        Attributes:
+            storage (:obj: `skills_ml.Store`): skills_ml Store object
+            model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model.
+        """
+        BaseEmbeddingModel.__init__(self, model_name=model_name, storage=storage)
         Word2Vec.__init__(self, *args, **kwargs)
-        self.model_name = ""
-        self.model_type = "word2vec"
-        self._metadata = None
+        self.model_type = Word2Vec.__name__.lower()
 
     def infer_vector(self, doc_words, warning=False):
         """
@@ -55,7 +58,7 @@ class Word2VecModel(ModelStorage, Word2Vec):
         return sentence_vector
 
 
-class Doc2VecModel(ModelStorage, Doc2Vec):
+class Doc2VecModel(BaseEmbeddingModel, Doc2Vec):
     """The Doc2VecModel inherited from gensim's Doc2Vec model (
     https://radimrehurek.com/gensim/models/doc2vec) for training,
     using and evaluating word embedding with extension methods.
@@ -67,15 +70,13 @@ class Doc2VecModel(ModelStorage, Doc2Vec):
     doc2vec_model = Doc2VecModel()
     ```
     """
-    def __init__(self, *args, **kwargs):
-        ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
+    def __init__(self, model_name=None, storage=None, *args, **kwargs):
+        BaseEmbeddingModel.__init__(self, model_name=model_name, storage=storage)
         Doc2Vec.__init__(self, *args, **kwargs)
-        self.model_name = ""
-        self.model_type = "doc2vec"
+        self.model_type = Doc2Vec.__name__.lower()
         self.lookup_dict = None
 
-
-class FastTextModel(ModelStorage, FT_gensim):
+class FastTextModel(BaseEmbeddingModel, FT_gensim):
     """The FastTextModel inhereited from gensim's FastText model (
     https://radimrehurek.com/gensim/models/fasttext.html) for training,
     using and evaluating word embedding with extension methods.
@@ -87,11 +88,10 @@ class FastTextModel(ModelStorage, FT_gensim):
         fasttext = FastTextModel()
         ```
     """
-    def __init__(self, *args, **kwargs):
-        ModelStorage.__init__(self, storage=kwargs.pop('storage', None))
+    def __init__(self, model_name=None, storage=None, *args, **kwargs):
+        BaseEmbeddingModel.__init__(self, model_name=model_name, storage=storage)
         FT_gensim.__init__(self, *args, **kwargs)
-        self.model_name = ""
-        self.model_type = "fasttext"
+        self.model_type = FT_gensim.__name__.lower()
 
     def infer_vector(self, doc_words, warning=False):
          """

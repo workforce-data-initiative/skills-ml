@@ -7,7 +7,7 @@ from skills_ml.algorithms.embedding.models import Word2VecModel
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.string_cleaners import nlp
 from skills_ml.algorithms.preprocessing import IterablePipeline
-from skills_ml.storage import FSStore
+from skills_ml.storage import FSStore, ModelStorage
 
 import os
 import time
@@ -16,6 +16,8 @@ import unittest
 import mock
 from descriptors import cachedproperty
 from functools import partial
+from sklearn.externals import joblib
+
 
 grid = {
         'sklearn.ensemble.ExtraTreesClassifier': {
@@ -120,7 +122,7 @@ class TestClassifierTrainer(unittest.TestCase):
                     storage=FSStore(td),
                     grid_config=grid,
                     scoring=['accuracy'])
-            occ_trainer.train()
+            occ_trainer.train(save=True)
             assert set(os.listdir(os.getcwd())) ==  set([occ_trainer.train_time])
 
     def test_one_filter(self):

@@ -5,7 +5,7 @@ from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup, DesignMat
 from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel, EmbeddingTransformer
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora import Word2VecGensimCorpusCreator
-from skills_ml.storage import S3Store, FSStore
+from skills_ml.storage import ModelStorage, S3Store, FSStore
 from skills_ml.algorithms.string_cleaners import nlp
 from skills_ml.algorithms.preprocessing import IterablePipeline
 
@@ -109,10 +109,11 @@ class TestCombinedClassifier(unittest.TestCase):
     def test_combined_cls_local(self, mock_getcwd):
         with tempfile.TemporaryDirectory() as td:
             mock_getcwd.return_value = td
+            model_storage = ModelStorage(FSStore(td))
             jobpostings = JobPostingCollectionSample()
             corpus_generator = Word2VecGensimCorpusCreator(jobpostings, raw=True)
-            w2v = Word2VecModel(storage=FSStore(td), size=10, min_count=0, alpha=0.025, min_alpha=0.025)
-            trainer = EmbeddingTrainer(corpus_generator, w2v)
+            w2v = Word2VecModel(size=10, min_count=0, alpha=0.025, min_alpha=0.025)
+            trainer = EmbeddingTrainer(corpus_generator, w2v, model_storage)
             trainer.train(True)
 
             matrix = DesignMatrix(jobpostings, self.major_group, self.pipe_x, self.pipe_y)
@@ -137,9 +138,10 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
     def test_knn_doc2vec_cls_local(self, mock_getcwd):
         with tempfile.TemporaryDirectory() as td:
             mock_getcwd.return_value = td
+            model_storage = ModelStorage(FSStore(td))
             corpus_generator = FakeCorpusGenerator()
-            d2v = Doc2VecModel(storage=FSStore(td), size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
-            trainer = EmbeddingTrainer(corpus_generator, d2v)
+            d2v = Doc2VecModel(size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
+            trainer = EmbeddingTrainer(corpus_generator, d2v, model_storage)
             trainer.train(True)
 
             # KNNDoc2VecClassifier only supports doc2vec now
@@ -160,12 +162,12 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
             assert isinstance(knn.indexer, AnnoyIndexer)
 
             # Save
-            knn.save()
+            model_storage.save_model(knn, knn.model_name)
             assert set(os.listdir(os.getcwd())) == set([knn.model_name])
             assert isinstance(knn.indexer, AnnoyIndexer)
 
             # Load
-            new_knn = KNNDoc2VecClassifier.load(FSStore(td), knn.model_name)
+            new_knn = model_storage.load_model(knn.model_name)
             assert new_knn.model_name ==  knn.model_name
             assert new_knn.predict_soc([doc])[0][0] == '29-2061.00'
 
@@ -178,18 +180,18 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
         client.create_bucket(Bucket='fake-open-skills', ACL='public-read-write')
         s3_path = f"s3://fake-open-skills/model_cache/soc_classifiers"
         s3_storage = S3Store(path=s3_path)
-
+        model_storage = ModelStorage(s3_storage)
         corpus_generator = FakeCorpusGenerator()
 
         # Embedding has no lookup_dict
-        d2v = Doc2VecModel(storage=s3_storage, size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
-        trainer = EmbeddingTrainer(corpus_generator, d2v)
+        d2v = Doc2VecModel(size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
+        trainer = EmbeddingTrainer(corpus_generator, d2v, model_storage)
         trainer.train(lookup=False)
 
         self.assertRaises(ValueError, lambda: KNNDoc2VecClassifier(embedding_model=d2v))
 
-        d2v = Doc2VecModel(storage=s3_storage, size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
-        trainer = EmbeddingTrainer(corpus_generator, d2v)
+        d2v = Doc2VecModel(size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
+        trainer = EmbeddingTrainer(corpus_generator, d2v, model_storage)
         trainer.train(lookup=True)
 
         # KNNDoc2VecClassifier only supports doc2vec now
@@ -212,12 +214,12 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
 
         # Save
         s3 = s3fs.S3FileSystem()
-        knn.save()
+        model_storage.save_model(knn, knn.model_name)
         files = [f.split('/')[-1] for f in s3.ls(s3_path)]
         assert set(files) == set([knn.model_name])
 
         # Load
-        new_knn = KNNDoc2VecClassifier.load(s3_storage, knn.model_name)
+        new_knn = model_storage.load_model(knn.model_name)
         assert new_knn.model_name ==  knn.model_name
         assert new_knn.predict_soc([doc])[0][0] == '29-2061.00'
 
