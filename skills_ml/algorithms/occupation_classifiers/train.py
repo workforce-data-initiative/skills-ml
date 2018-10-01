@@ -16,7 +16,7 @@ import logging
 from datetime import datetime
 from itertools import zip_longest, tee
 from typing import Type, Union
-import pickle
+import dill
 import os
 
 
@@ -124,4 +124,5 @@ class OccupationClassifierTrainer(object):
 
     def _save(self, cls_cv, path_to_save):
         with open_sesame(path_to_save, 'wb') as f:
-            joblib.dump(cls_cv, f, compress=True)
+            dill.dump(cls_cv, f)
+
