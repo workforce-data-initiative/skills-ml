@@ -41,6 +41,7 @@ class OccupationClassifierTrainer(object):
         self.scoring = scoring
         self.random_state_for_split = random_state_for_split
         self.train_time = datetime.today().isoformat()
+        self.best_estimators = []
 
     @property
     def default_grid_config(self):
@@ -85,15 +86,24 @@ class OccupationClassifierTrainer(object):
                     cls_cv = ProxyObjectWithStorage(
                             model_obj=GridSearchCV(estimator=cls(), param_grid=parameter_config, cv=kf, scoring=score),
                             storage=self.storage,
-                            model_name=trained_model_name)
+                            model_name=trained_model_name,
+                            target_variable=self.matrix.target_variable
+                            )
                 else:
-                    cls_cv = GridSearchCV(estimator=cls(n_jobs=self.n_jobs), param_grid=parameter_config, cv=kf, scoring=score)
-                    cls_cv = ProxyObjectWithStorage(model_obj=cls_cv, storage=self.storage, model_name=trained_model_name)
+                    cls_cv = ProxyObjectWithStorage(
+                            model_obj=GridSearchCV(estimator=cls(n_jobs=self.n_jobs), param_grid=parameter_config, cv=kf, scoring=score),
+                            storage=self.storage,
+                            model_name=trained_model_name,
+                            target_variable=self.matrix.target_variable
+                            )
                 cls_cv.fit(X, y)
                 self.cls_cv_result[score][class_name] = cls_cv.cv_results_
                 if save:
                     logging.info(f"storing {class_name} {model_hash} to {store_path}")
                     self._save(cls_cv, os.path.join(store_path, score, trained_model_name))
+                else:
+                    logging.info("appending classifier")
+                    self.best_estimators.append(cls_cv)
 
     def unique_parameters(self, parameters):
         return {

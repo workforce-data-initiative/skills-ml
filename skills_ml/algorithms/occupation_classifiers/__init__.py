@@ -35,7 +35,6 @@ class TargetVariable(ABC):
         else:
             return self.default_filters
 
-    @property
     def filter(self, item):
         if self.filter_func(item):
             return item
@@ -50,6 +49,10 @@ class TargetVariable(ABC):
     def transformer(self):
         pass
 
+    @abstractmethod
+    def extract_occupation_from_jobposting(self, job_posting):
+        pass
+
 
 class SOCMajorGroup(TargetVariable):
     name = 'major_group'
@@ -62,7 +65,10 @@ class SOCMajorGroup(TargetVariable):
 
     @property
     def transformer(self):
-        return lambda job_posting: self.encoder.transform([get_onet_occupation(job_posting)[:2]])
+        return lambda job_posting: self.encoder.transform([self.extract_occupation_from_jobposting(job_posting)[0]])
+
+    def extract_occupation_from_jobposting(self, job_posting):
+        return (get_onet_occupation(job_posting)[:2], job_posting['id'])
 
 
 class FullSOC(TargetVariable):
@@ -75,9 +81,12 @@ class FullSOC(TargetVariable):
         self.choices = self.onet.all_soc
         self.encoder = SocEncoder(self.choices)
 
+    def extract_occupation_from_jobposting(self, job_posting):
+        return (get_onet_occupation(job_posting), job_posting['id'])
+
     @property
     def transformer(self):
-        return lambda job_posting: self.encoder.transform([get_onet_occupation(job_posting)])
+        return lambda job_posting: self.encoder.transform([self.extract_occupation_from_jobposting(job_posting)[0]])
 
 
 class DesignMatrix(object):
@@ -137,5 +146,4 @@ class DesignMatrix(object):
                 'pipe_y': self.pipe_y.description,
                 'target_variable': self.target_variable.name
                 }
-        meta_dict.update(self.data_source_generator.metadata)
         return meta_dict
