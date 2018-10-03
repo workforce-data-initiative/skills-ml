@@ -185,6 +185,18 @@ class InMemoryStore(Store):
         return [key for key in self.store if key.startswith(subpath)]
 
 
+def store_from_path(path):
+    path_parsed = urlparse(path)
+    scheme = path_parsed.scheme
+
+    if not scheme or scheme == 'file':
+        return FSStore(path)
+    elif scheme == 's3':
+        return S3Store(path)
+    elif scheme == 'memory':
+        return InMemoryStore(path)
+
+
 class PersistedJSONDict(MutableMapping):
 
     SAVE_EVERY_N_UPDATES = 1000

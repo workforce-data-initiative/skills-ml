@@ -1,4 +1,5 @@
 from copy import deepcopy
+import json
 import logging
 import unicodecsv as csv
 from statistics import mean
@@ -9,6 +10,9 @@ from descriptors import cachedproperty
 from skills_utils.iteration import Batch
 from skills_utils.s3 import S3BackedJsonDict
 from skills_utils.hash import md5
+from skills_ml.algorithms.skill_extractors.base import CandidateSkill
+from skills_ml.algorithms.sampling import Sample
+from skills_ml.storage import store_from_path
 from skills_ml.job_postings import JobPosting
 
 from typing import Dict
@@ -269,7 +273,7 @@ class BratExperiment(object):
                 'entity' # the name of the configured entity (e.g. Skill) that the user annotated
                 'start_index': # the start index of the annotation in the text
                 'end_index': # the end index of the annotation in the text
-                'labeled_string': # the text string that the user annotated
+                'labeled_string': # the text string that the user annotated,
             }
         Returns: (dict) The annotations by unit, posting key, and user name
         """
@@ -282,7 +286,6 @@ class BratExperiment(object):
                 allocation_path = self.allocation_path(user_name, unit_name)
                 for key in self.s3.ls(allocation_path + '/'):
                     # this will iterate through both posting text (.txt) and annotation (.ann)
-                    # files, in this case we really only care about the annotations
                     if key.endswith('.ann'):
                         posting_key = key.split('/')[-1].replace('.ann', '')
                         with self.s3.open(key) as f:
@@ -302,8 +305,8 @@ class BratExperiment(object):
                                     'end_index': int(end),
                                     'labeled_string': string,
                                 })
-                            annotations_by_unit[unit_name][posting_key][user_name] = \
-                                converted_annotations
+                        annotations_by_unit[unit_name][posting_key][user_name] = \
+                            converted_annotations
 
         return annotations_by_unit
 
@@ -434,21 +437,31 @@ class BratExperiment(object):
         return labels_with_agreement
 
     @cachedproperty
-    def labels_with_agreement(self):
-        """Fetch flattened annotations with percent agreement
-            Each annotation is a dictionary of: {
-                'entity' # the name of the configured entity (e.g. Skill) that the user/s annotated
-                'start_index': # the start index of the annotation in the text
-                'end_index': # the end index of the annotation in the text
-                'labeled_string': # the text string that the user/s annotated
-                'percent_tagged': # of users that saw this posting, what percentage tagged this
-                'number_seen' # how many users saw this job posting
-                'job_posting_id' # the globally unique job posting id (from the original sample)
-            }
-        Returns: (list) The annotations with percent agreement
+    def sample_lookup(self):
+        if 'sample_base_path' not in self.metadata or 'sample_name' not in self.metadata:
+            raise ValueError('Sample information needs to be available to look up sample. Have you run .start on this BratExperiment yet?')
+        sample = Sample(store_from_path(self.metadata['sample_base_path']), self.metadata['sample_name'])
+        lookup = {}
+        for line in sample:
+           obj = json.loads(line) 
+           lookup[obj['id']] = obj
+        return lookup
+
+    def saved_text_lookup(self, unit, posting_key):
+        textfilename = '/'.join([self.unit_path(unit), str(posting_key)])
+        with self.s3.open(textfilename + '.txt', 'rb') as f:
+            text = f.read().decode('utf-8')
+            return text
+
+
+    @cachedproperty
+    def candidate_skills(self):
+        """Format labels as CandidateSkills.
+
+        Returns: (list) Flattened labels as CandidateSkill objects
         """
         by_unit = self.labels_with_agreement_by_unit
-        flattened_labels = []
+        candidate_skills = []
         for unit, unit_annotations in by_unit.items():
             posting_id_lookup = dict(self.metadata['units'][unit])
             for posting_key, posting_annotations in unit_annotations.items():
@@ -458,10 +471,22 @@ class BratExperiment(object):
                     posting_id_lookup
                 )
                 job_posting_id = posting_id_lookup[int(posting_key)]
+                text = self.saved_text_lookup(unit, posting_key)
                 for annotation in posting_annotations:
                     annotation['job_posting_id'] = job_posting_id
-                    annotation['sample_name'] = self.metadata['sample_name']
-                    flattened_labels.append(annotation)
-        # take labels with agreement by unit
-        # flatten, taking unit/posting key and looking up job posting id to include in dict
-        return flattened_labels
+                    if annotation['start_index'] - 100 < 0:
+                        context_start = 0
+                    else:
+                        context_start = annotation['start_index'] - 100
+                    candidate_skills.append(CandidateSkill(
+                        skill_name=annotation['labeled_string'],
+                        matched_skill_identifier=None,
+                        context=text[context_start:annotation['end_index']+100],
+                        start_index=annotation['start_index'],
+                        confidence=annotation['percent_tagged'],
+                        document_id=job_posting_id,
+                        document_type='JobPosting',
+                        source_object=self.sample_lookup[job_posting_id],
+                        skill_extractor_name='human_labeler',
+                    ))
+        return candidate_skills
