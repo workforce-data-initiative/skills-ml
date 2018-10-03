@@ -69,7 +69,6 @@ class TestOccupationClassifierTester(unittest.TestCase):
         train_matrix.build()
         occ_trainer = OccupationClassifierTrainer(train_matrix, 2, grid_config=self.grid_config)
         occ_trainer.train(save=False)
-        print(occ_trainer.best_estimators[0].target_variable)
         cc = CombinedClassifier(w2v, occ_trainer.best_estimators[0])
 
         steps = self.pipe_x.generators[:-1]
