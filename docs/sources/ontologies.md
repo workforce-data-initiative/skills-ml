@@ -233,6 +233,11 @@ ontology = CompetencyOntology.from_jsonld({
 })
 ```
 
+## Creating CompetencyOntology from CandidateSkills
+
+To evaluate a method of skill extraction, it can be useful to format the output (a collection of CandidateSkill objects) as a CompetencyOntology. Importing `skills_ml.ontologies.from_candidate_skills.ontology_from_candidate_skills` enables this conversion. At present, the `ontology_from_candidate_skills` simply adds each of the found competencies to a bare ontology, and optionally associates them with the source object's occupation if tagged with one.
+
+
 ## Included Ontologies
 
 ### ONET
