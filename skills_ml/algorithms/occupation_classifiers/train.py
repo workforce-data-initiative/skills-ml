@@ -17,7 +17,7 @@ from datetime import datetime
 from itertools import zip_longest, tee
 from typing import Type, Union
 import dill
-
+import inspect
 import os
 
 
@@ -83,16 +83,16 @@ class OccupationClassifierTrainer(object):
                 model_hash = self._model_hash(self.matrix.metadata, class_name, parameter_config)
                 trained_model_name = class_name.lower() + "_" + model_hash
                 self.storage.path = os.path.join(store_path, score, trained_model_name)
-                if class_name == "SVC" or class_name == "MLPClassifier":
+                if 'n_jobs' in inspect.signature(cls).parameters.keys():
                     cls_cv = ProxyObjectWithStorage(
-                            model_obj=GridSearchCV(estimator=cls(), param_grid=parameter_config, cv=kf, scoring=score),
+                            model_obj=GridSearchCV(estimator=cls(n_jobs=self.n_jobs), param_grid=parameter_config, cv=kf, scoring=score),
                             storage=self.storage,
                             model_name=trained_model_name,
                             target_variable=self.matrix.target_variable
                             )
                 else:
                     cls_cv = ProxyObjectWithStorage(
-                            model_obj=GridSearchCV(estimator=cls(n_jobs=self.n_jobs), param_grid=parameter_config, cv=kf, scoring=score),
+                            model_obj=GridSearchCV(estimator=cls(), param_grid=parameter_config, cv=kf, scoring=score),
                             storage=self.storage,
                             model_name=trained_model_name,
                             target_variable=self.matrix.target_variable
