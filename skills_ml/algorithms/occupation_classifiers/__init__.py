@@ -18,20 +18,8 @@ class SocEncoder(LabelEncoder):
         self.fit(label_list)
 
 unknown_soc_filter = lambda job: job['onet_soc_code'][:2] != '99'
-
-# def unknow_soc_filter(job_posting):
-#     if job_posting['onet_soc_code'][:2] != '99':
-#         return True
-#     else:
-#         return False
-
 empty_soc_filter = lambda job: job['onet_soc_code'] != ''
 
-# def empty_soc_filter(job_posting):
-#     if job_posting['onet_soc_code'] != '':
-#         return True
-#     else:
-#         return False
 
 class TargetVariable(ABC):
     def __init__(self, filters=None):
@@ -91,7 +79,6 @@ class FullSOC(TargetVariable):
     def __init__(self, filters=None, onet_cache=None):
         super().__init__(filters)
         self.default_filters = [unknown_soc_filter, empty_soc_filter]
-        # self.onet = Onet(onet_cache)
         self.choices = all_soc
         self.encoder = SocEncoder(self.choices)
 
