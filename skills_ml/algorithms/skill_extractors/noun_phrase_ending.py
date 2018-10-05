@@ -193,7 +193,7 @@ class NPEndPatternExtractor(SkillExtractor):
             found in the job posting
         """
         document = self.transform_func(source_object)
-        for cleaned_phrase, context in self.noun_phrases_matching_endings(document):
+        for cleaned_phrase, context, phrase_start in self.noun_phrases_matching_endings(document):
             orig_context = self.detokenizer.detokenize([t[0] for t in context], return_str=True)
             logging.info(
                 'Yielding candidate skill %s in context %s',
@@ -205,6 +205,7 @@ class NPEndPatternExtractor(SkillExtractor):
                 matched_skill_identifier=None,
                 confidence=self.confidence,
                 context=orig_context,
+                start_index=phrase_start,
                 document_id=source_object['id'],
                 document_type=source_object['@type'],
                 source_object=source_object,
@@ -218,11 +219,13 @@ class NPEndPatternExtractor(SkillExtractor):
             document (string) A raw text document, such as a job posting
 
         Yields:
-            tuples, each with two strings:
+            tuples, each with:
                 - a noun phrase
                 - the context of the noun phrase (currently defined as the surrounding sentence)
+                - the index of the start of the phrase in the document
         """
         lines = document.split('\n')
+        phrase_start = 0
         for line in lines:
             if not self.only_bulleted_lines or is_bulleted(line):
                 for noun_phrase, context in noun_phrases_in_line_with_context(line):
@@ -230,7 +233,8 @@ class NPEndPatternExtractor(SkillExtractor):
                     if term_list[-1].lower() in self.endings:
                         cleaned_phrase = clean_beginning(noun_phrase).lower()
                         if cleaned_phrase not in self.stop_phrases:
-                            yield cleaned_phrase, context
+                            yield cleaned_phrase, context, phrase_start
+                    phrase_start += len(noun_phrase)
 
 
 class SkillEndingPatternExtractor(NPEndPatternExtractor):

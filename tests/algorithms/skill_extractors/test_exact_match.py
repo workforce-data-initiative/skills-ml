@@ -46,8 +46,10 @@ def test_exactmatch_skill_extractor_candidate_skills():
     assert candidate_skills[0].matched_skill_identifier == 'c'
     assert candidate_skills[0].context == 'One-two years cooking experience in a professional kitchen'
     assert candidate_skills[0].confidence == 100
+    assert candidate_skills[0].start_index == 164
 
     assert candidate_skills[1].skill_name == 'organization'
     assert candidate_skills[1].matched_skill_identifier == 'a'
     assert candidate_skills[1].context == 'Organization, Cleanliness, Trainability, team player, good communication skillz, Motivation, a Sense of Responsibility and Pride in your Performance'
     assert candidate_skills[1].confidence == 100
+    assert candidate_skills[1].start_index == 430

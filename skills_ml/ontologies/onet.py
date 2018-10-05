@@ -32,14 +32,19 @@ majorgroupname = {
 
 
 class Onet(CompetencyOntology):
-    def __init__(self, onet_cache=None):
-        super().__init__()
-        self.is_built = False
-        self.onet_cache = onet_cache or OnetSiteCache()
-        self.name = 'onet'
-        self.competency_framework.name = 'onet_ksat'
-        self.competency_framework.description = 'ONET Knowledge, Skills, Abilities, Tools, and Technology'
-        self._build()
+    def __init__(self, onet_cache=None, manual_build=True):
+        if manual_build:
+            logging.info('Manual build specified. Building O*NET CompetencyOntology via direct querying from O*NET site, or local cache.')
+            super().__init__()
+            self.is_built = False
+            self.onet_cache = onet_cache or OnetSiteCache()
+            self.name = 'onet'
+            self.competency_framework.name = 'onet_ksat'
+            self.competency_framework.description = 'ONET Knowledge, Skills, Abilities, Tools, and Technology'
+            self._build()
+        else:
+            logging.info('Building O*NET CompetencyOntology via Research Hub-hosted JSON-LD')
+            super().__init__(research_hub_name='onet')
 
     def _build(self):
         if not self.is_built:

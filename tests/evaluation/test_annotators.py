@@ -1,4 +1,5 @@
 from skills_utils.hash import md5
+from skills_ml.algorithms.skill_extractors.base import CandidateSkill
 from skills_ml.evaluation.annotators import BratExperiment
 from skills_ml.algorithms.sampling import Sample
 from skills_ml.storage import S3Store
@@ -358,7 +359,7 @@ class TestLabelsWithAgreementByUnit(unittest.TestCase):
 
 @mock_s3
 @mock_s3_deprecated
-def test_BratExperiment_labels_with_agreement():
+def test_BratExperiment_candidate_skills():
     s3 = boto3.resource('s3')
     bucket = s3.create_bucket(Bucket='test-bucket')
 
@@ -385,13 +386,62 @@ def test_BratExperiment_labels_with_agreement():
             (1, 'ABC_4823943'),
         ]
     }
+    source_object = {'marco': 'polo'},
+    sample_lookup = {
+        'ABC_91238': source_object,
+        'ABC_4823943': source_object
+    }
+    experiment.sample_lookup = sample_lookup
+    def text_lookup(unit_name, posting_key):
+        return 'thetext'
+    experiment.saved_text_lookup = text_lookup
     experiment.metadata['sample_name'] = 'test-sample'
     experiment.metadata.save()
-    assert experiment.labels_with_agreement == [
-        {'job_posting_id': 'ABC_91238', 'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling', 'percent_tagged': 1.0, 'number_seen': 2, 'sample_name': 'test-sample'},
-        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming', 'percent_tagged': 1.0, 'number_seen': 2, 'sample_name': 'test-sample'},
-        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 39, 'end_index': 65, 'labeled_string': 'substance abuse counseling', 'percent_tagged': 0.5, 'number_seen': 2, 'sample_name': 'test-sample'},
-        {'job_posting_id': 'ABC_4823943', 'entity': 'Skill', 'start_index': 49, 'end_index': 65, 'labeled_string': 'abuse counseling', 'percent_tagged': 0.5, 'number_seen': 2, 'sample_name': 'test-sample'}
+    assert experiment.candidate_skills == [
+        CandidateSkill(
+            skill_name='substance abuse counseling',
+            matched_skill_identifier=None,
+            context='thetext',
+            start_index=44,
+            document_id='ABC_91238',
+            document_type='JobPosting',
+            confidence=1.0,
+            source_object=source_object,
+            skill_extractor_name='human_labeler',
+        ),
+        CandidateSkill(
+            skill_name='python programming',
+            matched_skill_identifier=None,
+            context='thetext',
+            start_index=16,
+            document_id='ABC_4823943',
+            document_type='JobPosting',
+            confidence=1.0,
+            source_object=source_object,
+            skill_extractor_name='human_labeler',
+        ),
+        CandidateSkill(
+            skill_name='substance abuse counseling',
+            matched_skill_identifier=None,
+            context='thetext',
+            start_index=39,
+            document_id='ABC_4823943',
+            document_type='JobPosting',
+            confidence=0.5,
+            source_object=source_object,
+            skill_extractor_name='human_labeler',
+        ),
+        CandidateSkill(
+            skill_name='abuse counseling',
+            matched_skill_identifier=None,
+            context='thetext',
+            start_index=49,
+            document_id='ABC_4823943',
+            document_type='JobPosting',
+            confidence=0.5,
+            source_object=source_object,
+            skill_extractor_name='human_labeler',
+        ),
     ]
 
 
@@ -478,21 +528,50 @@ def test_BratExperiment_annotations_by_unit():
     assert experiment.annotations_by_unit['unit_1'] == {
         '0': {
             'user_1': [
-                {'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling'}
+                {
+                    'entity': 'Skill',
+                    'start_index': 44,
+                    'end_index': 70,
+                    'labeled_string': 'substance abuse counseling',
+                }
             ],
             'user_2': [
-                {'entity': 'Skill', 'start_index': 44, 'end_index': 70, 'labeled_string': 'substance abuse counseling'}
+                {
+                    'entity': 'Skill',
+                    'start_index': 44,
+                    'end_index': 70,
+                    'labeled_string': 'substance abuse counseling',
+                }
             ]
         },
         '1': {
             'user_1': [
-                {'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming'},
-                {'entity': 'Skill', 'start_index': 39, 'end_index': 65, 'labeled_string': 'substance abuse counseling'}
+                {
+                    'entity': 'Skill',
+                    'start_index': 16,
+                    'end_index': 33,
+                    'labeled_string': 'python programming',
+                },
+                {
+                    'entity': 'Skill',
+                    'start_index': 39,
+                    'end_index': 65,
+                    'labeled_string': 'substance abuse counseling',
+                }
             ],
             'user_2': [
-                {'entity': 'Skill', 'start_index': 16, 'end_index': 33, 'labeled_string': 'python programming'},
-                {'entity': 'Skill', 'start_index': 49, 'end_index': 65, 'labeled_string': 'abuse counseling'}
+                {
+                    'entity': 'Skill',
+                    'start_index': 16,
+                    'end_index': 33,
+                    'labeled_string': 'python programming',
+                },
+                {
+                    'entity': 'Skill',
+                    'start_index': 49,
+                    'end_index': 65,
+                    'labeled_string': 'abuse counseling',
+                }
             ],
         }
     }
-

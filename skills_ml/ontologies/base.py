@@ -4,6 +4,12 @@ import json
 from statistics import median
 from functools import total_ordering
 import itertools
+import requests
+
+
+def research_hub_url(name: Text) -> Text:
+    """Retrieve the current Research Hub URL for ontologies"""
+    return 'https://open-skills-datasets.s3-us-west-2.amazonaws.com/v3/ontologies/' + name + '.json'
 
 
 @total_ordering
@@ -236,70 +242,102 @@ class CompetencyFramework(MutableMapping):
     def __init__(self, name=None, description=None, competencies=None):
         self.name = name or ''
         self.description = description or ''
-        self.competencies = {}
-        for competency in competencies or []:
-            self.competencies[competency.identifier] = competency
+        self._competencies = dict()
+        if competencies:
+            self.competencies = competencies
 
     def __setitem__(self, key, value):
-        self.competencies[key] = value
+        self._competencies[key] = value
 
     def __getitem__(self, key):
-        return self.competencies[key]
+        return self._competencies[key]
 
     def __delitem__(self, key):
-        del self.competencies[key]
+        del self._competencies[key]
 
     def __iter__(self):
-        return iter(self.competencies)
+        return iter(self._competencies)
 
     def __len__(self):
-        return len(self.competencies)
+        return len(self._competencies)
 
     def add(self, value):
-        if value.identifier in self.competencies:
+        if value.identifier in self._competencies:
             raise ValueError(f"{value} already in framework")
-        self.competencies[value.identifier] = value
+        self._competencies[value.identifier] = value
+
+    @property
+    def competencies(self):
+        return self._competencies
+
+    @competencies.setter
+    def competencies(self, competencies):
+        for competency in competencies:
+            self._competencies[competency.identifier] = competency
         
 
 class CompetencyOntology(object):
-    """An ontology of competencies and occupations and the edges between them
+    """An ontology of competencies and occupations (each referred to as nodes) and the edges between them
     
-    Can be initialized with a set of edges, in which case the competencies and occupations will be initialized with any that are present in the edge list
+    Can be initialized with:
+        - a JSON-LD string, in which case all nodes and edges will be initialized from the parsed JSON-LD
+        - a URL, in which case the URL is presumed to contain JSON-LD, parsed, and all nodes and edges will be initialized from the parsed JSON-LD
+        - a research hub name, in which case the Open Skills Research Hub is presumed to host an ontology by that name. a URL is built based on the name and the nodes and edges will be initialized from the parsed JSON-LD
+        - a set of edges, in which case all nodes will be initialized with any that are present in the edge list
     """
     name = 'unnamed_ontology'
 
-    def __init__(self, edges=None, name=None, competency_name=None, competency_description=None):
-        if name:
-            self.name = name
-        if edges:
-            self._competency_occupation_edges = edges
-            self.competency_framework = CompetencyFramework(
-                name=competency_name,
-                description=competency_description,
-                competencies=[edge.competency for edge in edges]
-            )
-            self._occupations = dict((edge.occupation.identifier, edge.occupation) for edge in edges)
-        else:
-            self.competency_framework = CompetencyFramework(
-                name=competency_name,
-                description=competency_description,
-            )
-            self._occupations = dict()
-            self._competency_occupation_edges = set()
+    def __init__(
+        self,
+        edges=None,
+        name=None,
+        competency_name=None,
+        competency_description=None,
+        research_hub_name=None,
+        url=None,
+        jsonld_string=None
+    ):
+        self.name = name
+        self._initialize_empty(competency_name, competency_description)
+        if jsonld_string:
+            self._build_from_jsonld(jsonld_string)
+        elif url:
+            self._build_from_url(url)
+        elif research_hub_name:
+            self._build_from_research_hub(research_hub_name)
+        elif edges:
+            self._build_from_edges(edges)
 
-    @classmethod
-    def from_jsonld(cls, jsonld_string: Text):
+    def _initialize_empty(self, competency_framework_name, competency_framework_description):
+        self.competency_framework = CompetencyFramework(
+            name=competency_framework_name,
+            description=competency_framework_description,
+        )
+        self._occupations = dict()
+        self._competency_occupation_edges = set()
+
+    def _build_from_research_hub(self, name):
+        self._build_from_url(research_hub_url(name))
+
+    def _build_from_url(self, url):
+        jsonld_string = requests.get(url).content
+        self._build_from_jsonld(jsonld_string)
+
+    def _build_from_jsonld(self, jsonld_string: Text):
         jsonld_input = json.loads(jsonld_string)
-        obj = cls(name=jsonld_input.get('name', 'unnamed ontology'))
+        self.name = jsonld_input.get('name', 'unnamed ontology')
         for competency_jsonld in jsonld_input['competencies']:
-            obj.add_competency(Competency.from_jsonld(competency_jsonld))
+            self.add_competency(Competency.from_jsonld(competency_jsonld))
         for occupation_jsonld in jsonld_input['occupations']:
-            obj.add_occupation(Occupation.from_jsonld(occupation_jsonld))
+            self.add_occupation(Occupation.from_jsonld(occupation_jsonld))
         for edge_jsonld in jsonld_input['edges']:
-            obj.add_edge(edge=CompetencyOccupationEdge.from_jsonld(edge_jsonld))
-
-        return obj
+            self.add_edge(edge=CompetencyOccupationEdge.from_jsonld(edge_jsonld))
         
+    def _build_from_edges(self, edges):
+        self._competency_occupation_edges = edges
+        self.competency_framework.competencies = [edge.competency for edge in edges]
+        self._occupations = dict((edge.occupation.identifier, edge.occupation) for edge in edges)
+
     def __eq__(self, other):
         if isinstance(self, other.__class__):
             return \
@@ -335,6 +373,9 @@ class CompetencyOntology(object):
         if competency.identifier not in self.competency_framework:
             self.competency_framework[competency.identifier] = competency
             self.add_edge(competency=competency, occupation=DummyOccupation())
+        else:
+            self.competency_framework[competency.identifier].children.update(competency.children)
+            self.competency_framework[competency.identifier].parents.update(competency.parents)
 
     def add_occupation(self, occupation: Occupation):
         if not isinstance(occupation, Occupation):
@@ -342,6 +383,9 @@ class CompetencyOntology(object):
         if occupation.identifier not in self._occupations:
             self._occupations[occupation.identifier] = occupation
             self.add_edge(competency=DummyCompetency(), occupation=occupation)
+        else:
+            self._occupations[occupation.identifier].children.update(occupation.children)
+            self._occupations[occupation.identifier].parents.update(occupation.parents)
 
     def add_edge(self, occupation: Occupation=None, competency: Competency=None, edge: CompetencyOccupationEdge=None):
         if edge:
@@ -385,6 +429,9 @@ class CompetencyOntology(object):
                 sorted(self.edges, key=lambda edge: edge.identifier)
             ]
         }, sort_keys=True)
+
+    def save(self, storage):
+        storage.write(self.jsonld.encode('utf-8'), self.name + '.json')
 
     @property
     def occupation_counts_per_competency(self):
