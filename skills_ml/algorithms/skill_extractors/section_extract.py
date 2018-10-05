@@ -36,6 +36,7 @@ class SectionExtractSkillExtractor(SkillExtractor):
                 matched_skill_identifier=None,
                 confidence=100,
                 context=line,
+                start_index=-1,
                 document_id=source_object['id'],
                 document_type=source_object['@type'],
                 source_object=source_object,
