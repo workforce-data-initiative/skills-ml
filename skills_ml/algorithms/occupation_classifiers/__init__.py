@@ -9,6 +9,7 @@ import numpy as np
 from itertools import zip_longest, tee
 from typing import Generator
 import logging
+import tensorflow as tf
 
 class SocEncoder(LabelEncoder):
     def __init__(self, label_list):
@@ -102,6 +103,10 @@ class DesignMatrix(object):
         self.pipe_y = pipe_y
         self.target_variable = target_variable
 
+    def __iter__(self):
+        for i in self._combine_pipelines():
+            yield i
+
     def _check_pipeline(self, pipeline):
         return isinstance(pipeline, IterablePipeline)
 
@@ -139,3 +144,16 @@ class DesignMatrix(object):
                 }
         meta_dict.update(self.data_source_generator.metadata)
         return meta_dict
+
+
+def input_func_for_tf_estimator(matrix_generator, shapes, batch_num):
+    dataset = tf.data.Dataset.from_generator(
+            generator=lambda matrix_generator,
+            output_types=(tf.float32, tf.float32),
+            output_shapes=shapes
+            )
+    dataset = dataset.batch(batch_num)
+    iterator = dataset.make_one_shot_iterator()
+    features_tensors, labels = iterator.get_next()
+    features = {'embedding': features_tensors}
+    return features, labels
