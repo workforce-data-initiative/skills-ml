@@ -1,9 +1,10 @@
-from .base import Competency, Occupation, CompetencyOccupationEdge, CompetencyOntology, CompetencyFramework
+from .base import Competency, Occupation, CompetencyOccupationEdge, CompetencyOntology, CompetencyFramework, research_hub_url
 
 __all__ = (
     'Competency',
     'CompetencyFramework',
     'Occupation',
     'CompetencyOccupationEdge',
-    'CompetencyOntology'
+    'CompetencyOntology',
+    'research_hub_url'
 )

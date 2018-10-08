@@ -3,6 +3,7 @@ assert gensim.models.doc2vec.FAST_VERSION > -1
 
 from skills_ml.job_postings.common_schema import batches_generator
 from skills_ml.algorithms.embedding.models import Word2VecModel
+from skills_ml.storage import ModelStorage
 
 from datetime import datetime
 from itertools import tee
@@ -37,11 +38,11 @@ class EmbeddingTrainer(object):
     w2v = Word2VecModel(storage=FSStore(path='/tmp'), size=10, min_count=3, iter=4, window=6, workers=3)
     trainer = EmbeddingTrainer(corpus_generator, w2v)
     trainer.train()
-    trainer.save()
+    trainer.save_model()
     ```
     """
     def __init__(
-        self, corpus_generator, model, batch_size=2000):
+        self, corpus_generator, model, model_storage=None, batch_size=2000):
         """Initialization
 
         Attributes:
@@ -52,9 +53,10 @@ class EmbeddingTrainer(object):
             batch_size (:int): batch size
             vocab_size_cumu (:list): record the number of vocab every batch for word2vec
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
-            lookup (:dict): dictionary for storing the training documents and keys for doc2vec
+            lookup_dict (:dict): dictionary for storing the training documents and keys for doc2vec
         """
         self.corpus_generator = corpus_generator
+        self.model_storage = model_storage
         self.training_time = datetime.today().isoformat()
         self.update = False
         self.batch_size = batch_size
@@ -103,11 +105,14 @@ class EmbeddingTrainer(object):
 
     def save_model(self, storage=None):
         if storage is None:
-            self._model.save(self.model_name)
+            if self.model_storage is None:
+                raise AttributeError(f"'self.model_storage' should not be None if you want to save the model")
+            ms = self.model_storage
+            ms.save_model(self._model, self.model_name)
         else:
-            self._model.storage = storage
-            self._model.save(self.model_name)
-        logging.info(f"{self.model_name} has been saved.")
+            ms = ModelStorage(storage)
+            ms.save_model(self._model, self.model_name)
+        logging.info(f"{self.model_name} has been stored to {ms.storage.path}.")
 
     @property
     def model_name(self):

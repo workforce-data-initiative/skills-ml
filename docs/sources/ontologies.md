@@ -205,7 +205,8 @@ ontology.add_edge(occupation=dinosaur_rider, competency=dinosaur_riding)
 ```python
 from skills_ml.ontologies import CompetencyOntology
 
-ontology = CompetencyOntology.from_jsonld({
+jsonld_string = """
+    'name': 'test_ontology',
 	'competencies': [{
 		'@type': 'Competency',
 		'@id': '12345',
@@ -230,14 +231,42 @@ ontology = CompetencyOntology.from_jsonld({
 		'competency': {'@type': 'Competency', '@id': '12345'},
 		'occupation': {'@type': 'Occupation', '@id': '9999'}
 	}]
-})
+}"""
+
+ontology = CompetencyOntology(jsonld_string=jsonld_string)
 ```
+
+*Using URL*
+
+If you have access to a URL that contains compatible JSON-LD, you can send this URL right to the constructor.
+
+```python
+
+ontology = CompetencyOntology(url='https://myhost.com/ontology.json')
+
+```
+
+*Using Research Hub*
+
+The Data@Work Research Hub hosts a number of ontologies publicly. The Research Hub ontology base URL is bundled into Skills-ML, so you can also just initialize one with the saved name on the Research Hub.
+
+You can view the list of available ontologies at the [Research Hub](http://dataatwork.org/data/research/?prefix=v3/ontologies/)
+
+```python
+
+ontology = CompetencyOntology(research_hub_name='esco')
+```
+
+## Creating CompetencyOntology from CandidateSkills
+
+To evaluate a method of skill extraction, it can be useful to format the output (a collection of CandidateSkill objects) as a CompetencyOntology. Importing `skills_ml.ontologies.from_candidate_skills.ontology_from_candidate_skills` enables this conversion. At present, the `ontology_from_candidate_skills` simply adds each of the found competencies to a bare ontology, and optionally associates them with the source object's occupation if tagged with one.
+
 
 ## Included Ontologies
 
 ### ONET
 
-The `skills_ml.ontologies.onet` module contains a Onet class inherited from CompetencyOntology which will build the ontology during the instantiation from a variety of files on the ONET site, using at the time of writing the latest version of onet (db_v22_3):
+The `skills_ml.ontologies.onet` module contains a Onet class inherited from CompetencyOntology. This class can be built either from a hosted JSON-LD file on the Research Hub, or by default will build the ontology during the instantiation from a variety of files on the ONET site, using at the time of writing the latest version of onet (db_v22_3):
 
 - Content Model Reference.txt
 - Knowledge.txt
@@ -263,6 +292,23 @@ from skills_ml.datasets.onet_cache import OnetSiteCache
 from skills_ml.ontologies.onet import Onet
 
 ONET = Onet(OnetSiteCache(FSStore('onet_cache')))
+```
+
+To build from the research hub, pass `manual_build=False`. This may be slightly quicker, and will be resilient to potential changes to the ONET site format.
+
+```python
+ONET = Onet(manual_build=False)
+```
+
+### ESCO
+
+The `skills_ml.ontologies.esco` module contains an Esco class inherited from CompetencyOntology that implements the European Skills and Competences and Occupations site. This class by default is built from a hosted JSON-LD file on the Research Hub, but you can also have it build right from the ESCO site. Building right from the ESCO site involves thousands of API calls, so we recommend building it from the Research Hub JSON-LD
+
+
+```python
+from skills_ml.ontologies.esco import Esco
+ESCO = Esco() # will build from premade Research Hub JSON-LD
+ESCO = Esco(manual_build=True) # will build from ESCO site, may take hours
 ```
 
 

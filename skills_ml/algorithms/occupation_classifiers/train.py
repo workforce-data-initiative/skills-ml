@@ -7,9 +7,9 @@ from skills_ml.ontologies.onet import majorgroupname
 from skills_ml.algorithms.string_cleaners.nlp import clean_str, word_tokenize
 from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, DesignMatrix
 from skills_ml.algorithms.preprocessing import IterablePipeline
-from skills_ml.algorithms.embedding.base import ModelStorage
 from skills_ml.job_postings.common_schema import JobPostingGeneratorType
 from skills_ml.utils import filename_friendly_hash
+from skills_ml.storage import ModelStorage, ProxyObjectWithStorage
 
 import importlib
 import logging
@@ -18,6 +18,7 @@ from itertools import zip_longest, tee
 from typing import Type, Union
 import pickle
 import os
+
 
 class OccupationClassifierTrainer(object):
     """Trains a series of classifiers using the same training set
@@ -38,7 +39,6 @@ class OccupationClassifierTrainer(object):
         self.grid_config = self.default_grid_config if grid_config is None else grid_config
         self.cls_cv_result = {}
         self.scoring = scoring
-        self.best_classifiers = {}
         self.random_state_for_split = random_state_for_split
         self.train_time = datetime.today().isoformat()
 
@@ -75,18 +75,25 @@ class OccupationClassifierTrainer(object):
                 module_name, class_name = class_path.rsplit(".", 1)
                 module = importlib.import_module(module_name)
                 cls = getattr(module, class_name)
+
                 logging.info(f"training {class_name}")
                 kf = StratifiedKFold(n_splits=self.k_folds, random_state=self.random_state_for_split)
+                model_hash = self._model_hash(self.matrix.metadata, class_name, parameter_config)
+                trained_model_name = class_name.lower() + "_" + model_hash
+                self.storage.path = os.path.join(store_path, score, trained_model_name)
                 if class_name == "SVC" or class_name == "MLPClassifier":
-                    cls_cv = GridSearchCV(cls(), parameter_config, cv=kf, scoring=score)
+                    cls_cv = ProxyObjectWithStorage(
+                            model_obj=GridSearchCV(estimator=cls(), param_grid=parameter_config, cv=kf, scoring=score),
+                            storage=self.storage,
+                            model_name=trained_model_name)
                 else:
-                    cls_cv = GridSearchCV(cls(n_jobs=self.n_jobs), parameter_config, cv=kf, scoring=score)
+                    cls_cv = GridSearchCV(estimator=cls(n_jobs=self.n_jobs), param_grid=parameter_config, cv=kf, scoring=score)
+                    cls_cv = ProxyObjectWithStorage(model_obj=cls_cv, storage=self.storage, model_name=trained_model_name)
                 cls_cv.fit(X, y)
                 self.cls_cv_result[score][class_name] = cls_cv.cv_results_
                 if save:
-                    model_hash = self._model_hash(self.matrix.metadata, class_name, cls_cv.best_params_)
                     logging.info(f"storing {class_name} {model_hash} to {store_path}")
-                    self._save(cls_cv, os.path.join(store_path, score, model_hash))
+                    self._save(cls_cv, os.path.join(store_path, score, trained_model_name))
 
     def unique_parameters(self, parameters):
         return {

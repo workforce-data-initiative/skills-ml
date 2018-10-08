@@ -5,7 +5,9 @@ from skills_ml.evaluation.skill_extraction_metrics import (
     SkillsPerDocumentHistogram,
     PercentageNoSkillDocuments,
     TotalVocabularySize,
-    TotalOccurrences
+    TotalOccurrences,
+    EvaluationSetPrecision,
+    EvaluationSetRecall
 )
 from tests.algorithms.skill_extractors import sample_ontology
 from tests.utils import CandidateSkillFactory
@@ -82,3 +84,60 @@ def test_OntologyOccupationRecall():
         for i in range(0, 25)
     ]
     assert metric.eval(candidate_skills, 50) == 1/len(ontology.occupations)
+
+
+def test_EvaluationSetPrecision():
+    # create a set of gold standard skills that are a subset of the ones being evaluated
+    gold_standard_candidate_skills = [
+        CandidateSkillFactory(document_id=str(i), skill_name=str(i), start_index=i)
+        for i in range(0, 25)
+    ]
+    candidate_skills = [
+        CandidateSkillFactory(document_id=str(i), skill_name=str(i), start_index=i)
+        for i in range(0, 40)
+    ]
+    # in both strict and non-strict mode, all should match
+    strict = EvaluationSetPrecision(gold_standard_candidate_skills, 'test', strict=True)
+    assert strict.name == 'test_evaluation_set_precision_strict'
+    assert strict.eval(candidate_skills, 40) == 25/40
+    nonstrict = EvaluationSetPrecision(gold_standard_candidate_skills, 'test', strict=False)
+    assert nonstrict.name == 'test_evaluation_set_precision_nonstrict'
+    assert nonstrict.eval(candidate_skills, 40) == 25/40
+
+    # now create candidate skills to evaluate that match for everything but the index is off
+    # strict mode should reject all matches. non-strict will have the same result
+    candidate_skills = [
+        CandidateSkillFactory(document_id=str(i), skill_name=str(i), start_index=i+1)
+        for i in range(0, 40)
+    ]
+    assert strict.eval(candidate_skills, 40) == 0/40
+    assert nonstrict.eval(candidate_skills, 40) == 25/40
+
+
+def test_EvaluationSetRecall():
+    # create a set of gold standard skills that are a superset of the ones being evaluated
+    gold_standard_candidate_skills = [
+        CandidateSkillFactory(document_id=str(i), skill_name=str(i), start_index=i)
+        for i in range(0, 40)
+    ]
+    candidate_skills = [
+        CandidateSkillFactory(document_id=str(i), skill_name=str(i), start_index=i)
+        for i in range(0, 25)
+    ]
+
+    # both strict and non-strict should find all of the intersection skills to match
+    strict = EvaluationSetRecall(gold_standard_candidate_skills, 'test')
+    assert strict.name == 'test_evaluation_set_recall_strict'
+    assert strict.eval(candidate_skills, 40) == 25/40
+    nonstrict = EvaluationSetRecall(gold_standard_candidate_skills, 'test', strict=False)
+    assert nonstrict.name == 'test_evaluation_set_recall_nonstrict'
+    assert nonstrict.eval(candidate_skills, 40) == 25/40
+
+    # now create candidate skills to evaluate that match for everything but the index is off
+    # strict mode should reject all matches. non-strict will have the same result
+    candidate_skills = [
+        CandidateSkillFactory(document_id=str(i), skill_name=str(i), start_index=i+1)
+        for i in range(0, 25)
+    ]
+    assert strict.eval(candidate_skills, 40) == 0
+    assert nonstrict.eval(candidate_skills, 40) == 25/40
