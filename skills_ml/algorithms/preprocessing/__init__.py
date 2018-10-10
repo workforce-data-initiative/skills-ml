@@ -3,6 +3,21 @@ from typing import List, Generator, Dict, Callable
 import logging
 import inspect
 
+class ProcessingPipeline(object):
+    def __init__(self, *functions: Callable):
+        self.functions = functions
+
+    @property
+    def compose(self):
+        """compose functions
+
+        Returns:
+            function: a function object which is not materialized yet
+        """
+        return reduce(lambda f, g: lambda x: g(f(x)), self.functions, lambda x: x)
+
+
+
 class IterablePipeline(object):
     """A simple iterable preprocessing pipeline.
 

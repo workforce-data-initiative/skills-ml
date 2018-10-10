@@ -1,8 +1,12 @@
 from .base import Competency, Occupation, CompetencyOntology
+from .distance import jaccard_competency_distance
 from skills_ml.datasets.onet_cache import OnetSiteCache
 from descriptors import cachedproperty
+from collections import defaultdict
 import logging
-
+from typing import Callable
+from scipy.spatial.distance import pdist, squareform
+import numpy as np
 
 majorgroupname = {
     '11': 'Management Occupations',
@@ -128,16 +132,53 @@ class Onet(CompetencyOntology):
         return sorted(major_groups, key=lambda k: k.identifier)
 
     @cachedproperty
-    def generate_major_group_occupation_clusters(self):
-        d = {}
-        for mg in self.all_major_groups:
-            d[mg.name] = [child.name for child in mg.children]
-        return d
+    def all_major_groups_occ(self):
+        occ = self.filter_by(lambda edge: len(edge.occupation.identifier) == 2)
+        return occ.occupations
 
     @cachedproperty
-    def generate_major_group_competencies_clusters(self):
-        d = {}
-        for mg in self.all_major_groups:
-            d[int(mg)] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == str(mg)).competencies
+    def competency_categories(self):
+        return set(c.categories[0] for c in self.competencies)
+
+    @property
+    def generate_major_group_occupation_clustering(self):
+        d = Clustering("major_group_occupations")
+        for mg in self.all_major_groups_occ:
+            d[mg.name] = [child for child in mg.children]
         return d
+
+    @property
+    def generate_major_group_competencies_clustering(self):
+        d = Clustering("major_group_competencies")
+        for mg in self.all_major_groups_occ:
+            d[mg.name] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == mg.identifier[:2]).competencies
+        return d
+
+    def occupation_competency_dict(self, key_fn: Callable=lambda occ_id: True):
+        occ_dict = defaultdict(list)
+        for edge in self._competency_occupation_edges:
+            if key_fn(edge.occupation.identifier):
+                occ_dict[edge.occupation.identifier].append(edge.competency)
+        return occ_dict
+
+    def distance_matrix_for_occupation(self, occupation_dict=None):
+        if occupation_dict is None:
+            occupation_dict = self.occupation_competency_dict(lambda occ_id: len(occ_id) > 2)
+        occ_keys = np.array(list(occupation_dict.keys()))
+        occ_values = np.array(list(occupation_dict.values()))
+        occ_values = occ_values.reshape(len(occupation_dict), 1)
+
+        d_matrix = pdist(occ_values, lambda u, v: jaccard_competency_distance(u[0], v[0], self.competency_categories))
+
+        return occ_keys, squareform(d_matrix)
+
+
+class Clustering(dict):
+    def __init__(self, name):
+        self.name = name
+        super().__init__()
+
+    def extract(self, fn):
+        for concept, entities in self.items():
+            self[concept] = list(map(fn, entities))
 
