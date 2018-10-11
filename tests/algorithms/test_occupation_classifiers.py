@@ -1,11 +1,10 @@
 from skills_ml.algorithms.occupation_classifiers.classifiers import CombinedClassifier, KNNDoc2VecClassifier, SocClassifier
-
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.occupation_classifiers import SOCMajorGroup, DesignMatrix
 from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel, EmbeddingTransformer
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora import Word2VecGensimCorpusCreator
-from skills_ml.storage import ModelStorage, S3Store, FSStore
+from skills_ml.storage import ProxyObjectWithStorage, ModelStorage, S3Store, FSStore
 from skills_ml.algorithms.string_cleaners import nlp
 from skills_ml.algorithms.preprocessing import IterablePipeline
 
@@ -120,9 +119,10 @@ class TestCombinedClassifier(unittest.TestCase):
             matrix.build()
 
             X = matrix.X
-            rf = RandomForestClassifier()
+            rf = ProxyObjectWithStorage(RandomForestClassifier(), None, None, matrix.target_variable)
             rf.fit(X, matrix.y)
 
+            proxy_rf = ProxyObjectWithStorage(rf, None, None, matrix.target_variable)
             # Remove the last step in the pipe_x
             # the input of predict_soc should be tokenized words
             new_pipe_x = self.pipe_x
@@ -130,7 +130,7 @@ class TestCombinedClassifier(unittest.TestCase):
 
             new_matrix = DesignMatrix(JobPostingCollectionSample(), self.major_group, new_pipe_x)
             new_matrix.build()
-            ccls = CombinedClassifier(w2v, rf, matrix.target_variable)
+            ccls = CombinedClassifier(w2v, rf)
             assert len(ccls.predict_soc([new_matrix.X[0]])[0]) == 2
 
 class TestKNNDoc2VecClassifier(unittest.TestCase):

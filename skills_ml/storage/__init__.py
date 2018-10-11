@@ -31,21 +31,22 @@ class ProxyObjectWithStorage(wrapt.ObjectProxy):
         storage (skills_ml.storage.Store): the skill_ml storage object
         model_obj (object): target model object
         model_name (str): model name
-
+        target_variable ():
     """
-    __slots__ = ('storage', 'model_name','by_ref')
-    def __init__(self, model_obj, storage=None, model_name=None):
+    __slots__ = ('storage', 'model_name','target_variable')
+    def __init__(self, model_obj, storage=None, model_name=None, target_variable=None):
         self.storage = storage
         self.model_name = model_name
+        self.target_variable = target_variable
         super().__init__(model_obj)
         self._model_obj = model_obj
 
     @classmethod
-    def __reconstruct__(cls, model_obj, storage, model_name):
-        return cls(model_obj, storage, model_name)
+    def __reconstruct__(cls, model_obj, storage, model_name, target_variable):
+        return cls(model_obj, storage, model_name, target_variable)
 
     def __reduce__(self):
-        return (self.__reconstruct__, (self._model_obj, self.storage, self.model_name))
+        return (self.__reconstruct__, (self._model_obj, self.storage, self.model_name, self.target_variable))
 
 
 @retry(stop_max_delay=150000, wait_fixed=3000)
