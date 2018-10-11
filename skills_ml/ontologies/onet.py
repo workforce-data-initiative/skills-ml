@@ -1,4 +1,4 @@
-from .base import Competency, Occupation, CompetencyOntology
+from .base import Competency, Occupation, CompetencyOntology, Clustering
 from .distance import jaccard_competency_distance
 from skills_ml.datasets.onet_cache import OnetSiteCache
 from descriptors import cachedproperty
@@ -141,17 +141,17 @@ class Onet(CompetencyOntology):
         return set(c.categories[0] for c in self.competencies)
 
     @property
-    def generate_major_group_occupation_clustering(self):
+    def major_group_occupation_clustering(self):
         d = Clustering("major_group_occupations")
         for mg in self.all_major_groups_occ:
-            d[mg.name] = [child for child in mg.children]
+            d[mg] = [child for child in mg.children]
         return d
 
     @property
-    def generate_major_group_competencies_clustering(self):
+    def major_group_competencies_clustering(self):
         d = Clustering("major_group_competencies")
         for mg in self.all_major_groups_occ:
-            d[mg.name] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == mg.identifier[:2]).competencies
+            d[mg] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == mg.identifier[:2]).competencies
         return d
 
     def occupation_competency_dict(self, key_fn: Callable=lambda occ_id: True):
@@ -172,13 +172,5 @@ class Onet(CompetencyOntology):
 
         return occ_keys, squareform(d_matrix)
 
-
-class Clustering(dict):
-    def __init__(self, name):
-        self.name = name
-        super().__init__()
-
-    def extract(self, fn):
-        for concept, entities in self.items():
-            self[concept] = list(map(fn, entities))
-
+    def generate_clusterings(self):
+        return [self.major_group_occupation_clustering, self.major_group_competencies_clustering]

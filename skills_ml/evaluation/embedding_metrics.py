@@ -1,3 +1,5 @@
+from skills_ml.ontologies.base import Clustering
+
 from scipy.spatial import distance
 from gensim.models import KeyedVectors
 import numpy as np
@@ -14,14 +16,15 @@ class BaseEmbeddingMetric(object):
 
 
 class CategorizationMetric(BaseEmbeddingMetric):
-    def __init__(self):
+    def __init__(self, clustering: Clustering):
+        self.clustering = clustering
         super().__init__()
 
     @property
     def name(self):
-        pass
+        return f"{self.clustering.name}_categorization_metric"
 
-    def eval(self, processing_pipeline, clustering):
+    def eval(self, processing_pipeline):
         result = {}
         for concept, entities in clustering.items():
             centroid = np.average([processing_pipeline.compose(entity) for entity in entities], axis=0)
@@ -31,14 +34,15 @@ class CategorizationMetric(BaseEmbeddingMetric):
 
 
 class IntraClusterCohesion(BaseEmbeddingMetric):
-    def __init__(self):
+    def __init__(self, clustering: Clustering):
+        self.clustering = clustering
         super().__init__()
 
     @property
     def name(self):
-        pass
+        return f"{self.clustering.name}_itra_cluster_cohesion"
 
-    def eval(self, processing_pipeline, clustering):
+    def eval(self, processing_pipeline):
         result = {}
         for concept, entities in clustering.items():
             centroid = np.average([processing_pipeline.compose(entity) for entity in entities], axis=0)
@@ -49,9 +53,10 @@ class IntraClusterCohesion(BaseEmbeddingMetric):
 
 
 class RecallTopN(BaseEmbeddingMetric):
-    def __init__(self, topn=20):
-        super().__init__()
+    def __init__(self, clustering: Clustering, topn=20):
+        self.clustering = clustering
         self.topn = topn
+        super().__init__()
 
     def entity_pool(self, clustering):
         pool = []
@@ -61,9 +66,9 @@ class RecallTopN(BaseEmbeddingMetric):
 
     @property
     def name(self):
-        pass
+        return f"{self.clustering.name}_recall_top{self.topn}"
 
-    def eval(self, processing_pipeline, clustering):
+    def eval(self, processing_pipeline):
         wv = convert_to_keyedvector(self.entity_pool(clustering), processing_pipeline)
         result = {}
         for concept, entities in clustering.items():
@@ -74,9 +79,10 @@ class RecallTopN(BaseEmbeddingMetric):
 
 
 class PrecisionTopN(BaseEmbeddingMetric):
-
-    def __init__(self, topn=10):
+    def __init__(self, clustering: Clustering, topn=10):
+        self.clustering = clustering
         self.topn = topn
+        super().__init__()
 
     def entity_pool(self, clustering):
         pool = []
@@ -86,9 +92,9 @@ class PrecisionTopN(BaseEmbeddingMetric):
 
     @property
     def name(self):
-        pass
+        return f"{self.clustering.name}_precision_top{self.topn}"
 
-    def eval(self, processing_pipeline, clustering):
+    def eval(self, processing_pipeline, clustering: Clustering):
         wv = convert_to_keyedvector(self.entity_pool(clustering), processing_pipeline)
         result = {}
         for concept, entities in clustering.items():
