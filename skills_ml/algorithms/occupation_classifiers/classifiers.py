@@ -42,10 +42,10 @@ class SocClassifier(object):
 
 
 class CombinedClassifier(object):
-    def __init__(self, embedding, classifier, target_variable,  **kwargs):
+    def __init__(self, embedding, classifier, **kwargs):
         self.embedding = SerializedByStorage(embedding)
         self.classifier = SerializedByStorage(classifier)
-        self.target_variable = target_variable
+        self.target_variable = self.classifier.target_variable
 
     @property
     def combined(self):
@@ -53,6 +53,9 @@ class CombinedClassifier(object):
             ('tokens_to_vector', EmbeddingTransformer(self.embedding)),
             ('classify', self.classifier)
         ])
+
+    def predict(self, tokenized_words):
+        return self.combined.predict(tokenized_words)
 
     def predict_soc(self, tokenized_words):
         result = self.target_variable.encoder.inverse_transform(self.combined.predict(tokenized_words)), self.combined.predict_proba(tokenized_words)

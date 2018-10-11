@@ -93,7 +93,7 @@ class TestClassifierTrainer(unittest.TestCase):
         return list(JobPostingFilterer(self.jobpostings, filters))
 
     def test_full_soc(self):
-        job_posting = {'onet_soc_code': '11-1031.00'}
+        job_posting = {'onet_soc_code': '11-1031.00', 'id': 'some_id_number'}
         assert self.full_soc.transformer(job_posting)[0] == [3]
 
     def test_design_matrix(self):

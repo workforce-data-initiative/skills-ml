@@ -1,4 +1,4 @@
-from skills_ml.storage import FSStore
+from skills_ml.storage import ModelStorage, FSStore
 
 from skills_ml.job_postings.common_schema import  JobPostingCollectionSample
 from skills_ml.job_postings.filtering import JobPostingFilterer
@@ -33,7 +33,8 @@ test_bytes = json.dumps(test_data).encode()
 
 
 logging.info("Loading Embedding Model")
-w2v = Word2VecModel.load(storage=FSStore('tmp'), model_name='your-embedding-model')
+model_storage = ModelStorage(FSStore('/your/model/path'))
+w2v = model_storage.load_model(model_name='your_model_name')
 
 full_soc = FullSOC()
 
@@ -42,7 +43,7 @@ def basic_filter(doc):
     Return the document except for the document which soc is unknown or empty or not in the
     soc code pool of current O*Net version
     """
-    if full_soc.filter_func(doc) and doc['onet_soc_code'] in full_soc.onet.all_soc:
+    if full_soc.filter_func(doc) and doc['onet_soc_code'] in full_soc.choices:
         return doc
     else:
         return None
@@ -86,7 +87,7 @@ grid_config = {
                      'max_depth': [20, 50],
                      'max_features': ['log2'],
                      'min_samples_split': [10, 20]
-                     },
+                      },
                  'sklearn.ensemble.RandomForestClassifier': {
                      'n_estimators': [50, 100, 500, 1000],
                      'criterion': ['entropy'],
