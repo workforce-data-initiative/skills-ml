@@ -10,9 +10,7 @@ from itertools import zip_longest, tee
 from typing import Generator
 import logging
 
-onet = Onet()
 
-all_soc = onet.all_soc
 class SocEncoder(LabelEncoder):
     def __init__(self, label_list):
         self.fit(label_list)
@@ -26,6 +24,7 @@ class TargetVariable(ABC):
         self.default_filters = []
         self.filters = filters
         self.filter_func =  lambda x: all(f(x) for f in self._all_filters)
+        self.ontology = None
 
     @property
     def _all_filters(self):
@@ -55,6 +54,14 @@ class TargetVariable(ABC):
     def extract_occupation_from_jobposting(self, job_posting):
         pass
 
+    def __getstate__(self):
+        result = self.__dict__.copy()
+        result['ontology'] = None
+        return result
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+
 
 class SOCMajorGroup(TargetVariable):
     name = 'major_group'
@@ -79,7 +86,8 @@ class FullSOC(TargetVariable):
     def __init__(self, filters=None, onet_cache=None):
         super().__init__(filters)
         self.default_filters = [unknown_soc_filter, empty_soc_filter]
-        self.choices = all_soc
+        self.ontology = Onet()
+        self.choices = self.ontology.all_soc
         self.encoder = SocEncoder(self.choices)
 
     def extract_occupation_from_jobposting(self, job_posting):

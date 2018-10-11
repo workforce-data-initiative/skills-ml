@@ -85,14 +85,21 @@ class OccupationClassifierTrainer(object):
                 self.storage.path = os.path.join(store_path, score, trained_model_name)
                 if 'n_jobs' in inspect.signature(cls).parameters.keys():
                     cls_cv = ProxyObjectWithStorage(
-                            model_obj=GridSearchCV(estimator=cls(n_jobs=self.n_jobs), param_grid=parameter_config, cv=kf, scoring=score),
+                            model_obj=GridSearchCV(
+                                estimator=cls(n_jobs=self.n_jobs),
+                                param_grid=parameter_config,
+                                cv=kf, scoring=score),
                             storage=self.storage,
                             model_name=trained_model_name,
                             target_variable=self.matrix.target_variable
                             )
                 else:
                     cls_cv = ProxyObjectWithStorage(
-                            model_obj=GridSearchCV(estimator=cls(), param_grid=parameter_config, cv=kf, scoring=score),
+                            model_obj=GridSearchCV(
+                                estimator=cls(),
+                                param_grid=parameter_config,
+                                cv=kf,
+                                scoring=score),
                             storage=self.storage,
                             model_name=trained_model_name,
                             target_variable=self.matrix.target_variable

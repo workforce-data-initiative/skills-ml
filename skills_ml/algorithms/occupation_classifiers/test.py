@@ -14,19 +14,23 @@ class OccupationClassifierTester(object):
             classifier: CombinedClassifier):
         self.test_data_generator = test_data_generator
         self.classifier = classifier
-        self.target_variable = self.classifier.target_variable
         self._preprocessing_X= preprocessing
         self._preprocessing_y = [self.target_variable.transformer]
         self.counter = 0
-        self.pipeline_X = None
-        self.pipeline_y = None
-        self._build_pipeline()
 
-    def _build_pipeline(self):
+    @property
+    def target_variable(self):
+        return self.classifier.target_variable
+
+    @property
+    def pipeline_X(self):
         steps = self._preprocessing_X.copy()
         steps.append(lambda x: self.classifier.predict([x]))
-        self.pipeline_X = IterablePipeline(*steps)
-        self.pipeline_y = IterablePipeline(*self._preprocessing_y)
+        return IterablePipeline(*steps)
+
+    @property
+    def pipeline_y(self):
+        return IterablePipeline(*self._preprocessing_y)
 
     def create_test_generator(self):
         for d in self.test_data_generator:
