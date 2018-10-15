@@ -11,4 +11,4 @@ bumpversion==0.5.3
 mkdocs==1.0.4
 git+git://github.com/thcrock/pydoc-markdown.git@master
 mkdocs-material==3.0.4
-factory_boy
+factory_boy==2.11.1
