@@ -1,5 +1,5 @@
 from typing import Callable, Text, List
-from collections import MutableMapping
+from collections import MutableMapping, KeysView
 import json
 from statistics import median
 from functools import total_ordering
@@ -467,35 +467,4 @@ class CompetencyOntology(object):
         print(f'Num competency-occupation edges: {len(self.edges)}')
         print(f'Median occupations per competency: {median(self.occupation_counts_per_competency)}')
         print(f'Median competencies per occupation: {median(self.competency_counts_per_occupation)}')
-
-
-class Clustering(MutableMapping):
-    def __init__(self, name):
-        self.name = name
-        self.store = dict()
-        self.map = dict()
-
-    def __setitem__(self, key, value):
-        self.store[self.__keytransform__(key)] = value
-        self.map[key.name] = key
-
-    def __getitem__(self, key):
-        return self.store[key]
-
-    def __delitem__(self, key):
-        del self.store[key]
-
-    def __iter__(self):
-        return iter(self.store)
-
-    def __len__(self):
-        return len(self.store)
-
-    def __keytransform__(self, key):
-        return key.name
-
-    def extract(self, fn):
-        for concept, entities in self.items():
-            self[concept] = list(map(fn, entities))
-
 

@@ -1,5 +1,5 @@
-from .base import Competency, Occupation, CompetencyOntology, Clustering
-from .distance import jaccard_competency_distance
+from .base import Competency, Occupation, CompetencyOntology
+from .clustering import Clustering, jaccard_competency_distance
 from skills_ml.datasets.onet_cache import OnetSiteCache
 from descriptors import cachedproperty
 from collections import defaultdict
@@ -140,18 +140,56 @@ class Onet(CompetencyOntology):
     def competency_categories(self):
         return set(c.categories[0] for c in self.competencies)
 
-    @property
-    def major_group_occupation_clustering(self):
-        d = Clustering("major_group_occupations")
+    @cachedproperty
+    def major_group_occupation_name_clustering(self):
+        d = Clustering(
+                name="major_group_occupations_name",
+                key_transform_fn=lambda concept: getattr(concept, "name"),
+                value_transform_fn=lambda entity: getattr(entity, "name"),
+        )
         for mg in self.all_major_groups_occ:
             d[mg] = [child for child in mg.children]
+        d.transform()
         return d
 
-    @property
-    def major_group_competencies_clustering(self):
-        d = Clustering("major_group_competencies")
+    @cachedproperty
+    def major_group_occupation_description_clustering(self):
+        d = Clustering(
+                name="major_group_occupations_description",
+                key_transform_fn=lambda concept: getattr(concept, "name"),
+                value_transform_fn=lambda entity: ' '.join([
+                    str(getattr(entity, "name")),
+                    str(getattr(entity, "other_attributes").get("description"))]),
+                )
+        for mg in self.all_major_groups_occ:
+            d[mg] = [child for child in mg.children]
+        d.transform()
+        return d
+
+    @cachedproperty
+    def major_group_competencies_name_clustering(self):
+        d = Clustering(
+                name="major_group_competencies_name",
+                key_transform_fn=lambda concept: getattr(concept, "name"),
+                value_transform_fn=lambda entity: getattr(entity, "name"),
+        )
         for mg in self.all_major_groups_occ:
             d[mg] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == mg.identifier[:2]).competencies
+        d.transform()
+        return d
+
+    @cachedproperty
+    def major_group_competencies_description_cluster(self):
+        d = Clustering(
+                name="major_group_competencies_description",
+                key_transform_fn=lambda concept: getattr(concept, "name"),
+                value_transform_fn=lambda entity: ' '.join([
+                    str(getattr(entity, "name")),
+                    str(getattr(entity, "other_attributes").get("competencyText"))]),
+        )
+        for mg in self.all_major_groups_occ:
+            d[mg] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == mg.identifier[:2]).competencies
+        d.transform()
         return d
 
     def occupation_competency_dict(self, key_fn: Callable=lambda occ_id: True):

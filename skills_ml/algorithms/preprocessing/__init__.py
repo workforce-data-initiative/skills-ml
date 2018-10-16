@@ -17,7 +17,6 @@ class ProcessingPipeline(object):
         return reduce(lambda f, g: lambda x: g(f(x)), self.functions, lambda x: x)
 
 
-
 class IterablePipeline(object):
     """A simple iterable preprocessing pipeline.
 
