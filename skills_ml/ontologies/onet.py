@@ -72,6 +72,21 @@ class Onet(CompetencyOntology):
                 self.add_occupation(occupation)
                 self.add_occupation(major_group)
 
+            logging.info('Processing detailed work activities')
+            dwa_reference = {}
+            for row in onet_cache.reader('DWA Reference'):
+                dwa_reference[row['DWA ID']] = row['DWA Title'] 
+            for row in onet_cache.reader('Tasks to DWAs'):
+                competency = Competency(
+                    identifier=row['DWA ID'],
+                    name=dwa_reference[row['DWA ID']],
+                    categories=['DWA'],
+                    competencyText=dwa_reference[row['DWA ID']],
+                )
+                self.add_competency(competency)
+                occupation = Occupation(identifier=row['O*NET-SOC Code'])
+                self.add_edge(competency=competency, occupation=occupation)
+
             logging.info('Processing Knowledge, Skills, Abilities')
             for content_model_file in {'Knowledge', 'Abilities', 'Skills'}:
                 for row in onet_cache.reader(content_model_file):
@@ -126,4 +141,3 @@ class Onet(CompetencyOntology):
             if 'O*NET-SOC Major Group' in occ.other_attributes['categories']:
                 major_groups.append(occ.identifier)
         return sorted(major_groups)
-
