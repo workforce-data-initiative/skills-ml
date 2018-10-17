@@ -2,7 +2,9 @@ from .base import Competency, Occupation, CompetencyOntology
 from skills_ml.datasets.onet_cache import OnetSiteCache
 from descriptors import cachedproperty
 import logging
-
+from typing import Callable
+from scipy.spatial.distance import pdist, squareform
+import numpy as np
 
 majorgroupname = {
     '11': 'Management Occupations',
@@ -126,4 +128,23 @@ class Onet(CompetencyOntology):
             if 'O*NET-SOC Major Group' in occ.other_attributes['categories']:
                 major_groups.append(occ.identifier)
         return sorted(major_groups)
+
+    def _occupation_competency_dict(self, key_fn: Callable=lambda occ_id: True):
+        occ_dict = defaultdict(list)
+        for edge in self._competency_occupation_edges:
+            if key_fn(edge.occupation.identifier):
+                occ_dict[edge.occupation.identifier].append(edge.competency)
+        return occ_dict
+
+    def distance_matrix_for_occupation(self, occupation_dict=None):
+        if occupation_dict is None:
+            occupation_dict = self._occupation_competency_dict(lambda occ_id: len(occ_id) > 2)
+        occ_keys = np.array(list(occupation_dict.keys()))
+        occ_values = np.array(list(occupation_dict.values()))
+        occ_values = occ_values.reshape(len(occupation_dict), 1)
+
+        d_matrix = pdist(occ_values, lambda u, v: jaccard_competency_distance(u[0], v[0], self.competency_categories))
+
+        return occ_keys, squareform(d_matrix)
+
 
