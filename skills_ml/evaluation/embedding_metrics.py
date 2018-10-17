@@ -1,10 +1,18 @@
 from skills_ml.ontologies.clustering import Clustering
 
+from collections import defaultdict
 from scipy.spatial import distance
 from gensim.models import KeyedVectors
 import numpy as np
 import tempfile
 import os
+
+
+def embedding_evaluate(vectorization_pipeline, metric_objects):
+    result = defaultdict(dict)
+    for metric in metric_objects:
+        result[metric.name] =  metric.eval(vectorization_pipeline)
+    return result
 
 
 class BaseEmbeddingMetric(object):

@@ -1,7 +1,7 @@
 from typing import Callable, Text, List
 from collections import MutableMapping, KeysView
 import json
-from statistics import median
+from statistics import median, mean
 from functools import total_ordering
 import itertools
 import requests
@@ -467,4 +467,5 @@ class CompetencyOntology(object):
         print(f'Num competency-occupation edges: {len(self.edges)}')
         print(f'Median occupations per competency: {median(self.occupation_counts_per_competency)}')
         print(f'Median competencies per occupation: {median(self.competency_counts_per_occupation)}')
-
+        print(f'Mean occupations per competency: {mean(self.occupation_counts_per_competency)}')
+        print(f'Mean competencies per occupation: {mean(self.competency_counts_per_occupation)}')
