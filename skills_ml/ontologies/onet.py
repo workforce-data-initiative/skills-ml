@@ -3,9 +3,6 @@ from .clustering import Clustering
 from skills_ml.datasets.onet_cache import OnetSiteCache
 from descriptors import cachedproperty
 import logging
-from typing import Callable
-from scipy.spatial.distance import pdist, squareform
-import numpy as np
 
 majorgroupname = {
     '11': 'Management Occupations',
