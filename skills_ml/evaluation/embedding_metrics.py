@@ -35,8 +35,8 @@ class CategorizationMetric(BaseEmbeddingMetric):
     def eval(self, vectorizing_pipeline):
         result = {}
         for concept, entities in self.clustering.items():
-            centroid = np.average([vectorizing_pipeline.compose(self.clustering.value_transform_fn(entity)) for entity in entities], axis=0)
-            result[concept] = distance.cosine(vectorizing_pipeline.compose(concept), centroid)
+            centroid = np.average([vectorizing_pipeline(self.clustering.value_transform_fn(entity)) for entity in entities], axis=0)
+            result[concept] = distance.cosine(vectorizing_pipeline(concept), centroid)
         self.eval_result = result
         return result
 
@@ -53,7 +53,7 @@ class IntraClusterCohesion(BaseEmbeddingMetric):
     def eval(self, vectorizing_pipeline):
         result = {}
         for concept, entities in self.clustering.items():
-            entities_vec = [vectorizing_pipeline.compose(self.clustering.value_transform_fn(entity)) for entity in entities]
+            entities_vec = [vectorizing_pipeline(self.clustering.value_transform_fn(entity)) for entity in entities]
             centroid = np.average(entities_vec, axis=0)
             result[concept] = np.sum((entities_vec - centroid)**2)
         self.eval_result = result
@@ -85,7 +85,7 @@ class RecallTopN(BaseEmbeddingMetric):
         )
         result = {}
         for concept, entities in self.clustering.items():
-            closest = wv.similar_by_vector(vectorizing_pipeline.compose(concept), topn=self.topn)
+            closest = wv.similar_by_vector(vectorizing_pipeline(concept), topn=self.topn)
             tp = set([c[0] for c in closest]) & set([e.identifier for e in entities])
             result[concept] = len(tp) / len(entities)
         return result
@@ -116,7 +116,7 @@ class PrecisionTopN(BaseEmbeddingMetric):
         )
         result = {}
         for concept, entities in self.clustering.items():
-            closest = wv.similar_by_vector(vectorizing_pipeline.compose(concept), topn=self.topn)
+            closest = wv.similar_by_vector(vectorizing_pipeline(concept), topn=self.topn)
             tp = set([c[0] for c in closest]) & set([e.identifier for e in entities])
             result[concept] = len(tp) / self.topn
         return result
@@ -134,7 +134,7 @@ def convert_to_keyedvector(
             f.write(str(len(list_of_objects)) + " " + str(vector_size) + "\n")
             for obj in list_of_objects:
                 f.write(identifier_fn(obj) + " ")
-                for s in list(map(str, list(vectorizing_pipeline.compose(value_transform_fn(obj))))):
+                for s in list(map(str, list(vectorizing_pipeline(value_transform_fn(obj))))):
                     f.write(s + " ")
                 f.write("\n")
         wv = KeyedVectors.load_word2vec_format(os.path.join(td, 'w2v.format'))

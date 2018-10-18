@@ -4,11 +4,38 @@ import logging
 import inspect
 
 class ProcessingPipeline(object):
+    """A simple callable processing pipeline for imperative execution runtime.
+
+    This class will compose processing functions together to become a callable
+    object that takes in the input from the very first processing function and
+    returns the output of the last processing function.
+
+    Example:
+        This class can be used to create a callable vectorization object which
+        will transform a string into a vector and also preserve the preprocessing
+        functions for being reused later.
+        ```python
+        jp = JobPostingCollectionSample()
+        vectorization = ProcessingPipeline(
+            normalize,
+            clean_html,
+            clean_str,
+            word_tokenize,
+            partial(vectorize, embedding_model=w2v)
+        )
+
+        vector = vecotrization("Why so serious?")
+        ```
+
+     Attributes:
+        functions (generator): a series of functions
+
+    """
     def __init__(self, *functions: Callable):
         self.functions = functions
 
     @property
-    def compose(self):
+    def _compose(self):
         """compose functions
 
         Returns:
@@ -16,12 +43,15 @@ class ProcessingPipeline(object):
         """
         return reduce(lambda f, g: lambda x: g(f(x)), self.functions, lambda x: x)
 
+    def __call__(self, input_to_be_processed):
+        return self._compose(input_to_be_processed)
+
 
 class IterablePipeline(object):
-    """A simple iterable preprocessing pipeline.
+    """A simple iterable processing pipeline.
 
-    This class will compose preprocessing functions together to be passed to different stages(training/prediction)
-    to assert the same preprocessing procedrues.
+    This class will compose processing functions together to be passed to different stages(training/prediction)
+    to assert the same processing procedrues.
 
     Example:
     ```python
