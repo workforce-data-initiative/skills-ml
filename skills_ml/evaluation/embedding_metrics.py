@@ -3,6 +3,7 @@ from skills_ml.ontologies.clustering import Clustering
 from collections import defaultdict
 from scipy.spatial import distance
 from gensim.models import KeyedVectors
+from typing import Callable, Dict
 import numpy as np
 import tempfile
 import os
@@ -32,7 +33,7 @@ class CategorizationMetric(BaseEmbeddingMetric):
     def name(self):
         return f"{self.clustering.name}_categorization_metric"
 
-    def eval(self, vectorizing_pipeline):
+    def eval(self, vectorizing_pipeline: Callable) -> Dict:
         result = {}
         for concept, entities in self.clustering.items():
             centroid = np.average([vectorizing_pipeline(self.clustering.value_transform_fn(entity)) for entity in entities], axis=0)
@@ -50,7 +51,7 @@ class IntraClusterCohesion(BaseEmbeddingMetric):
     def name(self):
         return f"{self.clustering.name}_intra_cluster_cohesion"
 
-    def eval(self, vectorizing_pipeline):
+    def eval(self, vectorizing_pipeline: Callable) -> Dict:
         result = {}
         for concept, entities in self.clustering.items():
             entities_vec = [vectorizing_pipeline(self.clustering.value_transform_fn(entity)) for entity in entities]
@@ -77,7 +78,7 @@ class RecallTopN(BaseEmbeddingMetric):
     def name(self):
         return f"{self.clustering.name}_recall_top{self.topn}"
 
-    def eval(self, vectorizing_pipeline):
+    def eval(self, vectorizing_pipeline: Callable) -> Dict:
         wv = convert_to_keyedvector(
                 self.entity_pool,
                 vectorizing_pipeline,
@@ -108,7 +109,7 @@ class PrecisionTopN(BaseEmbeddingMetric):
     def name(self):
         return f"{self.clustering.name}_precision_top{self.topn}"
 
-    def eval(self, vectorizing_pipeline):
+    def eval(self, vectorizing_pipeline: Callable) -> Dict:
         wv = convert_to_keyedvector(
                 self.entity_pool,
                 vectorizing_pipeline,
