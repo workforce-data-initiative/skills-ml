@@ -1,5 +1,5 @@
 from skills_ml.algorithms.skill_feature_creator import SequenceFeatureCreator, EmbeddingFeature
-from skills_ml.algorithms.string_cleaners.nlp import sentence_tokenize, word_tokenize
+from skills_ml.algorithms.nlp import sentence_tokenize, word_tokenize
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel
 

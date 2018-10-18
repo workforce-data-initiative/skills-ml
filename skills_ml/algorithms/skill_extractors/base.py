@@ -6,7 +6,7 @@ from collections import Counter, namedtuple
 
 
 from skills_ml.job_postings.corpora import SimpleCorpusCreator
-from skills_ml.algorithms.string_cleaners import nlp
+from skills_ml.algorithms import nlp
 from skills_ml.ontologies.base import CompetencyFramework
 
 from typing import Dict, Callable, Text, Generator

@@ -1,7 +1,7 @@
 import json
 import csv
 from collections import OrderedDict
-from skills_ml.algorithms.string_cleaners.nlp import sentence_tokenize
+from skills_ml.algorithms.nlp import sentence_tokenize
 import re
 
 def struct_features(sent, i, desc_length, word_tokenizer):

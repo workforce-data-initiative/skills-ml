@@ -1,4 +1,4 @@
-from skills_ml.algorithms.string_cleaners.nlp import title_phase_one, fields_join, clean_html, clean_str, section_extract
+from skills_ml.algorithms.nlp import title_phase_one, fields_join, clean_html, clean_str, section_extract
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 #from nltk.tokenize.texttiling import TextTilingTokenizer
 import unittest

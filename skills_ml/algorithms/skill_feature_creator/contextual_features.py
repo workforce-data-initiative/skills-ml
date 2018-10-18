@@ -1,6 +1,6 @@
 # coding: utf-8
 from skills_ml.algorithms.skill_feature_creator.posTags import tagMatching
-from skills_ml.algorithms.string_cleaners.nlp import sentence_tokenize
+from skills_ml.algorithms.nlp import sentence_tokenize
 from functools import reduce
 from operator import add
 import nltk

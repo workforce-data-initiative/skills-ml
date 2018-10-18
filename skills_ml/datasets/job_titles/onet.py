@@ -1,7 +1,7 @@
 """Process ONET job titles into a common format"""
 import pandas as pd
 
-from skills_ml.algorithms.string_cleaners.nlp import transforms, lowercase_strip_punc
+from skills_ml.algorithms.nlp import transforms, lowercase_strip_punc
 
 
 class Onet_Title(object):

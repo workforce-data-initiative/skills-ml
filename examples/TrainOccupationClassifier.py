@@ -5,7 +5,7 @@ from skills_ml.job_postings.filtering import JobPostingFilterer
 
 from skills_ml.algorithms.embedding.models import Word2VecModel
 from skills_ml.algorithms.preprocessing import IterablePipeline
-from skills_ml.algorithms.string_cleaners import nlp
+from skills_ml.algorithms import nlp
 from skills_ml.algorithms.occupation_classifiers.train import OccupationClassifierTrainer
 from skills_ml.algorithms.occupation_classifiers import FullSOC, DesignMatrix
 

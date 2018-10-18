@@ -1,6 +1,6 @@
 from skills_ml.algorithms.preprocessing import IterablePipeline
 from skills_ml.algorithms.occupation_classifiers.classifiers import CombinedClassifier
-from skills_ml.algorithms.string_cleaners import nlp
+from skills_ml.algorithms import nlp
 from skills_ml.job_postings.common_schema import JobPostingGeneratorType
 
 from typing import List, Callable

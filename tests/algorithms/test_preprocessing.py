@@ -1,6 +1,6 @@
 from skills_ml.algorithms.preprocessing import IterablePipeline
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
-from skills_ml.algorithms.string_cleaners.nlp import fields_join, clean_html, clean_str, sentence_tokenize, word_tokenize
+from skills_ml.algorithms.nlp import fields_join, clean_html, clean_str, sentence_tokenize, word_tokenize
 
 from functools import partial, update_wrapper
 import unittest

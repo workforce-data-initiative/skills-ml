@@ -4,7 +4,7 @@ from sklearn.externals import joblib
 
 from skills_ml.storage import FSStore, open_sesame
 from skills_ml.ontologies.onet import majorgroupname
-from skills_ml.algorithms.string_cleaners.nlp import clean_str, word_tokenize
+from skills_ml.algorithms.nlp import clean_str, word_tokenize
 from skills_ml.algorithms.occupation_classifiers import SocEncoder, SOCMajorGroup, TargetVariable, DesignMatrix
 from skills_ml.algorithms.preprocessing import IterablePipeline
 from skills_ml.job_postings.common_schema import JobPostingGeneratorType
