@@ -48,8 +48,8 @@ class TestPreprocessing(unittest.TestCase):
                 sentence_counter
                 )
 
-        pipe1_generator = pipe1.build(self.jp)
-        pipe2_generator = pipe2.build(self.jp)
+        pipe1_generator = pipe1(self.jp)
+        pipe2_generator = pipe2(self.jp)
 
         assert list(pipe1_generator) == list(pipe2_generator)
         assert pipe1.description == [f.__doc__ for f in pipe1.functions]
@@ -87,8 +87,8 @@ class TestPreprocessing(unittest.TestCase):
                 partial(vectorize, embedding_model=w2v)
                 )
 
-        pipe_combined_generator = pipe_combined.build(self.jp)
-        pipe_iterable_generator = pipe_iterable.build(self.jp)
+        pipe_combined_generator = pipe_combined(self.jp)
+        pipe_iterable_generator = pipe_iterable(self.jp)
 
         combined = list(pipe_combined_generator)
         iterable = list(pipe_iterable_generator)

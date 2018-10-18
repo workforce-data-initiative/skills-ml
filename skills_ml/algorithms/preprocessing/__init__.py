@@ -1,5 +1,6 @@
 from functools import reduce, wraps
 from typing import List, Generator, Dict, Callable
+from toolz import compose
 import logging
 import inspect
 
@@ -34,17 +35,9 @@ class ProcessingPipeline(object):
     def __init__(self, *functions: Callable):
         self.functions = functions
 
-    @property
-    def _compose(self):
-        """compose functions
-
-        Returns:
-            function: a function object which is not materialized yet
-        """
-        return reduce(lambda f, g: lambda x: g(f(x)), self.functions, lambda x: x)
-
     def __call__(self, input_to_be_processed):
-        return self._compose(input_to_be_processed)
+        reversed_for_compose = tuple(reversed(self.functions))
+        return compose(*reversed_for_compose)(input_to_be_processed)
 
 
 class IterablePipeline(object):
@@ -63,7 +56,7 @@ class IterablePipeline(object):
         clean_str,
         word_tokenize
     )
-    preprocessed_generator = pipe.build(jp)
+    preprocessed_generator = pipe(jp)
     ```
 
     Attributes:
@@ -82,22 +75,9 @@ class IterablePipeline(object):
     def generators(self, new_generators):
         self._generators = new_generators
 
-    @property
-    def _compose(self):
-        """compose functions
-
-        Returns:
-            function: a function object which is not materialized yet
-        """
-        return reduce(lambda f, g: lambda x: g(f(x)), self._generators, lambda x: x)
-
-    def build(self, source_data_generator: Generator):
-        """
-
-        Returns:
-            generator: a generator object of itmes after apply all the functions on them
-        """
-        return self._compose(source_data_generator)
+    def __call__(self, source_data_generator: Generator):
+        reversed_for_compose = tuple(reversed(self.generators))
+        return compose(*reversed_for_compose)(source_data_generator)
 
     @property
     def description(self):
