@@ -141,7 +141,7 @@ class Onet(CompetencyOntology):
         d = Clustering(
                 name="major_group_occupations_name",
                 key_transform_fn=lambda concept: getattr(concept, "name"),
-                value_transform_fn=lambda entity: getattr(entity, "name"),
+                value_item_transform_fn=lambda entity: (getattr(entity, "identifier"), getattr(entity, "name")),
         )
         for mg in self.all_major_groups_occ:
             d[mg] = [child for child in mg.children]
@@ -152,10 +152,10 @@ class Onet(CompetencyOntology):
         d = Clustering(
                 name="major_group_occupations_description",
                 key_transform_fn=lambda concept: getattr(concept, "name"),
-                value_transform_fn=lambda entity: ' '.join([
-                    str(getattr(entity, "name")),
-                    str(getattr(entity, "other_attributes").get("description"))]),
-                )
+                value_item_transform_fn=lambda entity: (
+                    getattr(entity, "identifier"),
+                    ' '.join([str(getattr(entity, "name")), str(getattr(entity, "other_attributes").get("description"))])),
+        )
         for mg in self.all_major_groups_occ:
             d[mg] = [child for child in mg.children]
         return d
@@ -165,7 +165,7 @@ class Onet(CompetencyOntology):
         d = Clustering(
                 name="major_group_competencies_name",
                 key_transform_fn=lambda concept: getattr(concept, "name"),
-                value_transform_fn=lambda entity: getattr(entity, "name"),
+                value_item_transform_fn=lambda entity: (getattr(entity, "identifier"), getattr(entity, "name")),
         )
         for mg in self.all_major_groups_occ:
             d[mg] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == mg.identifier[:2]).competencies
@@ -176,9 +176,9 @@ class Onet(CompetencyOntology):
         d = Clustering(
                 name="major_group_competencies_description",
                 key_transform_fn=lambda concept: getattr(concept, "name"),
-                value_transform_fn=lambda entity: ' '.join([
-                    str(getattr(entity, "name")),
-                    str(getattr(entity, "other_attributes").get("competencyText"))]),
+                value_item_transform_fn=lambda entity: (
+                    getattr(entity, "identifier"),
+                    ' '.join([str(getattr(entity, "name")), str(getattr(entity, "other_attributes").get("competencyText"))])),
         )
         for mg in self.all_major_groups_occ:
             d[mg] = self.filter_by(lambda edge: edge.occupation.identifier[:2] == mg.identifier[:2]).competencies
