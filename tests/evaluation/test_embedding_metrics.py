@@ -1,4 +1,4 @@
-from skills_ml.evaluation.embedding_metrics import embedding_evaluate, CategorizationMetric, IntraClusterCohesion, RecallTopN, PrecisionTopN
+from skills_ml.evaluation.embedding_metrics import metrics_for_embedding, CategorizationMetric, IntraClusterCohesion, RecallTopN, PrecisionTopN
 from skills_ml.algorithms.embedding.models import Word2VecModel
 from skills_ml.algorithms.preprocessing import ProcessingPipeline
 from skills_ml.algorithms.string_cleaners import nlp
@@ -57,12 +57,12 @@ class TestEmbeddingMetrics(unittest.TestCase):
         assert set(result.keys()) == set(self.major_group_occupation_clustering.keys())
         assert 0 <= sum(list(result.values())) / len(result.values()) <= 1
 
-    def test_embedding_evaluate(self):
+    def test_metrics_for_embedding(self):
         metric_objects = [
                 CategorizationMetric(self.major_group_occupation_clustering),
                 IntraClusterCohesion(self.major_group_occupation_clustering),
                 RecallTopN(self.major_group_occupation_clustering, 10),
                 PrecisionTopN(self.major_group_occupation_clustering, 10)
         ]
-        full_result = embedding_evaluate(self.vectorization, metric_objects)
+        full_result = metrics_for_embedding(self.vectorization, metric_objects)
         assert set(full_result.keys()) == set([metric.name for metric in metric_objects])

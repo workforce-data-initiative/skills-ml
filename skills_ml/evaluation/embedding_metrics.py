@@ -9,7 +9,7 @@ import tempfile
 import os
 
 
-def embedding_evaluate(vectorization_pipeline, metric_objects):
+def metrics_for_embedding(vectorization_pipeline, metric_objects):
     result = defaultdict(dict)
     for metric in metric_objects:
         result[metric.name] =  metric.eval(vectorization_pipeline)
@@ -130,13 +130,12 @@ def convert_to_keyedvector(
         identifier_fn=lambda key: getattr(key, "identifier"),
         ):
     vector_size = vectorizing_pipeline.functions[-1].keywords['embedding_model'].vector_size
-    with tempfile.TemporaryDirectory() as td:
-        with open(os.path.join(td, 'w2v.format'), 'w') as f:
-            f.write(str(len(list_of_objects)) + " " + str(vector_size) + "\n")
-            for obj in list_of_objects:
-                f.write(identifier_fn(obj) + " ")
-                for s in list(map(str, list(vectorizing_pipeline(value_transform_fn(obj))))):
-                    f.write(s + " ")
-                f.write("\n")
-        wv = KeyedVectors.load_word2vec_format(os.path.join(td, 'w2v.format'))
-    return wv
+    with tempfile.NamedTemporaryFile(mode='w') as f:
+        f.write(str(len(list_of_objects)) + " " + str(vector_size) + "\n")
+        for obj in list_of_objects:
+            f.write(identifier_fn(obj) + " ")
+            for s in list(map(str, list(vectorizing_pipeline(value_transform_fn(obj))))):
+                f.write(s + " ")
+            f.write("\n")
+        f.seek(0)
+        return KeyedVectors.load_word2vec_format(f.name)
