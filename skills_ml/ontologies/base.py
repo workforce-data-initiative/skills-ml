@@ -1,7 +1,7 @@
 from typing import Callable, Text, List
-from collections import MutableMapping
+from collections import MutableMapping, KeysView
 import json
-from statistics import median
+from statistics import median, mean
 from functools import total_ordering
 import itertools
 import requests
@@ -100,7 +100,7 @@ class Competency(object):
 @total_ordering
 class Occupation(object):
     """Represents an occupation that may or may not be part of an ontology
-    
+
     Args:
         identifier: A unique identifier for this occupation. Choose the identifier wisely as it will be used for equivalence with other occupation objects
         name: A name for the occupation (e.g. Civil Engineer)
@@ -235,7 +235,7 @@ class CompetencyOccupationEdge(object):
 
 class CompetencyFramework(MutableMapping):
     """A list of competencies and metadata about them
-    
+
     Implements MutableMapping, so the competencies may be interacted with as a dictionary.
     """
 
@@ -274,11 +274,11 @@ class CompetencyFramework(MutableMapping):
     def competencies(self, competencies):
         for competency in competencies:
             self._competencies[competency.identifier] = competency
-        
+
 
 class CompetencyOntology(object):
     """An ontology of competencies and occupations (each referred to as nodes) and the edges between them
-    
+
     Can be initialized with:
         - a JSON-LD string, in which case all nodes and edges will be initialized from the parsed JSON-LD
         - a URL, in which case the URL is presumed to contain JSON-LD, parsed, and all nodes and edges will be initialized from the parsed JSON-LD
@@ -332,7 +332,7 @@ class CompetencyOntology(object):
             self.add_occupation(Occupation.from_jsonld(occupation_jsonld))
         for edge_jsonld in jsonld_input['edges']:
             self.add_edge(edge=CompetencyOccupationEdge.from_jsonld(edge_jsonld))
-        
+
     def _build_from_edges(self, edges):
         self._competency_occupation_edges = edges
         self.competency_framework.competencies = [edge.competency for edge in edges]
@@ -467,3 +467,5 @@ class CompetencyOntology(object):
         print(f'Num competency-occupation edges: {len(self.edges)}')
         print(f'Median occupations per competency: {median(self.occupation_counts_per_competency)}')
         print(f'Median competencies per occupation: {median(self.competency_counts_per_occupation)}')
+        print(f'Mean occupations per competency: {mean(self.occupation_counts_per_competency)}')
+        print(f'Mean competencies per occupation: {mean(self.competency_counts_per_occupation)}')

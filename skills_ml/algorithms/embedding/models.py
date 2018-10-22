@@ -52,7 +52,8 @@ class Word2VecModel(BaseEmbeddingModel, Word2Vec):
                 pass
 
         if len(words_in_vocab) == 0:
-            logging.warning("None of the words is in vocabulary.")
+            if warning:
+                logging.warning("None of the words is in vocabulary.")
             return np.random.rand(self.vector_size)
         sentence_vector = sum_vector / len(words_in_vocab)
         return sentence_vector
@@ -109,7 +110,8 @@ class FastTextModel(BaseEmbeddingModel, FT_gensim):
                  pass
 
          if len(words_in_vocab) == 0:
-             logging.warning("None of the words is in vocabulary.")
+             if warning:
+                logging.warning("None of the words is in vocabulary.")
              return np.random.rand(self.vector_size)
          sentence_vector = sum_vector / len(words_in_vocab)
          return sentence_vector

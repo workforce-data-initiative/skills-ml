@@ -20,3 +20,22 @@ class OnetCompetencyTest(TestCase):
 
         assert onet.is_built == True
 
+        assert len(onet.all_major_groups_occ) == 23
+
+        assert len(onet.competency_categories) == 5
+
+        assert len(onet.major_group_occupation_name_clustering) == 23
+
+        assert all([len(v) > 0 for v in onet.major_group_occupation_name_clustering.values()])
+
+        assert len(onet.major_group_occupation_description_clustering) == 23
+
+        assert all([len(v) > 0 for v in onet.major_group_occupation_description_clustering.values()])
+
+        assert len(onet.major_group_competencies_name_clustering) == 23
+
+        assert sum([len(v) > 0 for v in onet.major_group_competencies_name_clustering.values()]) == 22
+
+        assert len(onet.major_group_competencies_description_clustering) == 23
+
+        assert sum([len(v) > 0 for v in onet.major_group_competencies_description_clustering.values()]) == 22
