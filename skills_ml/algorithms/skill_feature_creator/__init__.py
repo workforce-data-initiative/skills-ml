@@ -1,4 +1,4 @@
-from skills_ml.algorithms.string_cleaners.nlp import sentence_tokenize, word_tokenize
+from skills_ml.algorithms.nlp import sentence_tokenize, word_tokenize
 from skills_ml.algorithms.skill_feature_creator.structure_features import struct_features
 from skills_ml.algorithms.skill_feature_creator.contextual_features import sent2features, pre_process
 

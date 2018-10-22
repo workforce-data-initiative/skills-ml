@@ -1,7 +1,7 @@
 """Various computers of job posting properties. Each class is generally a generic algorithm (such as skill extraction or occupation classification) paired with enough configuration to run on its own"""
 from . import JobPostingComputedProperty, ComputedPropertyColumn
 
-from skills_ml.algorithms.string_cleaners.nlp import title_phase_one
+from skills_ml.algorithms.nlp import title_phase_one
 from skills_ml.algorithms.jobtitle_cleaner.clean import JobTitleStringClean
 from skills_ml.algorithms.occupation_classifiers.classifiers import \
     SocClassifier

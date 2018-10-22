@@ -1,6 +1,6 @@
 from skills_ml.storage import open_sesame, ModelStorage, S3Store, FSStore, PersistedJSONDict, ProxyObjectWithStorage, SerializedByStorage
 from skills_ml.algorithms.preprocessing import IterablePipeline
-from skills_ml.algorithms.string_cleaners import nlp
+from skills_ml.algorithms import nlp
 
 from skills_utils.s3 import upload, list_files
 

@@ -5,7 +5,7 @@ from skills_ml.algorithms.embedding.models import Doc2VecModel, Word2VecModel, E
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora import Word2VecGensimCorpusCreator
 from skills_ml.storage import ProxyObjectWithStorage, ModelStorage, S3Store, FSStore
-from skills_ml.algorithms.string_cleaners import nlp
+from skills_ml.algorithms import nlp
 from skills_ml.algorithms.preprocessing import IterablePipeline
 
 from skills_utils.s3 import upload

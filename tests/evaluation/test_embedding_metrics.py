@@ -1,7 +1,7 @@
 from skills_ml.evaluation.embedding_metrics import metrics_for_embedding, CategorizationMetric, IntraClusterCohesion, RecallTopN, PrecisionTopN
 from skills_ml.algorithms.embedding.models import Word2VecModel
 from skills_ml.algorithms.preprocessing import ProcessingPipeline
-from skills_ml.algorithms.string_cleaners import nlp
+from skills_ml.algorithms import nlp
 from skills_ml.ontologies.onet import Onet
 
 import unittest

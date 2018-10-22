@@ -3,7 +3,7 @@ import csv
 import pandas as pd
 import logging
 
-from skills_ml.algorithms.string_cleaners.nlp import transforms, lowercase_strip_punc
+from skills_ml.algorithms.nlp import transforms, lowercase_strip_punc
 
 
 KSA_TYPE_CONFIG = {

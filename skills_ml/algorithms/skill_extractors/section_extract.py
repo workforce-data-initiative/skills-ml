@@ -1,5 +1,5 @@
 from .base import SkillExtractor, CandidateSkill, CandidateSkillYielder
-from skills_ml.algorithms.string_cleaners.nlp import section_extract
+from skills_ml.algorithms.nlp import section_extract
 import logging
 from typing import Dict
 
@@ -7,7 +7,7 @@ from typing import Dict
 class SectionExtractSkillExtractor(SkillExtractor):
     """Extract skills from text by extracting sentences from matching 'sections'.
 
-    Heavily utilizes skills_ml.algorithms.string_cleaners.nlp.section_extract.
+    Heavily utilizes skills_ml.algorithms.nlp.section_extract.
     For more detail on how to define 'sections', refer to its docstring.
     """
     def __init__(self, section_regex=None, *args, **kwargs):
