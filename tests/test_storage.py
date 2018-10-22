@@ -262,7 +262,7 @@ class TestSerializedByStorage(unittest.TestCase):
         assert pipe_unpickled.functions[-1].keywords['embedding_model']._model ==  None
         assert pipe_unpickled.functions[-1].keywords['embedding_model'].storage.path == s3.path
         # The model will be loaded when it's needed
-        assert list(pipe_unpickled.build([1])) == [[1, 2, 3, 4]]
+        assert list(pipe_unpickled([1])) == [[1, 2, 3, 4]]
 
 
 class TestProxyObject(unittest.TestCase):
@@ -310,7 +310,7 @@ class TestProxyObject(unittest.TestCase):
         s3.write(pickle.dumps(pipe), 'fake.pipe')
         pipe_unpickled = pickle.loads(s3.load('fake.pipe'))
 
-        assert list(pipe_unpickled.build([1])) == [[1, 2, 3, 4]]
+        assert list(pipe_unpickled([1])) == [[1, 2, 3, 4]]
 
     @mock_s3
     def test_with_grid_search(self):

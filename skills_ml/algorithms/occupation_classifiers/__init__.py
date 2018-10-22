@@ -116,7 +116,7 @@ class DesignMatrix(object):
 
     def _combine_pipelines(self):
         gen1, gen2 = tee(self.data_source_generator, 2)
-        combined = zip_longest(self.pipe_X.build(gen1), self.pipe_y.build(gen2))
+        combined = zip_longest(self.pipe_X(gen1), self.pipe_y(gen2))
         return combined
 
     def build(self):

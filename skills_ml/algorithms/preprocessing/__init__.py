@@ -1,13 +1,50 @@
 from functools import reduce, wraps
 from typing import List, Generator, Dict, Callable
+from toolz import compose
 import logging
 import inspect
 
-class IterablePipeline(object):
-    """A simple iterable preprocessing pipeline.
+class ProcessingPipeline(object):
+    """A simple callable processing pipeline for imperative execution runtime.
 
-    This class will compose preprocessing functions together to be passed to different stages(training/prediction)
-    to assert the same preprocessing procedrues.
+    This class will compose processing functions together to become a callable
+    object that takes in the input from the very first processing function and
+    returns the output of the last processing function.
+
+    Example:
+        This class can be used to create a callable vectorization object which
+        will transform a string into a vector and also preserve the preprocessing
+        functions for being reused later.
+        ```python
+        jp = JobPostingCollectionSample()
+        vectorization = ProcessingPipeline(
+            normalize,
+            clean_html,
+            clean_str,
+            word_tokenize,
+            partial(vectorize, embedding_model=w2v)
+        )
+
+        vector = vecotrization("Why so serious?")
+        ```
+
+     Attributes:
+        functions (generator): a series of functions
+
+    """
+    def __init__(self, *functions: Callable):
+        self.functions = functions
+
+    def __call__(self, input_to_be_processed):
+        reversed_for_compose = tuple(reversed(self.functions))
+        return compose(*reversed_for_compose)(input_to_be_processed)
+
+
+class IterablePipeline(object):
+    """A simple iterable processing pipeline.
+
+    This class will compose processing functions together to be passed to different stages(training/prediction)
+    to assert the same processing procedrues.
 
     Example:
     ```python
@@ -19,7 +56,7 @@ class IterablePipeline(object):
         clean_str,
         word_tokenize
     )
-    preprocessed_generator = pipe.build(jp)
+    preprocessed_generator = pipe(jp)
     ```
 
     Attributes:
@@ -38,22 +75,9 @@ class IterablePipeline(object):
     def generators(self, new_generators):
         self._generators = new_generators
 
-    @property
-    def _compose(self):
-        """compose functions
-
-        Returns:
-            function: a function object which is not materialized yet
-        """
-        return reduce(lambda f, g: lambda x: g(f(x)), self._generators, lambda x: x)
-
-    def build(self, source_data_generator: Generator):
-        """
-
-        Returns:
-            generator: a generator object of itmes after apply all the functions on them
-        """
-        return self._compose(source_data_generator)
+    def __call__(self, source_data_generator: Generator):
+        reversed_for_compose = tuple(reversed(self.generators))
+        return compose(*reversed_for_compose)(source_data_generator)
 
     @property
     def description(self):

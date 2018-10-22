@@ -41,7 +41,7 @@ class OccupationClassifierTester(object):
 
     def __iter__(self):
         test_X, test_y = tee(self.create_test_generator())
-        for predict, label in zip(self.pipeline_X.build(test_X), self.pipeline_y.build(test_y)):
+        for predict, label in zip(self.pipeline_X(test_X), self.pipeline_y(test_y)):
             yield [predict[0], label[0]]
             self.counter += 1
 
