@@ -12,7 +12,7 @@ class SectionExtractSkillExtractor(SkillExtractor):
     """
     def __init__(self, section_regex=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.section_regex = section_regex or r'.*([Qq]ualifications|[Ss]kills|[Rr]equirements|[Ab]ilities|[Cc]ompetencies)'
+        self.section_regex = section_regex or r'.*([Ss]kills|[Ab]ilities|[Cc]ompetencies)'
 
     @property
     def name(self):
