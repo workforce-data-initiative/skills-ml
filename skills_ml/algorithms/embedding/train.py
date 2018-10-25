@@ -114,9 +114,6 @@ class EmbeddingTrainer(object):
             logging.info(f"Training {self.model_type}")
             reiter_corpus_gen = Reiterable(corpus_generator)
             self._models = [self._train_one_batch(model, reiter_corpus_gen) for model in self._models]
-            # partial_train = partial(self._train_one_batch, batch=reiter_corpus_gen)
-            # with mp.Pool(processes=n_processes, maxtasksperchild=1) as pool:
-                # self._models = pool.map(partial_train, self._models)
             if lookup:
                 self.lookup_dict = corpus_generator.lookup
                 self._models[0].lookup_dict = self.lookup_dict
