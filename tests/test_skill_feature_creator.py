@@ -31,8 +31,8 @@ class TestSkillFeatureCreator(unittest.TestCase):
         job_postings_generator = JobPostingCollectionSample(num_records=30)
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields, raw=True)
         w2v = Word2VecModel(size=10, min_count=0, iter=4, window=6, workers=3)
-        trainer = EmbeddingTrainer(corpus_generator, w2v)
-        trainer.train()
+        trainer = EmbeddingTrainer(w2v)
+        trainer.train(corpus_generator)
 
         raw = RawCorpusCreator(JobPostingCollectionSample())
         raw1, raw2 = tee(raw)
@@ -72,8 +72,8 @@ class TestSkillFeatureCreator(unittest.TestCase):
         job_postings_generator = JobPostingCollectionSample(num_records=30)
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields, raw=True)
         w2v = Word2VecModel(size=10, min_count=0, iter=4, window=6, workers=3)
-        trainer = EmbeddingTrainer(corpus_generator, w2v)
-        trainer.train()
+        trainer = EmbeddingTrainer(w2v)
+        trainer.train(corpus_generator)
 
         job_postings = RawCorpusCreator(JobPostingCollectionSample(num_records=50))
         raw1, raw2 = tee(job_postings)

@@ -33,8 +33,8 @@ class TestEmbeddingModels(unittest.TestCase):
         job_postings_generator = JobPostingCollectionSample(num_records=50)
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         w2v = Word2VecModel(size=16, min_count=3, iter=4, window=6, workers=3)
-        trainer = EmbeddingTrainer(corpus_generator, w2v)
-        trainer.train()
+        trainer = EmbeddingTrainer(w2v)
+        trainer.train(corpus_generator)
 
         v1 = w2v.infer_vector(["media"])
         v2 = w2v.infer_vector(["media"])
@@ -54,8 +54,8 @@ class TestEmbeddingModels(unittest.TestCase):
         job_postings_generator = JobPostingCollectionSample(num_records=50)
         corpus_generator = Doc2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         d2v = Doc2VecModel(size=16, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
-        trainer = EmbeddingTrainer(corpus_generator, d2v)
-        trainer.train()
+        trainer = EmbeddingTrainer(d2v)
+        trainer.train(corpus_generator)
 
         # Since the inference of doc2vec is an non-deterministic algorithm, we need to reset the random seed for testing.
         d2v.random.seed(0)
@@ -77,8 +77,8 @@ class TestEmbeddingModels(unittest.TestCase):
         job_postings_generator = JobPostingCollectionSample(num_records=50)
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
         fasttext = FastTextModel(size=16, min_count=3, window=6, iter=4)
-        trainer = EmbeddingTrainer(corpus_generator, fasttext)
-        trainer.train()
+        trainer = EmbeddingTrainer(fasttext)
+        trainer.train(corpus_generator)
 
         v1 = fasttext.infer_vector(["media"])
         v2 = fasttext.infer_vector(["media"])

@@ -1,13 +1,16 @@
 import gensim.models.doc2vec
 assert gensim.models.doc2vec.FAST_VERSION > -1
 
-from skills_ml.job_postings.common_schema import batches_generator
+from skills_ml.job_postings.common_schema import batches_generator, BatchGenerator
 from skills_ml.algorithms.embedding.models import Word2VecModel
 from skills_ml.storage import ModelStorage
+from skills_ml.utils import filename_friendly_hash
 
-from datetime import datetime
+import multiprocess as mp
+from datetime import datetime, timedelta
 from itertools import tee
-
+from functools import partial
+from time import time
 import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
@@ -36,13 +39,13 @@ class EmbeddingTrainer(object):
     job_postings_generator = JobPostingGenerator(s3_conn, quarters, s3_path, source="all")
     corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
     w2v = Word2VecModel(storage=FSStore(path='/tmp'), size=10, min_count=3, iter=4, window=6, workers=3)
-    trainer = EmbeddingTrainer(corpus_generator, w2v)
-    trainer.train()
+    trainer = EmbeddingTrainer(w2v)
+    trainer.train(corpus_generator)
     trainer.save_model()
     ```
     """
     def __init__(
-        self, corpus_generator, model, model_storage=None, batch_size=2000):
+        self, *models, model_storage=None, batch_size=2000):
         """Initialization
 
         Attributes:
@@ -55,83 +58,109 @@ class EmbeddingTrainer(object):
             _model (:obj: `gensim.models.doc2vec.Doc2Vec`): gensim doc2vec model object
             lookup_dict (:dict): dictionary for storing the training documents and keys for doc2vec
         """
-        self.corpus_generator = corpus_generator
         self.model_storage = model_storage
         self.training_time = datetime.today().isoformat()
-        self.update = False
         self.batch_size = batch_size
-        self.vocab_size_cumu = []
         self.lookup_dict = None
-        self._model = model
-        self.model_type = model.model_type
+        self._models = models
+        self.model_type = set([model.model_type for model in models])
+        self.corpus_metadata = None
 
-    def train(self, lookup=False, *args, **kwargs):
+    def _train_one_batch(self, model, batch, *args, **kwargs):
+        if len(model.wv.vocab) == 0:
+            model.build_vocab(batch, update=False)
+        else:
+            model.build_vocab(batch, update=True)
+
+        model.train(batch, total_examples=model.corpus_count, epochs=model.iter, *args, **kwargs)
+        return model
+
+    def train(self, corpus_generator, lookup=False, n_processes=1, *args, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
 
         Args:
             kwargs: all arguments that gensim.models will take.
         """
-        if self.model_type in ['word2vec', 'fasttext']:
-            if self._model.wv.vocab:
-                logging.info("Model has been trained")
-                self.update = True
+        tic = time()
+        try:
+            self.corpus_metadata = corpus_generator.metadata
+        except AttributeError:
+            self.corpus_metadata = None
 
-            batch_iter = 1
-            batch_gen = batches_generator(self.corpus_generator, self.batch_size)
-            for batch in batch_gen:
-                batch = Reiterable(batch)
-                logging.info("Training batch #{} ".format(batch_iter))
-                if not self.update:
-                    self._model.build_vocab(batch, update=False)
-                    self.update = True
-                else:
-                    self._model.build_vocab(batch, update=True)
+        if any([model.wv.vocab for model in self._models]):
+            logging.info("Model has been trained")
+            return 0
 
-                self._model.train(batch, total_examples=self._model.corpus_count, epochs=self._model.iter, *args, **kwargs)
-                self.vocab_size_cumu.append(len(self._model.wv.vocab))
-                batch_iter += 1
-                logging.info('\n')
+        for model in self._models:
+            model.model_name = "_".join([
+                model.model_type,
+                self._model_hash(model, self.training_time, self.corpus_metadata)]
+            ) + '.model'
 
-        elif self.model_type == 'doc2vec':
-            corpus_gen = self.corpus_generator
-            reiter_corpus_gen = Reiterable(corpus_gen)
-            self._model.build_vocab(reiter_corpus_gen)
-            self._model.train(reiter_corpus_gen, total_examples=self._model.corpus_count, epochs=self._model.iter, *args, **kwargs)
+        if self.model_type <= set(['word2vec', 'fasttext']):
+            batch_gen = BatchGenerator(corpus_generator, self.batch_size)
+            if n_processes == 1:
+                for i, batch in enumerate(batch_gen):
+                    logging.info("Training batch #{} ".format(i))
+                    self._models = [self._train_one_batch(model, batch) for model in self._models]
+            else:
+                with mp.Pool(processes=n_processes, maxtasksperchild=1) as pool:
+                    for i, batch in enumerate(batch_gen):
+                        logging.info("Training batch #{} ".format(i))
+                        partial_train = partial(self._train_one_batch, batch=batch, *args, **kwargs)
+                        self._models = pool.map(partial_train, self._models)
+
+        elif set(self.model_type) == set(['doc2vec']):
+            logging.info(f"Training {self.model_type}")
+            reiter_corpus_gen = Reiterable(corpus_generator)
+            self._models = [self._train_one_batch(model, reiter_corpus_gen) for model in self._models]
+            # partial_train = partial(self._train_one_batch, batch=reiter_corpus_gen)
+            # with mp.Pool(processes=n_processes, maxtasksperchild=1) as pool:
+                # self._models = pool.map(partial_train, self._models)
             if lookup:
-                self.lookup_dict = corpus_gen.lookup
-                self._model.lookup_dict = self.lookup_dict
+                self.lookup_dict = corpus_generator.lookup
+                self._models[0].lookup_dict = self.lookup_dict
+        else:
+            raise TypeError
 
-        self._model.model_name = self.model_name
+        logging.info(f"{', '.join([m.model_name for m in self._models])} are trained in {str(timedelta(seconds=time()-tic))}")
+
+    def _model_hash(self, model, training_time, corpus_metadata):
+        unique = {
+            "model_metadata": model.metadata,
+            "training_time": training_time,
+            "corpus_metadata": corpus_metadata
+        }
+        return filename_friendly_hash(unique)
 
     def save_model(self, storage=None):
         if storage is None:
             if self.model_storage is None:
                 raise AttributeError(f"'self.model_storage' should not be None if you want to save the model")
             ms = self.model_storage
-            ms.save_model(self._model, self.model_name)
+            for model in self._models:
+                ms.save_model(model, model.model_name)
+                logging.info(f"{model.model_name} has been stored to {ms.storage.path}.")
         else:
             ms = ModelStorage(storage)
-            ms.save_model(self._model, self.model_name)
-        logging.info(f"{self.model_name} has been stored to {ms.storage.path}.")
-
-    @property
-    def model_name(self):
-        return self.model_type + '_' + self.training_time + '.model'
+            for model in self._models:
+                ms.save_model(model, model.model_name)
+            logging.info(f"{model.model_name} has been stored to {ms.storage.path}.")
 
     @property
     def metadata(self):
         meta_dict = {'embedding_trainer': {}}
-        if self._model:
-            meta_dict['embedding_trainer']['model_name'] = self.model_name
+        if self._models:
+            meta_dict['embedding_trainer']['models'] = {model.model_name: model.metadata for model in self._models}
             meta_dict['embedding_trainer']['training_time'] = self.training_time
-            meta_dict['embedding_trainer']['vocab_size_cumu'] = self.vocab_size_cumu
         else:
             print("Haven't trained the model yet!")
 
         try:
-            meta_dict.update(self.corpus_generator.metadata)
-            meta_dict.update(self._model.metadata)
+            meta_dict.update(self.corpus_metadata)
         except AttributeError:
             logging.info(self.corpus_generator.__class__.__name__ + " has no metadata!")
 
         return meta_dict
+
+

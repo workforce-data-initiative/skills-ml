@@ -5,7 +5,7 @@ Each class in this module should implement a generator that yields job postings 
 import logging
 from retrying import Retrying
 from io import BytesIO
-from itertools import chain, islice
+from itertools import chain, islice, tee
 
 from skills_utils.s3 import split_s3_path
 from skills_utils.s3 import log_download_progress
@@ -64,7 +64,7 @@ class JobPostingCollectionFromS3(object):
             's3_paths': self.s3_paths,
         }
         metadata.update(self.extra_metadata)
-        
+
         return {'job postings': metadata }
 
 
@@ -175,6 +175,16 @@ def batches_generator(iterable, batch_size):
     while True:
         batchiter = islice(sourceiter, batch_size)
         yield chain([next(batchiter)], batchiter)
+
+
+class BatchGenerator(object):
+    def __init__(self, iterable, batch_size):
+        self.sourceiter = iterable
+        self.batch_size = batch_size
+
+    def __iter__(self):
+        for batch in batches_generator(self.sourceiter, self.batch_size):
+            yield tuple(batch)
 
 
 def get_onet_occupation(job_posting):
