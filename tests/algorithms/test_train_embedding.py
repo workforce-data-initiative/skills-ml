@@ -277,4 +277,10 @@ class TestTrainEmbedding(unittest.TestCase):
         files = [f.split('/')[-1] for f in s3.ls(s3_path)]
         assert set(files) == set([model.model_name for model in trainer._models])
 
+    def test_embedding_trainer_doc2vec_with_other(self):
+        document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
+        job_postings_generator = JobPostingCollectionSample(num_records=30)
+        corpus_generator = Doc2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
 
+        trainer = EmbeddingTrainer(Doc2VecModel(), Word2VecModel(), FastTextModel())
+        self.assertRaises(TypeError, lambda: trainer.train(corpus_generator))

@@ -49,7 +49,6 @@ class EmbeddingTrainer(object):
         """Initialization
 
         Attributes:
-            corpus_generator (:generator): the iterable corpus
             storage (:obj: `skills_ml.Store`): skills_ml Store object
             metadata (:dict): model metadata
             training_time (:str): training time
@@ -75,11 +74,14 @@ class EmbeddingTrainer(object):
         model.train(batch, total_examples=model.corpus_count, epochs=model.iter, *args, **kwargs)
         return model
 
-    def train(self, corpus_generator, lookup=False, n_processes=1, *args, **kwargs):
+    def train(self, corpus_generator, n_processes=1, lookup=False, *args, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
 
         Args:
-            kwargs: all arguments that gensim.models will take.
+            corpus_generator (:generator): the iterable corpus
+            n_processes (:int): number of the processes
+            lookup (:bool): if True, the lookup dictionary of the corpus will be saved. It's more useful for doc2vec model
+            kwargs: all arguments that gensim.models.train will take.
         """
         tic = time()
         try:
@@ -116,9 +118,10 @@ class EmbeddingTrainer(object):
             self._models = [self._train_one_batch(model, reiter_corpus_gen) for model in self._models]
             if lookup:
                 self.lookup_dict = corpus_generator.lookup
-                self._models[0].lookup_dict = self.lookup_dict
+                for model in self._models:
+                    model.lookup_dict = self.lookup_dict
         else:
-            raise TypeError
+            raise TypeError("Doc2Vec model can only be trained alone with its own kind, not supporting training with other models")
 
         logging.info(f"{', '.join([m.model_name for m in self._models])} are trained in {str(timedelta(seconds=time()-tic))}")
 

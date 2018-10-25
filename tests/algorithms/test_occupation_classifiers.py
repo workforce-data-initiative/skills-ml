@@ -113,7 +113,7 @@ class TestCombinedClassifier(unittest.TestCase):
             corpus_generator = Word2VecGensimCorpusCreator(jobpostings, raw=True)
             w2v = Word2VecModel(size=10, min_count=0, alpha=0.025, min_alpha=0.025)
             trainer = EmbeddingTrainer(w2v, model_storage=model_storage)
-            trainer.train(corpus_generator, True)
+            trainer.train(corpus_generator, lookup=True)
 
             matrix = DesignMatrix(jobpostings, self.major_group, self.pipe_x, self.pipe_y)
             matrix.build()
@@ -142,7 +142,7 @@ class TestKNNDoc2VecClassifier(unittest.TestCase):
             corpus_generator = FakeCorpusGenerator()
             d2v = Doc2VecModel(size=10, min_count=1, dm=0, alpha=0.025, min_alpha=0.025)
             trainer = EmbeddingTrainer(d2v, model_storage=model_storage)
-            trainer.train(corpus_generator, True)
+            trainer.train(corpus_generator, lookup=True)
 
             # KNNDoc2VecClassifier only supports doc2vec now
             self.assertRaises(NotImplementedError, lambda: KNNDoc2VecClassifier(Word2VecModel()))
