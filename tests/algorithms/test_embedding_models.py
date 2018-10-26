@@ -1,6 +1,6 @@
 from skills_ml.algorithms.embedding.train import EmbeddingTrainer
 from skills_ml.algorithms.embedding.base import BaseEmbeddingModel
-from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel, FastTextModel
+from skills_ml.algorithms.embedding.models import Word2VecModel, Doc2VecModel, FastTextModel, visualize_in_tensorboard
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
 from skills_ml.storage import ModelStorage
@@ -8,6 +8,9 @@ from skills_ml.storage import ModelStorage
 from numpy.testing import assert_array_equal, assert_almost_equal
 
 import unittest
+import mock
+import tempfile
+import os
 
 import logging
 logging.getLogger('boto').setLevel(logging.CRITICAL)
@@ -96,3 +99,18 @@ class TestEmbeddingModels(unittest.TestCase):
         v1 = fasttext.infer_vector(["media", "sport", "axe"])
         v2 = fasttext.infer_vector(["media", "sport"])
         assert_array_equal(v1, v2)
+
+    def test_visualize_in_tensorboard(self):
+        document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
+        job_postings_generator = JobPostingCollectionSample(num_records=50)
+        corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
+        w2v = Word2VecModel(size=16, min_count=3, iter=4, window=6, workers=3)
+        trainer = EmbeddingTrainer(w2v)
+        trainer.train(corpus_generator)
+
+        with tempfile.TemporaryDirectory() as td:
+            with mock.patch('os.getcwd') as mock_getcwd:
+                mock_getcwd.return_value = td
+                visualize_in_tensorboard(w2v)
+
+                assert len(set(os.listdir(os.path.join(os.getcwd(), w2v.model_name.split('.')[0])))) == 7

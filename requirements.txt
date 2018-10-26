@@ -5,7 +5,7 @@ scipy==1.1.0
 nltk==3.2.5 # pyup: ignore
 pytest==3.6.4
 Elasticsearch==6.3.0
-gensim==3.2.0 # pyup: ignore
+gensim==3.6.0 # pyup: ignore
 annoy==1.12.0
 unicodecsv==0.14.1
 us==1.0.0
@@ -26,3 +26,4 @@ skills-utils==0.4.0
 s3fs==0.1.5
 dill
 toolz
+tensorflow
