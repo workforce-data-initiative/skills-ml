@@ -27,3 +27,4 @@ s3fs==0.1.5
 dill
 toolz
 tensorflow
+multiprocess

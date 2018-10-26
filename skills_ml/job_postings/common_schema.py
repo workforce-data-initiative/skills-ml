@@ -64,7 +64,7 @@ class JobPostingCollectionFromS3(object):
             's3_paths': self.s3_paths,
         }
         metadata.update(self.extra_metadata)
-        
+
         return {'job postings': metadata }
 
 
@@ -175,6 +175,19 @@ def batches_generator(iterable, batch_size):
     while True:
         batchiter = islice(sourceiter, batch_size)
         yield chain([next(batchiter)], batchiter)
+
+
+class BatchGenerator(object):
+    def __init__(self, iterable, batch_size):
+        self.sourceiter = iterable
+        self.batch_size = batch_size
+        self.batches_generator = batches_generator(self.sourceiter, self.batch_size)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return tuple(next(self.batches_generator))
 
 
 def get_onet_occupation(job_posting):
