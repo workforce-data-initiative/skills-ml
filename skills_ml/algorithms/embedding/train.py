@@ -7,6 +7,7 @@ from skills_ml.storage import ModelStorage
 from skills_ml.utils import filename_friendly_hash
 
 import multiprocess as mp
+from multiprocessing.pool import ThreadPool
 from datetime import datetime, timedelta
 from itertools import tee
 from functools import partial
@@ -106,7 +107,7 @@ class EmbeddingTrainer(object):
                     logging.info("Training batch #{} ".format(i))
                     self._models = [self._train_one_batch(model, batch) for model in self._models]
             else:
-                with mp.Pool(processes=n_processes, maxtasksperchild=1) as pool:
+                with ThreadPool(processes=n_processes) as pool:
                     for i, batch in enumerate(batch_gen):
                         logging.info("Training batch #{} ".format(i))
                         partial_train = partial(self._train_one_batch, batch=batch, *args, **kwargs)
