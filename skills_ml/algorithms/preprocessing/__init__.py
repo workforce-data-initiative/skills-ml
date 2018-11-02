@@ -108,7 +108,7 @@ def func2gen(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
             for item in args[0]:
-                if item is not None:
+                if func(item) is not None:
                     yield func(item)
         return wrapper
 
