@@ -75,6 +75,28 @@ class EmbeddingTrainer(object):
         model.train(batch, total_examples=model.corpus_count, epochs=model.iter, *args, **kwargs)
         return model
 
+    def _train_batches(self, corpus_generator, n_processes, *args, **kwargs):
+        batch_gen = BatchGenerator(corpus_generator, self.batch_size)
+        if n_processes == 1:
+            for i, batch in enumerate(batch_gen):
+                logging.info("Training batch #{} ".format(i))
+                self._models = [self._train_one_batch(model, batch) for model in self._models]
+        else:
+            with mp.Pool(processes=n_processes) as pool:
+                for i, batch in enumerate(batch_gen):
+                    logging.info("Training batch #{} ".format(i))
+                    partial_train = partial(self._train_one_batch, batch=batch, *args, **kwargs)
+                    self._models = pool.map(partial_train, self._models)
+
+    def _train_full_corpus(self, corpus_generator, lookup):
+        logging.info(f"Training {self.model_type}")
+        reiter_corpus_gen = Reiterable(corpus_generator)
+        self._models = [self._train_one_batch(model, reiter_corpus_gen) for model in self._models]
+        if lookup:
+            self.lookup_dict = corpus_generator.lookup
+            for model in self._models:
+                model.lookup_dict = self.lookup_dict
+
     def train(self, corpus_generator, n_processes=1, lookup=False, *args, **kwargs):
         """Train an embedding model, build a lookup table and model metadata. After training, they will be saved to S3.
 
@@ -84,7 +106,7 @@ class EmbeddingTrainer(object):
             lookup (:bool): if True, the lookup dictionary of the corpus will be saved. It's more useful for doc2vec model
             kwargs: all arguments that gensim.models.train will take.
         """
-        tic = time()
+        train_start_time = time()
         try:
             self.corpus_metadata = corpus_generator.metadata
         except AttributeError:
@@ -95,57 +117,33 @@ class EmbeddingTrainer(object):
             return 0
 
         for model in self._models:
-            model.model_name = "_".join([
-                model.model_type,
-                self._model_hash(model, self.training_time, self.corpus_metadata)]
-            ) + '.model'
+            model.model_name = "_".join([model.model_type, self._model_hash(model)]) + '.model'
 
         if self.model_type <= set(['word2vec', 'fasttext']):
-            batch_gen = BatchGenerator(corpus_generator, self.batch_size)
-            if n_processes == 1:
-                for i, batch in enumerate(batch_gen):
-                    logging.info("Training batch #{} ".format(i))
-                    self._models = [self._train_one_batch(model, batch) for model in self._models]
-            else:
-                with ThreadPool(processes=n_processes) as pool:
-                    for i, batch in enumerate(batch_gen):
-                        logging.info("Training batch #{} ".format(i))
-                        partial_train = partial(self._train_one_batch, batch=batch, *args, **kwargs)
-                        self._models = pool.map(partial_train, self._models)
-
-        elif set(self.model_type) == set(['doc2vec']):
-            logging.info(f"Training {self.model_type}")
-            reiter_corpus_gen = Reiterable(corpus_generator)
-            self._models = [self._train_one_batch(model, reiter_corpus_gen) for model in self._models]
-            if lookup:
-                self.lookup_dict = corpus_generator.lookup
-                for model in self._models:
-                    model.lookup_dict = self.lookup_dict
+            self._train_batches(corpus_generator, n_processes, *args, **kwargs)
+        elif self.model_type == set(['doc2vec']):
+            self._train_full_corpus(corpus_generator, lookup)
         else:
             raise TypeError("Doc2Vec model can only be trained alone with its own kind, not supporting training with other models")
 
-        logging.info(f"{', '.join([m.model_name for m in self._models])} are trained in {str(timedelta(seconds=time()-tic))}")
+        logging.info(f"{', '.join([m.model_name for m in self._models])} are trained in {str(timedelta(seconds=time()-train_start_time))}")
 
-    def _model_hash(self, model, training_time, corpus_metadata):
+    def _model_hash(self, model):
         unique = {
             "model_metadata": model.metadata,
-            "training_time": training_time,
-            "corpus_metadata": corpus_metadata
+            "training_time": self.training_time,
+            "corpus_metadata": self.corpus_metadata
         }
         return filename_friendly_hash(unique)
 
     def save_model(self, storage=None):
-        if storage is None:
-            if self.model_storage is None:
-                raise AttributeError(f"'self.model_storage' should not be None if you want to save the model")
-            ms = self.model_storage
-            for model in self._models:
-                ms.save_model(model, model.model_name)
-                logging.info(f"{model.model_name} has been stored to {ms.storage.path}.")
-        else:
+        if storage:
             ms = ModelStorage(storage)
-            for model in self._models:
-                ms.save_model(model, model.model_name)
+        else:
+            ms = self.model_storage
+
+        for model in self._models:
+            ms.save_model(model, model.model_name)
             logging.info(f"{model.model_name} has been stored to {ms.storage.path}.")
 
     @property
