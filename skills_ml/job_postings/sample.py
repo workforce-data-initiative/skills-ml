@@ -13,6 +13,7 @@ class JobSampler(object):
 
     Attributes:
         job_posting_generator (iterator): Job posting iterator to sample from.
+        k (int): number of documents to sample
         major_group (bool): A flag for using major_group as a label or not
         keys (list|str): a key or keys(for nested dictionary) indicates the label which should exist in common schema
                          of job posting.
@@ -23,8 +24,9 @@ class JobSampler(object):
         random_state (int): the seed used by the random number generator
 
     """
-    def __init__(self, job_posting_generator, major_group=False, keys=None, weights=None, random_state=None):
+    def __init__(self, job_posting_generator, k, major_group=False, keys=None, weights=None, random_state=None):
         self.job_posting_generator = job_posting_generator
+        self.k = k
         self.major_group = major_group
         self.weights = weights
         self.keys = keys
@@ -50,17 +52,11 @@ class JobSampler(object):
             for job in job_posting_generator:
                 yield (job, )
 
-    def sample(self, k):
-        """ Sample method
-
-        Args:
-            k (int): number of documents to sample
-
-        Returns:
-            list of sampled documents
-        """
+    def __iter__(self):
         it = self._transform_generator(self.job_posting_generator)
         if self.weights:
-            return list(reservoir_weighted(it, k, self.weights))
+            # return list(reservoir_weighted(it, k, self.weights))
+            yield from reservoir_weighted(it, self.k, self.weights)
         else:
-            return list(reservoir(it, k))
+            # return list(reservoir(it, k))
+            yield from reservoir(it, self.k)
