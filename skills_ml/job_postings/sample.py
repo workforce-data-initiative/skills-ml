@@ -55,8 +55,6 @@ class JobSampler(object):
     def __iter__(self):
         it = self._transform_generator(self.job_posting_generator)
         if self.weights:
-            # return list(reservoir_weighted(it, k, self.weights))
             yield from reservoir_weighted(it, self.k, self.weights)
         else:
-            # return list(reservoir(it, k))
             yield from reservoir(it, self.k)
