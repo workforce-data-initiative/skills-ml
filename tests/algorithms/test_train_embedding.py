@@ -246,7 +246,7 @@ class TestTrainEmbedding(unittest.TestCase):
                     Word2VecModel(size=10, workers=3, window=6),
                     Word2VecModel(size=10, min_count=10, window=10, workers=3),
                     model_storage=model_storage)
-            trainer.train(corpus_generator)
+            trainer.train(corpus_generator, n_processes=4)
             trainer.save_model()
 
             assert set(os.listdir(os.getcwd())) == set([model.model_name for model in trainer._models])
