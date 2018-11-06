@@ -14,6 +14,9 @@ with open('requirements_dev.txt') as requirements_file:
         if 'git+' not in req
     ] + requirements
 
+with open('requirements_addon.txt') as requirements_file:
+    addon_requirements = requirements_file.readlines()
+
 setup(
     name='Skills ML',
     version='2.1.0',
@@ -24,6 +27,7 @@ setup(
     packages=find_packages(include=['skills_ml*']),
     include_package_data=True,
     install_requires=requirements,
+    extras_require={'tensorflow': addon_requirements},
     license="MIT license",
     keywords='nlp jobs skills onet',
     classifiers=[

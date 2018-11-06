@@ -2,11 +2,16 @@
 from skills_ml.storage import FSStore, ModelStorage
 from skills_ml.algorithms.embedding.base import BaseEmbeddingModel
 
+import gensim
 from gensim.models import Doc2Vec, Word2Vec
 from gensim.models.fasttext import FastText as FT_gensim
 
+from tensorflow.contrib.tensorboard.plugins import projector
+import tensorflow as tf
+
 from sklearn.base import BaseEstimator, TransformerMixin
 
+import os
 import numpy as np
 import logging
 
@@ -133,3 +138,38 @@ class EmbeddingTransformer(BaseEstimator, TransformerMixin):
     def fit_transform(self, X, y=None):
         self.fit(X, y)
         return self.transform(X)
+
+
+def visualize_in_tensorboard(embedding_model, output_dirname=None, host="127.0.0.1"):
+    if output_dirname is None:
+        output_dirname =  embedding_model.model_name.split('.')[0]
+
+    meta_file = f"{output_dirname}_metadata.tsv"
+    output_path = os.path.join(os.getcwd(), output_dirname)
+    if not os.path.isdir(output_path):
+        os.mkdir(output_path)
+
+    with open(os.path.join(output_path, meta_file), "wb") as file_metadata:
+        for word in embedding_model.wv.index2word:
+            file_metadata.write(gensim.utils.to_utf8(word) + gensim.utils.to_utf8("\n"))
+
+    embedding = tf.Variable(embedding_model.wv.vectors, trainable = False, name = f"{output_dirname}_tensor")
+    init_op = tf.global_variables_initializer()
+
+    saver = tf.train.Saver()
+    with tf.Session() as sess:
+        sess.run(init_op)
+        writer = tf.summary.FileWriter(output_path, sess.graph)
+
+    # adding into projector
+        config = projector.ProjectorConfig()
+        embed = config.embeddings.add()
+        embed.tensor_name = f"{output_dirname}_tensor"
+        embed.metadata_path = meta_file
+
+    # Specify the width and height of a single thumbnail.
+        projector.visualize_embeddings(writer, config)
+        saver.save(sess, os.path.join(output_path,f"{output_dirname}_metadata.ckpt"))
+
+    print(f"Run `tensorboard --logdir={output_path} --host {host}` to run visualize result on tensorboard")
+

@@ -111,7 +111,6 @@ class EmbeddingTrainer(object):
             self.corpus_metadata = corpus_generator.metadata
         except AttributeError:
             self.corpus_metadata = None
-
         if any([model.wv.vocab for model in self._models]):
             logging.info("Model has been trained")
             return 0
