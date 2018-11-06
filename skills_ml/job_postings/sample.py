@@ -1,6 +1,7 @@
 """Sample job postings"""
 
 import random
+from skills_ml.algorithms.string_cleaners import NLPTransforms
 from skills_ml.algorithms.sampling.methods import reservoir, reservoir_weighted
 import numpy as np
 from skills_utils.common import safe_get
@@ -23,8 +24,9 @@ class JobSampler(object):
         random_state (int): the seed used by the random number generator
 
     """
-    def __init__(self, job_posting_generator, k, major_group=False, keys=None, weights=None, random_state=None):
+    def __init__(self, job_posting_generator, major_group=False, keys=None, weights=None, random_state=None):
         self.job_posting_generator = job_posting_generator
+        self.nlp = NLPTransforms()
         self.major_group = major_group
         self.weights = weights
         self.keys = keys
@@ -50,7 +52,7 @@ class JobSampler(object):
             for job in job_posting_generator:
                 yield (job, )
 
-    def __iter__(self):
+    def sample(self, k):
         """ Sample method
 
         Args:
@@ -61,8 +63,6 @@ class JobSampler(object):
         """
         it = self._transform_generator(self.job_posting_generator)
         if self.weights:
-            # return list(reservoir_weighted(it, k, self.weights))
-            yield from reservoir_weighted(it, self.k, self.weights)
+            return list(reservoir_weighted(it, k, self.weights))
         else:
-            # return list(reservoir(it, k))
-            yield from reservoir(it, self.k)
+            return list(reservoir(it, k))
