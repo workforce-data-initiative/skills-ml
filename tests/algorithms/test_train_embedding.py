@@ -238,16 +238,15 @@ class TestTrainEmbedding(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             mock_getcwd.return_value = td
             model_storage = ModelStorage(FSStore(td))
-            job_postings_generator = JobPostingCollectionSample(num_records=30)
+            job_postings_generator = JobPostingCollectionSample()
             corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
-            FastTextModel(size=10, min_count=3, iter=4, window=6, workers=3)
             trainer = EmbeddingTrainer(
                     FastTextModel(size=10, min_count=3, iter=4, window=6, workers=3),
                     FastTextModel(size=10, min_count=3, iter=4, window=10, workers=3),
                     Word2VecModel(size=10, workers=3, window=6),
                     Word2VecModel(size=10, min_count=10, window=10, workers=3),
                     model_storage=model_storage)
-            trainer.train(corpus_generator)
+            trainer.train(corpus_generator, n_processes=4)
             trainer.save_model()
 
             assert set(os.listdir(os.getcwd())) == set([model.model_name for model in trainer._models])
@@ -261,9 +260,8 @@ class TestTrainEmbedding(unittest.TestCase):
         model_storage = ModelStorage(s3_storage)
 
         document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
-        job_postings_generator = JobPostingCollectionSample(num_records=30)
+        job_postings_generator = JobPostingCollectionSample()
         corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator, document_schema_fields=document_schema_fields)
-
         trainer = EmbeddingTrainer(
                 FastTextModel(size=10, min_count=3, iter=4, window=6, workers=3),
                 FastTextModel(size=10, min_count=3, iter=4, window=10, workers=3),

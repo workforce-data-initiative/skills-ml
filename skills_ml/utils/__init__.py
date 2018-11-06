@@ -10,7 +10,7 @@ def filename_friendly_hash(inputs):
             if isinstance(x, datetime.datetime) or isinstance(x, datetime.date):
                 return x.isoformat()
             if isinstance(x, np.ndarray):
-                return len(x)
+                return str(x)
         except:
             return 0
 

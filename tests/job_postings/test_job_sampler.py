@@ -78,31 +78,39 @@ class JobSamplerWithoutWeightingTest(unittest.TestCase):
     fake_corpus_train = FakeCorpusGenerator(num, occ_num, states, employment_type)
 
     def test_soc(self):
-        js = JobSampler(job_posting_generator=self.fake_corpus_train)
+        js = JobSampler(job_posting_generator=self.fake_corpus_train, k=self.sample_size)
 
         result = []
         for i in range(self.num_loops):
-            result.extend(list(map(lambda x: x[0]['onet_soc_code'], js.sample(self.sample_size))))
+            result.extend(list(map(lambda x: x[0]['onet_soc_code'], js)))
 
         counts = dict(Counter(result))
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / self.occ_num
 
     def test_state(self):
-        js = JobSampler(job_posting_generator=self.fake_corpus_train, keys=['jobLocation', 'address', 'addressRegion'])
+        js = JobSampler(
+                job_posting_generator=self.fake_corpus_train,
+                k=self.sample_size,
+                keys=['jobLocation', 'address', 'addressRegion']
+        )
 
         result = []
         for i in range(self.num_loops):
-            result.extend(list(map(lambda x: x[1], js.sample(self.sample_size))))
+            result.extend(list(map(lambda x: x[1], js)))
 
         counts = dict(Counter(result))
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / len(self.states)
 
     def test_employment_type(self):
-        js = JobSampler(job_posting_generator=self.fake_corpus_train, keys='employmentType')
+        js = JobSampler(
+                job_posting_generator=self.fake_corpus_train,
+                k=self.sample_size,
+                keys='employmentType'
+        )
 
         result = []
         for i in range(self.num_loops):
-            result.extend(list(map(lambda x: x[1], js.sample(self.sample_size))))
+            result.extend(list(map(lambda x: x[1], js)))
 
         counts = dict(Counter(result))
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / len(self.employment_type)
