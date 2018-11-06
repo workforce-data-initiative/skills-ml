@@ -2,7 +2,9 @@ from skills_ml.job_postings.common_schema import \
     generate_job_postings_from_s3,\
     generate_job_postings_from_s3_multiple_prefixes,\
     JobPostingCollectionFromS3,\
-    JobPostingCollectionSample
+    JobPostingCollectionSample, \
+    batches_generator, \
+    BatchGenerator
 import json
 import moto
 import boto
@@ -10,6 +12,7 @@ from unittest import mock
 import random
 import string
 import unittest
+import collections
 
 raise_error = True
 
@@ -143,3 +146,19 @@ class CommonSchemaTestCase(unittest.TestCase):
             self.assertIn('title', posting)
             self.assertIn('description', posting)
         self.assertIn('job postings', job_postings.metadata)
+
+    def test_batch_generator(self):
+        job_postings = JobPostingCollectionSample()
+        batch_iter = next(batches_generator(job_postings, 10))
+        # Each bacth produced by batched_generator() is still an iterator
+        assert isinstance(batch_iter, collections.Iterator)
+        batch_iter = list(batch_iter)
+        assert len(list(batch_iter)) == 10
+
+        job_postings = JobPostingCollectionSample()
+        batch_tuple = next(BatchGenerator(job_postings, 10))
+        # Each batch produced by BatchGenerator() is a tuple
+        assert isinstance(batch_tuple, tuple)
+        assert len(list(batch_tuple)) == 10
+
+        self.assertListEqual(list(batch_iter), list(batch_tuple))

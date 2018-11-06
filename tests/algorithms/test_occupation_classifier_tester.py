@@ -59,8 +59,8 @@ class TestOccupationClassifierTester(unittest.TestCase):
         document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
         corpus_generator = Word2VecGensimCorpusCreator(JobPostingCollectionSample(num_records=30), document_schema_fields=document_schema_fields)
         w2v = Word2VecModel(size=10, min_count=3, iter=4, window=6, workers=3)
-        trainer = EmbeddingTrainer(corpus_generator, w2v)
-        trainer.train()
+        trainer = EmbeddingTrainer(w2v)
+        trainer.train(corpus_generator)
 
         jp = JobPostingCollectionSample()
         train_gen = islice(jp, 30)
