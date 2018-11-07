@@ -27,7 +27,7 @@ def reservoir(it, k):
             if j < k:
                 result[j] = datum
     while len(result) > 0:
-        yield result.pop()
+        yield result.pop()[0]
 
 
 def reservoir_weighted(it, k, weights):
@@ -58,4 +58,4 @@ def reservoir_weighted(it, k, weights):
         elif score > heap[0][0]:
             hq.heapreplace(heap, (score, datum))
     while len(heap) > 0:
-        yield hq.heappop(heap)[1]
+        yield hq.heappop(heap)[1][0]

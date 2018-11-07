@@ -68,6 +68,9 @@ class OccupationClassifierTrainer(object):
         is vailable in this package's environment and implements .fit
         """
         logging.info(f"Start training {self.train_time}")
+        if not self.matrix.X:
+            self.matrix.build()
+
         X = self.matrix.X
         y = self.matrix.y
         store_path = os.path.join(self.storage.path, self.train_time)

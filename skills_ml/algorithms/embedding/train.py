@@ -142,6 +142,7 @@ class EmbeddingTrainer(object):
             ms = self.model_storage
 
         for model in self._models:
+            model.storage = ms.storage
             ms.save_model(model, model.model_name)
             logging.info(f"{model.model_name} has been stored to {ms.storage.path}.")
 
