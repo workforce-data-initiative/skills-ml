@@ -14,10 +14,6 @@ class ClassificationEvaluator(object):
             self.labels = self.target_variable.choices
         self.result = np.array(list(self.result_generator))
 
-    #@cachedproperty
-    #def result(self):
-    #    return np.array(list(self.result_generator))
-
     @cachedproperty
     def y_pred(self):
         return self.target_variable.encoder.inverse_transform(self.result[:, 0])
@@ -79,7 +75,6 @@ class OnetOccupationClassificationEvaluator(ClassificationEvaluator):
         else:
             self.target_variable = self.result_generator.target_variable
             self.labels = self.target_variable.choices
-        #self.result = np.array(list(self.result_generator))
 
     @cachedproperty
     def _result_for_major_group(self):
