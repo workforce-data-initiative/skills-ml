@@ -14,47 +14,26 @@ class JobSampler(object):
     Attributes:
         job_posting_generator (iterator): Job posting iterator to sample from.
         k (int): number of documents to sample
-        major_group (bool): A flag for using major_group as a label or not
-        keys (list|str): a key or keys(for nested dictionary) indicates the label which should exist in common schema
-                         of job posting.
         weights (dict): a dictionary that has key-value pairs as label-weighting pairs. It expects every
                         label in the iterator to be present as a key in the weights dictionary For example,
                         weights = {'11': 2, '13', 1}. In this case, the label/key is the occupation major
                         group and the value is the weight you want to sample with.
+        key (callable): a function to be called on each element to associate to the key of weights dictionary
         random_state (int): the seed used by the random number generator
 
     """
-    def __init__(self, job_posting_generator, k, major_group=False, keys=None, weights=None, random_state=None):
+    def __init__(self, job_posting_generator, k, weights=None, key=lambda x: x, random_state=None):
         self.job_posting_generator = job_posting_generator
         self.k = k
-        self.major_group = major_group
+        self.key = key
         self.weights = weights
-        self.keys = keys
         self.random_state = random_state
         if random_state:
             np.random.seed(random_state)
             random.seed(random_state)
 
-    def _transform_generator(self, job_posting_generator):
-        if isinstance(self.keys, list):
-            for job in job_posting_generator:
-                yield (job, safe_get(job, *self.keys))
-        elif isinstance(self.keys, str):
-            for job in job_posting_generator:
-                yield (job, job[self.keys])
-        elif self.major_group:
-            for job in job_posting_generator:
-                try:
-                    yield (job, job['onet_soc_code'][:2])
-                except TypeError:
-                    yield (job, None)
-        else:
-            for job in job_posting_generator:
-                yield (job, )
-
     def __iter__(self):
-        it = self._transform_generator(self.job_posting_generator)
         if self.weights:
-            yield from reservoir_weighted(it, self.k, self.weights)
+            yield from reservoir_weighted(self.job_posting_generator, self.k, self.weights, self.key)
         else:
-            yield from reservoir(it, self.k)
+            yield from reservoir(self.job_posting_generator, self.k)

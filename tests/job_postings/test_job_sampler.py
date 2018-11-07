@@ -1,4 +1,5 @@
 from skills_ml.job_postings.sample import JobSampler
+from skills_ml.job_postings.filtering import JobPostingFilterer
 from skills_utils.common import safe_get
 import gensim
 from collections import Counter
@@ -85,35 +86,35 @@ class JobSamplerWithoutWeightingTest(unittest.TestCase):
 
         result = []
         for i in range(self.num_loops):
-            result.extend(list(map(lambda x: x[0]['onet_soc_code'], js)))
+            result.extend(list(map(lambda x: x['onet_soc_code'], js)))
 
         counts = dict(Counter(result))
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / self.occ_num
 
     def test_state(self):
+        transformer = lambda job: safe_get(job, 'jobLocation', 'address', 'addressRegion')
         js = JobSampler(
                 job_posting_generator=self.fake_corpus_train,
                 k=self.sample_size,
-                keys=['jobLocation', 'address', 'addressRegion']
         )
 
         result = []
         for i in range(self.num_loops):
-            result.extend(list(map(lambda x: x[1], js)))
+            result.extend(list(map(lambda x: transformer(x), js)))
 
         counts = dict(Counter(result))
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / len(self.states)
 
     def test_employment_type(self):
+        transformer = lambda job: safe_get(job, 'employmentType')
         js = JobSampler(
                 job_posting_generator=self.fake_corpus_train,
                 k=self.sample_size,
-                keys='employmentType'
         )
 
         result = []
         for i in range(self.num_loops):
-            result.extend(list(map(lambda x: x[1], js)))
+            result.extend(list(map(lambda x: transformer(x), js)))
 
         counts = dict(Counter(result))
         assert np.mean(np.array(list(counts.values()))) == self.num_loops * self.sample_size / len(self.employment_type)
@@ -131,15 +132,23 @@ class JobSamplerWithWeightingTest(unittest.TestCase):
 
         ratio = self.weights['13'] / self.weights['11']
 
+        major_group_filter = lambda job: job['onet_soc_code'][:2] in ['11', '13']
+
+        filtered_jobposting = JobPostingFilterer(
+                self.fake_corpus_train,
+                [major_group_filter]
+                )
+
         js = JobSampler(
-                job_posting_generator=self.fake_corpus_train,
+                job_posting_generator=filtered_jobposting,
                 k=self.sample_size,
                 weights=self.weights,
-                major_group=True)
+                key=lambda job: job['onet_soc_code'][:2]
+                )
 
         result = []
         for i in range(self.num_loops):
-            r = list(map(lambda x: x[1][:2], js))
+            r = list(map(lambda x: x['onet_soc_code'][:2], js))
             counts = dict(Counter(r))
             result.append(counts['13'] / counts['11'])
 

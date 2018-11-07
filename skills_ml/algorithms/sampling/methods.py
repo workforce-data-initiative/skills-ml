@@ -27,10 +27,10 @@ def reservoir(it, k):
             if j < k:
                 result[j] = datum
     while len(result) > 0:
-        yield result.pop()[0]
+        yield result.pop()
 
 
-def reservoir_weighted(it, k, weights):
+def reservoir_weighted(it, k, weights, key):
     """Weighted reservoir Sampling from job posting iterator
 
     Randomly choosing a sample of k items from a streaming iterator based on the weights.
@@ -51,11 +51,11 @@ def reservoir_weighted(it, k, weights):
     heap = []
     hkey = lambda w: np.power(np.random.uniform(0.0, 1.0), 1.0 / w)
     for i, datum in enumerate(it):
-        weight = weights[datum[1]]
+        weight = weights[key(datum)]
         score = hkey(weight)
         if len(heap) < k:
             hq.heappush(heap, (hkey(weight), datum))
         elif score > heap[0][0]:
             hq.heapreplace(heap, (score, datum))
     while len(heap) > 0:
-        yield hq.heappop(heap)[1][0]
+        yield hq.heappop(heap)[1]
