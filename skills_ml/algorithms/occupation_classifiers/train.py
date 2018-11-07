@@ -85,7 +85,7 @@ class OccupationClassifierTrainer(object):
                 kf = StratifiedKFold(n_splits=self.k_folds, random_state=self.random_state_for_split)
                 model_hash = self._model_hash(self.matrix.metadata, class_name, parameter_config)
                 trained_model_name = class_name.lower() + "_" + model_hash
-                self.storage.path = os.path.join(store_path, score, trained_model_name)
+                self.storage.path = os.path.join(store_path, score)
                 if 'n_jobs' in inspect.signature(cls).parameters.keys():
                     cls_cv = ProxyObjectWithStorage(
                             model_obj=GridSearchCV(
