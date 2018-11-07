@@ -26,6 +26,9 @@ deploy:
       b1gzUGpVOU1EbjZxN24rMjVlc2J2VHgrdm1ib1AvZ3VkWlZtbjZJYzB6dThGTDVIcXlOTWIxVFk9
 env:
 - TOXENV=py36 BOTO_CONFIG=/tmp/nowhere PYTHONPATH='.'
+- AWS_ACCESS_KEY_ID=dummy-access-key
+- AWS_SECRET_ACCESS_KEY=dummy-access-key-secret
+- AWS_DEFAULT_REGION=us-east-1
 install:
 - pip install -r requirements.txt
 - pip install -r requirements_dev.txt
