@@ -42,7 +42,7 @@ class CategorizationMetric(BaseEmbeddingMetric):
         result = {}
         for concept, entities in self.clustering.items():
             centroid = np.average([vectorization(entity[1]) for entity in entities], axis=0)
-            result[concept] = distance.cosine(vectorization(concept), centroid)
+            result[concept] = distance.cosine(vectorization(concept), centroid).astype(float)
         self.eval_result = result
         return result
 
@@ -65,7 +65,7 @@ class IntraClusterCohesion(BaseEmbeddingMetric):
         for concept, entities in self.clustering.items():
             entities_vec = [vectorization(entity[1]) for entity in entities]
             centroid = np.average(entities_vec, axis=0)
-            result[concept] = np.sum((entities_vec - centroid)**2)
+            result[concept] = np.sum((entities_vec - centroid)**2).astype(float)
         self.eval_result = result
         return result
 

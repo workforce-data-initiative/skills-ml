@@ -34,11 +34,11 @@ class TestClustering(unittest.TestCase):
         assert set(occupation_clustering.keys()) == set([major_group_37_concept.name, major_group_35_concept.name])
         assert occupation_clustering["Building and Grounds Cleaning and Maintenance"] == major_group_37_entities
         assert occupation_clustering.map_raw_key["Building and Grounds Cleaning and Maintenance"] == major_group_37_concept
-        assert occupation_clustering["Food Preparation and Serving Related Occupations"] == major_group_35_entities
-        assert occupation_clustering.map_raw_key["Food Preparation and Serving Related Occupations"] == major_group_35_concept
+        assert occupation_clustering["Food Preparation and Serving Related"] == major_group_35_entities
+        assert occupation_clustering.map_raw_key["Food Preparation and Serving Related"] == major_group_35_concept
 
         # Delete
-        del occupation_clustering["Food Preparation and Serving Related Occupations"]
+        del occupation_clustering["Food Preparation and Serving Related"]
         assert len(occupation_clustering) == 1
 
         # Iterable

@@ -12,7 +12,7 @@ class ClassificationEvaluator(object):
         else:
             self.target_variable = self.result_generator.target_variable
             self.labels = self.target_variable.choices
-        self.result = np.array(list(result_generator))
+        self.result = np.array(list(self.result_generator))
 
     @cachedproperty
     def y_pred(self):
@@ -68,14 +68,13 @@ class ClassificationEvaluator(object):
 
 
 class OnetOccupationClassificationEvaluator(ClassificationEvaluator):
-    def __init__(self,result_generator):
+    def __init__(self, result_generator):
         super().__init__(result_generator)
-        if not hasattr(self.result_generator,'target_variable'):
+        if not hasattr(self.result_generator, 'target_variable'):
             raise AttributeError("the result_generator should have target_variable property")
         else:
             self.target_variable = self.result_generator.target_variable
             self.labels = self.target_variable.choices
-        self.result = np.array(list(result_generator))
 
     @cachedproperty
     def _result_for_major_group(self):

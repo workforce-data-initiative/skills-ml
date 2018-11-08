@@ -68,6 +68,9 @@ class OccupationClassifierTrainer(object):
         is vailable in this package's environment and implements .fit
         """
         logging.info(f"Start training {self.train_time}")
+        if len(self.matrix.X) == 0:
+            self.matrix.build()
+
         X = self.matrix.X
         y = self.matrix.y
         store_path = os.path.join(self.storage.path, self.train_time)
@@ -82,7 +85,7 @@ class OccupationClassifierTrainer(object):
                 kf = StratifiedKFold(n_splits=self.k_folds, random_state=self.random_state_for_split)
                 model_hash = self._model_hash(self.matrix.metadata, class_name, parameter_config)
                 trained_model_name = class_name.lower() + "_" + model_hash
-                self.storage.path = os.path.join(store_path, score, trained_model_name)
+                self.storage.path = os.path.join(store_path, score)
                 if 'n_jobs' in inspect.signature(cls).parameters.keys():
                     cls_cv = ProxyObjectWithStorage(
                             model_obj=GridSearchCV(

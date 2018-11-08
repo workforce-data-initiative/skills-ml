@@ -78,7 +78,7 @@ class FullSOC(TargetVariable):
     def __init__(self, filters=None, onet_cache=None):
         super().__init__(filters)
         self.default_filters = [unknown_soc_filter, empty_soc_filter]
-        self.choices = Onet().all_soc
+        self.choices = onet_cache.all_soc if onet_cache else Onet().all_soc
         self.encoder = SocEncoder(self.choices)
 
     def extract_occupation_from_jobposting(self, job_posting):
@@ -120,6 +120,7 @@ class DesignMatrix(object):
         return combined
 
     def build(self):
+        logging.info("Building matrix")
         for i, item in enumerate(self._combine_pipelines()):
             self._X.append(item[0])
             self._y.append(item[1])
