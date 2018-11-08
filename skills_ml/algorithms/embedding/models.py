@@ -49,7 +49,7 @@ class Word2VecModel(BaseEmbeddingModel, Word2Vec):
         words_in_vocab = []
         for token in doc_words:
             try:
-                sum_vector += self[token]
+                sum_vector += self.wv[token]
                 words_in_vocab.append(token)
             except KeyError as e:
                 if warning:
@@ -107,7 +107,7 @@ class FastTextModel(BaseEmbeddingModel, FT_gensim):
          words_in_vocab = []
          for token in doc_words:
              try:
-                 sum_vector += self[token]
+                 sum_vector += self.wv[token]
                  words_in_vocab.append(token)
              except KeyError as e:
                  if warning:
