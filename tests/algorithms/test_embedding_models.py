@@ -7,6 +7,7 @@ from skills_ml.storage import ModelStorage
 
 from numpy.testing import assert_array_equal, assert_almost_equal
 
+import pytest
 import unittest
 import mock
 import tempfile
@@ -100,6 +101,7 @@ class TestEmbeddingModels(unittest.TestCase):
         v2 = fasttext.infer_vector(["media", "sport"])
         assert_array_equal(v1, v2)
 
+    @pytest.mark.skip(reason="tensorflow version would cause too many warnings")
     def test_visualize_in_tensorboard(self):
         document_schema_fields = ['description','experienceRequirements', 'qualifications', 'skills']
         job_postings_generator = JobPostingCollectionSample(num_records=50)
