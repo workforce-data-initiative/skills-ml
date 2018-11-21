@@ -11,20 +11,19 @@ generate:
     skills_ml.algorithms.preprocessing+, skills_ml.algorithms.sampling+, skills_ml.algorithms.sampling.methods+,
     skills_ml.algorithms.skill_extractors+, skills_ml.algorithms.skill_extractors.base+,
     skills_ml.algorithms.skill_extractors.exact_match+, skills_ml.algorithms.skill_extractors.fuzzy_match+,
-    skills_ml.algorithms.skill_extractors.noun_phrase_ending+, skills_ml.algorithms.skill_extractors.section_extract+,
-    skills_ml.algorithms.skill_extractors.soc_exact+, skills_ml.algorithms.skill_extractors.symspell+,
-    skills_ml.algorithms.skill_feature_creator+, skills_ml.algorithms.skill_feature_creator.contextual_features+,
-    skills_ml.algorithms.skill_feature_creator.posTags+, skills_ml.algorithms.skill_feature_creator.structure_features+,
-    skills_ml.algorithms.tensorflow+, skills_ml.algorithms.tensorflow.data_loader+,
-    skills_ml.algorithms.tensorflow.logger+, skills_ml.algorithms.tensorflow.models+,
-    skills_ml.algorithms.tensorflow.trainers+, skills_ml.algorithms.tensorflow.utils+]
+    skills_ml.algorithms.skill_extractors.grammar+, skills_ml.algorithms.skill_extractors.noun_phrase_ending+,
+    skills_ml.algorithms.skill_extractors.section_extract+, skills_ml.algorithms.skill_extractors.soc_exact+,
+    skills_ml.algorithms.skill_extractors.symspell+, skills_ml.algorithms.skill_feature_creator+,
+    skills_ml.algorithms.skill_feature_creator.contextual_features+, skills_ml.algorithms.skill_feature_creator.posTags+,
+    skills_ml.algorithms.skill_feature_creator.structure_features+]
 - skills_ml.datasets.md: [skills_ml.datasets.cbsa_shapefile+, skills_ml.datasets.cousub_ua+,
     skills_ml.datasets.job_titles+, skills_ml.datasets.job_titles.elasticsearch+,
     skills_ml.datasets.job_titles.onet+, skills_ml.datasets.nber_county_cbsa+, skills_ml.datasets.negative_positive_dict+,
     skills_ml.datasets.onet_cache+, skills_ml.datasets.onet_source+, skills_ml.datasets.partner_updaters+,
     skills_ml.datasets.partner_updaters.usa_jobs+, skills_ml.datasets.place_ua+, skills_ml.datasets.sba_city_county+,
     skills_ml.datasets.skill_importances+, skills_ml.datasets.skill_importances.onet+,
-    skills_ml.datasets.skills+, skills_ml.datasets.skills.onet_ksat+, skills_ml.datasets.ua_cbsa+]
+    skills_ml.datasets.skills+, skills_ml.datasets.skills.ceasn_from_onet+, skills_ml.datasets.skills.onet_ksat+,
+    skills_ml.datasets.ua_cbsa+]
 - skills_ml.evaluation.md: [skills_ml.evaluation.annotators+, skills_ml.evaluation.embedding_metrics+,
     skills_ml.evaluation.job_title_normalizers+, skills_ml.evaluation.occ_cls_evaluator+,
     skills_ml.evaluation.representativeness_calculators+, skills_ml.evaluation.representativeness_calculators.geo_occupation+,
@@ -43,6 +42,7 @@ markdown_extensions:
 - toc: {anchorlink: true, baselevel: 2, permalink: true}
 pages:
 - {Home: index.md << ../README.md}
+- {Tour: skills_ml_tour.md}
 - {Examples: examples.md}
 - {Ontology Class: ontologies.md}
 - {Job Posting Common Schema: common_schema.md}
@@ -54,3 +54,4 @@ preprocessor: pydocmd.preprocessor.Preprocessor
 site_dir: _build/site
 site_name: skills-ml documentation
 theme: material
+use_directory_urls: false

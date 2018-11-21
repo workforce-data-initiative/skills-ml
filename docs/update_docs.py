@@ -8,6 +8,8 @@ import skills_ml.datasets
 import skills_ml.evaluation
 import skills_ml.job_postings
 
+from nbconvert.nbconvertapp import NbConvertApp
+
 
 def generate_api_docs():
     pkgs = [
@@ -65,5 +67,16 @@ def generate_api_docs():
         f.truncate()
 
 
+def convert_tour_nb_to_document():
+    app = NbConvertApp()
+    app.initialize()
+    app.notebooks = ['../Skills-ML Tour.ipynb']
+    app.export_format = 'markdown'
+    app.output_base = 'skills_ml_tour.md'
+    app.writer.build_directory = 'sources/'
+    app.convert_notebooks()
+
+
 if __name__ == "__main__":
+    convert_tour_nb_to_document()
     generate_api_docs()
