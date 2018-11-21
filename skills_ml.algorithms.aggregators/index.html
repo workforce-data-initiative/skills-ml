@@ -1,0 +1,1020 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.6">
+    
+    
+      
+        <title>Skills ml.algorithms.aggregators - skills-ml documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+      
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#jobaggregator" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="skills-ml documentation" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                skills-ml documentation
+              </span>
+              <span class="md-header-nav__topic">
+                Skills ml.algorithms.aggregators
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="skills-ml documentation" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    skills-ml documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml_tour/" title="Tour" class="md-nav__link">
+      Tour
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../examples/" title="Examples" class="md-nav__link">
+      Examples
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../ontologies/" title="Ontology Class" class="md-nav__link">
+      Ontology Class
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../common_schema/" title="Job Posting Common Schema" class="md-nav__link">
+      Job Posting Common Schema
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml.evaluation/" title="Evaluation Tools" class="md-nav__link">
+      Evaluation Tools
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml.algorithms/" title="Algorithms" class="md-nav__link">
+      Algorithms
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml.job_postings/" title="Job Posting Dataset Processors" class="md-nav__link">
+      Job Posting Dataset Processors
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml.datasets/" title="External Dataset Processors" class="md-nav__link">
+      External Dataset Processors
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#jobaggregator" title="JobAggregator" class="md-nav__link">
+    JobAggregator
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jobaggregator__init__" title="JobAggregator.__init__" class="md-nav__link">
+    JobAggregator.__init__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jobaggregatoraccumulate" title="JobAggregator.accumulate" class="md-nav__link">
+    JobAggregator.accumulate
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jobaggregatorgroup_outputs" title="JobAggregator.group_outputs" class="md-nav__link">
+    JobAggregator.group_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jobaggregatorinitialize_counts" title="JobAggregator.initialize_counts" class="md-nav__link">
+    JobAggregator.initialize_counts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jobaggregatoroutput_header_row" title="JobAggregator.output_header_row" class="md-nav__link">
+    JobAggregator.output_header_row
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jobaggregatorrollup_outputs" title="JobAggregator.rollup_outputs" class="md-nav__link">
+    JobAggregator.rollup_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jobaggregatorvalue" title="JobAggregator.value" class="md-nav__link">
+    JobAggregator.value
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#countaggregator" title="CountAggregator" class="md-nav__link">
+    CountAggregator
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#countaggregator__init__" title="CountAggregator.__init__" class="md-nav__link">
+    CountAggregator.__init__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#countaggregatoraccumulate" title="CountAggregator.accumulate" class="md-nav__link">
+    CountAggregator.accumulate
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#countaggregatorgroup_outputs" title="CountAggregator.group_outputs" class="md-nav__link">
+    CountAggregator.group_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#countaggregatorinitialize_counts" title="CountAggregator.initialize_counts" class="md-nav__link">
+    CountAggregator.initialize_counts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#countaggregatoroutput_header_row" title="CountAggregator.output_header_row" class="md-nav__link">
+    CountAggregator.output_header_row
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#countaggregatorrollup_outputs" title="CountAggregator.rollup_outputs" class="md-nav__link">
+    CountAggregator.rollup_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#countaggregatorvalue" title="CountAggregator.value" class="md-nav__link">
+    CountAggregator.value
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skillaggregator" title="SkillAggregator" class="md-nav__link">
+    SkillAggregator
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#skillaggregator__init__" title="SkillAggregator.__init__" class="md-nav__link">
+    SkillAggregator.__init__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skillaggregatoraccumulate" title="SkillAggregator.accumulate" class="md-nav__link">
+    SkillAggregator.accumulate
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skillaggregatorgroup_outputs" title="SkillAggregator.group_outputs" class="md-nav__link">
+    SkillAggregator.group_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skillaggregatorinitialize_counts" title="SkillAggregator.initialize_counts" class="md-nav__link">
+    SkillAggregator.initialize_counts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skillaggregatoroutput_header_row" title="SkillAggregator.output_header_row" class="md-nav__link">
+    SkillAggregator.output_header_row
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skillaggregatorrollup_outputs" title="SkillAggregator.rollup_outputs" class="md-nav__link">
+    SkillAggregator.rollup_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skillaggregatorvalue" title="SkillAggregator.value" class="md-nav__link">
+    SkillAggregator.value
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#occupationscopedskillaggregator" title="OccupationScopedSkillAggregator" class="md-nav__link">
+    OccupationScopedSkillAggregator
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#occupationscopedskillaggregator__init__" title="OccupationScopedSkillAggregator.__init__" class="md-nav__link">
+    OccupationScopedSkillAggregator.__init__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#occupationscopedskillaggregatoraccumulate" title="OccupationScopedSkillAggregator.accumulate" class="md-nav__link">
+    OccupationScopedSkillAggregator.accumulate
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#occupationscopedskillaggregatorgroup_outputs" title="OccupationScopedSkillAggregator.group_outputs" class="md-nav__link">
+    OccupationScopedSkillAggregator.group_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#occupationscopedskillaggregatorinitialize_counts" title="OccupationScopedSkillAggregator.initialize_counts" class="md-nav__link">
+    OccupationScopedSkillAggregator.initialize_counts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#occupationscopedskillaggregatoroutput_header_row" title="OccupationScopedSkillAggregator.output_header_row" class="md-nav__link">
+    OccupationScopedSkillAggregator.output_header_row
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#occupationscopedskillaggregatorrollup_outputs" title="OccupationScopedSkillAggregator.rollup_outputs" class="md-nav__link">
+    OccupationScopedSkillAggregator.rollup_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#occupationscopedskillaggregatorvalue" title="OccupationScopedSkillAggregator.value" class="md-nav__link">
+    OccupationScopedSkillAggregator.value
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#soccodeaggregator" title="SocCodeAggregator" class="md-nav__link">
+    SocCodeAggregator
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#soccodeaggregator__init__" title="SocCodeAggregator.__init__" class="md-nav__link">
+    SocCodeAggregator.__init__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soccodeaggregatoraccumulate" title="SocCodeAggregator.accumulate" class="md-nav__link">
+    SocCodeAggregator.accumulate
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soccodeaggregatorgroup_outputs" title="SocCodeAggregator.group_outputs" class="md-nav__link">
+    SocCodeAggregator.group_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soccodeaggregatorinitialize_counts" title="SocCodeAggregator.initialize_counts" class="md-nav__link">
+    SocCodeAggregator.initialize_counts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soccodeaggregatoroutput_header_row" title="SocCodeAggregator.output_header_row" class="md-nav__link">
+    SocCodeAggregator.output_header_row
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soccodeaggregatorrollup_outputs" title="SocCodeAggregator.rollup_outputs" class="md-nav__link">
+    SocCodeAggregator.rollup_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soccodeaggregatorvalue" title="SocCodeAggregator.value" class="md-nav__link">
+    SocCodeAggregator.value
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#givensoccodeaggregator" title="GivenSocCodeAggregator" class="md-nav__link">
+    GivenSocCodeAggregator
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#givensoccodeaggregator__init__" title="GivenSocCodeAggregator.__init__" class="md-nav__link">
+    GivenSocCodeAggregator.__init__
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#givensoccodeaggregatoraccumulate" title="GivenSocCodeAggregator.accumulate" class="md-nav__link">
+    GivenSocCodeAggregator.accumulate
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#givensoccodeaggregatorgroup_outputs" title="GivenSocCodeAggregator.group_outputs" class="md-nav__link">
+    GivenSocCodeAggregator.group_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#givensoccodeaggregatorinitialize_counts" title="GivenSocCodeAggregator.initialize_counts" class="md-nav__link">
+    GivenSocCodeAggregator.initialize_counts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#givensoccodeaggregatoroutput_header_row" title="GivenSocCodeAggregator.output_header_row" class="md-nav__link">
+    GivenSocCodeAggregator.output_header_row
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#givensoccodeaggregatorrollup_outputs" title="GivenSocCodeAggregator.rollup_outputs" class="md-nav__link">
+    GivenSocCodeAggregator.rollup_outputs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#givensoccodeaggregatorvalue" title="GivenSocCodeAggregator.value" class="md-nav__link">
+    GivenSocCodeAggregator.value
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>Skills ml.algorithms.aggregators</h1>
+                
+                <p><strong>Source:</strong> <a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L0">skills-ml/skills_ml/algorithms/aggregators/<strong>init</strong>.py#L0</a></p>
+<hr />
+<h3 id="jobaggregator"><a class="toclink" href="#jobaggregator"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L4">JobAggregator</a></a><a class="headerlink" href="#jobaggregator" title="Permanent link">&para;</a></h3>
+<hr />
+<h4 id="jobaggregator__init__"><a class="toclink" href="#jobaggregator__init__"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L5">JobAggregator.<code>__init__</code></a></a><a class="headerlink" href="#jobaggregator__init__" title="Permanent link">&para;</a></h4>
+<pre><code class="python">__init__(self, output_count=1, output_total=False)
+</code></pre>
+
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<hr />
+<h4 id="jobaggregatoraccumulate"><a class="toclink" href="#jobaggregatoraccumulate"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L23">JobAggregator.accumulate</a></a><a class="headerlink" href="#jobaggregatoraccumulate" title="Permanent link">&para;</a></h4>
+<pre><code class="python">accumulate(self, job_posting, job_key, groups)
+</code></pre>
+
+<p>Incorporates the data from a single job posting</p>
+<p><em>Args:</em></p>
+<p>job_posting (dict) a job postings in common schema format
+  job_key (str) an element of the job posting (say, a title) that is
+  being used for aggregation
+  groups (iterable) the aggregatable groups (say, CBSAs)
+  that this job posting belongs to</p>
+<hr />
+<h4 id="jobaggregatorgroup_outputs"><a class="toclink" href="#jobaggregatorgroup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L62">JobAggregator.group_outputs</a></a><a class="headerlink" href="#jobaggregatorgroup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">group_outputs(self, full_key)
+</code></pre>
+
+<hr />
+<h4 id="jobaggregatorinitialize_counts"><a class="toclink" href="#jobaggregatorinitialize_counts"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L10">JobAggregator.initialize_counts</a></a><a class="headerlink" href="#jobaggregatorinitialize_counts" title="Permanent link">&para;</a></h4>
+<pre><code class="python">initialize_counts(self)
+</code></pre>
+
+<hr />
+<h4 id="jobaggregatoroutput_header_row"><a class="toclink" href="#jobaggregatoroutput_header_row"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L53">JobAggregator.output_header_row</a></a><a class="headerlink" href="#jobaggregatoroutput_header_row" title="Permanent link">&para;</a></h4>
+<pre><code class="python">output_header_row(self, prefix)
+</code></pre>
+
+<hr />
+<h4 id="jobaggregatorrollup_outputs"><a class="toclink" href="#jobaggregatorrollup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L65">JobAggregator.rollup_outputs</a></a><a class="headerlink" href="#jobaggregatorrollup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">rollup_outputs(self, job_key)
+</code></pre>
+
+<hr />
+<h4 id="jobaggregatorvalue"><a class="toclink" href="#jobaggregatorvalue"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L39">JobAggregator.value</a></a><a class="headerlink" href="#jobaggregatorvalue" title="Permanent link">&para;</a></h4>
+<pre><code class="python">value(self, job_posting)
+</code></pre>
+
+<hr />
+<h3 id="countaggregator"><a class="toclink" href="#countaggregator"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L69">CountAggregator</a></a><a class="headerlink" href="#countaggregator" title="Permanent link">&para;</a></h3>
+<p>Counts job postings</p>
+<hr />
+<h4 id="countaggregator__init__"><a class="toclink" href="#countaggregator__init__"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L5">CountAggregator.<code>__init__</code></a></a><a class="headerlink" href="#countaggregator__init__" title="Permanent link">&para;</a></h4>
+<pre><code class="python">__init__(self, output_count=1, output_total=False)
+</code></pre>
+
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<hr />
+<h4 id="countaggregatoraccumulate"><a class="toclink" href="#countaggregatoraccumulate"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L23">CountAggregator.accumulate</a></a><a class="headerlink" href="#countaggregatoraccumulate" title="Permanent link">&para;</a></h4>
+<pre><code class="python">accumulate(self, job_posting, job_key, groups)
+</code></pre>
+
+<p>Incorporates the data from a single job posting</p>
+<p><em>Args:</em></p>
+<p>job_posting (dict) a job postings in common schema format
+  job_key (str) an element of the job posting (say, a title) that is
+  being used for aggregation
+  groups (iterable) the aggregatable groups (say, CBSAs)
+  that this job posting belongs to</p>
+<hr />
+<h4 id="countaggregatorgroup_outputs"><a class="toclink" href="#countaggregatorgroup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L62">CountAggregator.group_outputs</a></a><a class="headerlink" href="#countaggregatorgroup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">group_outputs(self, full_key)
+</code></pre>
+
+<hr />
+<h4 id="countaggregatorinitialize_counts"><a class="toclink" href="#countaggregatorinitialize_counts"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L10">CountAggregator.initialize_counts</a></a><a class="headerlink" href="#countaggregatorinitialize_counts" title="Permanent link">&para;</a></h4>
+<pre><code class="python">initialize_counts(self)
+</code></pre>
+
+<hr />
+<h4 id="countaggregatoroutput_header_row"><a class="toclink" href="#countaggregatoroutput_header_row"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L75">CountAggregator.output_header_row</a></a><a class="headerlink" href="#countaggregatoroutput_header_row" title="Permanent link">&para;</a></h4>
+<pre><code class="python">output_header_row(self, prefix)
+</code></pre>
+
+<hr />
+<h4 id="countaggregatorrollup_outputs"><a class="toclink" href="#countaggregatorrollup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L65">CountAggregator.rollup_outputs</a></a><a class="headerlink" href="#countaggregatorrollup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">rollup_outputs(self, job_key)
+</code></pre>
+
+<hr />
+<h4 id="countaggregatorvalue"><a class="toclink" href="#countaggregatorvalue"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L72">CountAggregator.value</a></a><a class="headerlink" href="#countaggregatorvalue" title="Permanent link">&para;</a></h4>
+<pre><code class="python">value(self, job_posting)
+</code></pre>
+
+<hr />
+<h3 id="skillaggregator"><a class="toclink" href="#skillaggregator"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L82">SkillAggregator</a></a><a class="headerlink" href="#skillaggregator" title="Permanent link">&para;</a></h3>
+<p>Aggregates skills found in job postings</p>
+<p><em>Args:</em></p>
+<p>skill_extractor (.skill_extractors.FreetextSkillExtractor)
+  an object that returns skill counts from unstructured text
+  corpus creator (object) an object that returns a text corpus
+  from a job posting</p>
+<hr />
+<h4 id="skillaggregator__init__"><a class="toclink" href="#skillaggregator__init__"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L91">SkillAggregator.<code>__init__</code></a></a><a class="headerlink" href="#skillaggregator__init__" title="Permanent link">&para;</a></h4>
+<pre><code class="python">__init__(self, skill_extractor, corpus_creator, *args, **kwargs)
+</code></pre>
+
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<hr />
+<h4 id="skillaggregatoraccumulate"><a class="toclink" href="#skillaggregatoraccumulate"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L23">SkillAggregator.accumulate</a></a><a class="headerlink" href="#skillaggregatoraccumulate" title="Permanent link">&para;</a></h4>
+<pre><code class="python">accumulate(self, job_posting, job_key, groups)
+</code></pre>
+
+<p>Incorporates the data from a single job posting</p>
+<p><em>Args:</em></p>
+<p>job_posting (dict) a job postings in common schema format
+  job_key (str) an element of the job posting (say, a title) that is
+  being used for aggregation
+  groups (iterable) the aggregatable groups (say, CBSAs)
+  that this job posting belongs to</p>
+<hr />
+<h4 id="skillaggregatorgroup_outputs"><a class="toclink" href="#skillaggregatorgroup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L62">SkillAggregator.group_outputs</a></a><a class="headerlink" href="#skillaggregatorgroup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">group_outputs(self, full_key)
+</code></pre>
+
+<hr />
+<h4 id="skillaggregatorinitialize_counts"><a class="toclink" href="#skillaggregatorinitialize_counts"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L10">SkillAggregator.initialize_counts</a></a><a class="headerlink" href="#skillaggregatorinitialize_counts" title="Permanent link">&para;</a></h4>
+<pre><code class="python">initialize_counts(self)
+</code></pre>
+
+<hr />
+<h4 id="skillaggregatoroutput_header_row"><a class="toclink" href="#skillaggregatoroutput_header_row"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L53">SkillAggregator.output_header_row</a></a><a class="headerlink" href="#skillaggregatoroutput_header_row" title="Permanent link">&para;</a></h4>
+<pre><code class="python">output_header_row(self, prefix)
+</code></pre>
+
+<hr />
+<h4 id="skillaggregatorrollup_outputs"><a class="toclink" href="#skillaggregatorrollup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L65">SkillAggregator.rollup_outputs</a></a><a class="headerlink" href="#skillaggregatorrollup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">rollup_outputs(self, job_key)
+</code></pre>
+
+<hr />
+<h4 id="skillaggregatorvalue"><a class="toclink" href="#skillaggregatorvalue"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L96">SkillAggregator.value</a></a><a class="headerlink" href="#skillaggregatorvalue" title="Permanent link">&para;</a></h4>
+<pre><code class="python">value(self, job_posting)
+</code></pre>
+
+<hr />
+<h3 id="occupationscopedskillaggregator"><a class="toclink" href="#occupationscopedskillaggregator"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L102">OccupationScopedSkillAggregator</a></a><a class="headerlink" href="#occupationscopedskillaggregator" title="Permanent link">&para;</a></h3>
+<p>Aggregates skills found in job postings using the job's occupation</p>
+<p><em>Args:</em></p>
+<p>skill_extractor (.skill_extractors.FreetextSkillExtractor)
+  an object that returns skill counts from unstructured text
+  corpus creator (object) an object that returns a text corpus
+  from a job posting</p>
+<hr />
+<h4 id="occupationscopedskillaggregator__init__"><a class="toclink" href="#occupationscopedskillaggregator__init__"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L91">OccupationScopedSkillAggregator.<code>__init__</code></a></a><a class="headerlink" href="#occupationscopedskillaggregator__init__" title="Permanent link">&para;</a></h4>
+<pre><code class="python">__init__(self, skill_extractor, corpus_creator, *args, **kwargs)
+</code></pre>
+
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<hr />
+<h4 id="occupationscopedskillaggregatoraccumulate"><a class="toclink" href="#occupationscopedskillaggregatoraccumulate"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L23">OccupationScopedSkillAggregator.accumulate</a></a><a class="headerlink" href="#occupationscopedskillaggregatoraccumulate" title="Permanent link">&para;</a></h4>
+<pre><code class="python">accumulate(self, job_posting, job_key, groups)
+</code></pre>
+
+<p>Incorporates the data from a single job posting</p>
+<p><em>Args:</em></p>
+<p>job_posting (dict) a job postings in common schema format
+  job_key (str) an element of the job posting (say, a title) that is
+  being used for aggregation
+  groups (iterable) the aggregatable groups (say, CBSAs)
+  that this job posting belongs to</p>
+<hr />
+<h4 id="occupationscopedskillaggregatorgroup_outputs"><a class="toclink" href="#occupationscopedskillaggregatorgroup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L62">OccupationScopedSkillAggregator.group_outputs</a></a><a class="headerlink" href="#occupationscopedskillaggregatorgroup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">group_outputs(self, full_key)
+</code></pre>
+
+<hr />
+<h4 id="occupationscopedskillaggregatorinitialize_counts"><a class="toclink" href="#occupationscopedskillaggregatorinitialize_counts"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L10">OccupationScopedSkillAggregator.initialize_counts</a></a><a class="headerlink" href="#occupationscopedskillaggregatorinitialize_counts" title="Permanent link">&para;</a></h4>
+<pre><code class="python">initialize_counts(self)
+</code></pre>
+
+<hr />
+<h4 id="occupationscopedskillaggregatoroutput_header_row"><a class="toclink" href="#occupationscopedskillaggregatoroutput_header_row"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L53">OccupationScopedSkillAggregator.output_header_row</a></a><a class="headerlink" href="#occupationscopedskillaggregatoroutput_header_row" title="Permanent link">&para;</a></h4>
+<pre><code class="python">output_header_row(self, prefix)
+</code></pre>
+
+<hr />
+<h4 id="occupationscopedskillaggregatorrollup_outputs"><a class="toclink" href="#occupationscopedskillaggregatorrollup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L65">OccupationScopedSkillAggregator.rollup_outputs</a></a><a class="headerlink" href="#occupationscopedskillaggregatorrollup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">rollup_outputs(self, job_key)
+</code></pre>
+
+<hr />
+<h4 id="occupationscopedskillaggregatorvalue"><a class="toclink" href="#occupationscopedskillaggregatorvalue"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L111">OccupationScopedSkillAggregator.value</a></a><a class="headerlink" href="#occupationscopedskillaggregatorvalue" title="Permanent link">&para;</a></h4>
+<pre><code class="python">value(self, job_posting)
+</code></pre>
+
+<hr />
+<h3 id="soccodeaggregator"><a class="toclink" href="#soccodeaggregator"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L118">SocCodeAggregator</a></a><a class="headerlink" href="#soccodeaggregator" title="Permanent link">&para;</a></h3>
+<p>Aggregates SOC codes inferred from job posting text</p>
+<p><em>Args:</em></p>
+<p>occupation_classifier (.occupation_classifiers.SocClassifier)
+  An object that returns a classified SOC code and similarity score
+  from unstructured text
+  corpus creator (object) an object that returns unstructured text
+  from a job posting</p>
+<hr />
+<h4 id="soccodeaggregator__init__"><a class="toclink" href="#soccodeaggregator__init__"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L128">SocCodeAggregator.<code>__init__</code></a></a><a class="headerlink" href="#soccodeaggregator__init__" title="Permanent link">&para;</a></h4>
+<pre><code class="python">__init__(self, occupation_classifier, corpus_creator, *args, **kwargs)
+</code></pre>
+
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<hr />
+<h4 id="soccodeaggregatoraccumulate"><a class="toclink" href="#soccodeaggregatoraccumulate"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L23">SocCodeAggregator.accumulate</a></a><a class="headerlink" href="#soccodeaggregatoraccumulate" title="Permanent link">&para;</a></h4>
+<pre><code class="python">accumulate(self, job_posting, job_key, groups)
+</code></pre>
+
+<p>Incorporates the data from a single job posting</p>
+<p><em>Args:</em></p>
+<p>job_posting (dict) a job postings in common schema format
+  job_key (str) an element of the job posting (say, a title) that is
+  being used for aggregation
+  groups (iterable) the aggregatable groups (say, CBSAs)
+  that this job posting belongs to</p>
+<hr />
+<h4 id="soccodeaggregatorgroup_outputs"><a class="toclink" href="#soccodeaggregatorgroup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L62">SocCodeAggregator.group_outputs</a></a><a class="headerlink" href="#soccodeaggregatorgroup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">group_outputs(self, full_key)
+</code></pre>
+
+<hr />
+<h4 id="soccodeaggregatorinitialize_counts"><a class="toclink" href="#soccodeaggregatorinitialize_counts"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L10">SocCodeAggregator.initialize_counts</a></a><a class="headerlink" href="#soccodeaggregatorinitialize_counts" title="Permanent link">&para;</a></h4>
+<pre><code class="python">initialize_counts(self)
+</code></pre>
+
+<hr />
+<h4 id="soccodeaggregatoroutput_header_row"><a class="toclink" href="#soccodeaggregatoroutput_header_row"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L53">SocCodeAggregator.output_header_row</a></a><a class="headerlink" href="#soccodeaggregatoroutput_header_row" title="Permanent link">&para;</a></h4>
+<pre><code class="python">output_header_row(self, prefix)
+</code></pre>
+
+<hr />
+<h4 id="soccodeaggregatorrollup_outputs"><a class="toclink" href="#soccodeaggregatorrollup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L65">SocCodeAggregator.rollup_outputs</a></a><a class="headerlink" href="#soccodeaggregatorrollup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">rollup_outputs(self, job_key)
+</code></pre>
+
+<hr />
+<h4 id="soccodeaggregatorvalue"><a class="toclink" href="#soccodeaggregatorvalue"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L133">SocCodeAggregator.value</a></a><a class="headerlink" href="#soccodeaggregatorvalue" title="Permanent link">&para;</a></h4>
+<pre><code class="python">value(self, job_posting)
+</code></pre>
+
+<hr />
+<h3 id="givensoccodeaggregator"><a class="toclink" href="#givensoccodeaggregator"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L140">GivenSocCodeAggregator</a></a><a class="headerlink" href="#givensoccodeaggregator" title="Permanent link">&para;</a></h3>
+<p>Aggregates SOC codes given as an input field</p>
+<p>Caution! We may or may not know where these came from, and the method
+for creating them may differ from record to record</p>
+<hr />
+<h4 id="givensoccodeaggregator__init__"><a class="toclink" href="#givensoccodeaggregator__init__"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L5">GivenSocCodeAggregator.<code>__init__</code></a></a><a class="headerlink" href="#givensoccodeaggregator__init__" title="Permanent link">&para;</a></h4>
+<pre><code class="python">__init__(self, output_count=1, output_total=False)
+</code></pre>
+
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<hr />
+<h4 id="givensoccodeaggregatoraccumulate"><a class="toclink" href="#givensoccodeaggregatoraccumulate"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L23">GivenSocCodeAggregator.accumulate</a></a><a class="headerlink" href="#givensoccodeaggregatoraccumulate" title="Permanent link">&para;</a></h4>
+<pre><code class="python">accumulate(self, job_posting, job_key, groups)
+</code></pre>
+
+<p>Incorporates the data from a single job posting</p>
+<p><em>Args:</em></p>
+<p>job_posting (dict) a job postings in common schema format
+  job_key (str) an element of the job posting (say, a title) that is
+  being used for aggregation
+  groups (iterable) the aggregatable groups (say, CBSAs)
+  that this job posting belongs to</p>
+<hr />
+<h4 id="givensoccodeaggregatorgroup_outputs"><a class="toclink" href="#givensoccodeaggregatorgroup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L62">GivenSocCodeAggregator.group_outputs</a></a><a class="headerlink" href="#givensoccodeaggregatorgroup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">group_outputs(self, full_key)
+</code></pre>
+
+<hr />
+<h4 id="givensoccodeaggregatorinitialize_counts"><a class="toclink" href="#givensoccodeaggregatorinitialize_counts"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L10">GivenSocCodeAggregator.initialize_counts</a></a><a class="headerlink" href="#givensoccodeaggregatorinitialize_counts" title="Permanent link">&para;</a></h4>
+<pre><code class="python">initialize_counts(self)
+</code></pre>
+
+<hr />
+<h4 id="givensoccodeaggregatoroutput_header_row"><a class="toclink" href="#givensoccodeaggregatoroutput_header_row"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L53">GivenSocCodeAggregator.output_header_row</a></a><a class="headerlink" href="#givensoccodeaggregatoroutput_header_row" title="Permanent link">&para;</a></h4>
+<pre><code class="python">output_header_row(self, prefix)
+</code></pre>
+
+<hr />
+<h4 id="givensoccodeaggregatorrollup_outputs"><a class="toclink" href="#givensoccodeaggregatorrollup_outputs"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L65">GivenSocCodeAggregator.rollup_outputs</a></a><a class="headerlink" href="#givensoccodeaggregatorrollup_outputs" title="Permanent link">&para;</a></h4>
+<pre><code class="python">rollup_outputs(self, job_key)
+</code></pre>
+
+<hr />
+<h4 id="givensoccodeaggregatorvalue"><a class="toclink" href="#givensoccodeaggregatorvalue"><a href="https://github.com/workforce-data-initiative/skills-ml/tree/master/skills-ml/skills_ml/algorithms/aggregators/__init__.py#L146">GivenSocCodeAggregator.value</a></a><a class="headerlink" href="#givensoccodeaggregatorvalue" title="Permanent link">&para;</a></h4>
+<pre><code class="python">value(self, job_posting)
+</code></pre>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.5e60981f.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>

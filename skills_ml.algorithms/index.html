@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-0.17.3, mkdocs-material-2.7.2">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.6">
     
     
       
@@ -40,20 +40,21 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.8d40d89b.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+      
       
     
     
       <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
     
     
-      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
       
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
     
     
   </head>
@@ -66,9 +67,9 @@
         
       </defs>
     </svg>
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search" autocomplete="off">
-    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
     
       <header class="md-header" data-md-component="header">
@@ -82,7 +83,7 @@
         </a>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
       </div>
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
@@ -101,14 +102,14 @@
       <div class="md-flex__cell md-flex__cell--shrink">
         
           
-            <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
             
 <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="search"></label>
+  <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
-      <label class="md-icon md-search__icon" for="search"></label>
+      <label class="md-icon md-search__icon" for="__search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
         &#xE5CD;
       </button>
@@ -146,12 +147,12 @@
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="drawer">
-    <span class="md-nav__button md-logo">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="skills-ml documentation" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
-    </span>
+    </a>
     skills-ml documentation
   </label>
   
@@ -165,6 +166,18 @@
   <li class="md-nav__item">
     <a href=".." title="Home" class="md-nav__link">
       Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml_tour/" title="Tour" class="md-nav__link">
+      Tour
     </a>
   </li>
 
@@ -226,7 +239,7 @@
 
   <li class="md-nav__item md-nav__item--active">
     
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
     
     <a href="./" title="Algorithms" class="md-nav__link md-nav__link--active">
@@ -273,45 +286,64 @@
               
                 
                 
-                <h1 id="skills_ml.algorithms.embedding">skills_ml.algorithms.embedding</h1>
-
+                <p>[TOC]
+<h1 id="skills_ml.algorithms.embedding">skills_ml.algorithms.embedding</h1></p>
 <h1 id="skills_ml.algorithms.embedding.base">skills_ml.algorithms.embedding.base</h1>
 
-<p>ModelStorage class to handle gensim model storage
-<h1 id="skills_ml.algorithms.embedding.models">skills_ml.algorithms.embedding.models</h1></p>
+<h1 id="skills_ml.algorithms.embedding.models">skills_ml.algorithms.embedding.models</h1>
+
 <p>Embedding model class inherited the interface from gensim
 <h2 id="skills_ml.algorithms.embedding.models.Word2VecModel">Word2VecModel</h2></p>
-<pre><code class="python">Word2VecModel(self, *args, **kwargs)
+<pre><code class="python">Word2VecModel(self, model_name=None, storage=None, *args, **kwargs)
 </code></pre>
 
-<p>The Word2VecModel Object is a base object which specifies which word-embeding model.</p>
-<p>Example:</p>
-<pre><code>from skills_ml.algorithms.embedding.base import Word2VecModel
+<p>The Word2VecModel inherited from gensim's Word2Vec model (
+https://radimrehurek.com/gensim/models/word2vec.html) for training,
+using and evaluating word embedding with extension methods.</p>
+<p><strong>Example</strong></p>
+<pre><code>from skills_ml.algorithms.embedding.models import Word2VecModel
 
 word2vec_model = Word2VecModel()
 </code></pre>
 
 <h2 id="skills_ml.algorithms.embedding.models.Doc2VecModel">Doc2VecModel</h2>
 
-<pre><code class="python">Doc2VecModel(self, *args, **kwargs)
+<pre><code class="python">Doc2VecModel(self, model_name=None, storage=None, *args, **kwargs)
 </code></pre>
 
-<p>The Doc2VecModel Object is a base object which specifies which word-embeding model.</p>
-<p>Example:</p>
-<pre><code>from skills_ml.algorithms.embedding.base import Doc2VecModel
+<p>The Doc2VecModel inherited from gensim's Doc2Vec model (
+https://radimrehurek.com/gensim/models/doc2vec) for training,
+using and evaluating word embedding with extension methods.</p>
+<p><strong>Example</strong></p>
+<pre><code>from skills_ml.algorithms.embedding.models import Doc2VecModel
 
 doc2vec_model = Doc2VecModel()
 </code></pre>
 
+<h2 id="skills_ml.algorithms.embedding.models.FastTextModel">FastTextModel</h2>
+
+<pre><code class="python">FastTextModel(self, model_name=None, storage=None, *args, **kwargs)
+</code></pre>
+
+<p>The FastTextModel inhereited from gensim's FastText model (
+https://radimrehurek.com/gensim/models/fasttext.html) for training,
+using and evaluating word embedding with extension methods.</p>
+<p><strong>Example</strong></p>
+<pre><code>```
+from skills_ml.algorithms.embedding.models import import FastTextModel
+
+fasttext = FastTextModel()
+```
+</code></pre>
 <h1 id="skills_ml.algorithms.embedding.train">skills_ml.algorithms.embedding.train</h1>
 
 <h2 id="skills_ml.algorithms.embedding.train.EmbeddingTrainer">EmbeddingTrainer</h2>
 
-<pre><code class="python">EmbeddingTrainer(self, corpus_generator, model, batch_size=2000)
+<pre><code class="python">EmbeddingTrainer(self, *models, model_storage=None, batch_size=2000)
 </code></pre>
 
 <p>An embedding learning class.
-Example:</p>
+<strong>Example</strong></p>
 <pre><code class="python">from skills_ml.algorithms.occupation_classifiers.train import EmbeddingTrainer
 from skills_ml.job_postings.common_schema import JobPostingCollectionSample
 from skills_ml.job_postings.corpora.basic import Doc2VecGensimCorpusCreator, Word2VecGensimCorpusCreator
@@ -323,25 +355,26 @@ s3_conn = S3Hook().get_conn()
 job_postings_generator = JobPostingGenerator(s3_conn, quarters, s3_path, source=&quot;all&quot;)
 corpus_generator = Word2VecGensimCorpusCreator(job_postings_generator)
 w2v = Word2VecModel(storage=FSStore(path='/tmp'), size=10, min_count=3, iter=4, window=6, workers=3)
-trainer = EmbeddingTrainer(corpus_generator, w2v)
-trainer.train()
-trainer.save()
+trainer = EmbeddingTrainer(w2v)
+trainer.train(corpus_generator)
+trainer.save_model()
 </code></pre>
 
 <h1 id="skills_ml.algorithms.geocoders">skills_ml.algorithms.geocoders</h1>
 
 <p>Geocoders, with caching and throttling
 <h2 id="skills_ml.algorithms.geocoders.CachedGeocoder">CachedGeocoder</h2></p>
-<pre><code class="python">CachedGeocoder(self, cache_storage, cache_fname, geocode_func=&lt;function osm at 0x7f82bb3dc048&gt;, sleep_time=1)
+<pre><code class="python">CachedGeocoder(self, cache_storage, cache_fname, geocode_func=&lt;function osm at 0x7f010819a510&gt;, sleep_time=1, autosave=True)
 </code></pre>
 
 <p>Geocoder that uses specified storage as a cache.</p>
-<p>Args:
-    cache_storage (object) FSStore() or S3Store object to store the cache
-    cache_fname (string) cache file name
-    geocode_func (function) a function that geocodes a given search string
-        defaults to the OSM geocoder provided by the geocode library
-    sleep_time (int) The time, in seconds, between geocode calls</p>
+<p><strong>Args</strong></p>
+<pre><code>cache_storage (object) FSStore() or S3Store object to store the cache
+cache_fname (string) cache file name
+geocode_func (function) a function that geocodes a given search string
+    defaults to the OSM geocoder provided by the geocode library
+sleep_time (int) The time, in seconds, between geocode calls
+</code></pre>
 <h1 id="skills_ml.algorithms.geocoders.cbsa">skills_ml.algorithms.geocoders.cbsa</h1>
 
 <p>Given geocode results, find matching Core-Based Statistical Areas.
@@ -375,14 +408,15 @@ geocoder.osm('Flushing, NY').json()
 <p>Warning: The caching is not parallel-safe! It is recommended you should run
 only one copy of <code>find_all_cbsas_and_save</code> at a time to avoid overwriting
 the cache file.</p>
-<p>Args:
-    cache_storage (object) FSStore() or S3Store object to store the cache
-    cache_fname (string) cache file name
-    shapefile_name (string) local path to a CBSA shapefile to use
-        optional, will download TIGER 2015 shapefile if absent
-    cache_dir (string) local path to a cache directory to use if the
-        shapefile needs to be downloaded
-        optional, will use 'tmp' in working directory if absent</p>
+<p><strong>Args</strong></p>
+<pre><code>cache_storage (object) FSStore() or S3Store object to store the cache
+cache_fname (string) cache file name
+shapefile_name (string) local path to a CBSA shapefile to use
+    optional, will download TIGER 2015 shapefile if absent
+cache_dir (string) local path to a cache directory to use if the
+    shapefile needs to be downloaded
+    optional, will use 'tmp' in working directory if absent
+</code></pre>
 <h1 id="skills_ml.algorithms.job_normalizers">skills_ml.algorithms.job_normalizers</h1>
 
 <p>Algorithms to normalize a job title to a smaller space
@@ -399,10 +433,11 @@ the cache file.</p>
 1. job titles or occupations that match the job description
 2. Occupation matches</p>
 <p>The top three results are indexed.</p>
-<p>Args:
-    quarter (string) the quarter from which to retrieve job postings
-    job_postings_generator (iterable) an iterable of job postings
-    job_title_index (string) The name of an already existing job title/occupation index</p>
+<p><strong>Args</strong></p>
+<pre><code>quarter (string) the quarter from which to retrieve job postings
+job_postings_generator (iterable) an iterable of job postings
+job_title_index (string) The name of an already existing job title/occupation index
+</code></pre>
 <h1 id="skills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer">skills_ml.algorithms.job_normalizers.esa_jobtitle_normalizer</h1>
 
 <p>Normalize a job title through Explicit Semantic Analysis</p>
@@ -425,37 +460,192 @@ the cache file.</p>
 </code></pre>
 
 <p>Remove numbers and normalize spaces</p>
-<p>Args:
-    jobtitle (string) A string</p>
-<p>Returns: (string) the string with numbers removes and spaces normalized</p>
+<p><strong>Args</strong></p>
+<pre><code>jobtitle (string) A string
+</code></pre>
+<ul>
+<li><strong>Returns</strong>: (string) the string with numbers removes and spaces normalized</li>
+</ul>
 <h2 id="skills_ml.algorithms.jobtitle_cleaner.clean.clean_by_neg_dic">clean_by_neg_dic</h2>
 
 <pre><code class="python">clean_by_neg_dic(jobtitle, negative_list, positive_list)
 </code></pre>
 
 <p>Remove words from the negative dictionary</p>
-<p>Args:
-    jobtitle (string) A job title string
-    negative_list (collection) A list of stop words
-    positive_list (collection) A list of positive words to override stop words</p>
-<p>Returns: (string) The cleaned job title</p>
+<p><strong>Args</strong></p>
+<pre><code>jobtitle (string) A job title string
+negative_list (collection) A list of stop words
+positive_list (collection) A list of positive words to override stop words
+</code></pre>
+<ul>
+<li><strong>Returns</strong>: (string) The cleaned job title</li>
+</ul>
 <h2 id="skills_ml.algorithms.jobtitle_cleaner.clean.aggregate">aggregate</h2>
 
 <pre><code class="python">aggregate(df_jobtitles, groupby_keys)
 </code></pre>
 
-<p>Args:
-    df_jobtitles: job titles in pandas DataFrame
-    groupby_keys: a list of keys to be grouped by. should be something like ['title', 'geo']
-Returns:
-    agg_cleaned_jobtitles: a aggregated verison of job title in pandas DataFrame</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>df_jobtitles</strong>: job titles in pandas DataFrame</li>
+<li><strong>groupby_keys</strong>: a list of keys to be grouped by. should be something like ['title', 'geo']
+<strong>Returns</strong></li>
+</ul>
+<p><code>agg_cleaned_jobtitles</code>: a aggregated verison of job title in pandas DataFrame</p>
 <h2 id="skills_ml.algorithms.jobtitle_cleaner.clean.JobTitleStringClean">JobTitleStringClean</h2>
 
 <pre><code class="python">JobTitleStringClean(self)
 </code></pre>
 
 <p>Clean job titles by stripping numbers, and removing place/state names (unless they are also ONET jobs)</p>
-<h1 id="skills_ml.algorithms.occupation_classifiers">skills_ml.algorithms.occupation_classifiers</h1>
+<h1 id="skills_ml.algorithms.nlp">skills_ml.algorithms.nlp</h1>
+
+<p>String transformations for cleaning
+<strong>for unicodedata, see</strong></p>
+<p>http://www.unicode.org/reports/tr44/tr44-4.html#General_Category_Values</p>
+<h2 id="skills_ml.algorithms.nlp.deep">deep</h2>
+
+<pre><code class="python">deep(func)
+</code></pre>
+
+<p>A decorator that will apply a function to a nested list recursively</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>func (function)</strong>: a function to be applied to a nested list
+<strong>Returns</strong></li>
+</ul>
+<p><code>function</code>: The wrapped function</p>
+<h2 id="skills_ml.algorithms.nlp.normalize">normalize</h2>
+
+<pre><code class="python">normalize(text:str) -&gt; str
+</code></pre>
+
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>text (str)</strong>: A unicode string
+<strong>Returns</strong></li>
+</ul>
+<p><code>str</code>: The text, lowercased and in NFKD normal form</p>
+<h2 id="skills_ml.algorithms.nlp.lowercase_strip_punc">lowercase_strip_punc</h2>
+
+<pre><code class="python">lowercase_strip_punc(text:str, punct:Set[str]=None) -&gt; str
+</code></pre>
+
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>text (str)</strong>: A unicode string</li>
+<li><strong>punct (</strong>:obj: <code>set</code>, optional)
+<strong>Returns</strong></li>
+</ul>
+<p><code>str</code>: The text, lowercased, sans  punctuation and in NFKD normal form</p>
+<h2 id="skills_ml.algorithms.nlp.title_phase_one">title_phase_one</h2>
+
+<pre><code class="python">title_phase_one(text:str, punct:Set[str]=None) -&gt; str
+</code></pre>
+
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>text (str)</strong>: A unicode string</li>
+<li><strong>punct (</strong>:obj: <code>set</code>, optional)
+<strong>Returns</strong></li>
+</ul>
+<p><code>str</code>: The text, lowercased, sans punctuation, whitespace normalized</p>
+<h2 id="skills_ml.algorithms.nlp.clean_str">clean_str</h2>
+
+<pre><code class="python">clean_str(text:str) -&gt; str
+</code></pre>
+
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>text</strong>: A unicode string
+<strong>Returns</strong></li>
+</ul>
+<p><code>str</code>: lowercased, sans punctuation, non-English letters</p>
+<h2 id="skills_ml.algorithms.nlp.sentence_tokenize">sentence_tokenize</h2>
+
+<pre><code class="python">sentence_tokenize(text:str) -&gt; List[str]
+</code></pre>
+
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>text (str)</strong>: a unicode string
+<strong>Returns</strong></li>
+</ul>
+<p><code>list</code>: tokenized sentence</p>
+<h2 id="skills_ml.algorithms.nlp.word_tokenize">word_tokenize</h2>
+
+<pre><code class="python">word_tokenize(text:str, punctuation=True) -&gt; List[str]
+</code></pre>
+
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>text (str)</strong>: a unicode string
+<strong>Returns</strong></li>
+</ul>
+<p><code>list</code>: tokenized words</p>
+<h2 id="skills_ml.algorithms.nlp.fields_join">fields_join</h2>
+
+<pre><code class="python">fields_join(document:Dict, document_schema_fields:List[str]=None) -&gt; str
+</code></pre>
+
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>document (dict)</strong>: a document dictionary</li>
+<li><strong>document_schema_fields (</strong>:obj: <code>list</code>, optional): a list of keys
+<strong>Returns</strong></li>
+</ul>
+<p><code>str</code>: a text joined with selected fields.</p>
+<h2 id="skills_ml.algorithms.nlp.vectorize">vectorize</h2>
+
+<pre><code class="python">vectorize(tokenized_text:List[str], embedding_model)
+</code></pre>
+
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>tokenized_text</strong>: a tokenized list of word tokens</li>
+<li><strong>embedding_model</strong>: the embedding model implements <code>.infer_vector()</code> method
+<strong>Returns</strong></li>
+</ul>
+<p><code>np.ndarray</code>: a word embedding vector</p>
+<h2 id="skills_ml.algorithms.nlp.section_extract">section_extract</h2>
+
+<pre><code class="python">section_extract(section_regex:Pattern[~AnyStr], document:str) -&gt; List
+</code></pre>
+
+<p>Only return the contents of the configured section heading</p>
+<p><strong>Defines a 'heading' as the text of a sentence that</strong></p>
+<pre><code>- does not itself start with a bullet character
+- either has between 1 and 3 words or ends in a colon
+</code></pre>
+<p>For a heading that matches the given pattern, returns each sentence between it and the next heading.</p>
+<p>Heavily relies on the fact that sentence_tokenize does line splitting
+as well as standard sentence tokenization. In this way, it should work both
+for text strings that have newlines and for text strings that don't.</p>
+<p>In addition, this function splits each sentence by bullet characters as often bullets denote
+what we want to call 'sentences', but authors often take advantage of the bullet characters
+to make the contents of each 'sentence' into small sentence fragments, which makes standard
+sentence tokenization insufficient if the newlines have been taken out.</p>
+<h2 id="skills_ml.algorithms.nlp.split_by_bullets">split_by_bullets</h2>
+
+<pre><code class="python">split_by_bullets(sentence:str) -&gt; List
+</code></pre>
+
+<p>Split sentence by bullet characters
+<h2 id="skills_ml.algorithms.nlp.strip_bullets_from_line">strip_bullets_from_line</h2></p>
+<pre><code class="python">strip_bullets_from_line(line:str) -&gt; str
+</code></pre>
+
+<p>Remove bullets from beginning of line
+<h1 id="skills_ml.algorithms.occupation_classifiers">skills_ml.algorithms.occupation_classifiers</h1></p>
+<h2 id="skills_ml.algorithms.occupation_classifiers.SOCMajorGroup">SOCMajorGroup</h2>
+
+<pre><code class="python">SOCMajorGroup(self, filters=None)
+</code></pre>
+
+<h2 id="skills_ml.algorithms.occupation_classifiers.FullSOC">FullSOC</h2>
+
+<pre><code class="python">FullSOC(self, filters=None, onet_cache=None)
+</code></pre>
 
 <h1 id="skills_ml.algorithms.occupation_classifiers.classifiers">skills_ml.algorithms.occupation_classifiers.classifiers</h1>
 
@@ -464,20 +654,117 @@ Returns:
 <pre><code class="python">SocClassifier(self, classifier)
 </code></pre>
 
-<p>Interface of SOC Code Classifier.</p>
+<p>Interface of SOC Code Classifier for computer class to use.</p>
 <h2 id="skills_ml.algorithms.occupation_classifiers.classifiers.KNNDoc2VecClassifier">KNNDoc2VecClassifier</h2>
 
-<pre><code class="python">KNNDoc2VecClassifier(self, embedding_model, k=1, indexer=None, **kwargs)
+<pre><code class="python">KNNDoc2VecClassifier(self, embedding_model, k=1, indexer=None, model_name=None, model_storage=None, **kwargs)
 </code></pre>
 
 <p>Nearest neightbors model to classify the jobposting data into soc code.
 If the indexer is passed, then NearestNeighbors will use approximate nearest
 neighbor approach which is much faster than the built-in knn in gensim.</p>
-<p>Attributes:
-    embedding_model (:job: <code>skills_ml.algorithms.embedding.models.Doc2VecModel</code>): Doc2Vec embedding model
-    k (int): number of nearest neighbor. If k = 1, look for the soc code from single nearest neighbor.
-             If k &gt; 1, classify the soc code by the majority vote of nearest k neighbors.
-    indexer (:obj: <code>gensim.similarities.index</code>): any kind of gensim compatible indexer</p>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><code>embedding_model (</code>:job: <code>skills_ml.algorithms.embedding.models.Doc2VecModel</code>): Doc2Vec embedding model</li>
+<li><code>k (int)</code>: number of nearest neighbor. If k = 1, look for the soc code from single nearest neighbor.
+             If k &gt; 1, classify the soc code by the majority vote of nearest k neighbors.</li>
+<li><code>indexer (</code>:obj: <code>gensim.similarities.index</code>): any kind of gensim compatible indexer</li>
+</ul>
+<h1 id="skills_ml.algorithms.occupation_classifiers.test">skills_ml.algorithms.occupation_classifiers.test</h1>
+
+<h1 id="skills_ml.algorithms.occupation_classifiers.train">skills_ml.algorithms.occupation_classifiers.train</h1>
+
+<h2 id="skills_ml.algorithms.occupation_classifiers.train.OccupationClassifierTrainer">OccupationClassifierTrainer</h2>
+
+<pre><code class="python">OccupationClassifierTrainer(self, matrix, k_folds, grid_config=None, storage=None, random_state_for_split=None, scoring=['accuracy'], n_jobs=3)
+</code></pre>
+
+<p>Trains a series of classifiers using the same training set
+<strong>Args</strong></p>
+<ul>
+<li><strong>matrix (skills_ml.algorithms.train.matrix)</strong>: a matrix object holds X, y and other training data information</li>
+<li><strong>storage (skills_ml.storage)</strong>: a skills_ml storage object specified the store method</li>
+<li><strong>k_folds (int)</strong>: number of folds for cross validation</li>
+<li><strong>random_state_for_split(int)</strong>: random state</li>
+<li><strong>n_jobs (int)</strong>: umber of jobs to run in parallel
+<strong>    scores</strong></li>
+</ul>
+<h1 id="skills_ml.algorithms.preprocessing">skills_ml.algorithms.preprocessing</h1>
+
+<h2 id="skills_ml.algorithms.preprocessing.ProcessingPipeline">ProcessingPipeline</h2>
+
+<pre><code class="python">ProcessingPipeline(self, *functions:Callable)
+</code></pre>
+
+<p>A simple callable processing pipeline for imperative execution runtime.</p>
+<p>This class will compose processing functions together to become a callable
+object that takes in the input from the very first processing function and
+returns the output of the last processing function.</p>
+<p><strong>Example</strong></p>
+<pre><code>This class can be used to create a callable vectorization object which
+will transform a string into a vector and also preserve the preprocessing
+functions for being reused later.
+```python
+jp = JobPostingCollectionSample()
+vectorization = ProcessingPipeline(
+    normalize,
+    clean_html,
+    clean_str,
+    word_tokenize,
+    partial(vectorize, embedding_model=w2v)
+)
+
+vector = vecotrization("Why so serious?")
+```
+</code></pre>
+<p><strong> Attributes</strong></p>
+<ul>
+<li><code>functions (generator)</code>: a series of functions</li>
+</ul>
+<h2 id="skills_ml.algorithms.preprocessing.IterablePipeline">IterablePipeline</h2>
+
+<pre><code class="python">IterablePipeline(self, *functions:Callable)
+</code></pre>
+
+<p>A simple iterable processing pipeline.</p>
+<p>This class will compose processing functions together to be passed to different stages(training/prediction)
+to assert the same processing procedrues.</p>
+<p><strong>Example</strong></p>
+<pre><code class="python">jp = JobPostingCollectionSample()
+pipe = IterablePipeline(
+    partial(fields_join, document_schema_fields=['description']),
+    clean_html,
+    sentence_tokenize,
+    clean_str,
+    word_tokenize
+)
+preprocessed_generator = pipe(jp)
+</code></pre>
+
+<p><strong>Attributes</strong></p>
+<ul>
+<li><code>functions (generator)</code>: a series of generator functions that takes another generator as input</li>
+</ul>
+<h2 id="skills_ml.algorithms.preprocessing.func2gen">func2gen</h2>
+
+<pre><code class="python">func2gen(func:Callable) -&gt; Callable
+</code></pre>
+
+<p>A wrapper that change a document-transforming function that takes only one document the input
+into a function that takes a generator/iterator as the input. When it instantiates, it will become
+a generator.</p>
+<p><strong>Example</strong></p>
+<pre><code>@func2gen
+</code></pre>
+<p><strong>    def do_something(doc)</strong></p>
+<pre><code>    return do_something_to_the_doc(doc)
+</code></pre>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>func (function)</strong>: a function only take one document as the first argument input.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<p><code>func (function)</code>: a function that takes a generator as the first argument input.</p>
 <h1 id="skills_ml.algorithms.sampling">skills_ml.algorithms.sampling</h1>
 
 <p>Generate and store samples of datasets
@@ -491,32 +778,41 @@ neighbor approach which is much faster than the built-in knn in gensim.</p>
 <p>Randomly choosing a sample of k items from a streaming iterator. Using random sort to implement the algorithm.
 Basically, it's assigning random number as keys to each item and maintain k items with minimum value for keys,
 which equals to assigning a random number to each item as key and sort items using these keys and take top k items.</p>
-<p>Args:
-    it (iterator): Job posting iterator to sample from
-    k (int): Sample size</p>
-<p>Returns:
-    generator: The result sample of k items.</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>it (iterator)</strong>: Job posting iterator to sample from</li>
+<li><strong>k (int)</strong>: Sample size</li>
+</ul>
+<p><strong>Returns</strong></p>
+<p><code>generator</code>: The result sample of k items.</p>
 <h2 id="skills_ml.algorithms.sampling.methods.reservoir_weighted">reservoir_weighted</h2>
 
-<pre><code class="python">reservoir_weighted(it, k, weights)
+<pre><code class="python">reservoir_weighted(it, k, weights, key)
 </code></pre>
 
 <p>Weighted reservoir Sampling from job posting iterator</p>
 <p>Randomly choosing a sample of k items from a streaming iterator based on the weights.</p>
-<p>Args:
-    it (iterator): Job posting iterator to sample from. The format should be (job_posting, label)
-    k (int): Sample size
-    weights (dict): a dictionary that has key-value pairs as label-weighting pairs. It expects every
-                    label in the iterator to be present as a key in the weights dictionary For example,
-                    weights = {'11': 2, '13', 1}. In this case, the label/key is the occupation major
-                    group and the value is the weight you want to sample with.</p>
-<p>Returns:
-    generator: The result sample of k items from weighted reservori sampling.</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>it (iterator)</strong>: Job posting iterator to sample from. The format should be (job_posting, label)</li>
+<li><strong>k (int)</strong>: Sample size</li>
+<li><strong>weights (dict)</strong>: a dictionary that has key-value pairs as label-weighting pairs. It expects every
+                    label in the iterator to be present as a key in the weights dictionary For example,</li>
+<li><strong>weights = {'11'</strong>: 2, '13', 1}. In this case, the label/key is the occupation major
+                    group and the value is the weight you want to sample with.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<p><code>generator</code>: The result sample of k items from weighted reservori sampling.</p>
 <h1 id="skills_ml.algorithms.skill_extractors">skills_ml.algorithms.skill_extractors</h1>
 
 <p>Extract skills from text corpora, such as job postings
 <h1 id="skills_ml.algorithms.skill_extractors.base">skills_ml.algorithms.skill_extractors.base</h1></p>
 <p>Base classes for skill extraction
+<h2 id="skills_ml.algorithms.skill_extractors.base.CandidateSkill">CandidateSkill</h2></p>
+<pre><code class="python">CandidateSkill(self, /, *args, **kwargs)
+</code></pre>
+
+<p>CandidateSkill(skill_name, matched_skill_identifier, context, start_index, confidence, document_id, document_type, source_object, skill_extractor_name)
 <h2 id="skills_ml.algorithms.skill_extractors.base.Trie">Trie</h2></p>
 <pre><code class="python">Trie(self)
 </code></pre>
@@ -532,40 +828,155 @@ The corresponding Regex should match much faster than a simple Regex union.
 <p>All subclasses must define properties
 'method' (a short machine readable property)
 'description' (a text description of how the extractor does its work)</p>
-<p>Args:
-    transform_func (callable, optional) Function that transforms a structured object into text
-        Defaults to SimpleCorpusCreator's _join, which takes common text fields
-        in common schema job postings and concatenates them together.
-        For non-job postings another transform function may be needed.</p>
+<p><strong>Args</strong></p>
+<pre><code>transform_func (callable, optional) Function that transforms a structured object into text
+    Defaults to SimpleCorpusCreator's _join, which takes common text fields
+    in common schema job postings and concatenates them together.
+    For non-job postings another transform function may be needed.
+</code></pre>
 <h2 id="skills_ml.algorithms.skill_extractors.base.ListBasedSkillExtractor">ListBasedSkillExtractor</h2>
 
-<pre><code class="python">ListBasedSkillExtractor(self, skill_lookup_path, skill_lookup_name='onet_ksat', skill_lookup_description=None, *args, **kwargs)
+<pre><code class="python">ListBasedSkillExtractor(self, competency_framework, *args, **kwargs)
 </code></pre>
 
-<p>Extract skills by comparing with a known lookup/list</p>
+<p>Extract skills by comparing with a known lookup/list.</p>
 <p>Subclasses must implement _skills_lookup and _document_skills_in_lookup</p>
-<p>Args:
-    skill_lookup_path (string) A path to the skill lookup file
-    skill_lookup_name (string, optional) An identifier for the skill lookup type.
-        Defaults to onet_ksat
-    skill_lookup_description (string, optional) A human-readable description of the skill lookup.</p>
+<p><strong>Args</strong></p>
+<pre><code>skill_lookup_name (string, optional) An identifier for the skill lookup type.
+    Defaults to onet_ksat
+skill_lookup_description (string, optional) A human-readable description of the skill lookup.
+</code></pre>
 <h1 id="skills_ml.algorithms.skill_extractors.exact_match">skills_ml.algorithms.skill_extractors.exact_match</h1>
 
 <p>Use exact matching with a source list to find skills
 <h2 id="skills_ml.algorithms.skill_extractors.exact_match.ExactMatchSkillExtractor">ExactMatchSkillExtractor</h2></p>
-<pre><code class="python">ExactMatchSkillExtractor(self, skill_lookup_path, skill_lookup_name='onet_ksat', skill_lookup_description=None, *args, **kwargs)
+<pre><code class="python">ExactMatchSkillExtractor(self, *args, **kwargs)
 </code></pre>
 
 <p>Extract skills from unstructured text</p>
+<p>Builds a lookup based on the 'name' attribute of all competencies in the given framework</p>
 <p>Originally written by Kwame Porter Robinson</p>
 <h1 id="skills_ml.algorithms.skill_extractors.fuzzy_match">skills_ml.algorithms.skill_extractors.fuzzy_match</h1>
 
-<p>Use fuzzy matching with a source list to extract skills from a job posting
+<p>Use fuzzy matching with a source list to extract skills
+from unstructured text
 <h2 id="skills_ml.algorithms.skill_extractors.fuzzy_match.FuzzyMatchSkillExtractor">FuzzyMatchSkillExtractor</h2></p>
-<pre><code class="python">FuzzyMatchSkillExtractor(self, skill_lookup_path, skill_lookup_name='onet_ksat', skill_lookup_description=None, *args, **kwargs)
+<pre><code class="python">FuzzyMatchSkillExtractor(self, *args, **kwargs)
 </code></pre>
 
 <p>Extract skills from unstructured text using fuzzy matching
+<h1 id="skills_ml.algorithms.skill_extractors.grammar">skills_ml.algorithms.skill_extractors.grammar</h1></p>
+<p>Use sentence grammar to extract phrases that may be skills
+<h2 id="skills_ml.algorithms.skill_extractors.grammar.sentences_words_pos">sentences_words_pos</h2></p>
+<pre><code class="python">sentences_words_pos(document)
+</code></pre>
+
+<p>Chops raw text into part-of-speech (POS)-tagged words in sentences</p>
+<p><strong>Args</strong></p>
+<pre><code>document (string) A document in text format
+</code></pre>
+<ul>
+<li><strong>Returns</strong>: (list) of sentences, each being a list of word/POS pair</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>sentences_words_pos(
+    '* Develop and maintain relationship with key members of ' +
+    'ESPN’s Spanish speaking editorial team'
+)
+[ # list of sentences
+    [ # list of word/POS pairs
+        ('*', 'NN'),
+        ('Develop', 'NNP'),
+        ('and', 'CC'),
+        ('maintain', 'VB'),
+        ('relationship', 'NN'),
+        ('with', 'IN'),
+        ('key', 'JJ'),
+        ('members', 'NNS'),
+        ('of', 'IN'),
+        ('ESPN', 'NNP'),
+        ('’', 'NNP'),
+        ('s', 'VBD'),
+        ('Spanish', 'JJ'),
+        ('speaking', 'NN'),
+        ('editorial', 'NN'),
+        ('team', 'NN')
+    ]
+]
+</code></pre>
+<h2 id="skills_ml.algorithms.skill_extractors.grammar.phrases_in_line_with_context">phrases_in_line_with_context</h2>
+
+<pre><code class="python">phrases_in_line_with_context(line, parser, target_labels)
+</code></pre>
+
+<p>Generate phrases in the given line of text</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>text (string)</strong>: A line of raw text</li>
+</ul>
+<p><strong>Yields</strong></p>
+<p><strong>    tuples, each with two strings</strong></p>
+<pre><code>    - a noun phrase
+    - the context of the noun phrase (currently defined as the surrounding sentence)
+</code></pre>
+<h2 id="skills_ml.algorithms.skill_extractors.grammar.is_bulleted">is_bulleted</h2>
+
+<pre><code class="python">is_bulleted(string)
+</code></pre>
+
+<p>Whether or not a given string begins a 'bullet' character</p>
+<p>A bullet character is understood to indicate list membership.
+Differeing common bullet characters are checked.</p>
+<p><strong>Args</strong></p>
+<ul>
+<li>
+<p><strong>string (string)</strong>: Any string</p>
+</li>
+<li>
+<p><strong>Returns</strong>: (bool) whether or not the string begins with one of the characters
+    in a predefined list of common bullets</p>
+</li>
+</ul>
+<h2 id="skills_ml.algorithms.skill_extractors.grammar.clean_beginning">clean_beginning</h2>
+
+<pre><code class="python">clean_beginning(string)
+</code></pre>
+
+<p>Clean the beginning of a string of common undesired formatting substrings</p>
+<p><strong>Args</strong></p>
+<ul>
+<li>
+<p><strong>string (string)</strong>: Any string</p>
+</li>
+<li>
+<p><strong>Returns</strong>: The string with beginning formatting substrings removed</p>
+</li>
+</ul>
+<h2 id="skills_ml.algorithms.skill_extractors.grammar.NPEndPatternExtractor">NPEndPatternExtractor</h2>
+
+<pre><code class="python">NPEndPatternExtractor(self, endings, stop_phrases, only_bulleted_lines=True, confidence=95, *args, **kwargs)
+</code></pre>
+
+<p>Identify noun phrases with certain ending words (e.g 'skills', 'abilities') as skills</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>endings (list)</strong>: Single words that should identify the ending of a noun phrase
+        as being a skill</li>
+<li><strong>stop_phrases (list)</strong>: Noun phrases that should not be considered skills</li>
+<li><strong>only_bulleted_lines (bool, default True)</strong>: Whether or not to only consider lines
+        that look like they are items in a list</li>
+</ul>
+<h2 id="skills_ml.algorithms.skill_extractors.grammar.SkillEndingPatternExtractor">SkillEndingPatternExtractor</h2>
+
+<pre><code class="python">SkillEndingPatternExtractor(self, *args, **kwargs)
+</code></pre>
+
+<p>Identify noun phrases ending with 'skill' or 'skills' as skills
+<h2 id="skills_ml.algorithms.skill_extractors.grammar.AbilityEndingPatternExtractor">AbilityEndingPatternExtractor</h2></p>
+<pre><code class="python">AbilityEndingPatternExtractor(self, *args, **kwargs)
+</code></pre>
+
+<p>Identify noun phrases ending in 'ability' or 'abilities' as skills
 <h1 id="skills_ml.algorithms.skill_extractors.noun_phrase_ending">skills_ml.algorithms.skill_extractors.noun_phrase_ending</h1></p>
 <p>Use noun phrases with specific endings to extract skills from job postings
 <h2 id="skills_ml.algorithms.skill_extractors.noun_phrase_ending.sentences_words_pos">sentences_words_pos</h2></p>
@@ -573,46 +984,53 @@ The corresponding Regex should match much faster than a simple Regex union.
 </code></pre>
 
 <p>Chops raw text into part-of-speech (POS)-tagged words in sentences</p>
-<p>Args:
-    document (string) A document in text format</p>
-<p>Returns: (list) of sentences, each being a list of word/POS pair</p>
-<p>Example:
-    sentences_words_pos(
-        '<em> Develop and maintain relationship with key members of ' +
-        'ESPN’s Spanish speaking editorial team'
-    )
-    [ # list of sentences
-        [ # list of word/POS pairs
-            ('</em>', 'NN'),
-            ('Develop', 'NNP'),
-            ('and', 'CC'),
-            ('maintain', 'VB'),
-            ('relationship', 'NN'),
-            ('with', 'IN'),
-            ('key', 'JJ'),
-            ('members', 'NNS'),
-            ('of', 'IN'),
-            ('ESPN', 'NNP'),
-            ('’', 'NNP'),
-            ('s', 'VBD'),
-            ('Spanish', 'JJ'),
-            ('speaking', 'NN'),
-            ('editorial', 'NN'),
-            ('team', 'NN')
-        ]
-    ]</p>
+<p><strong>Args</strong></p>
+<pre><code>document (string) A document in text format
+</code></pre>
+<ul>
+<li><strong>Returns</strong>: (list) of sentences, each being a list of word/POS pair</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>sentences_words_pos(
+    '* Develop and maintain relationship with key members of ' +
+    'ESPN’s Spanish speaking editorial team'
+)
+[ # list of sentences
+    [ # list of word/POS pairs
+        ('*', 'NN'),
+        ('Develop', 'NNP'),
+        ('and', 'CC'),
+        ('maintain', 'VB'),
+        ('relationship', 'NN'),
+        ('with', 'IN'),
+        ('key', 'JJ'),
+        ('members', 'NNS'),
+        ('of', 'IN'),
+        ('ESPN', 'NNP'),
+        ('’', 'NNP'),
+        ('s', 'VBD'),
+        ('Spanish', 'JJ'),
+        ('speaking', 'NN'),
+        ('editorial', 'NN'),
+        ('team', 'NN')
+    ]
+]
+</code></pre>
 <h2 id="skills_ml.algorithms.skill_extractors.noun_phrase_ending.noun_phrases_in_line_with_context">noun_phrases_in_line_with_context</h2>
 
 <pre><code class="python">noun_phrases_in_line_with_context(line)
 </code></pre>
 
 <p>Generate noun phrases in the given line of text</p>
-<p>Args:
-    text (string): A line of raw text</p>
-<p>Yields:
-    tuples, each with two strings:
-        - a noun phrase
-        - the context of the noun phrase (currently defined as the surrounding sentence)</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>text (string)</strong>: A line of raw text</li>
+</ul>
+<p><strong>Yields</strong></p>
+<p><strong>    tuples, each with two strings</strong></p>
+<pre><code>    - a noun phrase
+    - the context of the noun phrase (currently defined as the surrounding sentence)
+</code></pre>
 <h2 id="skills_ml.algorithms.skill_extractors.noun_phrase_ending.is_bulleted">is_bulleted</h2>
 
 <pre><code class="python">is_bulleted(string)
@@ -621,31 +1039,45 @@ The corresponding Regex should match much faster than a simple Regex union.
 <p>Whether or not a given string begins a 'bullet' character</p>
 <p>A bullet character is understood to indicate list membership.
 Differeing common bullet characters are checked.</p>
-<p>Args:
-string (string): Any string</p>
-<p>Returns: (bool) whether or not the string begins with one of the characters
+<p><strong>Args</strong></p>
+<ul>
+<li>
+<p><strong>string (string)</strong>: Any string</p>
+</li>
+<li>
+<p><strong>Returns</strong>: (bool) whether or not the string begins with one of the characters
     in a predefined list of common bullets</p>
+</li>
+</ul>
 <h2 id="skills_ml.algorithms.skill_extractors.noun_phrase_ending.clean_beginning">clean_beginning</h2>
 
 <pre><code class="python">clean_beginning(string)
 </code></pre>
 
 <p>Clean the beginning of a string of common undesired formatting substrings</p>
-<p>Args:
-string (string): Any string</p>
-<p>Returns: The string with beginning formatting substrings removed</p>
+<p><strong>Args</strong></p>
+<ul>
+<li>
+<p><strong>string (string)</strong>: Any string</p>
+</li>
+<li>
+<p><strong>Returns</strong>: The string with beginning formatting substrings removed</p>
+</li>
+</ul>
 <h2 id="skills_ml.algorithms.skill_extractors.noun_phrase_ending.NPEndPatternExtractor">NPEndPatternExtractor</h2>
 
-<pre><code class="python">NPEndPatternExtractor(self, endings, stop_phrases, only_bulleted_lines=True, *args, **kwargs)
+<pre><code class="python">NPEndPatternExtractor(self, endings, stop_phrases, only_bulleted_lines=True, confidence=95, *args, **kwargs)
 </code></pre>
 
 <p>Identify noun phrases with certain ending words (e.g 'skills', 'abilities') as skills</p>
-<p>Args:
-    endings (list): Single words that should identify the ending of a noun phrase
-        as being a skill
-    stop_phrases (list): Noun phrases that should not be considered skills
-    only_bulleted_lines (bool, default True): Whether or not to only consider lines
-        that look like they are items in a list</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>endings (list)</strong>: Single words that should identify the ending of a noun phrase
+        as being a skill</li>
+<li><strong>stop_phrases (list)</strong>: Noun phrases that should not be considered skills</li>
+<li><strong>only_bulleted_lines (bool, default True)</strong>: Whether or not to only consider lines
+        that look like they are items in a list</li>
+</ul>
 <h2 id="skills_ml.algorithms.skill_extractors.noun_phrase_ending.SkillEndingPatternExtractor">SkillEndingPatternExtractor</h2>
 
 <pre><code class="python">SkillEndingPatternExtractor(self, *args, **kwargs)
@@ -657,14 +1089,55 @@ string (string): Any string</p>
 </code></pre>
 
 <p>Identify noun phrases ending in 'ability' or 'abilities' as skills
-<h1 id="skills_ml.algorithms.skill_extractors.soc_exact">skills_ml.algorithms.skill_extractors.soc_exact</h1></p>
+<h1 id="skills_ml.algorithms.skill_extractors.section_extract">skills_ml.algorithms.skill_extractors.section_extract</h1></p>
+<h2 id="skills_ml.algorithms.skill_extractors.section_extract.SectionExtractSkillExtractor">SectionExtractSkillExtractor</h2>
+
+<pre><code class="python">SectionExtractSkillExtractor(self, section_regex=None, *args, **kwargs)
+</code></pre>
+
+<p>Extract skills from text by extracting sentences from matching 'sections'.</p>
+<p>Heavily utilizes skills_ml.algorithms.nlp.section_extract.
+For more detail on how to define 'sections', refer to its docstring.</p>
+<h1 id="skills_ml.algorithms.skill_extractors.soc_exact">skills_ml.algorithms.skill_extractors.soc_exact</h1>
+
 <h2 id="skills_ml.algorithms.skill_extractors.soc_exact.SocScopedExactMatchSkillExtractor">SocScopedExactMatchSkillExtractor</h2>
 
-<pre><code class="python">SocScopedExactMatchSkillExtractor(self, skill_lookup_path, skill_lookup_name='onet_ksat', skill_lookup_description=None, *args, **kwargs)
+<pre><code class="python">SocScopedExactMatchSkillExtractor(self, competency_ontology, *args, **kwargs)
 </code></pre>
 
 <p>Extract skills from unstructured text,
 but only return matches that agree with a known taxonomy</p>
+<h1 id="skills_ml.algorithms.skill_extractors.symspell">skills_ml.algorithms.skill_extractors.symspell</h1>
+
+<h2 id="skills_ml.algorithms.skill_extractors.symspell.SymSpell">SymSpell</h2>
+
+<pre><code class="python">SymSpell(self, max_dictionary_edit_distance=2, prefix_length=7, count_threshold=1)
+</code></pre>
+
+<p>SymSpell: 1 million times faster through Symmetric Delete spelling correction algorithm.
+The Symmetric Delete spelling correction algorithm reduces the complexity of edit candidate generation and dictionary lookup
+for a given Damerau-Levenshtein distance. It is six orders of magnitude faster and language independent.
+Opposite to other algorithms only deletes are required, no transposes + replaces + inserts.
+Transposes + replaces + inserts of the input term are transformed into deletes of the dictionary term.
+Replaces and inserts are expensive and language dependent: e.g. Chinese has 70,000 Unicode Han characters!
+<strong>SymSpell supports compound splitting / decompounding of multi-word input strings with three cases</strong></p>
+<ol>
+<li>mistakenly inserted space into a correct word led to two incorrect terms</li>
+<li>mistakenly omitted space between two correct words led to one incorrect combined term</li>
+<li>
+<p>multiple independent input terms with/without spelling errors
+See https://github.com/wolfgarbe/SymSpell for details.
+<strong>Args</strong></p>
+</li>
+<li>
+<p><strong>max_dictionary_edit_distance (int, optional)</strong>: Maximum distance used to generate index. Also acts
+        as an upper bound for <code>max_edit_distance</code> parameter in <code>lookup()</code> method. Defaults to 2.</p>
+</li>
+<li><strong>prefix_length (int, optional)</strong>: Prefix length. Should not be changed normally. Defaults to 7.</li>
+<li><strong>count_threshold (int, optional)</strong>: Threshold corpus-count value for words to be considered correct.
+        Defaults to 1, values below zero are also mapped to 1. Consider setting a higher value if your
+        corpus contains mistakes.</li>
+</ol>
 <h1 id="skills_ml.algorithms.skill_feature_creator">skills_ml.algorithms.skill_feature_creator</h1>
 
 <h2 id="skills_ml.algorithms.skill_feature_creator.SequenceFeatureCreator">SequenceFeatureCreator</h2>
@@ -675,19 +1148,23 @@ but only return matches that agree with a known taxonomy</p>
 <p>Sequence Feature Creator helps users to instantiate different
 types of feature at once and combine them together into a sentence(sequence) feature array for sequence modeling.
 It's a generator that outputs a sentence array at a time. A sentence array is composed of word vectors.</p>
-<p>Example:
-    from skills_ml.algorithms.skill_feature_creator import FeatureCreator</p>
-<pre><code>feature_vector_generator = FeatureCreator(job_posting_generator)
+<p><strong>Example</strong></p>
+<pre><code>from skills_ml.algorithms.skill_feature_creator import FeatureCreator
+
+feature_vector_generator = FeatureCreator(job_posting_generator)
 feature_vector_generator = FeatureCreator(job_posting_generator, features=["StructuralFeature", "EmbeddingFeature"])
 </code></pre>
-<p>Args:
-    job_posting_generator (generator): job posting generator.
-    sentence_tokenizer (func): sentence tokenization function
-    word_tokenizer (func): word tokenization function
-    features (list): list of feature types ones want to include. If it's None or by default, it includes all the feature types.</p>
-<p>Yield:
-    sentence_array (numpy.array): an array of word vectors represents the words and punctuations in the sentence. The dimension
-                                  is (# of words)*(dimension of the concat word vector)</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>job_posting_generator (generator)</strong>: job posting generator.</li>
+<li><strong>sentence_tokenizer (func)</strong>: sentence tokenization function</li>
+<li><strong>word_tokenizer (func)</strong>: word tokenization function</li>
+<li><strong>features (list)</strong>: list of feature types ones want to include. If it's None or by default, it includes all the feature types.</li>
+</ul>
+<p><strong>Yield</strong></p>
+<pre><code>sentence_array (numpy.array): an array of word vectors represents the words and punctuations in the sentence. The dimension
+                              is (# of words)*(dimension of the concat word vector)
+</code></pre>
 <h2 id="skills_ml.algorithms.skill_feature_creator.StructuralFeature">StructuralFeature</h2>
 
 <pre><code class="python">StructuralFeature(self, sentence_tokenizer=None, word_tokenizer=None, **kwargs)
@@ -711,12 +1188,6 @@ feature_vector_generator = FeatureCreator(job_posting_generator, features=["Stru
 <h1 id="skills_ml.algorithms.skill_feature_creator.posTags">skills_ml.algorithms.skill_feature_creator.posTags</h1>
 
 <h1 id="skills_ml.algorithms.skill_feature_creator.structure_features">skills_ml.algorithms.skill_feature_creator.structure_features</h1>
-
-<h1 id="skills_ml.algorithms.string_cleaners">skills_ml.algorithms.string_cleaners</h1>
-
-<p>String cleaning algorithms
-<h1 id="skills_ml.algorithms.string_cleaners.nlp">skills_ml.algorithms.string_cleaners.nlp</h1></p>
-<p>String transformations for cleaning</p>
                 
                   
                 
@@ -774,7 +1245,7 @@ feature_vector_generator = FeatureCreator(job_posting_generator, features=["Stru
       <div class="md-footer-copyright">
         
         powered by
-        <a href="http://www.mkdocs.org">MkDocs</a>
+        <a href="https://www.mkdocs.org">MkDocs</a>
         and
         <a href="https://squidfunk.github.io/mkdocs-material/">
           Material for MkDocs</a>
@@ -788,9 +1259,9 @@ feature_vector_generator = FeatureCreator(job_posting_generator, features=["Stru
       
     </div>
     
-      <script src="../assets/javascripts/application.b438e6c5.js"></script>
+      <script src="../assets/javascripts/application.5e60981f.js"></script>
       
-      <script>app.initialize({version:"0.17.3",url:{base:".."}})</script>
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
       
     
     

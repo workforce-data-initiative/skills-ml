@@ -1,68 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-    
     <url>
-     <loc>/</loc>
-     <lastmod>2018-07-16</lastmod>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/examples/</loc>
-     <lastmod>2018-07-16</lastmod>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/ontologies/</loc>
-     <lastmod>2018-07-16</lastmod>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/common_schema/</loc>
-     <lastmod>2018-07-16</lastmod>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/skills_ml.evaluation/</loc>
-     <lastmod>2018-07-16</lastmod>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/skills_ml.algorithms/</loc>
-     <lastmod>2018-07-16</lastmod>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/skills_ml.job_postings/</loc>
-     <lastmod>2018-07-16</lastmod>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/skills_ml.datasets/</loc>
-     <lastmod>2018-07-16</lastmod>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
      <changefreq>daily</changefreq>
     </url>
-    
-
+    <url>
+     <loc>None</loc>
+     <lastmod>2018-11-21</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
 </urlset>

@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-0.17.3, mkdocs-material-2.7.2">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.6">
     
     
       
@@ -40,20 +40,21 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.8d40d89b.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+      
       
     
     
       <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
     
     
-      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
       
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
     
     
   </head>
@@ -66,9 +67,13 @@
         
       </defs>
     </svg>
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search" autocomplete="off">
-    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#these-first-five-keys-are-just-storage-of-user-input-to-either" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
     
     
       <header class="md-header" data-md-component="header">
@@ -82,7 +87,7 @@
         </a>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
       </div>
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
@@ -101,14 +106,14 @@
       <div class="md-flex__cell md-flex__cell--shrink">
         
           
-            <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
             
 <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="search"></label>
+  <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
-      <label class="md-icon md-search__icon" for="search"></label>
+      <label class="md-icon md-search__icon" for="__search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
         &#xE5CD;
       </button>
@@ -146,12 +151,12 @@
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="drawer">
-    <span class="md-nav__button md-logo">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="skills-ml documentation" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
-    </span>
+    </a>
     skills-ml documentation
   </label>
   
@@ -165,6 +170,18 @@
   <li class="md-nav__item">
     <a href=".." title="Home" class="md-nav__link">
       Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../skills_ml_tour/" title="Tour" class="md-nav__link">
+      Tour
     </a>
   </li>
 
@@ -214,7 +231,9 @@
 
   <li class="md-nav__item md-nav__item--active">
     
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
     
     
     <a href="./" title="Evaluation Tools" class="md-nav__link md-nav__link--active">
@@ -267,20 +286,35 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                <h1 id="skills_ml.evaluation.annotators">skills_ml.evaluation.annotators</h1>
-
+                <p>[TOC]
+<h1 id="skills_ml.evaluation.annotators">skills_ml.evaluation.annotators</h1></p>
 <h2 id="skills_ml.evaluation.annotators.BratExperiment">BratExperiment</h2>
 
 <pre><code class="python">BratExperiment(self, experiment_name, brat_s3_path)
 </code></pre>
 
-<p>Manage a BRAT experiment. Handles:</p>
+<p><strong>Manage a BRAT experiment. Handles</strong></p>
 <ol>
 <li>The creation of BRAT config for a specific sample of job postings</li>
 <li>Adding users to the installation and allocating them semi-hidden job postings</li>
@@ -289,16 +323,16 @@
 <p>Syncs data to an experiment directory on S3.
 BRAT installations are expected to sync this data down regularly.</p>
 <p>Keeps track of a metadata file,
-available as a dictionary at self.metadata, with the following structure:</p>
-<p><strong>these first five keys are just storage of user input to either</strong></p>
-<p><strong>the constructor or start()</strong></p>
-<p><strong>view relevant docstrings for definitions</strong></p>
+<strong>available as a dictionary at self.metadata, with the following structure</strong></p>
+<h2 id="these-first-five-keys-are-just-storage-of-user-input-to-either"><a class="toclink" href="#these-first-five-keys-are-just-storage-of-user-input-to-either">these first five keys are just storage of user input to either</a><a class="headerlink" href="#these-first-five-keys-are-just-storage-of-user-input-to-either" title="Permanent link">&para;</a></h2>
+<h2 id="the-constructor-or-start"><a class="toclink" href="#the-constructor-or-start">the constructor or start()</a><a class="headerlink" href="#the-constructor-or-start" title="Permanent link">&para;</a></h2>
+<h2 id="view-relevant-docstrings-for-definitions"><a class="toclink" href="#view-relevant-docstrings-for-definitions">view relevant docstrings for definitions</a><a class="headerlink" href="#view-relevant-docstrings-for-definitions" title="Permanent link">&para;</a></h2>
 <p>sample_base_path
 sample_name
 entities_with_shortcuts
 minimum_annotations_per_posting
 max_postings_per_allocation</p>
-<p><strong>units and allocations are far more important when reading results of an experiment</strong></p>
+<h2 id="units-and-allocations-are-far-more-important-when-reading-results-of-an-experiment"><a class="toclink" href="#units-and-allocations-are-far-more-important-when-reading-results-of-an-experiment">units and allocations are far more important when reading results of an experiment</a><a class="headerlink" href="#units-and-allocations-are-far-more-important-when-reading-results-of-an-experiment" title="Permanent link">&para;</a></h2>
 <p>units: {
     # canonical list of 'unit' (bundle of job postings) names,
     # along with a list of tuples of job posting keys (only unique within unit)
@@ -317,11 +351,46 @@ allocations: {
     'user_1': ['unit_1', 'unit_2'],
     'user_2': ['unit_2']
 }</p>
+<h1 id="skills_ml.evaluation.embedding_metrics">skills_ml.evaluation.embedding_metrics</h1>
+
+<h2 id="skills_ml.evaluation.embedding_metrics.CategorizationMetric">CategorizationMetric</h2>
+
+<pre><code class="python">CategorizationMetric(self, clustering:skills_ml.ontologies.clustering.Clustering)
+</code></pre>
+
+<p>cosine similarity between the clustering concept and the mean vector
+of all entities within that concept cluster.</p>
+<h2 id="skills_ml.evaluation.embedding_metrics.IntraClusterCohesion">IntraClusterCohesion</h2>
+
+<pre><code class="python">IntraClusterCohesion(self, clustering:skills_ml.ontologies.clustering.Clustering)
+</code></pre>
+
+<p>sum of squared error of the centroid of the concept cluster and
+each entities within the concept cluster.</p>
+<h2 id="skills_ml.evaluation.embedding_metrics.RecallTopN">RecallTopN</h2>
+
+<pre><code class="python">RecallTopN(self, clustering:skills_ml.ontologies.clustering.Clustering, topn=20)
+</code></pre>
+
+<p>For a given concept cluster and a given number n, find top
+n similar entities from the whole entity pool based on cosin
+similarity, and then calculate the top n recall: number of the true
+positive from top n closest entities divided by the total number
+of the concept cluster.</p>
+<h2 id="skills_ml.evaluation.embedding_metrics.PrecisionTopN">PrecisionTopN</h2>
+
+<pre><code class="python">PrecisionTopN(self, clustering:skills_ml.ontologies.clustering.Clustering, topn=10)
+</code></pre>
+
+<p>For a given concept cluster and a given number n, find top
+n similar entities from the whole entity pool based on cosin
+similarity, and then calculate the top n precision: number of the true
+positive from top n closest entities divided by n.</p>
 <h1 id="skills_ml.evaluation.job_title_normalizers">skills_ml.evaluation.job_title_normalizers</h1>
 
 <p>Test job normalizers</p>
-<p>Requires 'interesting_job_titles.csv' to be populated, of format:
-input job title description of job  ONET code</p>
+<p><strong>Requires 'interesting_job_titles.csv' to be populated, of format</strong></p>
+<p>input job title description of job  ONET code</p>
 <p>Each task will output two CSV files, one with the normalizer's ranks
 and one without ranks. The latter is for sending to people to fill out
 and the former is for testing those results against the normalizer's</p>
@@ -343,10 +412,12 @@ and the former is for testing those results against the normalizer's</p>
 
 <p>Abstract interface for enforcing common iteration, access patterns
 to a variety of possible normalizers.</p>
-<p>Args:
-    name (string): A name for the normalizer
-    access (filename or file object): A tab-delimited CSV with column order {job_title, description, soc_code}
-    num_examples (int, optional): Number of top responses to include</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>name (string)</strong>: A name for the normalizer</li>
+<li><strong>access (filename or file object)</strong>: A tab-delimited CSV with column order {job_title, description, soc_code}</li>
+<li><strong>num_examples (int, optional)</strong>: Number of top responses to include</li>
+</ul>
 <p>Normalizers should return a list of results, ordered by relevance,
 with 'title' and optional 'relevance_score' keys</p>
 <h2 id="skills_ml.evaluation.job_title_normalizers.MiniNormalizer">MiniNormalizer</h2>
@@ -356,6 +427,23 @@ with 'title' and optional 'relevance_score' keys</p>
 
 <p>Access normalizer classes which can be instantiated and
 implement 'normalize_job_title(job_title)'</p>
+<h2 id="skills_ml.evaluation.job_title_normalizers.DataAtWorkNormalizer">DataAtWorkNormalizer</h2>
+
+<pre><code class="python">DataAtWorkNormalizer(self, name=None, access=None, num_examples=3)
+</code></pre>
+
+<h1 id="skills_ml.evaluation.occ_cls_evaluator">skills_ml.evaluation.occ_cls_evaluator</h1>
+
+<h2 id="skills_ml.evaluation.occ_cls_evaluator.ClassificationEvaluator">ClassificationEvaluator</h2>
+
+<pre><code class="python">ClassificationEvaluator(self, result_generator)
+</code></pre>
+
+<h2 id="skills_ml.evaluation.occ_cls_evaluator.OnetOccupationClassificationEvaluator">OnetOccupationClassificationEvaluator</h2>
+
+<pre><code class="python">OnetOccupationClassificationEvaluator(self, result_generator)
+</code></pre>
+
 <h1 id="skills_ml.evaluation.representativeness_calculators">skills_ml.evaluation.representativeness_calculators</h1>
 
 <p>Calculate representativeness of a dataset, such as job postings
@@ -369,10 +457,88 @@ implement 'normalize_job_title(job_title)'</p>
 <p>Calculates geographic representativeness of SOC Codes.
 If a job normalizer is given, will attempt to compute SOC codes
 of jobs that have missing SOC codes</p>
-<p>Args:
-    geo_querier (skills_ml.job_postings.geography_queriers) An object that can return a CBSA from a job posting
-    normalizer (skills_ml.algorithms.occupation_classifiers) An object that can return the SOC code from a job posting</p>
+<p><strong>Args</strong></p>
+<pre><code>geo_querier (skills_ml.job_postings.geography_queriers) An object that can return a CBSA from a job posting
+normalizer (skills_ml.algorithms.occupation_classifiers) An object that can return the SOC code from a job posting
+</code></pre>
 <h1 id="skills_ml.evaluation.skill_extraction_metrics">skills_ml.evaluation.skill_extraction_metrics</h1>
+
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.OntologyCompetencyRecall">OntologyCompetencyRecall</h2>
+
+<pre><code class="python">OntologyCompetencyRecall(self, ontology:skills_ml.ontologies.base.CompetencyOntology)
+</code></pre>
+
+<p>The percentage of competencies in an ontology which are present in the candidate skills
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.OntologyOccupationRecall">OntologyOccupationRecall</h2></p>
+<pre><code class="python">OntologyOccupationRecall(self, ontology:skills_ml.ontologies.base.CompetencyOntology)
+</code></pre>
+
+<p>The percentage of occupations in the ontology that are present in the candidate skills
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.MedianSkillsPerDocument">MedianSkillsPerDocument</h2></p>
+<pre><code class="python">MedianSkillsPerDocument(self, /, *args, **kwargs)
+</code></pre>
+
+<p>The median number of distinct skills present in each document
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.SkillsPerDocumentHistogram">SkillsPerDocumentHistogram</h2></p>
+<pre><code class="python">SkillsPerDocumentHistogram(self, bins=10, *args, **kwargs)
+</code></pre>
+
+<p>The
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.PercentageNoSkillDocuments">PercentageNoSkillDocuments</h2></p>
+<pre><code class="python">PercentageNoSkillDocuments(self, /, *args, **kwargs)
+</code></pre>
+
+<p>The percentage of documents that contained zero skills
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.TotalVocabularySize">TotalVocabularySize</h2></p>
+<pre><code class="python">TotalVocabularySize(self, /, *args, **kwargs)
+</code></pre>
+
+<p>The total number of skills represented
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.TotalOccurrences">TotalOccurrences</h2></p>
+<pre><code class="python">TotalOccurrences(self, /, *args, **kwargs)
+</code></pre>
+
+<p>The total number of candidate skill occurrences
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.EvaluationSetPrecision">EvaluationSetPrecision</h2></p>
+<pre><code class="python">EvaluationSetPrecision(self, candidate_skills:Generator[skills_ml.algorithms.skill_extractors.base.CandidateSkill, NoneType, NoneType], evaluation_set_name:str, strict:bool=True)
+</code></pre>
+
+<p>Find the precision evaluated against an evaluation set of candidate skills.</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>candidate_skills (CandidateSkillYielder)</strong>: A collection of candidate skills to evaluate against</li>
+<li><strong>evaluation_set_name (str)</strong>: A name for the evaluation set of candidate skills.
+    Used in the name of the metric so results from multiple evaluation sets
+    can be compared side-by-side.</li>
+<li><strong>strict (bool, default True)</strong>: Whether or not to enforce the exact location of the match,
+    versus just matching between sets on the same skill name and document.
+<strong>    Setting this to False will guard against</strong><pre><code>1. labelers who don't mark every instance of a skill once they found one instance
+2. discrepancies in start_index values caused by errant transformation methods
+</code></pre>
+<p>However, this could also produce false matches, so use with care.</p>
+</li>
+</ul>
+<h2 id="skills_ml.evaluation.skill_extraction_metrics.EvaluationSetRecall">EvaluationSetRecall</h2>
+
+<pre><code class="python">EvaluationSetRecall(self, candidate_skills, evaluation_set_name, strict=True)
+</code></pre>
+
+<p>Find the recall evaluated against an evaluation set of candidate skills.</p>
+<p><strong>Args</strong></p>
+<ul>
+<li><strong>candidate_skills (CandidateSkillYielder)</strong>: A collection of candidate skills to evaluate against</li>
+<li><strong>evaluation_set_name (str)</strong>: A name for the evaluation set of candidate skills.
+    Used in the name of the metric so results from multiple evaluation sets
+    can be compared side-by-side.</li>
+<li><strong>strict (bool, default True)</strong>: Whether or not to enforce the exact location of the match,
+    versus just matching between sets on the same skill name and document.
+<strong>    Setting this to False will guard against</strong><pre><code>1. labelers who don't mark every instance of a skill once they found one instance
+2. discrepancies in start_index values caused by errant transformation methods
+</code></pre>
+<p>However, this could also produce false matches, so use with care.</p>
+</li>
+</ul>
+<h1 id="skills_ml.evaluation.skill_extractors">skills_ml.evaluation.skill_extractors</h1>
                 
                   
                 
@@ -430,7 +596,7 @@ of jobs that have missing SOC codes</p>
       <div class="md-footer-copyright">
         
         powered by
-        <a href="http://www.mkdocs.org">MkDocs</a>
+        <a href="https://www.mkdocs.org">MkDocs</a>
         and
         <a href="https://squidfunk.github.io/mkdocs-material/">
           Material for MkDocs</a>
@@ -444,9 +610,9 @@ of jobs that have missing SOC codes</p>
       
     </div>
     
-      <script src="../assets/javascripts/application.b438e6c5.js"></script>
+      <script src="../assets/javascripts/application.5e60981f.js"></script>
       
-      <script>app.initialize({version:"0.17.3",url:{base:".."}})</script>
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
       
     
     
