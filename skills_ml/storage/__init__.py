@@ -48,6 +48,9 @@ class ProxyObjectWithStorage(wrapt.ObjectProxy):
     def __reduce__(self):
         return (self.__reconstruct__, (self._model_obj, self.storage, self.model_name, self.target_variable))
 
+    def __reduce_ex__(self):
+        return self.__reduce__()
+
 
 @retry(stop_max_delay=150000, wait_fixed=3000)
 @contextmanager
