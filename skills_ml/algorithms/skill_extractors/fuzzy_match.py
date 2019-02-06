@@ -78,13 +78,11 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
 
     def candidate_skills(self, source_object: Dict) -> CandidateSkillYielder:
         document = self.transform_func(source_object)
-        sentences = self.nlp.sentence_tokenize(document)
-        phrase_start = 0
+        sentences = self.nlp.sentence_tokenize(document, include_spans=True)
 
         for sent in sentences:
-            for phrase in self.ngrams(sent, self.max_ngrams):
+            for phrase in self.ngrams(sent.text, self.max_ngrams):
                 length_of_phrase = len(phrase)
-                phrase_start += length_of_phrase
                 max_distance = length_of_phrase - \
                     ceil(length_of_phrase * self.match_threshold/100)
                 if max_distance > self.max_distance:
@@ -95,14 +93,14 @@ class FuzzyMatchSkillExtractor(ListBasedSkillExtractor):
                         'Fuzzy match found: %s corrected to %s in %s',
                         phrase,
                         match.term,
-                        sent
+                        sent.text
                     )
                     yield CandidateSkill(
                         skill_name=phrase,
                         matched_skill_identifier=self.id_lookup[match.term],
                         confidence=100*(length_of_phrase-match.distance)/length_of_phrase,
-                        context=sent,
-                        start_index=phrase_start,
+                        context=sent.text,
+                        start_index=sent.start_index + sent.text.lower().index(phrase),
                         document_id=source_object['id'],
                         document_type=source_object['@type'],
                         source_object=source_object,

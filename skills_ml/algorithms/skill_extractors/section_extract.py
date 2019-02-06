@@ -28,15 +28,15 @@ class SectionExtractSkillExtractor(SkillExtractor):
         Yields each sentence from the configured section pattern
         """
 
-        lines_in_section = section_extract(self.section_regex, source_object['description'])
-        for line in lines_in_section:
-            logging.info('Yielding candidate skill %s', line)
+        spans_in_section = section_extract(self.section_regex, source_object['description'])
+        for span in spans_in_section:
+            logging.info('Yielding candidate skill %s', span)
             yield CandidateSkill(
-                skill_name=line,
+                skill_name=span.text,
                 matched_skill_identifier=None,
                 confidence=100,
-                context=line,
-                start_index=-1,
+                context=span.text,
+                start_index=span.start_index,
                 document_id=source_object['id'],
                 document_type=source_object['@type'],
                 source_object=source_object,
