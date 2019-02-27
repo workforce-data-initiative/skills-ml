@@ -6,8 +6,10 @@ import unicodedata
 import re
 from bs4 import BeautifulSoup
 import nltk
+from nltk.tokenize import PunktSentenceTokenizer
 from functools import reduce, wraps
-from typing import List, Set, Generator, Dict, Pattern
+from typing import List, Set, Generator, Dict, Pattern, Tuple
+from collections import namedtuple
 
 
 transforms = ['nlp_a']
@@ -106,16 +108,32 @@ def clean_str(text: str) -> str:
     return text
 
 
-def sentence_tokenize(text: str) -> List[str]:
+Span = namedtuple("Span", ["text", "start_index"])
+
+def sentence_tokenize(text: str, include_spans: bool=False) -> List:
     """
     Args:
         text (str): a unicode string
     Returns:
-        list: tokenized sentence
+        list: tokenized sentence. If include_spans is True, then each item is a Span object  with both text and a start_index. Otherwise, only text is returned.
     """
-    sentences = re.split('\n', text)
-    sentences = list(filter(None, sentences))
-    return reduce(lambda x, y: x+y, map(lambda x: nltk.sent_tokenize(x), sentences))
+    lines = re.split('\n', text)
+    #lines = list(filter(None, sentences))
+    sentences = []
+    
+    tokenizer = PunktSentenceTokenizer()
+    total_offset = 0
+    for line in lines:
+        line_start = total_offset
+        for sentence_start, sentence_end in tokenizer.span_tokenize(line):
+            sentence = line[sentence_start:sentence_end]
+            if include_spans:
+                sentences.append(Span(text=sentence, start_index=line_start + sentence_start))
+            else:
+                sentences.append(sentence)
+            total_offset = line_start + sentence_end
+        total_offset += 1
+    return sentences
 
 @deep
 def word_tokenize(text: str, punctuation=True) -> List[str]:
@@ -164,7 +182,7 @@ def vectorize(
     return embedding_model.infer_vector(tokenized_text)
 
 
-def section_extract(section_regex: Pattern, document: str) -> List:
+def section_extract(section_regex: Pattern, document: str) -> List[Span]:
     """Only return the contents of the configured section heading
 
     Defines a 'heading' as the text of a sentence that:
@@ -181,40 +199,59 @@ def section_extract(section_regex: Pattern, document: str) -> List:
     what we want to call 'sentences', but authors often take advantage of the bullet characters
     to make the contents of each 'sentence' into small sentence fragments, which makes standard
     sentence tokenization insufficient if the newlines have been taken out.
+
+    Args:
+        section_regex (Pattern), A regular expression defining the heading/s you want to include
+        document (str) The text to search in
+    Returns: List of Span objects with both the text and a start_index
     """
     units_in_section = []
     if not document:
         return units_in_section
-    sentences = sentence_tokenize(document)
+    sentences = sentence_tokenize(document, include_spans=True)
     units = [
-        unit
+        Span(text=unit.text, start_index=sentence.start_index + unit.start_index)
         for sentence in sentences
-        for unit in split_by_bullets(sentence)
+        for unit in split_by_bullets(sentence.text)
     ]
 
     heading = ''
     for unit in units:
-        words_in_unit = len(unit.lstrip().rstrip().split(' '))
-        if unit.strip() and unit[0] not in BULLET_CHARACTERS and ((words_in_unit > 0 and words_in_unit < 4) or unit.endswith(':')):
-            heading = unit
-        if re.match(section_regex, heading) and unit != heading and len(unit.strip()) > 0:
-            units_in_section.append(strip_bullets_from_line(unit).lstrip().rstrip())
+        words_in_unit = len(unit.text.lstrip().rstrip().split(' '))
+        if unit.text.strip() and unit.text[0] not in BULLET_CHARACTERS and ((words_in_unit > 0 and words_in_unit < 4) or unit.text.endswith(':')):
+            heading = unit.text
+        if re.match(section_regex, heading) and unit.text != heading and len(unit.text.strip()) > 0:
+            stripped = strip_bullets_from_line(unit.text).lstrip().rstrip()
+
+            units_in_section.append(Span(
+                text=stripped,
+                start_index=unit.start_index + unit.text.index(stripped)
+            ))
     return units_in_section
 
 
-def split_by_bullets(sentence: str) -> List:
-    """Split sentence by bullet characters"""
+def split_by_bullets(sentence: str) -> List[Span]:
+    """Split sentence by bullet characters
+
+    Args:
+        sentence (str)
+
+    Returns: List of Span objects representing the text inbetween bullets, with both text and start indices
+    """
     units = []
     for bullet_char in BULLET_CHARACTERS:
+        index = 0
         padded_bullet = bullet_char + ' '
         if sentence.count(padded_bullet) > 1:
             for i, fragment in enumerate(sentence.split(padded_bullet)):
                 if i > 0:
-                    units.append(padded_bullet + fragment)
+                    units.append(Span(text=padded_bullet + fragment, start_index=index))
+                    index += len(padded_bullet + fragment)
                 else:
-                    units.append(fragment)
+                    units.append(Span(text=fragment, start_index=index))
+                    index += len(fragment)
             return units
-    units.append(sentence)
+    units.append(Span(text=sentence, start_index=0))
     return units
 
 

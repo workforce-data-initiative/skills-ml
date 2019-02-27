@@ -186,7 +186,7 @@ class SectionExtractWord2VecCorpusCreator(Word2VecGensimCorpusCreator):
 
     def _transform(self, document):
         lines_from_section = section_extract(self.section_regex, document['description'])
-        return [word_tokenize(clean_str(strip_bullets_from_line(line))) for line in lines_from_section]
+        return [word_tokenize(clean_str(strip_bullets_from_line(line.text))) for line in lines_from_section]
 
 
 class RawCorpusCreator(CorpusCreator):
