@@ -9,12 +9,14 @@ try:
 except LookupError:
     nltk.download('averaged_perceptron_tagger')
 
+from nltk.tokenize.regexp import WordPunctTokenizer
 try:
     from nltk.tokenize.moses import MosesDetokenizer
 except LookupError:
     nltk.download('perluniprops')
     from nltk.tokenize.moses import MosesDetokenizer
 
+from skills_ml.algorithms.nlp import sentence_tokenize
 from .base import SkillExtractor, CandidateSkill, CandidateSkillYielder
 
 from typing import Dict
@@ -55,13 +57,17 @@ def sentences_words_pos(document):
         ]
     """
     try:
-        sentences = nltk.sent_tokenize(document.encode('utf-8'))
+        sentences = sentence_tokenize(document.encode('utf-8'), include_spans=True)
     except:
-        sentences = nltk.sent_tokenize(document)
-    sentences = [nltk.wordpunct_tokenize(sent) for sent in sentences]
-
-    sentences = [nltk.pos_tag(sent) for sent in sentences]
-    return sentences
+        sentences = sentence_tokenize(document, include_spans=True)
+    tokenizer = WordPunctTokenizer()
+    tokenized_sentences = []
+    for sent_obj in sentences:
+        token_spans = list(tokenizer.span_tokenize(sent_obj.text))
+        tokens = [sent_obj.text[span[0]:span[1]] for span in token_spans]
+        pos_tagged = nltk.pos_tag(tokens) 
+        tokenized_sentences.append((pos_tagged, sent_obj.start_index, token_spans))
+    return tokenized_sentences
 
 
 def noun_phrases_in_line_with_context(line):
@@ -71,9 +77,10 @@ def noun_phrases_in_line_with_context(line):
         text (string): A line of raw text
 
     Yields:
-        tuples, each with two strings:
-            - a noun phrase
-            - the context of the noun phrase (currently defined as the surrounding sentence)
+        tuples, each with:
+            - a noun phrase (str)
+            - the context of the noun phrase (currently defined as the surrounding sentence) (str)
+            - the start index of the phrase within the line (int)
     """
     if line.strip() != "\n":
         output = sentences_words_pos(line)
@@ -82,20 +89,27 @@ def noun_phrases_in_line_with_context(line):
                   NP: {<JJ.*>*<NN.*><NN.*>*}   # chunk adjectives and nouns
                    """
         cp = nltk.RegexpParser(grammar)
-        for sent in output:
+        sentence_start = 0
+        for sent, sentence_start, spans in output:
+            #print(sent)
             if sent:
                 tree = cp.parse(sent)
+                flattened_tree = tree.flatten()
+                highest_index_seen = 0
                 for subtree in tree.subtrees():
                     if subtree.label() == 'NP':
-                        np = ""
-                        for node in subtree:
-                            try:
-                                np += node[0].encode('utf-8') + ' '
-                            except:
-                                np += node[0] + ' '
-                        np = np.strip()
-                        logging.debug('Yielding noun phrase %s with context %s', np, sent)
-                        yield np, sent
+                        start_node = subtree[0]
+                        start_span = flattened_tree[highest_index_seen:].index(start_node) + highest_index_seen
+                        start_index = sentence_start + spans[start_span][0]
+                        end_node = subtree[-1]
+                        #print(start_node, end_node)
+                        end_span = flattened_tree[start_span:].index(end_node) + start_span
+                        end_index = sentence_start + spans[end_span][1]
+                        np = line[start_index:end_index]
+                        highest_index_seen = end_span
+                        #print('yielding', np, start_index, end_index, line[start_index:end_index])
+                        logging.debug('Yielding noun phrase %s with context %s and start %s', np, sent, start_index)
+                        yield np, sent, start_index
 
 
 BULLETS = ['+', '*', '-']
@@ -194,6 +208,7 @@ class NPEndPatternExtractor(SkillExtractor):
         """
         document = self.transform_func(source_object)
         for cleaned_phrase, context, phrase_start in self.noun_phrases_matching_endings(document):
+            #print(cleaned_phrase, context, phrase_start)
             orig_context = self.detokenizer.detokenize([t[0] for t in context], return_str=True)
             logging.info(
                 'Yielding candidate skill %s in context %s',
@@ -225,16 +240,20 @@ class NPEndPatternExtractor(SkillExtractor):
                 - the index of the start of the phrase in the document
         """
         lines = document.split('\n')
-        phrase_start = 0
+        #phrase_start = 0
+        line_start = 0
         for line in lines:
+            #print('new line!', line)
             if not self.only_bulleted_lines or is_bulleted(line):
-                for noun_phrase, context in noun_phrases_in_line_with_context(line):
+                for noun_phrase, context, phrase_start in noun_phrases_in_line_with_context(line):
+                    #print(noun_phrase, line_start, phrase_start)
                     term_list = noun_phrase.split()
                     if term_list[-1].lower() in self.endings:
                         cleaned_phrase = clean_beginning(noun_phrase).lower()
                         if cleaned_phrase not in self.stop_phrases:
-                            yield cleaned_phrase, context, phrase_start
-                    phrase_start += len(noun_phrase)
+                            yield cleaned_phrase, context, line_start + phrase_start
+                    #phrase_start += len(noun_phrase) + 1
+            line_start += len(line) + 1
 
 
 class SkillEndingPatternExtractor(NPEndPatternExtractor):
