@@ -1,7 +1,7 @@
 pandas==1.2.3
 requests==2.25.1
 scikit-learn==0.24.1
-scipy==1.1.0
+scipy==1.6.1
 nltk==3.2.5 # pyup: ignore
 pytest==3.10.1
 Elasticsearch==6.3.1
