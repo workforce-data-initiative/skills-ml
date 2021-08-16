@@ -7,7 +7,7 @@ pytest-cov==2.12.1
 pytest==6.2.4
 testing.postgresql==1.3.0
 tox==3.24.1
-bumpversion==0.5.3
+bumpversion==0.6.0
 mkdocs==1.0.4
 git+git://github.com/thcrock/pydoc-markdown.git@master
 mkdocs-material==3.0.6
