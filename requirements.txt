@@ -4,7 +4,7 @@ scikit-learn==1.0.1
 scipy==1.7.2
 nltk==3.2.5 # pyup: ignore
 pytest==6.2.5
-Elasticsearch==6.3.1
+Elasticsearch==7.15.1
 gensim==3.6.0 # pyup: ignore
 annoy==1.14.0
 unicodecsv==0.14.1
