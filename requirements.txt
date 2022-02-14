@@ -6,7 +6,7 @@ nltk==3.2.5 # pyup: ignore
 pytest==7.0.1
 Elasticsearch==8.0.0
 gensim==3.6.0 # pyup: ignore
-annoy==1.14.0
+annoy==1.17.0
 unicodecsv==0.14.1
 us==1.0.0
 Sqlalchemy==1.2.14
