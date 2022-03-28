@@ -4,7 +4,7 @@ freezegun==0.3.11
 mock==2.0.0
 moto==1.3.7
 pytest-cov==2.6.0
-pytest==3.10.1
+pytest==7.1.1
 testing.postgresql==1.3.0
 tox==3.5.3
 bumpversion==0.5.3
