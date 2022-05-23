@@ -3,7 +3,7 @@ requests==2.27.1
 scikit-learn==1.1.1
 scipy==1.8.1
 nltk==3.2.5 # pyup: ignore
-pytest==3.10.1
+pytest==7.1.2
 Elasticsearch==6.3.1
 gensim==3.6.0 # pyup: ignore
 annoy==1.14.0
