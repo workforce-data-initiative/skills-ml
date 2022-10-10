@@ -11,7 +11,7 @@ unicodecsv==0.14.1
 us==2.0.2
 Sqlalchemy==1.4.41
 geocoder==1.38.1
-psycopg2==2.7.6.1
+psycopg2==2.9.4
 alembic==1.0.2
 retrying==1.3.3
 fiona==1.8.0
