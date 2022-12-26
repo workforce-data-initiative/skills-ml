@@ -12,7 +12,7 @@ us==2.0.2
 Sqlalchemy==1.4.45
 geocoder==1.38.1
 psycopg2==2.9.5
-alembic==1.0.2
+alembic==1.9.1
 retrying==1.3.3
 fiona==1.8.0
 shapely==1.6.4.post2
