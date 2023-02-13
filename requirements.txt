@@ -8,7 +8,7 @@ Elasticsearch==8.6.1
 gensim==3.6.0 # pyup: ignore
 annoy==1.17.1
 unicodecsv==0.14.1
-us==1.0.0
+us==2.0.2
 Sqlalchemy==1.2.14
 geocoder==1.38.1
 psycopg2==2.7.6.1
