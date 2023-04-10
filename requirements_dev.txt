@@ -2,7 +2,7 @@ codecov==2.1.12
 httpretty==1.1.4
 freezegun==1.2.2
 mock==5.0.1
-moto==1.3.7
+moto==4.1.6
 pytest-cov==2.6.0
 pytest==7.3.0
 testing.postgresql==1.3.0
