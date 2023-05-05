@@ -1,4 +1,4 @@
-BY DOWNLOADING aequitas PROGRAM YOU AGREE TO THE FOLLOWING TERMS OF USE:
+BY DOWNLOADING skills-ml PROGRAM YOU AGREE TO THE FOLLOWING TERMS OF USE:
 
 Copyright ©2018.  The University of Chicago (“Chicago”). All Rights Reserved.
 
