@@ -9,7 +9,7 @@ gensim==3.6.0 # pyup: ignore
 annoy==1.17.3
 unicodecsv==0.14.1
 us==3.1.1
-Sqlalchemy==1.2.14
+Sqlalchemy==2.0.23
 geocoder==1.38.1
 psycopg2==2.7.6.1
 alembic==1.0.2
